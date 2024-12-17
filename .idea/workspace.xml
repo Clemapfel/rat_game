@@ -22,21 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored animations">
-      <change afterPath="$PROJECT_DIR$/battle/~enemy_sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/~entity_sprite.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/~party_sprite.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored entity sprites">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/enemy_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_appeared.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/stunned_particle_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/stunned_particle_animation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -703,15 +692,7 @@
       <workItem from="1733958947216" duration="8190000" />
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
-      <workItem from="1734193768056" duration="51135000" />
-    </task>
-    <task id="LOCAL-01279" summary="stashing before paralellizing sort step">
-      <option name="closed" value="true" />
-      <created>1732745009997</created>
-      <option name="number" value="01279" />
-      <option name="presentableId" value="LOCAL-01279" />
-      <option name="project" value="LOCAL" />
-      <updated>1732745009997</updated>
+      <workItem from="1734193768056" duration="51502000" />
     </task>
     <task id="LOCAL-01280" summary="stashing before parallelizing">
       <option name="closed" value="true" />
@@ -1097,7 +1078,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734375984504</updated>
     </task>
-    <option name="localTasksCounter" value="1328" />
+    <task id="LOCAL-01328" summary="refactored entity sprites">
+      <option name="closed" value="true" />
+      <created>1734388733855</created>
+      <option name="number" value="01328" />
+      <option name="presentableId" value="LOCAL-01328" />
+      <option name="project" value="LOCAL" />
+      <updated>1734388733855</updated>
+    </task>
+    <option name="localTasksCounter" value="1329" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1146,7 +1135,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing kill removes entity from state" />
     <MESSAGE value="stashing before battle scene refactor" />
     <MESSAGE value="scene refactored, kill working" />
     <MESSAGE value="sprite order is now determinstic" />
@@ -1171,7 +1159,8 @@
     <MESSAGE value="stashing metaballs" />
     <MESSAGE value="stashing before reworking animation to query sprite on start" />
     <MESSAGE value="refactored animations" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored animations" />
+    <MESSAGE value="refactored entity sprites" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored entity sprites" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1211,11 +1200,6 @@
           <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
           <line>376</line>
           <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/battle/animations/status_applied.lua</url>
-          <line>4</line>
-          <option name="timeStamp" value="47" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

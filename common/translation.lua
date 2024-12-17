@@ -337,9 +337,6 @@ rt.Translation = rt.initialize_translation({
                 return entity .. "s " .. move .. " lost PP"
             end,
 
-            equip_applied_f = function(entity, equip)
-                return entity .. "s " .. equip .. " activated"
-            end,
 
             consumable_removed_f = function(entity, consumable)
                 return entity .. " lost " .. consumable
@@ -415,6 +412,22 @@ rt.Translation = rt.initialize_translation({
 
             start_battle_f = function()
                 return "start battle"
+            end,
+
+            status_applied_f = function(entity, status)
+                return entity .. "s " .. status .. " activated"
+            end,
+
+            consumable_applied_f = function(entity, consumable)
+                return entity .. "s " .. consumable .. " activated"
+            end,
+
+            equip_applied_f = function(entity, equip)
+                return entity .. "s " .. equip .. " activated"
+            end,
+
+            global_status_applied_f = function(status)
+                return status .. " activated"
             end
         }
     }

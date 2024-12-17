@@ -445,6 +445,7 @@ function bt.BattleScene:create_simulation_environment()
         _push_current_move_user(nil)
         local animation = bt.Animation.STATUS_APPLIED(_scene, status, _get_native(entity_proxy))
         _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.status_applied_f(entity_proxy, status_proxy))
         local out = _scene:invoke(status[callback_id], status_proxy, entity_proxy, ...)
         _pop_current_move_user()
         return out
@@ -472,6 +473,7 @@ function bt.BattleScene:create_simulation_environment()
 
         local animation = bt.Animation.CONSUMABLE_APPLIED(_scene, slot_i, entity)
         _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.consumable_applied_f(holder_proxy, consumable_proxy))
         local out = _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
         _pop_current_move_user()
         return out
@@ -491,6 +493,7 @@ function bt.BattleScene:create_simulation_environment()
         _push_current_move_user(nil)
         local animation = bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status)
         _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.global_status_applied_f(global_status_proxy))
         local out = _scene:invoke(global_status[callback_id], global_status_proxy, ...)
         _pop_current_move_user()
         return out
@@ -511,6 +514,7 @@ function bt.BattleScene:create_simulation_environment()
         _push_current_move_user(nil)
         local animation = bt.Animation.EQUIP_APPLIED(_scene, equip, _get_native(holder_proxy))
         _scene:push_animation(animation)
+        env.append_message(rt.Translation.battle.message.equip_applied_f(holder_proxy, equip_proxy))
         local out = _scene:invoke(equip[callback_id], equip_proxy, holder_proxy, ...)
         _pop_current_move_user()
         return out
@@ -2713,7 +2717,7 @@ function bt.BattleScene:create_simulation_environment()
         local to_remove = {}
 
         -- clear state if present
-        for enemy in values(_state:list_all_enemies()) do
+        for enemy in values(_state:list_all_entities()) do
             table.insert(to_remove, enemy)
             _state:remove_entity(enemy)
         end
@@ -2722,7 +2726,7 @@ function bt.BattleScene:create_simulation_environment()
             _state:remove_global_status(global_status)
         end
 
-        -- spawn
+        -- spawn enemies
         local to_spawn = {}
         local n_enemies = battle:get_n_enemies()
         for enemy_i = 1, n_enemies do
@@ -2747,6 +2751,22 @@ function bt.BattleScene:create_simulation_environment()
             for status in values(battle:get_enemy_statuses(enemy_i)) do
                 table.insert(statuses, bt.create_status_proxy(_scene, status))
             end
+
+            table.insert(to_spawn, {
+                id,
+                moves,
+                consumables,
+                equips,
+                statuses
+            })
+        end
+
+        for ally in values(_state:list_party()) do
+            local id = ally:get_id()
+            local moves = {}
+            local consumables = {}
+            local equips = {}
+            local statuses = {}
 
             table.insert(to_spawn, {
                 id,
