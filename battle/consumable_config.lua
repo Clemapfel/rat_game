@@ -21,6 +21,7 @@ bt.ConsumableConfig = meta.new_type("ConsumableConfig", function(id)
 end, {
     max_n_uses = POSITIVE_INFINITY,
     restore_uses_after_battle = false,
+    is_silent = false,
 
     -- (ConsumableProxy, EntityProxy) -> nil
     on_gained = function(self, holder)

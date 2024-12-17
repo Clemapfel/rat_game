@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored entity sprites">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before refactoring animation node system">
+      <change afterPath="$PROJECT_DIR$/battle/~~~simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable_config.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -692,15 +694,7 @@
       <workItem from="1733958947216" duration="8190000" />
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
-      <workItem from="1734193768056" duration="51502000" />
-    </task>
-    <task id="LOCAL-01280" summary="stashing before parallelizing">
-      <option name="closed" value="true" />
-      <created>1732748499689</created>
-      <option name="number" value="01280" />
-      <option name="presentableId" value="LOCAL-01280" />
-      <option name="project" value="LOCAL" />
-      <updated>1732748499689</updated>
+      <workItem from="1734193768056" duration="57775000" />
     </task>
     <task id="LOCAL-01281" summary="mwe working">
       <option name="closed" value="true" />
@@ -1086,7 +1080,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734388733855</updated>
     </task>
-    <option name="localTasksCounter" value="1329" />
+    <task id="LOCAL-01329" summary="stashing before refactoring animation node system">
+      <option name="closed" value="true" />
+      <created>1734467301020</created>
+      <option name="number" value="01329" />
+      <option name="presentableId" value="LOCAL-01329" />
+      <option name="project" value="LOCAL" />
+      <updated>1734467301020</updated>
+    </task>
+    <option name="localTasksCounter" value="1330" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1135,7 +1137,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before battle scene refactor" />
     <MESSAGE value="scene refactored, kill working" />
     <MESSAGE value="sprite order is now determinstic" />
     <MESSAGE value="stashing swap animation" />
@@ -1160,7 +1161,8 @@
     <MESSAGE value="stashing before reworking animation to query sprite on start" />
     <MESSAGE value="refactored animations" />
     <MESSAGE value="refactored entity sprites" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored entity sprites" />
+    <MESSAGE value="stashing before refactoring animation node system" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before refactoring animation node system" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

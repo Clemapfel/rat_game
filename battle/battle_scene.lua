@@ -409,16 +409,6 @@ function bt.BattleScene:make_inactive()
 end
 
 --- @brief
-function bt.BattleScene:push_animation(...)
-    self._animation_queue:push(...)
-end
-
---- @brief
-function bt.BattleScene:append_animation(...)
-    self._animation_queue:append(...)
-end
-
---- @brief
 function bt.BattleScene:set_priority_order(entities)
     self._priority_queue:reorder(entities)
 end
