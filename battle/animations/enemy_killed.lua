@@ -1,9 +1,9 @@
 --- @class
-bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, entity)
+bt.Animation.ENEMY_KILLED = meta.new_type("ENEMY_KILLED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
 
-    return meta.new(bt.Animation.KILL, {
+    return meta.new(bt.Animation.ENEMY_KILLED, {
         _step_shader = rt.ComputeShader("battle/animations/kill_step.glsl"),
         _render_shader = rt.Shader("battle/animations/kill_render.glsl"),
         _initialize_shader = rt.ComputeShader("battle/animations/kill_initialize.glsl"),
@@ -29,7 +29,7 @@ bt.Animation.KILL = meta.new_type("KILL", rt.Animation, function(scene, entity)
 end)
 
 --- @brief [internal]
-function bt.Animation.KILL:_dispatch(shader)
+function bt.Animation.ENEMY_KILLED:_dispatch(shader)
     shader:dispatch(
         self._target_aabb.width / self._pixel_size,
         self._target_aabb.height / self._pixel_size
@@ -37,7 +37,7 @@ function bt.Animation.KILL:_dispatch(shader)
 end
 
 --- @brief
-function bt.Animation.KILL:start()
+function bt.Animation.ENEMY_KILLED:start()
     self._target = self._scene:get_sprite(self._entity)
 
     local pixel_size = self._pixel_size
@@ -92,12 +92,12 @@ function bt.Animation.KILL:start()
 end
 
 --- @override
-function bt.Animation.KILL:finish()
+function bt.Animation.ENEMY_KILLED:finish()
     self._target:set_is_visible(true)
 end
 
 --- @override
-function bt.Animation.KILL:draw(delta)
+function bt.Animation.ENEMY_KILLED:draw(delta)
     self._render_shader:bind()
     self._render_shader:send("position_texture", self._position_texture)
     self._render_shader:send("color_texture", self._color_texture)
@@ -110,7 +110,7 @@ function bt.Animation.KILL:draw(delta)
 end
 
 --- @override
-function bt.Animation.KILL:update(delta)
+function bt.Animation.ENEMY_KILLED:update(delta)
     --delta = clamp(delta, 0, 1 / 60)
     self._elapsed = self._elapsed + delta
 

@@ -2155,14 +2155,7 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     -- init valid entity IDs
-    local _valid_entity_ids = {}
-    for _, name in pairs(love.filesystem.getDirectoryItems(rt.settings.battle.entity.config_path)) do
-        if string.match(name, "%.lua$") ~= nil then
-            local id = string.gsub(name, "%.lua$", "")
-            env[entity_prefix .. "_" .. id] = id
-            _valid_entity_ids[id] = true
-        end
-    end
+
 
     local _spawn = function(
         entity_id,
@@ -2434,7 +2427,6 @@ function bt.BattleScene:create_simulation_environment()
             value = value + consumable:get_damage_received_offset()
         end
 
-        value = value - env.get_defense(defending_entity_proxy) -- TODO?
 
         value = math.ceil(value)
         if value < 1 then value = 1 end

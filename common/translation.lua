@@ -394,6 +394,10 @@ rt.Translation = rt.initialize_translation({
                 return entity .. " was knocked out"
             end,
 
+            helped_up_f = function(entity)
+                return entity .. " is no longer knocked out"
+            end,
+
             swap_f = function(entity_a, entity_b)
                 return entity_a .. " and " .. entity_b .. " swapped places"
             end,
@@ -428,6 +432,18 @@ rt.Translation = rt.initialize_translation({
 
             global_status_applied_f = function(status)
                 return status .. " activated"
+            end,
+
+            enemy_spawned_f = function(entity)
+                return entity .. " appeared"
+            end,
+
+            ally_spawned_f = function(entity)
+                return nil
+            end,
+
+            move_used_f = function(entity, move)
+                return entity .. " used " .. move
             end
         }
     }

@@ -1,15 +1,15 @@
-rt.settings.battle.animations.revive = {
+rt.settings.battle.animations.entity_revived = {
     duration = 6,
     n_particles = 16
 }
 
---- @class bt.Animation.REVIVE
-bt.Animation.REVIVE = meta.new_type("REVIVE", rt.Animation, function(scene, entity)
+--- @class bt.Animation.ENTITY_REVIVED
+bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(entity, bt.Entity)
 
-    local settings = rt.settings.battle.animations.revive
-    return meta.new(bt.Animation.REVIVE, {
+    local settings = rt.settings.battle.animations.entity_revived
+    return meta.new(bt.Animation.ENTITY_REVIVED, {
         _scene = scene,
         _entity = entity,
         _sprite = nil,
@@ -53,7 +53,7 @@ do
     local _particle_mesh = nil
 
     --- @override
-    function rt.Animation.REVIVE:start()
+    function rt.Animation.ENTITY_REVIVED:start()
         local x, y, w, h = rt.aabb_unpack(self._scene:get_bounds())
         local sprite_x, sprite_y = self._sprite:get_position()
         local sprite_w, sprite_h = self._sprite:get_size()
@@ -171,12 +171,12 @@ do
 end
 
 --- @override
-function bt.Animation.REVIVE:finish()
+function bt.Animation.ENTITY_REVIVED:finish()
     self._sprite:set_opacity(1)
 end
 
 --- @override
-function bt.Animation.REVIVE:update(delta)
+function bt.Animation.ENTITY_REVIVED:update(delta)
     self._shadow_fade_in_animation:update(delta)
     self._shadow:set_opacity(self._shadow_fade_in_animation:get_value())
 
@@ -210,7 +210,7 @@ function bt.Animation.REVIVE:update(delta)
         self._after_descend_hold:update(delta)
     end
 
-    local gravity = rt.settings.battle.animations.revive.particle_gravity
+    local gravity = rt.settings.battle.animations.entity_revived.particle_gravity
     for particle in values(self._particles) do
         local _, particle_y = self._particle_path:at(self._particle_path_animation:get_value() * particle.mass)
         particle.y = particle_y
@@ -226,7 +226,7 @@ function bt.Animation.REVIVE:update(delta)
 end
 
 --- @override
-function bt.Animation.REVIVE:draw()
+function bt.Animation.ENTITY_REVIVED:draw()
     self._shadow:draw()
     if  self._shadow_fade_in_animation:get_is_done() and
         self._before_light_hold:get_is_done()
