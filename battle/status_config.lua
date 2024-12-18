@@ -50,7 +50,6 @@ end, {
     is_stun = false, -- Boolean
 
     max_duration = POSITIVE_INFINITY,
-    is_silent = false,
 
     -- (StatusProxy, EntityProxy) -> nil
     on_gained = function(self, afflicted)
@@ -259,7 +258,6 @@ function bt.StatusConfig:realize()
         animation_id = rt.STRING,
         name = rt.STRING,
         max_duration = rt.UNSIGNED,
-        is_silent = rt.BOOLEAN,
         is_stun = rt.BOOLEAN
     }
 
@@ -311,11 +309,6 @@ end
 --- @brief
 function bt.StatusConfig:get_max_duration()
     return self.max_duration
-end
-
---- @brief
-function bt.StatusConfig:get_is_silent()
-    return self.is_silent
 end
 
 --- @brief

@@ -21,7 +21,6 @@ bt.ConsumableConfig = meta.new_type("ConsumableConfig", function(id)
 end, {
     max_n_uses = POSITIVE_INFINITY,
     restore_uses_after_battle = false,
-    is_silent = false,
 
     -- (ConsumableProxy, EntityProxy) -> nil
     on_gained = function(self, holder)
@@ -232,7 +231,6 @@ function bt.ConsumableConfig:realize()
         sprite_id = rt.STRING,
         sprite_index = { rt.UNSIGNED, rt.STRING },
         max_n_uses = rt.UNSIGNED,
-        is_silent = rt.BOOLEAN,
     }
 
     for key in values(functions) do
@@ -265,11 +263,6 @@ end
 --- @brief
 function bt.ConsumableConfig:get_sprite_id()
     return self.sprite_id, self.sprite_index
-end
-
---- @brief
-function bt.ConsumableConfig:get_is_silent()
-    return self.is_silent
 end
 
 --- @brief

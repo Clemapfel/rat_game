@@ -20,7 +20,6 @@ bt.GlobalStatusConfig = meta.new_type("GlobalStatus", function(id)
     return out
 end, {
     max_duration = POSITIVE_INFINITY,
-    is_silent = false,
 
     description = rt.Translation.battle.global_status_default_description,
     flavor_text = rt.Translation.battle.global_status_default_flavor_text,
@@ -208,8 +207,7 @@ function bt.GlobalStatusConfig:realize()
         sprite_index = { rt.UNSIGNED, rt.STRING },
         id = rt.STRING,
         name = rt.STRING,
-        max_duration = rt.UNSIGNED,
-        is_silent = rt.BOOLEAN
+        max_duration = rt.UNSIGNED
     }
 
     for key in values(functions) do
@@ -237,11 +235,6 @@ end
 --- @brief
 function bt.GlobalStatusConfig:get_name()
     return self.name
-end
-
---- @brief
-function bt.GlobalStatusConfig:get_is_silent()
-    return self.is_silent
 end
 
 --- @brief

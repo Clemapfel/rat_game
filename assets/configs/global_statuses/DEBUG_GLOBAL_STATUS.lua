@@ -6,7 +6,6 @@ return {
     sprite_id = "global_statuses",
     sprite_index = "DEBUG_GLOBAL_STATUS",
 
-    is_silent = false,
     max_duration = POSITIVE_INFINITY,
 
     on_gained = function(self, entities)

@@ -22,17 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing refactoring">
-      <change afterPath="$PROJECT_DIR$/battle/animations/ally_helped_up.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/ally_killed.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/ally_knocked_out.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/battle/animations/enemy_helped_up.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/kill.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/enemy_killed.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/revive.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/entity_revived.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/DEBUG_GLOBAL_STATUS.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/global_statuses/RAIN.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/global_statuses/RAIN.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/consumable_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/consumable_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/equip_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/equip_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/global_status_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status_config.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~~~simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~~~simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/status_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/status_config.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -699,15 +697,7 @@
       <workItem from="1733958947216" duration="8190000" />
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
-      <workItem from="1734193768056" duration="62358000" />
-    </task>
-    <task id="LOCAL-01282" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1732753186870</created>
-      <option name="number" value="01282" />
-      <option name="presentableId" value="LOCAL-01282" />
-      <option name="project" value="LOCAL" />
-      <updated>1732753186870</updated>
+      <workItem from="1734193768056" duration="65031000" />
     </task>
     <task id="LOCAL-01283" summary="stashing before reworking mesh ring">
       <option name="closed" value="true" />
@@ -1093,7 +1083,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734474342051</updated>
     </task>
-    <option name="localTasksCounter" value="1331" />
+    <task id="LOCAL-01331" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1734549769447</created>
+      <option name="number" value="01331" />
+      <option name="presentableId" value="LOCAL-01331" />
+      <option name="project" value="LOCAL" />
+      <updated>1734549769447</updated>
+    </task>
+    <option name="localTasksCounter" value="1332" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1149,7 +1147,6 @@
     <MESSAGE value="turn start end working" />
     <MESSAGE value="stashing scene before indexed sprite rework" />
     <MESSAGE value="added shader" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing cool noise" />
     <MESSAGE value="game over vignette done" />
     <MESSAGE value="stat changed up working" />
@@ -1167,7 +1164,8 @@
     <MESSAGE value="refactored entity sprites" />
     <MESSAGE value="stashing before refactoring animation node system" />
     <MESSAGE value="stashing refactoring" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing refactoring" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

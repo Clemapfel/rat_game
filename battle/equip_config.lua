@@ -29,8 +29,6 @@ end, {
     defense_base_factor = 1,
     speed_base_factor = 1,
 
-    is_silent = false,
-
     -- (EquipProxy, EntityProxy) -> nil
     effect = nil,
 
@@ -50,7 +48,6 @@ function bt.EquipConfig:realize()
     local template = {
         id = rt.STRING,
         name = rt.STRING,
-        is_silent = rt.BOOLEAN,
         description = rt.STRING,
         flavor_text = rt.STRING,
         sprite_id = rt.STRING,

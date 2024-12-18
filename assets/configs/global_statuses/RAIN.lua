@@ -6,6 +6,5 @@ return {
     sprite_id = "global_statuses",
     sprite_index = "RAIN",
 
-    is_silent = false,
     max_duration = 5,
 }
