@@ -50,19 +50,20 @@ rt.GameState = meta.new_type("GameState", function()
         keybinding = {}, -- Table<rt.InputButton, Table<Union<rt.GamepadButton, rt.KeyboardKey>>>
 
         -- battle
-        n_entities = 0,
         entity_id_to_multiplicity = {},
         entity_id_to_index = {},
         entities = {},
+        global_statuses = {},
         turn_i = 1,
         quicksave = nil,
 
-        global_statuses = {},
+        -- inventory
         shared_moves = {},
         shared_equips = {},
         shared_consumables = {},
 
         template_id_counter = 0,
+        active_template_id = "default",
         templates = {}
     }
 

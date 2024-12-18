@@ -139,9 +139,9 @@ function mn.InventoryScene:create_from_state(state)
 
     self._entity_tab_bar:clear()
 
-    local entities = self._state:list_party()
+    local entities = self._state:active_template_list_party()
     table.sort(entities, function(a, b)
-        return self._state:entity_get_party_index(a) < self._state:entity_get_party_index(b)
+        return self._state:active_template_get_entity_index(a) < self._state:active_template_get_entity_index(b)
     end)
 
     for entity_i, entity in ipairs(entities) do
@@ -154,7 +154,7 @@ function mn.InventoryScene:create_from_state(state)
         local move_layout = {}
         do
             -- split into rows of 4
-            local n_move_slots = self._state:entity_get_n_move_slots(entity)
+            local n_move_slots = self._state:active_template_get_n_move_slots(entity)
             table.insert(move_layout, {})
             for i = 1, n_move_slots do
                 table.insert(move_layout[#move_layout], mn.SlotType.MOVE)
@@ -164,12 +164,12 @@ function mn.InventoryScene:create_from_state(state)
             end
 
             -- single row
-            local n_equips = self._state:entity_get_n_equip_slots(entity)
+            local n_equips = self._state:active_template_get_n_equip_slots(entity)
             for i = 1, n_equips do
                 table.insert(equip_consumable_layout, mn.SlotType.EQUIP)
             end
 
-            for i = 1, self._state:entity_get_n_consumable_slots(entity) do
+            for i = 1, self._state:active_template_get_n_consumable_slots(entity) do
                 table.insert(equip_consumable_layout, mn.SlotType.CONSUMABLE)
             end
         end
@@ -177,26 +177,26 @@ function mn.InventoryScene:create_from_state(state)
         local page = {
             entity = entity,
             info = mn.EntityInfo(
-                self._state:entity_get_hp(entity),
-                self._state:entity_get_attack(entity),
-                self._state:entity_get_defense(entity),
-                self._state:entity_get_speed(entity)
+                self._state:active_template_get_hp(entity),
+                self._state:active_template_get_attack(entity),
+                self._state:active_template_get_defense(entity),
+                self._state:active_template_get_speed(entity)
             ),
             equips_and_consumables = mn.Slots({equip_consumable_layout}),
             moves = mn.Slots(move_layout)
         }
 
-        local n_moves, moves = self._state:entity_list_move_slots(entity)
+        local n_moves, moves = self._state:active_template_list_move_slots(entity)
         for i = 1, n_moves do
             page.moves:set_object(i, moves[i])
         end
         
-        local n_equips, equips = self._state:entity_list_equip_slots(entity)
+        local n_equips, equips = self._state:active_template_list_equip_slots(entity)
         for i = 1, n_equips do
             page.equips_and_consumables:set_object(i, equips[i])
         end
         
-        local n_consumables, consumables = self._state:entity_list_consumable_slots(entity)
+        local n_consumables, consumables = self._state:active_template_list_consumable_slots(entity)
         for i = 1, n_consumables do
             page.equips_and_consumables:set_object(i + n_equips, consumables[i])
         end
@@ -547,7 +547,7 @@ end
 --- @brief
 function mn.InventoryScene:_set_entity_index(entity_i)
     self._entity_index = entity_i
-    local n = self._state:get_n_party()
+    local n = self._state:active_template_get_party_size()
     for i = 1, n do
         self._entity_tab_bar:set_tab_active(i, i == self._entity_index)
     end
@@ -601,7 +601,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     table.sort(entity_tab_nodes, function(a, b) return a:get_bounds().y < b:get_bounds().y end)
 
     local entity_page_nodes = {}
-    local n_entities = self._state:get_n_party()
+    local n_entities = self._state:active_template_get_party_size()
     for entity_i = 1, n_entities do
         local page = self._entity_pages[entity_i]
         local info_node = rt.SelectionGraphNode(page.info:get_bounds())
@@ -664,19 +664,19 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local current_entity = scene:_get_current_entity()
         if scene._shared_list_index == scene.shared_move_list_index then
             -- inventory full
-            if scene._state:entity_get_first_free_move_slot(current_entity) == nil then
+            if scene._state:active_template_get_first_free_move_slot(current_entity) == nil then
                 return false
             end
 
             -- or more already present
             local selected_move = scene._shared_move_list:get_selected_object()
-            return not scene._state:entity_has_move(current_entity, selected_move)
+            return not scene._state:active_template_has_move(current_entity, selected_move)
         elseif scene._shared_list_index == scene.shared_equip_list_index then
             -- inventory full
-            return scene._state:entity_get_first_free_equip_slot(current_entity) ~= nil
+            return scene._state:active_template_get_first_free_equip_slot(current_entity) ~= nil
         elseif scene._shared_list_index == scene.shared_consumable_list_index then
             -- inventory full
-            return scene._state:entity_get_first_free_consumable_slot(current_entity) ~= nil
+            return scene._state:active_template_get_first_free_consumable_slot(current_entity) ~= nil
         else
             return false
         end
@@ -702,7 +702,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_move(entity, slot_i)
+        local down = scene._state:active_template_get_move(entity, slot_i)
 
         return up == nil and down ~= nil
     end
@@ -711,7 +711,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_equip(entity, slot_i)
+        local down = scene._state:active_template_get_equip(entity, slot_i)
 
         return up == nil and down ~= nil
     end
@@ -719,8 +719,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_take = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
-        local down = scene._state:entity_get_consumable(entity, slot_i)
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:active_template_get_n_equip_slots(entity)
+        local down = scene._state:active_template_get_consumable(entity, slot_i)
 
         return up == nil and down ~= nil
     end
@@ -733,8 +733,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local grabbed = scene._state:peek_grabbed_object()
         if grabbed == nil or not meta.isa(grabbed, bt.MoveConfig) then return false end
 
-        local slot_is_free = scene._state:entity_get_move(entity, slot_i) == nil
-        local entity_has_move = scene._state:entity_has_move(entity, grabbed)
+        local slot_is_free = scene._state:active_template_get_move(entity, slot_i) == nil
+        local entity_has_move = scene._state:active_template_has_move(entity, grabbed)
         return slot_is_free and not entity_has_move
     end
 
@@ -746,34 +746,34 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local grabbed = scene._state:peek_grabbed_object()
         if grabbed == nil or not meta.isa(grabbed, bt.EquipConfig) then return false end
 
-        return scene._state:entity_get_equip(entity, slot_i) == nil
+        return scene._state:active_template_get_equip(entity, slot_i) == nil
     end
 
     local consumable_slot_allow_deposit = function()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_consumable_slots(entity)
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:active_template_get_n_consumable_slots(entity)
         if slot_i == nil then return false end
 
         local grabbed = scene._state:peek_grabbed_object()
         if grabbed == nil or not meta.isa(grabbed, bt.ConsumableConfig) then return false end
 
-        return scene._state:entity_get_consumable(entity, slot_i) == nil
+        return scene._state:active_template_get_consumable(entity, slot_i) == nil
     end
 
     local move_slot_allow_swap = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_move(entity, slot_i)
+        local down = scene._state:active_template_get_move(entity, slot_i)
 
-        return meta.isa(up, bt.MoveConfig) and down ~= nil and (not scene._state:entity_has_move(entity, down))
+        return meta.isa(up, bt.MoveConfig) and down ~= nil and (not scene._state:active_template_has_move(entity, down))
     end
 
     local equip_slot_allow_swap = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_equip(entity, slot_i)
+        local down = scene._state:active_template_get_equip(entity, slot_i)
 
         return meta.isa(up, bt.EquipConfig) and down ~= nil
     end
@@ -781,8 +781,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_swap = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
-        local down = scene._state:entity_get_consumable(entity, slot_i)
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:active_template_get_n_equip_slots(entity)
+        local down = scene._state:active_template_get_consumable(entity, slot_i)
 
         return meta.isa(up, bt.ConsumableConfig) and down ~= nil
     end
@@ -791,7 +791,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_move(entity, slot_i)
+        local down = scene._state:active_template_get_move(entity, slot_i)
         return up ~= nil or down ~= nil
     end
 
@@ -799,7 +799,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_equip(entity, slot_i)
+        local down = scene._state:active_template_get_equip(entity, slot_i)
 
         return up ~= nil or down ~= nil
     end
@@ -807,8 +807,8 @@ function mn.InventoryScene:_regenerate_selection_nodes()
     local consumable_slot_allow_unequip = function()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
-        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:entity_get_n_equip_slots(entity)
-        local down = scene._state:entity_get_consumable(entity, slot_i)
+        local slot_i = scene._selection_graph:get_current_node().slot_i - self._state:active_template_get_n_equip_slots(entity)
+        local down = scene._state:active_template_get_consumable(entity, slot_i)
 
         return up ~= nil or down ~= nil
     end
@@ -965,7 +965,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_move(entity, slot_i)
+        local down = scene._state:active_template_get_move(entity, slot_i)
         local name = move_name
 
         local translation = rt.Translation.inventory_scene
@@ -1010,7 +1010,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_equip(entity, slot_i)
+        local down = scene._state:active_template_get_equip(entity, slot_i)
         local translation = rt.Translation.inventory_scene
 
         local a_label
@@ -1053,7 +1053,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         local up = scene._state:peek_grabbed_object()
         local entity = scene:_get_current_entity()
         local slot_i = scene._selection_graph:get_current_node().slot_i
-        local down = scene._state:entity_get_consumable(entity, slot_i - self._state:entity_get_n_equip_slots(entity))
+        local down = scene._state:active_template_get_consumable(entity, slot_i - self._state:active_template_get_n_equip_slots(entity))
         local translation = rt.Translation.inventory_scene
 
         local a_label
@@ -1100,7 +1100,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
         end
 
         local entity = scene._entity_pages[page_i].entity
-        local n_equip_slots = self._state:entity_get_n_equip_slots(entity)
+        local n_equip_slots = self._state:active_template_get_n_equip_slots(entity)
         for slot_i, node in ipairs(node_page.slot_nodes) do
             if slot_i <= n_equip_slots then
                 node:set_control_layout(equip_node_control_layout)
@@ -1441,7 +1441,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                 slots:set_selection_state(rt.SelectionState.ACTIVE)
                 slots:set_slot_selection_state(node_i, rt.SelectionState.ACTIVE)
 
-                local object = scene._state:entity_get_move(page.entity, node_i)
+                local object = scene._state:active_template_get_move(page.entity, node_i)
                 if object == nil and not scene._state:has_grabbed_object() then
                     scene:_set_verbose_info_object(rt.VerboseInfoObject.MOVE)
                 else
@@ -1465,18 +1465,18 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                 local page = scene._entity_pages[page_i]
 
                 local up = scene._state:peek_grabbed_object()
-                local down = scene._state:entity_get_move(page.entity, node_i)
+                local down = scene._state:active_template_get_move(page.entity, node_i)
 
                 if up ~= nil and down == nil and move_slot_allow_deposit() then
                     scene._state:take_grabbed_object()
-                    scene._state:entity_add_move(page.entity, node_i, up)
+                    scene._state:active_template_add_move(page.entity, node_i, up)
 
                     page.moves:set_object(node_i, up)
                     scene:_update_grabbed_object()
                     scene._undo_grab = function() end
                 elseif up == nil and down ~= nil and move_slot_allow_take() then
                     scene._state:set_grabbed_object(down)
-                    scene._state:entity_remove_move(page.entity, node_i)
+                    scene._state:active_template_remove_move(page.entity, node_i)
 
                     page.moves:set_object(node_i, nil)
                     scene:_update_grabbed_object()
@@ -1484,7 +1484,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
                     scene._undo_grab = function()
                         scene:_set_entity_index(page_i)
-                        scene._state:entity_add_move(page.entity, node_i, down)
+                        scene._state:active_template_add_move(page.entity, node_i, down)
                         scene._state:take_grabbed_object()
                         scene:_play_transfer_object_animation(
                             down,
@@ -1492,17 +1492,17 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                             page.moves:get_slot_aabb(node_i),
                             function() end,
                             function()
-                                page.moves:set_object(node_i, scene._state:entity_get_move(page.entity, node_i))
+                                page.moves:set_object(node_i, scene._state:active_template_get_move(page.entity, node_i))
                                 scene:_update_grabbed_object()
                             end
                         )
                     end
                 elseif up ~= nil and down ~= nil and move_slot_allow_swap() then
                     local new_equipped = scene._state:take_grabbed_object()
-                    local new_grabbed = scene._state:entity_remove_move(page.entity, node_i)
+                    local new_grabbed = scene._state:active_template_remove_move(page.entity, node_i)
 
                     scene._state:set_grabbed_object(new_grabbed)
-                    scene._state:entity_add_move(page.entity, node_i, new_equipped)
+                    scene._state:active_template_add_move(page.entity, node_i, new_equipped)
 
                     page.moves:set_object(node_i, new_equipped)
                     scene:_update_grabbed_object()
@@ -1510,7 +1510,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
                     scene._undo_grab = function()
                         scene:_set_entity_index(page_i)
-                        scene._state:entity_add_move(page.entity, node_i, new_grabbed)
+                        scene._state:active_template_add_move(page.entity, node_i, new_grabbed)
                         scene._state:set_grabbed_object(new_equipped)
                         scene:_play_transfer_object_animation(
                             down,
@@ -1520,7 +1520,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                                 page.moves:set_object(node_i, nil)
                             end,
                             function()
-                                page.moves:set_object(node_i, scene._state:entity_get_move(page.entity, node_i))
+                                page.moves:set_object(node_i, scene._state:active_template_get_move(page.entity, node_i))
                                 scene:_update_grabbed_object()
                             end
                         )
