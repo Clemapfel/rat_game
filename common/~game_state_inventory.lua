@@ -32,6 +32,12 @@
     template_id_counter
 ]]--
 
+
+--- @brief
+function rt.GameState:get_active_template()
+    return self._state.active_template_id
+end
+
 --- @brief
 function rt.GameState:set_active_template(id)
     meta.assert_string(id)
@@ -41,31 +47,36 @@ function rt.GameState:set_active_template(id)
     self._state.active_template_id = id
 end
 
-function rt.GameState:_get_template(id)
-    local template = self._state.templates[id]
-    if template == nil then
-        rt.error("In rt.GameState:_get_template: no template with id `" .. id .. "`")
-    end
-    return template
+function rt.GameState:_get_active_template()
+    local out = self._state.templates[self._state.active_template_id]
+    assert(out ~= nil)
+    return out
 end
 
-function rt.GameState:_template_get_entity_entry(template_id, entity)
-    meta.assert_string(template_id)
+function rt.GameState:_active_template_get_entity_entry(entity)
     meta.assert_isa(entity, bt.Entity)
-    local template = self._state.templates[template_id]
-    if template == nil then
-        rt.error("In rt.GameState:_template_get_entity_entry: no template with id `" .. template_id .. "`")
-        return nil
-    end
-
+    local template = self:_get_active_template()
     for i, entry in pairs(template.party) do
         if entry.id == entity:get_id() then
             return entry, i
         end
     end
-
-    rt.error("In rt.GameState:_template_get_entity_entry: template `" .. template_id .. "` does not have entity `" .. entity:get_id() .. "`")
     return nil
+end
+
+--- @brief
+function rt.GameState:active_template_list_party()
+    return self:template_list_party(self._state.active_template_id)
+end
+
+--- @brief
+function rt.GameState:active_template_get_entity_index(entity)
+    local entry, i = self:_active_template_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState.active_template_get_party_index: entity `" .. entity:get_id() .. "` is not present in template `" .. self:_get_active_template().name .. "`")
+        return 0
+    end
+    return i
 end
 
 --- @brief
@@ -78,28 +89,8 @@ function rt.GameState:list_templates()
 end
 
 --- @brief
-function rt.GameState:template_list_party(id)
-    local template = self:_get_template(id)
-    local out = {}
-    for entry in values(template.party) do
-        table.insert(out, bt.Entity(bt.EntityConfig(entry.id), 1))
-    end
-    return out
-end
-
---- @brief
-function rt.GameState:template_get_party_index(id, entity)
-    local entry, i = self:_template_get_entity_entry(id, entity)
-    if entry == nil then
-        rt.error("In rt.GameState.active_template_get_party_index: entity `" .. entity:get_id() .. "` is not present in template `" .. self:_get_template(id).name .. "`")
-        return 0
-    end
-    return i
-end
-
---- @brief
-function rt.GameState:template_get_party_size(id)
-    return sizeof(self:template_list_party(id))
+function rt.GameState:active_template_get_party_size()
+    return sizeof(self:_get_active_template().party)
 end
 
 for which_type in range(
@@ -110,13 +101,18 @@ for which_type in range(
     local which, type = table.unpack(which_type)
 
     --- @brief template_get_n_move_slots, template_get_n_equip_slots, template_get_n_consumable_slots
-    rt.GameState["template_get_n_" .. which .. "_slots"] = function(self, id, entity)
-        return self:_template_get_entity_entry(id, entity)["n_" .. which .. "_slots"]
+    rt.GameState["template_get_n_" .. which .. "_slots"] = function(self, entity)
+        return self:_active_template_get_entity_entry(entity)["n_" .. which .. "_slots"]
     end
 
-    --- @brief template_list_move_slots, template_list_equip_slots, template_list_consumable_slots
-    rt.GameState["template_list_" .. which .. "_slots"] = function(self, id, entity)
-        local entry = self:_template_get_entity_entry(id, entity)
+    --- @brief active_template_get_n_move_slots, active_template_get_n_equip_slots, active_template_get_n_consumable_slots
+    rt.GameState["active_template_get_n_" .. which .. "_slots"] = function(self, entity)
+        return self["template_get_n_" .. which .. "_slots"]
+    end
+
+    --- @brief active_template_list_move_slots, active_template_list_equip_slots, active_template_list_consumable_slots
+    rt.GameState["active_template_list_" .. which .. "_slots"] = function(self, entity)
+        local entry = self:_active_template_get_entity_entry(entity)
         local out = {}
         local n = entry["n_" .. which .. "_slots"]
         for i = 1, n do
@@ -129,43 +125,42 @@ for which_type in range(
         return n, out
     end
 
-    --- @brief template_get_move, template_get_equip, template_get_consumable
-    rt.GameState["template_get_" .. which] = function(self, id, entity, slot_i)
+    --- @brief active_template_get_move, active_template_get_equip, active_template_get_consumable
+    rt.GameState["active_template_get_" .. which] = function(self, entity, slot_i)
         meta.assert_number(slot_i)
-        local entry = self:_template_get_entity_entry(id, entity)
+        local entry = self:_active_template_get_entity_entry(entity)
         local n = entry["n_" .. which .. "_slots"]
-        if slot_i > n then return nil end
+        if slot_i > n then
+            rt.error("In rt.GameState.active_template_get_" .. which .. ": slot index `" .. slot_i .. "` is out of range for entity `" .. entry.id .. "` which has `" .. n .. "` slots")
+        end
         local id = entry[which .. "s"][slot_i]
         if id == nil then return nil else return type(id) end
     end
 
-    --- @brief template_get_first_free_move_slot, template_get_first_free_equip_slot, template_get_first_free_consumable_slot
-    rt.GameState["template_get_first_free_" .. which .. "_slot"] = function(self, id, entity)
-        local entry = self:_template_get_entity_entry(id, entity)
+    --- @brief active_template_get_first_free_move_slot, active_template_get_first_free_equip_slot, active_template_get_first_free_consumable_slot
+    rt.GameState["active_template_get_first_free_" .. which .. "_slot"] = function(self, entity)
+        local entry = self:_active_template_get_entity_entry(entity)
         for i = 1, entry["n_" .. which .. "_slots"] do
             if entry[which .. "s"][i] == nil then return i end
         end
         return nil
     end
 
-    --- @brief template_has_move, template_has_equip, template_has_consumable
-    rt.GameState["template_has_" .. which] = function(self, id, entity, object)
-        local entry = self:_template_get_entity_entry(id, entity)
+    --- @brief active_template_has_move, active_template_has_equip, active_template_has_consumable
+    rt.GameState["active_template_has_" .. which] = function(self, entity, object)
+        local entry = self:_active_template_get_entity_entry(entity)
         for i = 1, entry["n_" .. which .. "_slots"] do
-            local other = entry[which .. "s"][i]
-            if other ~= nil and other.id == object:get_id() then
+            if entry[which .. "s"][i].id == object:get_id() then
                 return true
             end
         end
         return false
     end
 
-    --- @brief template_add_move, template_add_equip, template_add_consumable
-    rt.GameState["template_add_" .. which] = function(self, id, entity, slot_i, object)
+    --- @brief active_template_add_move, active_template_add_equip, active_template_add_consumable
+    rt.GameState["active_template_add_" .. which] = function(self, entity, slot_i, object)
         meta.assert_number(slot_i)
-        meta.assert_isa(entity, bt.Entity)
-        meta.assert_isa(object, type)
-        local entry = self:_template_get_entity_entry(id, entity)
+        local entry = self:_active_template_get_entity_entry(entity)
         local n = entry["n_" .. which .. "_slots"]
         if slot_i > n then
             rt.error("In rt.GameState.active_template_add_" .. which .. ": slot index `" .. slot_i .. "` is out of range for entity `" .. entry.id .. "` which has `" .. n .. "` slots")
@@ -180,13 +175,18 @@ for which_type in range(
         entry[which .. "s"][slot_i] = object:get_id()
     end
 
-    --- @brief template_remove_move, template_remove_equip, template_remove_consumable
-    rt.GameState["template_remove_" .. which] = function(self, id, entity, slot_i)
+    --- @brief active_template_remove_move, active_template_remove_equip, active_template_remove_consumable
+    rt.GameState["active_template_remove_" .. which] = function(self, entity, slot_i)
         meta.assert_number(slot_i)
-        local entry = self:_template_get_entity_entry(id, entity)
+        local entry = self:_active_template_get_entity_entry(entity)
         local n = entry["n_" .. which .. "_slots"]
         if slot_i > n then
             rt.error("In rt.GameState.active_template_remove_" .. which .. ": slot index `" .. slot_i .. "` is out of range for entity `" .. entry.id .. "` which has `" .. n .. "` slots")
+            return
+        end
+
+        if entry[which .. "s"][slot_i] ~= nil then
+            rt.error("In rt.GameState.active_template_remove_" .. which .. ": slot index `" .. slot_i .. "` of entity `" .. entry.id .. "` already has a " .. which .. " equipped")
             return
         end
 
@@ -197,8 +197,8 @@ for which_type in range(
 end
 
 --- @brief
-function rt.GameState:template_sort(id, entity)
-    local template = self:_get_template(id)
+function rt.GameState:active_template_sort(entity)
+    local template = self:_get_active_template()
     for entry in values(template.party) do
         for which in range(
             "move",
@@ -232,34 +232,34 @@ for which in range(
     "defense",
     "speed"
 ) do
-    --- @brief template_get_hp, template_get_attack, template_get_defense, template_get_speed
-    rt.GameState["template_get_" .. which] = function(self, id, entity)
-        local entry = self:_template_get_entity_entry(id, entity)
-        local config = bt.EntityConfig(entry.id)
+    --- @brief active_template_get_hp, active_template_get_attack, active_template_get_defense, active_template_get_speed
+    rt.GameState["active_template_get_" .. which] = function(self, entity)
+       local entry = self:_active_template_get_entity_entry(entity)
+       local config = bt.EntityConfig(entry.id)
 
-        local value = config[which .. "_base"]
-        for i = 1, entry.n_equip_slots do
-            local equip_id = entry.equips[i]
-            if equip_id ~= nil then
-                local equip_config = bt.EquipConfig(equip_id)
-                value = value * equip_config["get_" .. which .. "_base_factor"](equip_config)
-            end
-        end
+       local value = config[which .. "_base"]
+       for i = 1, entry.n_equip_slots do
+           local equip_id = entry.equips[i]
+           if equip_id ~= nil then
+               local equip_config = bt.EquipConfig(equip_id)
+               value = value * equip_config["get_" .. which .. "_base_factor"](equip_config)
+           end
+       end
 
-        for i = 1, entry.n_equip_slots do
-            local equip_id = entry.equips[i]
-            if equip_id ~= nil then
-                local equip_config = bt.EquipConfig(equip_id)
-                value = value + equip_config["get_" .. which .. "_base_offset"](equip_config)
-            end
-        end
+       for i = 1, entry.n_equip_slots do
+           local equip_id = entry.equips[i]
+           if equip_id ~= nil then
+               local equip_config = bt.EquipConfig(equip_id)
+               value = value + equip_config["get_" .. which .. "_base_offset"](equip_config)
+           end
+       end
 
-        return value
+       return value
     end
 end
 
-function rt.GameState:template_preview_equip(id, entity, slot_i, equip)
-    local entry = self:_template_get_entity_entry(id, entity)
+function rt.GameState:active_template_preview_equip(entity, slot_i, equip)
+    local entry = self:_active_template_get_entity_entry(entity)
 
     if slot_i > entry.n_equip_slots then
         rt.error("In rt.GameState:active_template_preview_equip: equip slot `" .. slot_i .. "` is out of range for entity `" .. entity:get_id() .. "` which has " .. entry.n_equip_slots .. " slots")
@@ -267,11 +267,11 @@ function rt.GameState:template_preview_equip(id, entity, slot_i, equip)
     end
     local before = entry.equips[slot_i]
 
-    entry.equips[slot_i] = equip:get_id()
-    local hp = self:template_get_hp(id, entity)
-    local attack = self:template_get_attack(id, entity)
-    local defense = self:template_get_defense(id, entity)
-    local speed = self:template_get_speed(id, entity)
+    entry.equips[slot_i] = equip
+    local hp = self:active_template_get_hp(entity)
+    local attack = self:active_template_get_attack(entity)
+    local defense = self:active_template_get_defense(entity)
+    local speed = self:active_template_get_speed(entity)
 
     entry.equips[slot_i] = before
     return hp, attack, defense, speed
@@ -314,7 +314,7 @@ do
         end
         return template
     end
-
+    
     function rt.GameState:load_template(id)
         if self:_assert_template_exists("load_template", id) ~= nil then
             self._state.active_template_id = id
@@ -346,6 +346,15 @@ do
             return os.date("%c",  self._state.templates[id].date)
         end
         return ""
+    end
+
+    function rt.GameState:template_list_party(id)
+        local template = self:_assert_template_exists("template_list_entities", id)
+        local out = {}
+        for entry in values(template.party) do
+            table.insert(out, bt.Entity(bt.EntityConfig(entry.id), 1))
+        end
+        return out
     end
 
     function rt.GameState:template_add_entity(id, entity_config, moves, equips, consumables)
@@ -406,49 +415,6 @@ do
 
             to_add.consumables[i] = consumable:get_id()
         end
-    end
-end
-
---- @brief active_template_*
-for which in range(
-    "template_list_party",
-    "template_get_party_index",
-    "template_get_entity_index",
-    "template_get_party_size",
-    "template_get_n_move_slots",
-    "template_get_n_equip_slots",
-    "template_get_n_consumable_slots",
-    "template_list_move_slots",
-    "template_list_equip_slots",
-    "template_list_consumable_slots",
-    "template_get_move",
-    "template_get_equip",
-    "template_get_consumable",
-    "template_get_first_free_move_slot",
-    "template_get_first_free_equip_slot",
-    "template_get_first_free_consumable_slot",
-    "template_has_move",
-    "template_has_equip",
-    "template_has_consumable",
-    "template_add_move",
-    "template_add_equip",
-    "template_add_consumable",
-    "template_remove_move",
-    "template_remove_equip",
-    "template_remove_consumable",
-    "template_sort",
-    "template_get_hp",
-    "template_get_attack",
-    "template_get_defense",
-    "template_get_speed",
-    "template_preview_equip",
-    "template_rename",
-    "template_get_name",
-    "template_get_date",
-    "template_add_entity"
-) do
-    rt.GameState["active_" .. which] = function(self, ...)
-        return self[which](self, self._state.active_template_id, ...)
     end
 end
 
@@ -551,24 +517,6 @@ function rt.GameState:initialize_debug_inventory()
         "DOUBLE_CHERRY"
     }
 
-    for move_id in values(moves) do
-        for i = 1, rt.random.integer(1, 99) do
-            self:add_shared_move(bt.MoveConfig(move_id))
-        end
-    end
-
-    for equip_id in values(equips) do
-        for i = 1, rt.random.integer(1, 99) do
-            self:add_shared_equip(bt.EquipConfig(equip_id))
-        end
-    end
-
-    for consumable_id in values(consumables) do
-        for i = 1, rt.random.integer(1, 99) do
-            self:add_shared_consumable(bt.ConsumableConfig(consumable_id))
-        end
-    end
-
     local entities = {
         bt.EntityConfig("MC"),
         bt.EntityConfig("PROF"),
@@ -634,6 +582,8 @@ function rt.GameState:initialize_debug_inventory()
     self._state.active_template_id = default_template:get_id()
 end
 
+---------------------
+
 --- @brief
 function rt.GameState:set_grabbed_object(object)
     if not (meta.isa(object, bt.MoveConfig) or meta.isa(object, bt.EquipConfig) or meta.isa(object, bt.ConsumableConfig)) then
@@ -672,5 +622,3 @@ end
 function rt.GameState:peek_grabbed_object()
     return self._grabbed_object
 end
-
-

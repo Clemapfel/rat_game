@@ -141,7 +141,7 @@ function mn.InventoryScene:create_from_state(state)
 
     local entities = self._state:active_template_list_party()
     table.sort(entities, function(a, b)
-        return self._state:active_template_get_entity_index(a) < self._state:active_template_get_entity_index(b)
+        return self._state:active_template_get_party_index(a) < self._state:active_template_get_party_index(b)
     end)
 
     for entity_i, entity in ipairs(entities) do
@@ -670,6 +670,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
 
             -- or more already present
             local selected_move = scene._shared_move_list:get_selected_object()
+            if selected_move == nil then return false end
             return not scene._state:active_template_has_move(current_entity, selected_move)
         elseif scene._shared_list_index == scene.shared_equip_list_index then
             -- inventory full
@@ -1668,7 +1669,7 @@ function mn.InventoryScene:_regenerate_selection_nodes()
                     scene:_update_entity_info_preview(node_i)
                 else
                     local up = scene._state:peek_grabbed_object()
-                    local slot_i = node_i - page.self._state:active_template_get_n_equip_slots(entity)
+                    local slot_i = node_i - self._state:active_template_get_n_equip_slots(entity)
                     local down = scene._state:active_template_get_consumable(page.entity, slot_i)
                     if up ~= nil and down == nil and consumable_slot_allow_deposit() then
                         scene._state:take_grabbed_object()
@@ -2121,7 +2122,7 @@ end
 function mn.InventoryScene:_update_entity_info_preview(equip_slot_i)
     local up = self._state:peek_grabbed_object()
     local page = self._entity_pages[self._entity_index]
-    local down = self._state:template_get_equip(page.entity, equip_slot_i)
+    local down = self._state:active_template_get_equip(page.entity, equip_slot_i)
 
     if up ~= nil and meta.isa(up, bt.EquipConfig) then
         page.info:set_preview_values(self._state:active_template_preview_equip(page.entity, equip_slot_i, up))

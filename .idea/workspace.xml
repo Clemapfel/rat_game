@@ -22,19 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing inventory state refactor">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing inventory refactor">
+      <change afterPath="$PROJECT_DIR$/common/~game_state_inventory.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/RAT.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_inventory.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_inventory.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_scene.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -702,15 +695,8 @@
       <workItem from="1734050208171" duration="17043000" />
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
-      <workItem from="1734630565045" duration="6487000" />
-    </task>
-    <task id="LOCAL-01285" summary="refactored vertex shape">
-      <option name="closed" value="true" />
-      <created>1732986076032</created>
-      <option name="number" value="01285" />
-      <option name="presentableId" value="LOCAL-01285" />
-      <option name="project" value="LOCAL" />
-      <updated>1732986076032</updated>
+      <workItem from="1734630565045" duration="7042000" />
+      <workItem from="1734643804197" duration="1937000" />
     </task>
     <task id="LOCAL-01286" summary="stashing before moving away from mesh">
       <option name="closed" value="true" />
@@ -1096,7 +1082,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734566188971</updated>
     </task>
-    <option name="localTasksCounter" value="1334" />
+    <task id="LOCAL-01334" summary="stashing inventory refactor">
+      <option name="closed" value="true" />
+      <created>1734637364899</created>
+      <option name="number" value="01334" />
+      <option name="presentableId" value="LOCAL-01334" />
+      <option name="project" value="LOCAL" />
+      <updated>1734637364899</updated>
+    </task>
+    <option name="localTasksCounter" value="1335" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1145,7 +1139,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="swap working" />
     <MESSAGE value="swap done" />
     <MESSAGE value="turn start end working" />
     <MESSAGE value="stashing scene before indexed sprite rework" />
@@ -1170,7 +1163,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring inventory state to be separate from battle state" />
     <MESSAGE value="stashing inventory state refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing inventory state refactor" />
+    <MESSAGE value="stashing inventory refactor" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing inventory refactor" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
