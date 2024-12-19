@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing inventory refactor">
-      <change afterPath="$PROJECT_DIR$/common/~game_state_inventory.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored templates">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_inventory.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_inventory.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/template.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/template.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -696,15 +695,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="1937000" />
-    </task>
-    <task id="LOCAL-01286" summary="stashing before moving away from mesh">
-      <option name="closed" value="true" />
-      <created>1732992678192</created>
-      <option name="number" value="01286" />
-      <option name="presentableId" value="LOCAL-01286" />
-      <option name="project" value="LOCAL" />
-      <updated>1732992678192</updated>
+      <workItem from="1734643804197" duration="3246000" />
     </task>
     <task id="LOCAL-01287" summary="stashing non-mesh version">
       <option name="closed" value="true" />
@@ -1090,7 +1081,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734637364899</updated>
     </task>
-    <option name="localTasksCounter" value="1335" />
+    <task id="LOCAL-01335" summary="refactored templates">
+      <option name="closed" value="true" />
+      <created>1734646010251</created>
+      <option name="number" value="01335" />
+      <option name="presentableId" value="LOCAL-01335" />
+      <option name="project" value="LOCAL" />
+      <updated>1734646010252</updated>
+    </task>
+    <option name="localTasksCounter" value="1336" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1139,7 +1138,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="swap done" />
     <MESSAGE value="turn start end working" />
     <MESSAGE value="stashing scene before indexed sprite rework" />
     <MESSAGE value="added shader" />
@@ -1164,7 +1162,8 @@
     <MESSAGE value="stashing before refactoring inventory state to be separate from battle state" />
     <MESSAGE value="stashing inventory state refactor" />
     <MESSAGE value="stashing inventory refactor" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing inventory refactor" />
+    <MESSAGE value="refactored templates" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored templates" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

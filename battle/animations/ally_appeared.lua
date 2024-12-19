@@ -1,7 +1,7 @@
 --- @class bt.Animation.ALLY_APPEARED
 bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, function(scene, entity)
     meta.assert_isa(scene, bt.BattleScene)
-    meta.assert_isa(sprite, bt.Entity)
+    meta.assert_isa(entity, bt.Entity)
     local duration = rt.settings.battle.animation.enemy_appeared.duration
     return meta.new(bt.Animation.ALLY_APPEARED, {
         _scene = scene,
@@ -49,10 +49,6 @@ function bt.Animation.ALLY_APPEARED:start()
     )
 
     self._target:set_is_visible(true)
-    self._target:set_health_visible(true)
-    self._target:set_speed_visible(true)
-    self._target:set_status_visible(true)
-
     self._snapshot = rt.RenderTexture(w, h)
 
     love.graphics.push()
@@ -64,17 +60,11 @@ function bt.Animation.ALLY_APPEARED:start()
     love.graphics.pop()
 
     self._target:set_is_visible(false)
-    self._target:set_health_visible(false)
-    self._target:set_speed_visible(false)
-    self._target:set_status_visible(false)
 end
 
 --- @override
 function bt.Animation.ALLY_APPEARED:finish()
     self._target:set_is_visible(true)
-    self._target:set_health_visible(true)
-    self._target:set_speed_visible(true)
-    self._target:set_status_visible(true)
 end
 
 --- @override

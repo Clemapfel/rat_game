@@ -392,6 +392,15 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
+    do -- for entities, only store id
+        for _, name in pairs(love.filesystem.getDirectoryItems(rt.settings.battle.entity.config_path)) do
+            if string.match(name, "%.lua$") ~= nil then
+                local id = string.gsub(name, "%.lua$", "")
+                env[entity_prefix .. "_" .. id] = id
+            end
+        end
+    end
+
     local _get_native = function(x) return getmetatable(x)._native end
 
     local _assert_id_exists = function(scope, id)
@@ -463,7 +472,7 @@ function bt.BattleScene:create_simulation_environment()
         env.message(rt.Translation.battle.message.status_applied_f(entity_proxy, status_proxy))
 
         _push_current_move_user(nil)
-        _scene:invoke(status[callback_id], status_proxy, entity_proxy, ...)
+        _invoke(status[callback_id], status_proxy, entity_proxy, ...)
         _pop_current_move_user()
     end
 
@@ -492,7 +501,7 @@ function bt.BattleScene:create_simulation_environment()
         env.message(rt.Translation.battle.message.consumable_applied_f(holder_proxy, consumable_proxy))
 
         _push_current_move_user(nil)
-        _scene:invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
+        _invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
         _pop_current_move_user()
     end
 
@@ -509,11 +518,11 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _scene:push_animation(bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status))
+        _queue_animation(bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status))
         env.message(rt.Translation.battle.message.global_status_applied_f(global_status_proxy))
 
         _push_current_move_user(nil)
-        _scene:invoke(global_status[callback_id], global_status_proxy, ...)
+        _invoke(global_status[callback_id], global_status_proxy, ...)
         _pop_current_move_user()
     end
 
@@ -532,11 +541,11 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _scene:push_animation(bt.Animation.EQUIP_APPLIED(_scene, equip, _get_native(holder_proxy)))
+        _queue_animation(bt.Animation.EQUIP_APPLIED(_scene, equip, _get_native(holder_proxy)))
         env.message(rt.Translation.battle.message.equip_applied_f(holder_proxy, equip_proxy))
 
         _push_current_move_user(nil)
-        _scene:invoke(equip[callback_id], equip_proxy, holder_proxy, ...)
+        _invoke(equip[callback_id], equip_proxy, holder_proxy, ...)
         _pop_current_move_user()
     end
 
@@ -1254,7 +1263,7 @@ function bt.BattleScene:create_simulation_environment()
                     end
                 end
             elseif before == true and now == false then
-                _scene:push_animation(bt.Animation.OBJECT_ENABLED(_scene, object, entity))
+                _queue_animation(bt.Animation.OBJECT_ENABLED(_scene, object, entity))
                 env.message(rt.Translation.battle.message.object_no_longer_disabled_f(entity_proxy, object_proxy))
                 -- no callbacks on enable
             end
@@ -1502,7 +1511,7 @@ function bt.BattleScene:create_simulation_environment()
             status_proxy, bt.StatusProxy
         )
 
-        if env.is_dead(entity_proxy) or env.is_knocked_out(entity_proxy) then
+        if env.get_is_dead(entity_proxy) or env.get_is_knocked_out(entity_proxy) then
             return
         end
 
@@ -1575,7 +1584,7 @@ function bt.BattleScene:create_simulation_environment()
             _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
-        _scene:push_animation(animation)
+        _queue_animation(animation)
         env.message(rt.Translation.battle.message.status_removed_f(entity_proxy, status_proxy))
 
         _new_animation_node()
@@ -1803,7 +1812,7 @@ function bt.BattleScene:create_simulation_environment()
             hp_value, bt.Number
         )
 
-        if env.is_dead(entity_proxy) or not env.is_knocked_out(entity_proxy) then
+        if env.get_is_dead(entity_proxy) or not env.get_is_knocked_out(entity_proxy) then
             return -- fizzle
         end
 
@@ -1870,7 +1879,7 @@ function bt.BattleScene:create_simulation_environment()
 
     env.kill = function(entity_proxy)
         bt.assert_args("kill", entity_proxy, bt.EntityProxy)
-        if env.is_dead(entity_proxy) then
+        if env.get_is_dead(entity_proxy) then
             return -- fizzle
         end
 
@@ -1946,7 +1955,7 @@ function bt.BattleScene:create_simulation_environment()
             hp_value, bt.Number
         )
 
-        if env.is_dead(entity_proxy) ~= true then return end
+        if env.get_is_dead(entity_proxy) ~= true then return end
 
         local entity = _get_native(entity_proxy)
         hp_value = clamp(hp_value, 1, _state:entity_get_hp_base(entity))
@@ -2023,8 +2032,8 @@ function bt.BattleScene:create_simulation_environment()
         local hp_current = env.get_hp(entity_proxy)
         local hp_base = env.get_hp_base(entity_proxy)
         if hp_current >= hp_base or value == 0 or
-            env.is_knocked_out(entity_proxy) or
-            env.is_dead(entity_proxy)
+            env.get_is_knocked_out(entity_proxy) or
+            env.get_is_dead(entity_proxy)
         then
             return -- fizzle
         end
@@ -2092,11 +2101,11 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        if value == 0 or env.is_dead(entity_proxy) then
+        if value == 0 or env.get_is_dead(entity_proxy) then
             return -- if dead, fizzle
         end
 
-        if env.is_knocked_out(entity_proxy) then
+        if env.get_is_knocked_out(entity_proxy) then
             -- if knocked out, any damage > 0 kills
             env.kill(entity_proxy)
             return
@@ -2193,8 +2202,9 @@ function bt.BattleScene:create_simulation_environment()
         local added_entities = {}
         local entity_to_status_proxies = {}
 
-        for arg_i = 1, select("#", ...) do
-            local entity_id, move_proxies, consumable_proxies, equip_proxies, status_proxies = table.unpack(select(arg_i, ...))
+        local args = {...}
+        for to_spawn in values(args) do
+            local entity_id, move_proxies, consumable_proxies, equip_proxies, status_proxies = table.unpack(to_spawn)
             if move_proxies == nil then move_proxies = {} end
             if consumable_proxies == nil then consumable_proxies = {} end
             if equip_proxies == nil then equip_proxies = {} end
@@ -2328,7 +2338,7 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        if env.is_dead(entity_a_proxy) or env.is_dead(entity_a_proxy) then
+        if env.get_is_dead(entity_a_proxy) or env.get_is_dead(entity_a_proxy) then
             return -- fizzle
         end
 
@@ -2872,24 +2882,36 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         -- spawn allies
-        for ally in values(_state:list_party()) do
+        for ally in values(_state:active_template_list_party()) do
             local id = ally:get_id()
             local moves = {}
             local consumables = {}
             local equips = {}
             local statuses = {}
 
-            local move_slots = _state:entity_list_move_slots(ally)
-            for i, move in pairs(move_slots) do
-                moves[i] = move
+            local n, move_slots = _state:active_template_list_move_slots(ally)
+            for i = 1, n do
+                local config = move_slots[i]
+                if config ~= nil then
+                    moves[i] = bt.create_move_proxy(_scene, config)
+                end
             end
 
-            local equip_slots = _state:entity_list_equip_slots(ally)
-            for i, equip in pairs(equip_slots) do
-                equips[i] = equip
+            local n, equip_slots = _state:active_template_list_equip_slots(ally)
+            for i = 1, n do
+                local config = equip_slots[i]
+                if config ~= nil then
+                    equips[i] = bt.create_equip_proxy(_scene, config)
+                end
             end
 
-            local consumable_slots = _state:entity_list_consumable_slots()
+            local n, consumable_slots = _state:active_template_list_consumable_slots(ally)
+            for i = 1, n do
+                local config = consumable_slots[i]
+                if config ~= nil then
+                    consumables[i] = bt.create_consumable_proxy(_scene, config)
+                end
+            end
 
             table.insert(to_spawn, {
                 id,
@@ -2900,6 +2922,8 @@ function bt.BattleScene:create_simulation_environment()
             })
         end
 
-        env.spawn(to_spawn)
+        env.spawn(table.unpack(to_spawn))
     end
+
+    return env
 end

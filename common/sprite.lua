@@ -133,7 +133,7 @@ end
 
 --- @brief
 function rt.Sprite:skip()
-    rt.warning("TODO: rt.Sprite.skip")
+    --rt.warning("TODO: rt.Sprite.skip")
 end
 
 --- @override

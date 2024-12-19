@@ -42,7 +42,7 @@ end)
 love.load = function()
     STATE:load()
 
-    STATE:set_current_scene(mn.InventoryScene)
+    STATE:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 
     twinkle = rt.Twinkle()
