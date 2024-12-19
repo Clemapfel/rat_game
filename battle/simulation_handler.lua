@@ -439,7 +439,7 @@ function bt.BattleScene:create_simulation_environment()
 
     -- callback invocation
 
-    local _invoke = function(f)
+    local _invoke = function(f, ...)
         debug.setfenv(f, env)
         return f(...)
     end

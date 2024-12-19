@@ -1,6 +1,7 @@
 --- @class mn.Template
 mn.Template = meta.new_type("InventoryTemplate", function(state, id)
     meta.assert_isa(state, rt.GameState)
+    meta.assert_string(id)
     return meta.new(mn.Template, {
         _id = id,
         _state = state
@@ -23,8 +24,8 @@ function mn.Template:get_date()
 end
 
 --- @brief
-function mn.Template:list_entities()
-    return self._state:template_list_entities(self._id)
+function mn.Template:list_party()
+    return self._state:template_list_party(self._id)
 end
 
 --- @brief

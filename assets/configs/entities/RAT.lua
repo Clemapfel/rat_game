@@ -7,7 +7,7 @@ return {
     portrait_sprite_index = "RAT",
 
     is_enemy = false,
-    n_equip_slots = 0,
+    n_equip_slots = 1,
     n_consumable_slots = 1,
 
     attack_base = 100,

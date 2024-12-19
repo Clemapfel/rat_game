@@ -257,6 +257,6 @@ require "battle.simulation_handler"
 
 -- state
 require "common.game_state"
-require "common.game_state_scene"
+require "common.game_state_inventory"
 require "common.game_state_battle"
 

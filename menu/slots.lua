@@ -314,6 +314,7 @@ end
 
 --- @brief
 function mn.Slots:set_object(slot_i, object, label)
+    assert(object == nil or meta.isa(object, bt.MoveConfig) or meta.isa(object, bt.EquipConfig) or meta.isa(object, bt.ConsumableConfig) or meta.isa(object, mn.Template))
     if self._is_realized == false then
         self._pre_realize_items[slot_i] = object
     else
