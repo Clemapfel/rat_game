@@ -2,7 +2,7 @@
 bt.PartySprite = meta.new_type("PartySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.PartySprite, {
         _sprite_id = entity:get_config():get_sprite_id(),
-        _name = rt.Label("<o>" .. entity:get_name() .. "</o>"),
+        _name = rt.Label("<o><b>" .. entity:get_name() .. "</b></o>"),
         _frame = rt.Frame(),
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
         _gradient_visible = true
@@ -38,8 +38,8 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local label_w, label_h = self._name:measure()
     self._name:fit_into(x + xm, current_y - label_h, width - 2 * xm)
     local speed_value_w, speed_value_h = self._speed_value:measure()
-    self._speed_value:fit_into(x + width - xm - speed_value_w, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
-    current_y = current_y - label_h - ym
+    self._speed_value:fit_into(x + width - xm, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
+    current_y = current_y - label_h - 0.5 * ym
 
     local hp_bar_height = label_h
     local hp_bar_bounds = rt.AABB(x + xm, current_y - hp_bar_height, width - 2 * xm, bar_h)
@@ -94,7 +94,9 @@ function bt.PartySprite:draw()
         self:draw_snapshot()
     end
 
-    self._frame:draw()
+    if self._ui_visible then
+        self._frame:draw()
+    end
 
     if self._gradient_visible then
         local value = meta.hash(self) % 254 + 1
@@ -112,13 +114,12 @@ function bt.PartySprite:draw()
         for widget in range(
             self._health_bar,
             self._speed_value,
-            self._status_consumable_bar
+            self._status_consumable_bar,
+            self._name:draw()
         ) do
             widget:draw()
         end
     end
-
-    self._name:draw()
 end
 
 --- @override

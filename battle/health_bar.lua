@@ -165,7 +165,7 @@ function bt.HealthBar:update(delta)
     if self._is_realized ~= true then return end
 
     self._value_animation:update(delta)
-    self._current_value = self._value_animation:get_value()
+    self._current_value = math.ceil(self._value_animation:get_value())
     self:_update_value()
 end
 
@@ -179,7 +179,8 @@ function bt.HealthBar:set_opacity(alpha)
 end
 
 --- @brief
-function bt.HealthBar:set_value(value)
+function bt.HealthBar:set_value(value, upper)
+    if upper ~= nil then self._upper = upper end
     value = clamp(value, self._lower, self._upper)
     self._target_value = value
     self._value_animation:set_target_value(self._target_value)

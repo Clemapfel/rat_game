@@ -151,6 +151,16 @@ function bt.EntitySprite:set_animation_active(b)
 end
 
 --- @brief
+function bt.EntitySprite:set_hp(hp_current, hp_base)
+    self._health_bar:set_value(hp_current, hp_base)
+end
+
+--- @brief
+function bt.EntitySprite:set_speed(value)
+    self._speed_value:set_value(value)
+end
+
+--- @brief
 function bt.EntitySprite:add_status(status, n_turns_left)
     meta.assert_isa(status, bt.StatusConfig)
     if n_turns_left == nil then n_turns_left = status:get_max_duration() end

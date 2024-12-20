@@ -31,7 +31,7 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
 
     local speed_w, speed_h = self._speed_value:measure()
     self._speed_value:fit_into(
-        x + 0.5 * width - 0.5 * sprite_w + sprite_w - speed_w,
+        x + sprite_w - m, -- right aligned
         current_y - speed_h
     )
 
