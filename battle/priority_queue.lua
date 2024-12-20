@@ -2,6 +2,7 @@ rt.settings.battle.priority_queue = {
     first_element_scale_factor = 1.2,
     scale_speed = 4, -- 1x per second
     element_speed = 500, -- px per second
+    sprite_scale = 2
 }
 
 --- @class bt.PriorityQueue
@@ -50,9 +51,9 @@ function bt.PriorityQueue:_element_new(entity)
     element.gradient:set_vertex_color(4, bottom_color)
 
     local sprite_w, sprite_h = element.sprite:get_resolution()
-    local sprite_scale = 2
-    sprite_w = sprite_w * 2
-    sprite_h = sprite_h * 2
+    local scale = rt.settings.battle.priority_queue.sprite_scale
+    sprite_w = sprite_w * scale
+    sprite_h = sprite_h * scale
     element.sprite:set_minimum_size(sprite_w, sprite_h)
 
     element.frame:fit_into(0, 0, sprite_w, sprite_h)
@@ -83,10 +84,10 @@ end
 function bt.PriorityQueue:_element_set_multiplicity(element, n)
     while element.multiplicity < n do
         table.insert(element.motions, rt.SmoothedMotion2D(
-            0.5 * rt.graphics.get_width(),
-            0.5 * rt.graphics.get_height(),
+            self._bounds.x + 0.5 * self._bounds.width,
+            self._bounds.y + 0.5 * self._bounds.height,
             rt.settings.battle.priority_queue.element_speed
-        )) --rt.graphics.get_width() + element.width, 0.5 * rt.graphics.get_height()))
+        ))
         element.multiplicity = element.multiplicity + 1
     end
 
