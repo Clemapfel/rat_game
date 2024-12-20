@@ -21,6 +21,6 @@ return {
         for entity in values(targets) do
             assert_is_entity_proxy(entity)
         end
-        println(get_id(self) .. " effect")
+        println(get_id(user) .. " " .. get_id(self) .. " effect")
     end
 }

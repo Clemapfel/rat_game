@@ -20,6 +20,6 @@ return {
     effect = function(self, entity)
         assert_is_equip_proxy(self)
         assert_is_entity_proxy(entity)
-        println(get_id(self) .. " effect")
+        println(get_id(entity) .. " " .. get_id(self) .. " effect")
     end
 }
