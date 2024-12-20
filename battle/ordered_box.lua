@@ -34,7 +34,7 @@ function bt.OrderedBox:add(widget, left_or_right)
         current_opacity = 0,
         target_opacity = 1,
 
-        current_scale = 2,
+        current_scale = 1,
         target_scale = 1,
 
         position_animation = nil, -- rt.SmoothedMotion2D
@@ -42,7 +42,7 @@ function bt.OrderedBox:add(widget, left_or_right)
         current_position_y = nil,
 
         on_scale_reached = {}, -- Table<Function>
-        on_opacity_reached_0 = nil, -- function
+        on_opacity_reached_0 = nil, -- Function
     }
 
 
@@ -93,8 +93,13 @@ function bt.OrderedBox:update(delta)
 
         -- update scale
         local scale_speed = rt.settings.battle.ordered_box.scale_speed
+
         if item.current_scale < item.target_scale then
-            item.current_scale = clamp(item.current_scale + scale_speed * delta , 0, item.target_scale)
+            item.current_scale = item.current_scale + scale_speed * delta
+            if item.current_scale > item.target_scale then
+                item.current_scale = item.target_scale
+            end
+
             if item.current_scale >= item.target_scale then
                 item.target_scale = 1
                 for f in values(item.on_scale_reached) do
@@ -103,7 +108,10 @@ function bt.OrderedBox:update(delta)
                 item.on_scale_reached = {}
             end
         elseif item.current_scale > item.target_scale then
-            item.current_scale = clamp(item.current_scale - scale_speed * delta, 0)
+            item.current_scale = item.current_scale - scale_speed * delta
+            if item.current_scale < item.target_scale then
+                item.current_scale = item.target_scale
+            end
         end
 
         -- update opacity

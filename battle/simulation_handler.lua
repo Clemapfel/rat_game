@@ -432,15 +432,13 @@ function bt.BattleScene:create_simulation_environment()
     -- manage running multiple animations at once by opening / closing nodes
 
     local _animation_should_open_new_node = true
-    local _animation_should_open_new_node_override_active = false
-
     local _new_animation_node = function()
         _animation_should_open_new_node = true
     end
 
     local _queue_animation = function(animation)
         meta.assert_isa(animation, bt.Animation)
-        if _animation_should_open_new_node == true and not _animation_should_open_new_node_override_active then
+        if _animation_should_open_new_node == true then
             _scene._animation_queue:push(animation)
             _animation_should_open_new_node = false
         else
@@ -584,14 +582,12 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.message = function(...)
-        --[[
         local to_concat = {} -- table.concat does not invoke __concat metamethods
         for x in range(...) do
             table.insert(to_concat, tostring(x))
         end
 
         _queue_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
-        ]]--
     end
 
     env.get_turn_i = function()

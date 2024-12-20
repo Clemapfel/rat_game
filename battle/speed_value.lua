@@ -10,7 +10,10 @@ bt.SpeedValue = meta.new_type("SpeedValue", rt.Widget, function(value)
         _current_value = value,
         _target_value = value,
         _priority = 0,
-        _label = {}
+        _label = {},
+        _label_x = 0,
+        _label_y = 0,
+        _label_w = 0
     })
 end)
 
@@ -23,6 +26,7 @@ end
 function bt.SpeedValue:_update_value()
     if self._is_realized then
         self._label:set_text(self:_format_value())
+        self._label_w = select(1, self._label:measure())
     end
     self:reformat()
 end
@@ -34,14 +38,15 @@ function bt.SpeedValue:realize()
     self._label = rt.Label(self:_format_value())
     self._label:set_justify_mode(rt.JustifyMode.LEFT)
     self._label:realize()
+    self._label:fit_into(0, 0)
     self._motion_animation:set_value(self._current_value)
     self:update(0)
 end
 
 --- @override
 function bt.SpeedValue:size_allocate(x, y, width, height)
-    local label_w, label_h = self._label:measure()
-    self._label:fit_into(x + 0.5 * width - 0.5 * label_w, y + 0.5 * height - 0.5 * label_h)
+    self._label_x = x
+    self._label_y = y
 end
 
 --- @override
@@ -49,7 +54,7 @@ function bt.SpeedValue:update(delta)
     if self._is_realized ~= true then return end
     self._motion_animation:update(delta)
 
-    local new_value = self._motion_animation:get_value()
+    local new_value = math.ceil(self._motion_animation:get_value())
     if new_value ~= self._current_value then
         self._current_value = new_value
         self:_update_value()
@@ -58,7 +63,7 @@ end
 --- @brief
 function bt.SpeedValue:set_value(value)
     self._target_value = value
-    self._motion_animation:set_target(self._target_value)
+    self._motion_animation:set_target_value(self._target_value)
 end
 
 --- @brief
@@ -81,7 +86,10 @@ end
 --- @brief
 function bt.SpeedValue:draw()
     if self._is_realized == true then
+        love.graphics.push()
+        love.graphics.translate(self._label_x - self._label_w, self._label_y)
         self._label:draw()
+        love.graphics.pop()
     end
 end
 
