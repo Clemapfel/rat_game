@@ -26,7 +26,6 @@ end
 
 --- @override
 function bt.Animation.STATUS_APPLIED:update(delta)
-    dbg(meta.hash(self), "update", self._is_done)
     return self._is_done
 end
 

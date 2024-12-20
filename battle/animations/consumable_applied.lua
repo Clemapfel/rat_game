@@ -7,7 +7,6 @@ bt.Animation.CONSUMABLE_APPLIED = meta.new_type("CONSUMABLE_APPLIED", rt.Animati
         _scene = scene,
         _slot_i = slot_i,
         _entity = entity,
-        _target = nil,
         _is_done = false
     })
 end)

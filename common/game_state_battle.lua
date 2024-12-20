@@ -470,12 +470,15 @@ for which in range("hp", "attack", "defense", "speed") do
     rt.GameState["entity_get_" .. which] = function(self, entity)
         local value = self["entity_get_" .. which .. "_base"](self, entity)
         local statuses = self:entity_list_statuses(entity)
-        for status in values(statuses) do
-            value = value + status[which .. "_offset"]
-        end
 
-        for status in values(statuses) do
-            value = value * status[which .. "_factor"]
+        if which ~= "hp" then
+            for status in values(statuses) do
+                value = value + status[which .. "_offset"]
+            end
+
+            for status in values(statuses) do
+                value = value * status[which .. "_factor"]
+            end
         end
 
         return math.max(0, math.ceil(value))

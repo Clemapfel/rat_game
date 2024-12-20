@@ -41,7 +41,7 @@ function bt.OrderedBox:add(widget, left_or_right)
         current_position_x = nil,
         current_position_y = nil,
 
-        on_scale_reached = nil, -- function
+        on_scale_reached = {}, -- Table<Function>
         on_opacity_reached_0 = nil, -- function
     }
 
@@ -97,9 +97,10 @@ function bt.OrderedBox:update(delta)
             item.current_scale = clamp(item.current_scale + scale_speed * delta , 0, item.target_scale)
             if item.current_scale >= item.target_scale then
                 item.target_scale = 1
-                if item.on_scale_reached ~= nil then
-                    item.on_scale_reached(item.widget)
+                for f in values(item.on_scale_reached) do
+                    f(item.widget)
                 end
+                item.on_scale_reached = {}
             end
         elseif item.current_scale > item.target_scale then
             item.current_scale = clamp(item.current_scale - scale_speed * delta, 0)
@@ -225,11 +226,7 @@ function bt.OrderedBox:activate(widget, on_activate_done)
     end
 
     item.target_scale = rt.settings.battle.ordered_box.max_scale
-    item.on_scale_reached = function(widget)
-        if on_activate_done ~= nil then
-            on_activate_done(widget)
-        end
-    end
+    table.insert(item.on_scale_reached, on_activate_done)
 end
 
 --- @brief
@@ -239,10 +236,10 @@ function bt.OrderedBox:skip()
     for item in values(self._widget_to_item) do
         item.current_scale = 1
         item.target_scale = 1
-        if item.on_scale_reached ~= nil then
-            item.on_scale_reached(item.widget)
-            item.on_scale_reached = nil
+        for f in values(item.on_scale_reached) do
+            f(item.widget)
         end
+        item.on_scale_reached = {}
 
         item.current_opacity = item.target_opacity
         if item.on_opacity_reached_0 ~= nil then

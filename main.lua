@@ -44,23 +44,14 @@ love.load = function()
 
     STATE:set_current_scene(bt.BattleScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
-
-    twinkle = rt.Twinkle()
-    twinkle:realize()
-    twinkle:fit_into(500, 500, 64, 64)
-    twinkle:fit_into(0, 0, love.graphics.getDimensions())
 end
 
 love.update = function(delta)
     STATE:update(delta)
-
-    twinkle:update(delta)
 end
 
 love.draw = function()
     STATE:draw()
-
-    twinkle:draw()
 end
 
 love.resize = function(new_width, new_height)
