@@ -22,11 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed animation ordering on spawn">
-      <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/speed_value.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/speed_value.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed ordered box scale animation">
+      <change afterPath="$PROJECT_DIR$/battle/battle_ai.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_event.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_event.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -695,15 +694,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="10214000" />
-    </task>
-    <task id="LOCAL-01293" summary="added hp lost">
-      <option name="closed" value="true" />
-      <created>1733260919107</created>
-      <option name="number" value="01293" />
-      <option name="presentableId" value="LOCAL-01293" />
-      <option name="project" value="LOCAL" />
-      <updated>1733260919108</updated>
+      <workItem from="1734643804197" duration="11383000" />
     </task>
     <task id="LOCAL-01294" summary="added radius fade out">
       <option name="closed" value="true" />
@@ -1089,7 +1080,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734722288716</updated>
     </task>
-    <option name="localTasksCounter" value="1342" />
+    <task id="LOCAL-01342" summary="fixed ordered box scale animation">
+      <option name="closed" value="true" />
+      <created>1734722942797</created>
+      <option name="number" value="01342" />
+      <option name="presentableId" value="LOCAL-01342" />
+      <option name="project" value="LOCAL" />
+      <updated>1734722942797</updated>
+    </task>
+    <option name="localTasksCounter" value="1343" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1138,7 +1137,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added twinkle, stashing" />
     <MESSAGE value="added debug configs" />
     <MESSAGE value="stashing 4 vertices" />
     <MESSAGE value="stashing before starting battle from env" />
@@ -1163,7 +1161,8 @@
     <MESSAGE value="fixed animation deadlock" />
     <MESSAGE value="movement polish" />
     <MESSAGE value="fixed animation ordering on spawn" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed animation ordering on spawn" />
+    <MESSAGE value="fixed ordered box scale animation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed ordered box scale animation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
