@@ -5,7 +5,8 @@ bt.PartySprite = meta.new_type("PartySprite", bt.EntitySprite, function(entity)
         _name = rt.Label("<o><b>" .. entity:get_name() .. "</b></o>"),
         _frame = rt.Frame(),
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
-        _gradient_visible = true
+        _gradient_visible = true,
+        _final_bounds = rt.AABB(0, 0, 1, 1)
     })
 end)
 
@@ -86,6 +87,13 @@ function bt.PartySprite:size_allocate(x, y, width, height)
         sprite_w,
         stunned_animation_h
     )
+
+    self._final_bounds = rt.AABB(
+        frame_aabb.x - frame_outline_thickness,
+        self._snapshot_position_y,
+        frame_aabb.width + 2 * frame_outline_thickness,
+        (y + height) - self._snapshot_position_y + 2 * frame_outline_thickness
+    )
 end
 
 --- @override
@@ -96,21 +104,19 @@ function bt.PartySprite:draw()
 
     if self._ui_visible then
         self._frame:draw()
-    end
 
-    if self._gradient_visible then
-        local value = meta.hash(self) % 254 + 1
-        rt.graphics.stencil(value, function()
-            self._frame:_draw_frame()
-        end)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
-        rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
-        self._gradient:draw()
-        rt.graphics.set_stencil_test()
-        rt.graphics.set_blend_mode()
-    end
+        if self._gradient_visible then
+            local value = meta.hash(self) % 254 + 1
+            rt.graphics.stencil(value, function()
+                self._frame:_draw_frame()
+            end)
+            rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, value)
+            rt.graphics.set_blend_mode(rt.BlendMode.MULTIPLY, rt.BlendMode.NORMAL)
+            self._gradient:draw()
+            rt.graphics.set_stencil_test()
+            rt.graphics.set_blend_mode()
+        end
 
-    if self._ui_visible then
         for widget in range(
             self._health_bar,
             self._speed_value,
@@ -132,4 +138,14 @@ function bt.PartySprite:set_selection_state(state)
     self._selection_state = state
     self._frame:set_selection_state(state)
     self._gradient_visible = state ~= rt.SelectionState.ACTIVE
+end
+
+--- @override
+function bt.PartySprite:measure()
+    return self._final_bounds.width, self._final_bounds.height
+end
+
+--- @override
+function bt.PartySprite:get_position()
+    return self._final_bounds.x, self._final_bounds.y
 end

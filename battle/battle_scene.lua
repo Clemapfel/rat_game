@@ -35,7 +35,6 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _is_first_size_allocate = true
     })
 
-    out._background:set_implementation(rt.Background.EYE) -- TODO
     return out
 end)
 
@@ -82,6 +81,9 @@ end
 
 --- @override
 function bt.BattleScene:create_from_state()
+
+    self._animation_queue:clear()
+
     self._enemy_sprites = {}
     self._party_sprites = {}
     self._entity_id_to_sprite = {}

@@ -1395,6 +1395,11 @@ do
 end
 
 --- @brief
+function rt.GameState:reset_entity_multiplicity()
+    self._state.entity_id_to_multiplicity = {}
+end
+
+--- @brief
 function rt.GameState:has_quicksave()
     return self._state.quicksave ~= nil
 end

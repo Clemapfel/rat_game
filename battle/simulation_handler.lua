@@ -2206,6 +2206,8 @@ function bt.BattleScene:create_simulation_environment()
         local added_entities = {}
         local entity_to_status_proxies = {}
 
+        local is_first_animation = true
+
         local args = {...}
         for to_spawn in values(args) do
             local entity_id, move_proxies, consumable_proxies, equip_proxies, status_proxies = table.unpack(to_spawn)
@@ -2255,13 +2257,25 @@ function bt.BattleScene:create_simulation_environment()
                 animation = bt.Animation.ALLY_APPEARED(_scene, entity)
             end
 
-            animation:signal_connect("start", function(_)
-                _scene:add_entity(entity)
+            if is_first_animation then
+                -- batch sprite add so animations can trigger on fully formatted scene
+                animation:signal_connect("start", function(_)
+                    for entity in values(added_entities) do
+                        _scene:add_entity(entity)
+                    end
+                end)
+                is_first_animation = false
+            end
+
+            animation:signal_connect("start", function()
                 local sprite = _scene:get_sprite(entity)
                 sprite:set_hp(_state:entity_get_hp(entity), _state:entity_get_hp_base(entity))
                 sprite:set_is_visible(false)
                 sprite:set_speed(_state:entity_get_speed(entity))
+            end)
 
+            animation:signal_connect("finish", function()
+                local sprite = _scene:get_sprite(entity)
                 for consumable_proxy in values(consumable_proxies) do
                     local native = _get_native(consumable_proxy)
                     local slot_i = _state:entity_get_consumable_slot_i(entity, native)
@@ -2284,6 +2298,16 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
+        do
+            local animation = bt.Animation.DUMMY(_scene)
+            animation:signal_connect("start", function(_)
+                _scene:set_priority_order(_state:list_entities_in_order())
+            end)
+            _queue_animation(animation)
+        end
+
+        _new_animation_node()
+
         -- invoke added on self
 
         for entity in values(added_entities) do
@@ -2297,7 +2321,7 @@ function bt.BattleScene:create_simulation_environment()
                 _try_invoke_consumable_callback("on_gained", consumable_proxy, entity_proxy)
             end
 
-            -- invoke spanw
+            -- invoke spawn
             local callback_id = "on_entity_spawned"
             for other_entity_proxy in values(env.list_entities()) do
                 if other_entity_proxy ~= entity_proxy then
@@ -2843,7 +2867,7 @@ function bt.BattleScene:create_simulation_environment()
         local battle = bt.BattleConfig(battle_id)
 
         -- clear state if present
-
+        _state:reset_entity_multiplicity()
         for enemy in values(_state:list_all_entities()) do
             _state:remove_entity(enemy)
         end

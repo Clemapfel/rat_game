@@ -148,8 +148,6 @@ function bt.OrderedBox:draw()
             rt.graphics.translate(-0.5 * w, -0.5 * h)
 
             item.widget:draw()
-            item.widget:draw_bounds()
-
             rt.graphics.pop()
         end
     end

@@ -22,17 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored template inventory">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="movement polish">
+      <change afterPath="$PROJECT_DIR$/battle/animations/dummy.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/equips/DEBUG_EQUIP.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/DEBUG_MOVE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/consumable_applied.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/status_applied.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/status_applied.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/ally_appeared.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/ordered_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/ordered_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
@@ -40,7 +36,6 @@
       <change beforePath="$PROJECT_DIR$/battle/speed_value.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/speed_value.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -709,39 +704,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="5262000" />
-    </task>
-    <task id="LOCAL-01288" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1732995344605</created>
-      <option name="number" value="01288" />
-      <option name="presentableId" value="LOCAL-01288" />
-      <option name="project" value="LOCAL" />
-      <updated>1732995344605</updated>
-    </task>
-    <task id="LOCAL-01289" summary="done">
-      <option name="closed" value="true" />
-      <created>1732999602200</created>
-      <option name="number" value="01289" />
-      <option name="presentableId" value="LOCAL-01289" />
-      <option name="project" value="LOCAL" />
-      <updated>1732999602200</updated>
-    </task>
-    <task id="LOCAL-01290" summary="added hp animation">
-      <option name="closed" value="true" />
-      <created>1733082804005</created>
-      <option name="number" value="01290" />
-      <option name="presentableId" value="LOCAL-01290" />
-      <option name="project" value="LOCAL" />
-      <updated>1733082804005</updated>
-    </task>
-    <task id="LOCAL-01291" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1733085038372</created>
-      <option name="number" value="01291" />
-      <option name="presentableId" value="LOCAL-01291" />
-      <option name="project" value="LOCAL" />
-      <updated>1733085038372</updated>
+      <workItem from="1734643804197" duration="9815000" />
     </task>
     <task id="LOCAL-01292" summary="stashing shader">
       <option name="closed" value="true" />
@@ -1103,7 +1066,39 @@
       <option name="project" value="LOCAL" />
       <updated>1734647186707</updated>
     </task>
-    <option name="localTasksCounter" value="1337" />
+    <task id="LOCAL-01337" summary="added entity id to debug message">
+      <option name="closed" value="true" />
+      <created>1734717725139</created>
+      <option name="number" value="01337" />
+      <option name="presentableId" value="LOCAL-01337" />
+      <option name="project" value="LOCAL" />
+      <updated>1734717725139</updated>
+    </task>
+    <task id="LOCAL-01338" summary="fixed health bar motion">
+      <option name="closed" value="true" />
+      <created>1734717741465</created>
+      <option name="number" value="01338" />
+      <option name="presentableId" value="LOCAL-01338" />
+      <option name="project" value="LOCAL" />
+      <updated>1734717741465</updated>
+    </task>
+    <task id="LOCAL-01339" summary="fixed animation deadlock">
+      <option name="closed" value="true" />
+      <created>1734717756067</created>
+      <option name="number" value="01339" />
+      <option name="presentableId" value="LOCAL-01339" />
+      <option name="project" value="LOCAL" />
+      <updated>1734717756067</updated>
+    </task>
+    <task id="LOCAL-01340" summary="movement polish">
+      <option name="closed" value="true" />
+      <created>1734717764329</created>
+      <option name="number" value="01340" />
+      <option name="presentableId" value="LOCAL-01340" />
+      <option name="project" value="LOCAL" />
+      <updated>1734717764329</updated>
+    </task>
+    <option name="localTasksCounter" value="1341" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1152,10 +1147,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing scene before indexed sprite rework" />
-    <MESSAGE value="added shader" />
-    <MESSAGE value="stashing cool noise" />
-    <MESSAGE value="game over vignette done" />
     <MESSAGE value="stat changed up working" />
     <MESSAGE value="added twinkle, stashing" />
     <MESSAGE value="added debug configs" />
@@ -1177,7 +1168,11 @@
     <MESSAGE value="stashing inventory refactor" />
     <MESSAGE value="refactored templates" />
     <MESSAGE value="refactored template inventory" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored template inventory" />
+    <MESSAGE value="added entity id to debug message" />
+    <MESSAGE value="fixed health bar motion" />
+    <MESSAGE value="fixed animation deadlock" />
+    <MESSAGE value="movement polish" />
+    <option name="LAST_COMMIT_MESSAGE" value="movement polish" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

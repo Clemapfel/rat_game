@@ -20,13 +20,16 @@ end)
 
 --- @brief [internal]
 function bt.PriorityQueue:_element_new(entity)
+
+    local suffix = entity:get_name_suffix()
+
     local element = {
         motions = {},
         multiplicity = 0,
         sprite = rt.Sprite(entity:get_config():get_portrait_sprite_id()),
         frame = rt.Frame(),
         gradient = rt.VertexRectangle(0, 0, 1, 1),
-        id_offset_label = rt.Label(entity:get_name_suffix()),
+        id_offset_label = nil,
         snapshot = rt.RenderTexture(),
         padding = 0,
         width = 0,
@@ -39,9 +42,14 @@ function bt.PriorityQueue:_element_new(entity)
         a = 1
     }
 
+    if suffix ~= nil then
+        element.id_offset_label = rt.Label("<b><o>" .. suffix .. "</o></b>", rt.settings.font.default_large)
+    end
+
     element.frame:set_thickness(rt.settings.frame.thickness + 1)
     element.frame:realize()
     element.sprite:realize()
+    element.id_offset_label:realize()
 
     local top_color = rt.RGBA(1, 1, 1, 1)
     local bottom_color = rt.RGBA(0.4, 0.4, 0.4, 1)
@@ -66,6 +74,9 @@ function bt.PriorityQueue:_element_new(entity)
         frame_w, frame_h,
         0, frame_h
     )
+
+    local label_w, label_h = element.id_offset_label:measure()
+    element.id_offset_label:fit_into(0.5 * sprite_w - 0.5 * label_w, 1 * sprite_h - 0.5 * label_h)
 
     local thickness = element.frame:get_thickness()
     element.width = sprite_w + 2 * thickness
@@ -108,6 +119,13 @@ function bt.PriorityQueue:_element_draw(element, x, y, scale, opacity, opacity_o
     love.graphics.translate(-(x + 0.5 * element.width * scale), -y)
     love.graphics.draw(element.snapshot._native, x, y)
     love.graphics.pop()
+
+    if element.id_offset_label ~= nil then
+        love.graphics.push()
+        love.graphics.translate(x, y)
+        element.id_offset_label:draw()
+        love.graphics.pop()
+    end
 end
 
 --- @brief [internal]
@@ -139,6 +157,20 @@ end
 
 --- @brief
 function bt.PriorityQueue:reorder(new_order)
+
+    local old_size = sizeof(self._order)
+    local new_size = sizeof(new_order)
+    if old_size == new_size then
+        local is_same = true
+        for i, _ in ipairs(new_order) do
+            if self._order[i]:get_id() ~= new_order[i]:get_id() then
+                is_same = false
+                break
+            end
+        end
+        if is_same then return end
+    end
+
     assert(new_order ~= nil)
     self._order = new_order
     self._scale_elapsed = 1

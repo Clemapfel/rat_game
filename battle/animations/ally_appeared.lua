@@ -12,18 +12,15 @@ bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, functi
         _position_x = 0,
         _position_y = 0,
         _snapshot = rt.RenderTexture(),
+        _black_weight = 1,
 
         _position_animation = rt.TimedAnimation(duration, 0, 1,
             rt.InterpolationFunctions.CUBE_EASE_OUT, 2
         ),
 
-        _opacity_animation = rt.TimedAnimation(duration / 5, 0, 1,
+        _black_animation = rt.TimedAnimation(duration - 0.1, 0, 1,
             rt.InterpolationFunctions.GAUSSIAN_HIGHPASS
         ),
-
-        _black_animation = rt.TimedAnimation(0.1, 0, 1,
-            rt.InterpolationFunctions.LINEAR
-        )
     })
 end, {
     _shader = (function()
@@ -41,23 +38,20 @@ function bt.Animation.ALLY_APPEARED:start()
     local x, y = self._target:get_position()
     local w, h = self._target:measure()
 
-    local target_x, target_y = x, y -- positions, not offsets
-    local screen_w, screen_h = love.graphics.getWidth(), love.graphics.getHeight()
-    self._path = rt.Path(
-        target_x, y + h,
-        target_x, target_y
-    )
-
-    self._target:set_is_visible(true)
     self._snapshot = rt.RenderTexture(w, h)
+    self._target:set_is_visible(true)
 
     love.graphics.push()
     self._snapshot:bind()
-    love.graphics.origin()
     love.graphics.translate(-x, -y)
     self._target:draw()
     self._snapshot:unbind()
     love.graphics.pop()
+
+    self._path = rt.Path(
+        x, y + h,
+        x, y
+    )
 
     self._target:set_is_visible(false)
 end
@@ -70,15 +64,10 @@ end
 --- @override
 function bt.Animation.ALLY_APPEARED:update(delta)
     self._position_animation:update(delta)
-    self._opacity_animation:update(delta)
-    if self._position_animation:get_is_done() and self._opacity_animation:get_is_done() then
-        self._black_animation:update(delta)
-    end
+    self._black_animation:update(delta)
 
     self._position_x, self._position_y = self._path:at(self._position_animation:get_value())
-
     return self._position_animation:get_is_done() and
-        self._opacity_animation:get_is_done() and
         self._black_animation:get_is_done()
 end
 
@@ -87,7 +76,7 @@ function bt.Animation.ALLY_APPEARED:draw()
     love.graphics.push()
     self._shader:bind()
     self._shader:send("weight", self._black_animation:get_value())
-    self._shader:send("alpha", self._opacity_animation:get_value())
+    self._shader:send("alpha", 1) --self._opacity_animation:get_value())
     love.graphics.translate(self._position_x, self._position_y)
     self._snapshot:draw()
     self._shader:unbind()

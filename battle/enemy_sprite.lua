@@ -2,7 +2,9 @@
 bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.EnemySprite, {
         _sprite_id = entity:get_config():get_sprite_id(),
-        _frame = rt.Frame()
+        _frame = rt.Frame(),
+        _suffix = entity:get_name_suffix(),
+        _id_offset_label = nil -- rt.Label
     })
 end)
 
@@ -13,6 +15,11 @@ function bt.EnemySprite:realize()
 
     self._frame:realize()
     self._frame:set_base_color(rt.RGBA(0, 0, 0, 0))
+
+    if self._suffix ~= nil then
+        self._id_offset_label = rt.Label("<b><o>" .. self._suffix .. "</o></b>")
+        self._id_offset_label:realize()
+    end
 end
 
 --- @override
@@ -35,6 +42,9 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         current_y - speed_h
     )
 
+    local label_w, label_h = self._id_offset_label:measure()
+    self._id_offset_label:fit_into(x + sprite_w - 2 * label_w, current_y - label_h)
+
     current_y = current_y - sprite_h
     self._sprite:fit_into(
         0, 0,
@@ -50,6 +60,7 @@ function bt.EnemySprite:size_allocate(x, y, width, height)
         sprite_w,
         sprite_h
     )
+
 
     self._snapshot = rt.RenderTexture(sprite_w, sprite_h)
     self._snapshot:bind()
@@ -76,8 +87,9 @@ function bt.EnemySprite:draw()
     if self._ui_visible then
         for widget in range(
             self._health_bar,
-            self._speed_value,
-            self._status_consumable_bar
+            --self._speed_value,
+            self._status_consumable_bar,
+            self._id_offset_label
         ) do
             widget:draw()
         end
@@ -86,8 +98,6 @@ function bt.EnemySprite:draw()
     if self._selection_state == rt.SelectionState.ACTIVE then
         self._frame:draw()
     end
-
-    self:draw_bounds()
 end
 
 --- @override
