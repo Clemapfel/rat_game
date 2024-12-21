@@ -147,6 +147,7 @@ do
                 end
             elseif animation._state == rt.AnimationState.STARTED then
                 local res = animation:update(delta)
+                --dbg(meta.typeof(animation))
                 if res == rt.AnimationResult.DISCONTINUE then
                     _finish_animation(animation)
                 else

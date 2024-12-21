@@ -17,7 +17,6 @@ end)
 --- @override
 function bt.Animation.MESSAGE:start()
     self._text_box:append(self._message, function()
-        dbg("done")
         self._is_done = true
     end)
 end

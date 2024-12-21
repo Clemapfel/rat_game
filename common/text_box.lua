@@ -1,7 +1,7 @@
 rt.settings.text_box = {
     n_lines = 3,
     scroll_duration = 0.5, -- seconds
-    letters_per_second = 10,
+    letters_per_second = 10010,
     scroll_speed = 300, -- px / s
     label_hide_delay = 1, -- seconds
 }
@@ -31,6 +31,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _max_n_lines = rt.settings.text_box.n_lines,
 
         _entries = {},
+        _n_entries = 0,
+        _first_scrolling_entry = 1
     })
 
     return out
@@ -67,7 +69,10 @@ end
 
 --- @brief
 function rt.TextBox:append(msg, on_done_notify)
-    if msg == nil or msg == "" then return end
+    if msg == nil or msg == "" then
+        if on_done_notify ~= nil then on_done_notify() end
+        return
+    end
 
     local entry = {
         label = rt.Label(msg),
@@ -91,6 +96,7 @@ function rt.TextBox:append(msg, on_done_notify)
     entry.width, entry.height = entry.label:measure()
 
     table.insert(self._entries, entry)
+    self._n_entries = self._n_entries + 1
 
     self._position_target_value = _SHOWN
     self._position_show_delay = 0
@@ -128,13 +134,16 @@ function rt.TextBox:update(delta)
 
     local line_height = NEGATIVE_INFINITY
     local n_lines_shown = 0
-    for entry in values(self._entries) do
+
+    for i = self._first_scrolling_entry, self._n_entries do
+        local entry = self._entries[i]
+
         entry.elapsed = entry.elapsed + delta
         local is_done, new_n_lines_visible = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed)
 
         n_lines_shown = n_lines_shown + new_n_lines_visible
         if n_lines_shown > self._max_n_lines then
-            self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible) * entry.line_height
+            self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible ) * entry.line_height
         end
         entry.n_lines_visible = new_n_lines_visible
 
@@ -145,14 +154,13 @@ function rt.TextBox:update(delta)
                     entry.on_done_f()
                     entry.is_done = true
                 end
-            else
-                break
             end
         else
             break
         end
     end
 
+    -- scroll up smoothly
     local scroll_speed = rt.settings.text_box.scroll_speed
     local current, target = self._current_line_y_offset, self._target_line_y_offset
     if current < target then
@@ -160,6 +168,20 @@ function rt.TextBox:update(delta)
         if current > target then current = target end
     end
     self._current_line_y_offset = current
+
+    -- hide once scrolling is done
+    local is_done = true
+    for entry in values(self._entries) do
+        if entry.is_done == false then
+            is_done = false
+            break
+        end
+    end
+
+    if is_done and self._current_line_y_offset >= self._target_line_y_offset then
+        self._position_target_value = _HIDDEN
+        self._first_scrolling_entry = self._n_entries + 1
+    end
 end
 
 --- @brief
@@ -179,28 +201,26 @@ function rt.TextBox:draw()
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
     love.graphics.translate(x, y - self._current_line_y_offset)
-    for entry in values(self._entries) do
+    for i = self._first_scrolling_entry, self._n_entries do
+        local entry = self._entries[i]
         entry.label:draw()
         love.graphics.translate(0, entry.height)
     end
 
     rt.graphics.set_stencil_test()
-
     love.graphics.pop()
 end
 
 --- @brief
 function rt.TextBox:skip()
-    for entry in values(self._entries) do
-        entry.label:set_n_visible_characters(POSITIVE_INFINITY)
-        if entry.on_done_f ~= nil then
-            entry.on_done_f()
-        end
-    end
-    self._position_target_value = _HIDDEN
+    self:update(POSITIVE_INFINITY)
 end
 
 --- @brief
 function rt.TextBox:clear()
-
+    self._current_line_y_offset = 0
+    self._target_line_y_offset = 0
+    self._entries = {}
+    self._n_entries = 0
+    self._first_scrolling_entry = 1
 end
