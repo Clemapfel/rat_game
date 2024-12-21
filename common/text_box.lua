@@ -1,6 +1,8 @@
 rt.settings.text_box = {
     n_lines = 3,
     scroll_duration = 0.5, -- seconds
+    letters_per_second = 10,
+    scroll_speed = 300, -- px / s
     label_hide_delay = 1, -- seconds
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
@@ -23,12 +25,12 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _position_y = 0,
         _position_show_delay = 0,
 
-        _line_y_offset = 0,
+        _current_line_y_offset = 0,
+        _target_line_y_offset = 0,
+
         _max_n_lines = rt.settings.text_box.n_lines,
 
         _entries = {},
-        _scrolling_entries = {},
-        _n_scrolling_entries = 0,
     })
 
     return out
@@ -75,21 +77,20 @@ function rt.TextBox:append(msg, on_done_notify)
         elapsed = 0,
         delay_elapsed = 0,
         n_lines_visible = 0,
-        on_done_f = on_done_notify
+        n_lines = 0,
+        on_done_f = on_done_notify,
+        is_done = false
     }
 
-    if self._is_realized then
-        entry.label:set_justify_mode(rt.JustifyMode.LEFT)
-        entry.label:realize()
-        entry.label:fit_into(0, 0, self._stencil_aabb.width)
-        entry.line_height = entry.label:get_line_height()
-        entry.label:set_n_visible_characters(0)
-        entry.width, entry.height = entry.label:measure()
-    end
+    entry.label:set_justify_mode(rt.JustifyMode.LEFT)
+    entry.label:realize()
+    entry.label:fit_into(0, 0, self._stencil_aabb.width)
+    entry.line_height = entry.label:get_line_height()
+    entry.n_lines = entry.label:get_n_lines()
+    entry.label:set_n_visible_characters(0)
+    entry.width, entry.height = entry.label:measure()
 
     table.insert(self._entries, entry)
-    table.insert(self._scrolling_entries, entry)
-    self._n_scrolling_entries = self._n_scrolling_entries + 1
 
     self._position_target_value = _SHOWN
     self._position_show_delay = 0
@@ -122,35 +123,43 @@ function rt.TextBox:update(delta)
     end
 
     -- scroll labels
-    local letters_per_second = rt.settings.text_box.scroll_speed
+    local letters_per_second = rt.settings.text_box.letters_per_second
     local line_delay = rt.settings.text_box.label_hide_delay
 
-    local first = self._scrolling_entries[1]
-    if first ~= nil then
-        first.elapsed = first.elapsed + delta
-        local is_done, new_n_lines_visible = first.label:update_n_visible_characters_from_elapsed(first.elapsed)
-        first.n_lines_visible = new_n_lines_visible
+    local line_height = NEGATIVE_INFINITY
+    local n_lines_shown = 0
+    for entry in values(self._entries) do
+        entry.elapsed = entry.elapsed + delta
+        local is_done, new_n_lines_visible = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed)
 
-        local diff = first.n_lines_visible - self._max_n_lines
-        self._line_y_offset = first.line_height * clamp(diff, 0)
+        n_lines_shown = n_lines_shown + new_n_lines_visible
+        if n_lines_shown > self._max_n_lines then
+            self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible) * entry.line_height
+        end
+        entry.n_lines_visible = new_n_lines_visible
 
         if is_done then
-            first.delay_elapsed = first.delay_elapsed + delta
-            if first.delay_elapsed > line_delay then
-                if first.on_done_f ~= nil then
-                    first.on_done_f()
+            entry.delay_elapsed = entry.delay_elapsed + delta
+            if entry.delay_elapsed > line_delay then
+                if entry.is_done == false and entry.on_done_f ~= nil then
+                    entry.on_done_f()
+                    entry.is_done = true
                 end
-
-                self._line_y_offset = self._line_y_offset - first.n_lines_visible * first.line_height
-
-                table.remove(self._scrolling_entries, 1)
-                self._n_scrolling_entries = self._n_scrolling_entries - 1
-                if self._n_scrolling_entries == 0 then
-                    self._position_target_value = _HIDDEN
-                end
+            else
+                break
             end
+        else
+            break
         end
     end
+
+    local scroll_speed = rt.settings.text_box.scroll_speed
+    local current, target = self._current_line_y_offset, self._target_line_y_offset
+    if current < target then
+        current = current + delta * scroll_speed
+        if current > target then current = target end
+    end
+    self._current_line_y_offset = current
 end
 
 --- @brief
@@ -159,35 +168,35 @@ function rt.TextBox:draw()
     love.graphics.translate(self._position_x, self._position_y)
     self._frame:draw()
 
-    if self._n_scrolling_entries > 0 then
-        local x, y, w, h = rt.aabb_unpack(self._stencil_aabb)
-        love.graphics.setColor(1, 1, 1, 0.1)
+    local x, y, w, h = rt.aabb_unpack(self._stencil_aabb)
+    love.graphics.setColor(1, 1, 1, 0.1)
+    love.graphics.rectangle("fill", x, y, w, h)
+
+    local stencil_value = meta.hash(self) % 254 + 1
+    rt.graphics.stencil(stencil_value, function()
         love.graphics.rectangle("fill", x, y, w, h)
+    end)
+    rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
-        local stencil_value = meta.hash(self) % 254 + 1
-        rt.graphics.stencil(stencil_value, function()
-            love.graphics.rectangle("fill", x, y, w, h)
-        end)
-        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
-
-        love.graphics.translate(x, y - self._line_y_offset)
-        self._scrolling_entries[1].label:draw()
-
-        rt.graphics.set_stencil_test()
+    love.graphics.translate(x, y - self._current_line_y_offset)
+    for entry in values(self._entries) do
+        entry.label:draw()
+        love.graphics.translate(0, entry.height)
     end
+
+    rt.graphics.set_stencil_test()
+
     love.graphics.pop()
 end
 
 --- @brief
 function rt.TextBox:skip()
-    for entry in values(self._scrolling_entries) do
-        entry.label:set_n_visible_characters(entry.label:get_n_characters())
+    for entry in values(self._entries) do
+        entry.label:set_n_visible_characters(POSITIVE_INFINITY)
         if entry.on_done_f ~= nil then
             entry.on_done_f()
         end
     end
-    self._scrolling_entries = {}
-    self._n_scrolling_entries = 0
     self._position_target_value = _HIDDEN
 end
 

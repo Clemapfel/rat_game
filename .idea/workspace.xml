@@ -22,11 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before messsage rework">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing textbox one line at a time">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -696,15 +693,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="19189000" />
-    </task>
-    <task id="LOCAL-01296" summary="sequential working">
-      <option name="closed" value="true" />
-      <created>1733336318102</created>
-      <option name="number" value="01296" />
-      <option name="presentableId" value="LOCAL-01296" />
-      <option name="project" value="LOCAL" />
-      <updated>1733336318102</updated>
+      <workItem from="1734643804197" duration="21405000" />
     </task>
     <task id="LOCAL-01297" summary="multi-pass shader working">
       <option name="closed" value="true" />
@@ -1090,7 +1079,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734802280392</updated>
     </task>
-    <option name="localTasksCounter" value="1345" />
+    <task id="LOCAL-01345" summary="stashing textbox one line at a time">
+      <option name="closed" value="true" />
+      <created>1734807369486</created>
+      <option name="number" value="01345" />
+      <option name="presentableId" value="LOCAL-01345" />
+      <option name="project" value="LOCAL" />
+      <updated>1734807369486</updated>
+    </task>
+    <option name="localTasksCounter" value="1346" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1139,7 +1136,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before starting battle from env" />
     <MESSAGE value="start battle with no animation working" />
     <MESSAGE value="stashing paralellogram" />
     <MESSAGE value="entity refactoring done" />
@@ -1164,7 +1160,8 @@
     <MESSAGE value="fixed ordered box scale animation" />
     <MESSAGE value="stashing before adding power to moves" />
     <MESSAGE value="stashing before messsage rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before messsage rework" />
+    <MESSAGE value="stashing textbox one line at a time" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing textbox one line at a time" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1204,11 +1201,6 @@
           <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
           <line>376</line>
           <option name="timeStamp" value="31" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/battle/animations/consumable_applied.lua</url>
-          <line>5</line>
-          <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>
