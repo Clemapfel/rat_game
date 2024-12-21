@@ -28,7 +28,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _should_emit_scrolling_done = false,
 
         _n_lines = rt.settings.text_box.n_lines,
-
+        
         _current_y_offset = 0,
         _max_y_offset = 0
     })
@@ -48,8 +48,8 @@ end
 --- @brief
 function rt.TextBox:realize()
     if self:already_realized() then return end
-
     self._frame:realize()
+
     self._label_stencil:set_color(rt.RGBA(0.3, 0.3, 0.3, 0.8))
 
     for entry in values(self._entries) do
@@ -66,9 +66,9 @@ function rt.TextBox:size_allocate(x, y, width, height)
     local font = rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC)
     local labels_h = self._n_lines * font:getHeight()
     self._label_aabb = rt.AABB(
-        x + xm,
-        y + 0.5 * height - 0.5 * labels_h,
-        width - 2 * xm,
+    x + xm,
+    y + 0.5 * height - 0.5 * labels_h,
+    width - 2 * xm,
         labels_h
     )
 
@@ -84,7 +84,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
 end
 
 --- @brief
-function rt.TextBox:append(msg, on_done_notify)
+function rt.TextBox:append(msg)
     if msg == nil then return end
     local entry = {
         label = rt.Label(msg),
@@ -92,8 +92,7 @@ function rt.TextBox:append(msg, on_done_notify)
         height = 0,
         n_lines = 1,
         n_lines_visible = 0,
-        elapsed = 0,
-        on_done_f = on_done_notify
+        elapsed = 0
     }
 
     if self._is_realized then
@@ -143,11 +142,6 @@ function rt.TextBox:update(delta)
             end
 
             if is_done then
-                local entry = self._scrolling_labels[1]
-                if entry.on_done_f ~= nil then
-                    entry.on_done_f()
-                end
-
                 table.remove(self._scrolling_labels, 1)
                 self._n_scrolling_labels = self._n_scrolling_labels - 1
                 self._should_emit_scrolling_done = true

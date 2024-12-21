@@ -117,6 +117,8 @@ rt.Translation = rt.initialize_translation({
 
         move_n_uses = "Uses",
         move_priority = "Priority",
+        move_power = "Power",
+        move_0_power = "\u{2501}", -- horizontal bar
 
         status_max_duration = "Max Duration",
         global_status_max_duration = "Max Duration",

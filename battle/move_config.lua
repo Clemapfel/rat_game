@@ -39,6 +39,7 @@ end, {
     can_target_ally = false,
 
     priority = 0,
+    power = 0, -- factor
 
     --- (MoveProxy, EntityProxy, Table<EntityProxy>) -> nil
     effect = function(move_proxy, user_proxy, target_proxies)
@@ -55,6 +56,7 @@ function bt.MoveConfig:realize()
     local template = {
         id = rt.STRING,
         name = rt.STRING,
+        power = rt.UNSIGNED,
         max_n_uses = rt.UNSIGNED,
         can_target_multiple = rt.BOOLEAN,
         can_target_self = rt.BOOLEAN,
@@ -147,4 +149,9 @@ end
 --- @brief
 function bt.MoveConfig:get_is_intrinsic()
     return self.is_intrinsic
+end
+
+--- @brief
+function bt.MoveConfig:get_power()
+    return self.power
 end

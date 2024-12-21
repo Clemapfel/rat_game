@@ -527,6 +527,11 @@ function bt.BattleScene:get_are_sprites_done_repositioning()
 end
 
 --- @brief
+function bt.BattleScene:append_to_log(text, on_done_notify)
+    self._text_box:append(text, on_done_notify)
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self._env.start_battle("DEBUG_BATTLE")

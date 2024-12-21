@@ -237,14 +237,14 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
 
         local title_max_h = math.max(sprite_h, title_h)
         local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
-        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.title_label:fit_into(current_x, title_y, w)
         self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
 
         current_y = current_y + title_max_h
 
         local title_ym = current_y - title_y - title_h
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+        self.description_label:fit_into(current_x, current_y, w)
         current_y = current_y + select(2, self.description_label:measure())
         current_y = current_y + title_ym
 
@@ -273,10 +273,10 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
 
                 if value_label ~= nil then
                     local value_w, value_h = value_label:measure()
-                    prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+                    prefix_label:fit_into(current_x, current_y)
                     local colon_w = select(1, colon_label:measure())
-                    colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
-                    value_label:fit_into(current_x + w - max_value_w, current_y, POSITIVE_INFINITY)
+                    colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y)
+                    value_label:fit_into(current_x + w - max_value_w, current_y)
 
                     current_y = current_y + value_h
                     at_least_one_stat_change = true
@@ -292,7 +292,7 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
             current_y = current_y + ym
         end
@@ -324,6 +324,17 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             self.spacer = self._hrule()
             self.flavor_text_label = self._flavor_text(move:get_flavor_text())
         end
+
+        self.power_prefix_label = self._prefix("<b>" .. rt.Translation.verbose_info.move_power .. "</b>")
+        self.power_colon_label = self._colon()
+
+        local power = move:get_power()
+        local power_string = rt.Translation.verbose_info.move_0_power
+        if power > 0 then
+            power_string = tostring(math.ceil(power * 100))
+        end
+
+        self.power_value_label = self._number("<b>" .. power_string .. "</b>")
 
         self.n_uses_prefix_label = self._prefix(rt.Translation.verbose_info.move_n_uses)
         self.n_uses_colon_label = self._colon()
@@ -360,6 +371,10 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             self.spacer, -- may be nil
             self.flavor_text_label,
 
+            self.power_prefix_label,
+            self.power_colon_label,
+            self.power_value_label,
+
             self.n_uses_prefix_label,
             self.n_uses_colon_label,
             self.n_uses_value_label,
@@ -381,10 +396,20 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
 
         local title_max_h = math.max(sprite_h, title_h)
         local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
-        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.title_label:fit_into(current_x, title_y, w)
         self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
 
         current_y = current_y + title_max_h
+
+        do
+            local value_w, value_h = self.power_value_label:measure()
+            local colon_w, colon_h = self.power_colon_label:measure()
+
+            self.power_prefix_label:fit_into(current_x, current_y)
+            self.power_colon_label:fit_into(current_x + value_w + m, current_y)
+            self.power_value_label:fit_into(current_x + value_w + m + colon_w + m, current_y)
+            current_y = current_y + value_h + m
+        end
 
         local max_prefix_w = NEGATIVE_INFINITY
         for which in range("n_uses", "priority") do
@@ -397,24 +422,24 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             local value_label = self[which .. "_value_label"]
 
             local value_w, value_h = value_label:measure()
-            prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+            prefix_label:fit_into(current_x, current_y)
             local colon_w = select(1, colon_label:measure())
-            colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
-            value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+            colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y)
+            value_label:fit_into(current_x + w - value_w, current_y)
 
             current_y = current_y + value_h
         end
 
         current_y = current_y + 2 * m
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+        self.description_label:fit_into(current_x, current_y, w)
         current_y = current_y + select(2, self.description_label:measure()) + 2 * m
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
         end
 
@@ -467,19 +492,19 @@ function mn.VerboseInfoPanel.Item:create_from_consumable(consumable)
 
         local title_max_h = math.max(sprite_h, title_h)
         local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
-        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.title_label:fit_into(current_x, title_y, w)
         self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
 
         current_y = current_y + title_max_h
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        self.description_label:fit_into(current_x, current_y, w) -- alloc to measure
         current_y = current_y + select(2, self.description_label:measure()) + 2 * m
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
         end
 
@@ -592,19 +617,19 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
 
         local title_max_h = math.max(sprite_h, title_h)
         local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
-        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.title_label:fit_into(current_x, title_y, w)
         self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
 
         current_y = current_y + title_max_h
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        self.description_label:fit_into(current_x, current_y, w) -- alloc to measure
         current_y = current_y + select(2, self.description_label:measure()) + 2 * m
 
-        self.max_duration_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+        self.max_duration_prefix_label:fit_into(current_x, current_y)
         local value_w, value_h = self.max_duration_value_label:measure()
-        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y)
         local colon_w, colon_h = self.max_duration_colon_label:measure()
-        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
 
         current_y = current_y + math.max(value_h, colon_h) + m
 
@@ -625,9 +650,9 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             if offset_prefix_label ~= nil then
                 local colon_w, colon_h = offset_colon_label:measure()
                 local value_w, value_h = offset_value_label:measure()
-                offset_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
-                offset_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
-                offset_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+                offset_prefix_label:fit_into(current_x, current_y)
+                offset_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+                offset_value_label:fit_into(current_x + w - value_w, current_y)
                 current_y = current_y + value_h
 
                 attribute_active = true
@@ -640,9 +665,9 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             if factor_prefix_label ~= nil then
                 local colon_w, colon_h = factor_colon_label:measure()
                 local value_w, value_h = factor_value_label:measure()
-                factor_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
-                factor_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
-                factor_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+                factor_prefix_label:fit_into(current_x, current_y)
+                factor_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+                factor_value_label:fit_into(current_x + w - value_w, current_y)
                 current_y = current_y + value_h
 
                 attribute_active = true
@@ -655,7 +680,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
         end
 
@@ -727,19 +752,19 @@ function mn.VerboseInfoPanel.Item:create_from_global_status(status)
 
         local title_max_h = math.max(sprite_h, title_h)
         local title_y = current_y + 0.5 * title_max_h - 0.5 * title_h
-        self.title_label:fit_into(current_x, title_y, w, POSITIVE_INFINITY)
+        self.title_label:fit_into(current_x, title_y, w)
         self.sprite:fit_into(current_x + w - sprite_w, current_y + 0.5 * title_max_h - 0.5 * sprite_h, sprite_w, sprite_h)
 
         current_y = current_y + title_max_h
 
-        self.description_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY) -- alloc to measure
+        self.description_label:fit_into(current_x, current_y, w) -- alloc to measure
         current_y = current_y + select(2, self.description_label:measure()) + 2 * m
 
-        self.max_duration_prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+        self.max_duration_prefix_label:fit_into(current_x, current_y)
         local value_w, value_h = self.max_duration_value_label:measure()
-        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+        self.max_duration_value_label:fit_into(current_x + w - value_w, current_y)
         local colon_w, colon_h = self.max_duration_colon_label:measure()
-        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y, POSITIVE_INFINITY)
+        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
 
         current_y = current_y + math.max(value_h, colon_h) + m
 
@@ -747,7 +772,7 @@ function mn.VerboseInfoPanel.Item:create_from_global_status(status)
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
         end
 
@@ -870,7 +895,7 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
         local sprite_w, sprite_h = 32, 32
         local tab = 2 * xm
         for element in values(self.entities) do
-            element.name_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+            element.name_label:fit_into(current_x, current_y)
             current_y = current_y + select(2, element.name_label:measure()) + m
 
             element.move_label:fit_into(current_x + xm, current_y)
@@ -1085,10 +1110,10 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
 
             if value_label ~= nil then
                 local value_w, value_h = value_label:measure()
-                prefix_label:fit_into(current_x, current_y, POSITIVE_INFINITY)
+                prefix_label:fit_into(current_x, current_y)
                 local colon_w = select(1, colon_label:measure())
-                colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y, POSITIVE_INFINITY)
-                value_label:fit_into(current_x + w - value_w, current_y, POSITIVE_INFINITY)
+                colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y)
+                value_label:fit_into(current_x + w - value_w, current_y)
 
                 current_y = current_y + value_h
             end
@@ -1117,7 +1142,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
                 if sprite ~= nil then
                     sprite:fit_into(sprite_x, current_y + 0.5 * row_h - 0.5 * sprite_h, sprite_w, sprite_h)
                 end
-                label:fit_into(sprite_x + sprite_w + m, current_y + 0.5 * row_h - 0.5 * label_h, POSITIVE_INFINITY)
+                label:fit_into(sprite_x + sprite_w + m, current_y + 0.5 * row_h - 0.5 * label_h)
 
                 current_y = current_y + row_h
             end
@@ -1129,7 +1154,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             self.spacer:fit_into(current_x, current_y, w, 0)
             current_y = current_y + select(2, self.spacer:measure()) + m
 
-            self.flavor_text_label:fit_into(current_x, current_y, w, POSITIVE_INFINITY)
+            self.flavor_text_label:fit_into(current_x, current_y, w)
             current_y = current_y + select(2, self.flavor_text_label:measure()) + m
             current_y = current_y + ym
         end
