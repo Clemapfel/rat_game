@@ -43,7 +43,7 @@ function bt.PriorityQueue:_element_new(entity)
     }
 
     if suffix ~= nil then
-        element.id_offset_label = rt.Label("<b><o>" .. suffix .. "</o></b>", rt.settings.font.default_large)
+        element.id_offset_label = rt.Label("<b><o>" .. suffix .. "</o></b>")--, rt.settings.font.default_large)
     end
 
     element.frame:set_thickness(rt.settings.frame.thickness + 1)

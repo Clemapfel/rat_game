@@ -2861,6 +2861,7 @@ function bt.BattleScene:create_simulation_environment()
 
     env.start_battle = function(battle_id)
         local battle = bt.BattleConfig(battle_id)
+        _scene._animation_queue:clear()
 
         -- clear state if present
         _state:reset_entity_multiplicity()

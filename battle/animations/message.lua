@@ -9,27 +9,24 @@ bt.Animation.MESSAGE = meta.new_type("MESSAGE", rt.Animation, function(scene, ms
         _text_box = scene:get_text_box(),
         _message = msg,
         _scrolling_done = false,
-        _signal_handler = -1
+        _signal_handler = -1,
+        _is_done = false
     })
 end)
 
 --- @override
 function bt.Animation.MESSAGE:start()
-    self._text_box:show()
-    self._text_box:append(self._message)
-    self._signal_handler = self._text_box:signal_connect("scrolling_done", function()
-        self._scrolling_done = true
+    self._text_box:append(self._message, function()
+        dbg("done")
+        self._is_done = true
     end)
 end
 
 --- @override
 function bt.Animation.MESSAGE:update(delta)
-    return ternary(self._scrolling_done, rt.AnimationResult.DISCONTINUE, rt.AnimationResult.CONTINUE)
+    return self._is_done
 end
 
 --- @override
 function bt.Animation.MESSAGE:finish()
-    self._text_box:signal_disconnect("scrolling_done", self._signal_handler)
-    self._text_box:clear()
-    self._text_box:hide()
 end

@@ -234,7 +234,7 @@ function bt.EntitySprite:add_consumable(slot_i, consumable, n_uses_left)
 
     if self._consumable_slot_to_sprite[slot_i] ~= nil then
         if self._consumable_slot_to_consumable[slot_i] == consumable then
-            self:set_consumable_n_uses_left(slot_i, consumable, n_uses_left)
+            self:set_consumable_n_uses_left(slot_i, n_uses_left)
             return
         end
         -- else replace
