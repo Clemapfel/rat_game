@@ -22,10 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing new scroll method">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/animation_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -695,15 +697,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="23425000" />
-    </task>
-    <task id="LOCAL-01298" summary="1 pass radix sort done">
-      <option name="closed" value="true" />
-      <created>1733338575667</created>
-      <option name="number" value="01298" />
-      <option name="presentableId" value="LOCAL-01298" />
-      <option name="project" value="LOCAL" />
-      <updated>1733338575667</updated>
+      <workItem from="1734643804197" duration="28159000" />
     </task>
     <task id="LOCAL-01299" summary="sorting working">
       <option name="closed" value="true" />
@@ -1089,7 +1083,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734809459681</updated>
     </task>
-    <option name="localTasksCounter" value="1347" />
+    <task id="LOCAL-01347" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1734811671477</created>
+      <option name="number" value="01347" />
+      <option name="presentableId" value="LOCAL-01347" />
+      <option name="project" value="LOCAL" />
+      <updated>1734811671477</updated>
+    </task>
+    <option name="localTasksCounter" value="1348" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1147,7 +1149,6 @@
     <MESSAGE value="refactored entity sprites" />
     <MESSAGE value="stashing before refactoring animation node system" />
     <MESSAGE value="stashing refactoring" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing before refactoring inventory state to be separate from battle state" />
     <MESSAGE value="stashing inventory state refactor" />
     <MESSAGE value="stashing inventory refactor" />
@@ -1163,7 +1164,8 @@
     <MESSAGE value="stashing before messsage rework" />
     <MESSAGE value="stashing textbox one line at a time" />
     <MESSAGE value="stashing new scroll method" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing new scroll method" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

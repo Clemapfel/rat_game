@@ -287,6 +287,7 @@ function rt.GameState:run()
         local background_color = rt.Palette.TRUE_MAGENTA
         if love.graphics.isActive() then
             love.graphics.reset()
+            love.graphics.clear()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
@@ -317,6 +318,7 @@ function rt.GameState:run()
             end
 
             love.graphics.present()
+            rt.graphics._stencil_value = 1
         end
 
         durations.n_frames = durations.n_frames + 1

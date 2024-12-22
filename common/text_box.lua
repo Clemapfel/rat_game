@@ -1,12 +1,11 @@
 rt.settings.text_box = {
     n_lines = 3,
     scroll_duration = 0.5, -- seconds
-    letters_per_second = 10010,
-    scroll_speed = 300, -- px / s
-    label_hide_delay = 1, -- seconds
+    letters_per_second = 60,
+    scroll_speed = 300, -- px / s, frame reveal/hide movement
+    label_hide_delay = 0.2, -- seconds, hold after line is done revealing but before scroll up
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
-
 
 local _HIDDEN = 1
 local _SHOWN = 0
@@ -65,6 +64,10 @@ function rt.TextBox:size_allocate(x, y, width, height)
         x, y,
         x, 0 - frame_h * 1.3
     )
+
+    self._manual_scroll_indicator_radius = 0.5 * m
+    self._manual_scroll_indicator_x = frame_h - 2 * xm
+    self._manual_scroll_indicator_y = height - 2 * ym
 end
 
 --- @brief
@@ -107,11 +110,12 @@ function rt.TextBox:update(delta)
     -- update position
     local scrolling_speed = 1 / rt.settings.text_box.scroll_duration
     local current, target = self._position_current_value, self._position_target_value
+    local distance = math.abs(current - target) * 2
     if current < target then
-        current = current + delta * scrolling_speed
+        current = current + delta * scrolling_speed -- sic, linear when leaving screen
         if current >= target then current = target end
     elseif current > target then
-        current = current - delta * scrolling_speed
+        current = current - delta * scrolling_speed * distance
         if current < target then current = target end
     end
 
@@ -134,30 +138,41 @@ function rt.TextBox:update(delta)
 
     local line_height = NEGATIVE_INFINITY
     local n_lines_shown = 0
+    local is_manual = self._manual_mode == true
 
+    local all_entries_done = self._first_scrolling_entry < self._n_entries
+    local is_previous_done = true
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
+        entry.label:update(delta)
 
-        entry.elapsed = entry.elapsed + delta
-        local is_done, new_n_lines_visible = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed)
-
-        n_lines_shown = n_lines_shown + new_n_lines_visible
-        if n_lines_shown > self._max_n_lines then
-            self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible ) * entry.line_height
+        local is_done, new_n_lines_visible = false, 0
+        if is_previous_done then
+            entry.elapsed = entry.elapsed + delta
+            is_done, new_n_lines_visible = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed, letters_per_second)
+            n_lines_shown = n_lines_shown + new_n_lines_visible
+            if n_lines_shown > self._max_n_lines then
+                self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible ) * entry.line_height
+            end
+            entry.n_lines_visible = new_n_lines_visible
         end
-        entry.n_lines_visible = new_n_lines_visible
 
-        if is_done then
+        if is_done and not self._waiting_for_input then
             entry.delay_elapsed = entry.delay_elapsed + delta
             if entry.delay_elapsed > line_delay then
                 if entry.is_done == false and entry.on_done_f ~= nil then
                     entry.on_done_f()
                     entry.is_done = true
                 end
+            else
+                all_entries_done = false
             end
         else
+            all_entries_done = false
             break
         end
+
+        is_previous_done = entry.is_done
     end
 
     -- scroll up smoothly
@@ -170,16 +185,10 @@ function rt.TextBox:update(delta)
     self._current_line_y_offset = current
 
     -- hide once scrolling is done
-    local is_done = true
-    for entry in values(self._entries) do
-        if entry.is_done == false then
-            is_done = false
-            break
-        end
-    end
-
-    if is_done and self._current_line_y_offset >= self._target_line_y_offset then
+    if not self._waiting_for_input and all_entries_done and self._current_line_y_offset >= self._target_line_y_offset then
         self._position_target_value = _HIDDEN
+        self._current_line_y_offset = 0
+        self._target_line_y_offset = 0
         self._first_scrolling_entry = self._n_entries + 1
     end
 end
@@ -191,16 +200,14 @@ function rt.TextBox:draw()
     self._frame:draw()
 
     local x, y, w, h = rt.aabb_unpack(self._stencil_aabb)
-    love.graphics.setColor(1, 1, 1, 0.1)
-    love.graphics.rectangle("fill", x, y, w, h)
-
-    local stencil_value = meta.hash(self) % 254 + 1
+    local stencil_value = rt.graphics.get_stencil_value()
     rt.graphics.stencil(stencil_value, function()
         love.graphics.rectangle("fill", x, y, w, h)
     end)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
     love.graphics.translate(x, y - self._current_line_y_offset)
+    local n_drawn, max_lines = 0, self._max_n_lines
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
         entry.label:draw()
@@ -208,12 +215,26 @@ function rt.TextBox:draw()
     end
 
     rt.graphics.set_stencil_test()
+
     love.graphics.pop()
 end
 
 --- @brief
 function rt.TextBox:skip()
-    self:update(POSITIVE_INFINITY)
+    local offset = 0
+    for entry in values(self._entries) do
+        entry.label:set_n_visible_characters(POSITIVE_INFINITY)
+        if entry.on_done_f ~= nil and entry.is_done == false then
+            entry.on_done_f()
+        end
+        entry.is_done = true
+        offset = offset + entry.height
+    end
+    self._target_line_y_offset = 0
+    self._current_line_y_offset = 0
+    self._first_scrolling_entry = self._n_entries + 1
+    self._position_target_value = _HIDDEN
+    self._position_current_value = _HIDDEN
 end
 
 --- @brief
@@ -223,4 +244,12 @@ function rt.TextBox:clear()
     self._entries = {}
     self._n_entries = 0
     self._first_scrolling_entry = 1
+end
+
+--- @brief
+function rt.TextBox:advance()
+    if self._manual_mode == false then
+        rt.warning("In rt.TextBox.advance: advancing textbox, even though it is not in manual advance mode")
+        -- TODO
+    end
 end

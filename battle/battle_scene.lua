@@ -535,9 +535,6 @@ end
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
-        for _ = 1, 5 do
-            --self._env.message(rt.random.string(64, " "))
-        end
         self._env.start_battle("DEBUG_BATTLE")
         --[[
         local target = self._state:list_enemies()[1]
@@ -570,4 +567,6 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.DEBUG then
         self._game_over_screen._vignette_shader:recompile()
     end
+
+    if which == rt.InputButton.X then self._text_box:advance() end
 end

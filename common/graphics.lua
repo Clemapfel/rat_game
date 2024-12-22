@@ -172,6 +172,13 @@ if love.getVersion() >= 12 then
         DECREMENT = "decrement"
     })
 
+    rt.graphics._stencil_value = 1
+    function rt.graphics.get_stencil_value()
+        local out = rt.graphics._stencil_value
+        rt.graphics._stencil_value = rt.graphics._stencil_value + 1
+        return out
+    end
+
     --- @brief write a stencil value to an area on screen occupied by drawables
     --- @param new_value Number new stencil value
     --- @vararg rt.Drawable
