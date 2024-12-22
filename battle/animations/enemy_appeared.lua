@@ -3,7 +3,7 @@ rt.settings.battle.animation.enemy_appeared = {
 }
 
 --- @class bt.Animation.ENEMY_APPEARED
-bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, function(scene, entity)
+bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
     local duration = rt.settings.battle.animation.enemy_appeared.duration
@@ -25,7 +25,10 @@ bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, func
 
         _black_animation = rt.TimedAnimation(0.1, 0, 1,
             rt.InterpolationFunctions.LINEAR
-        )
+        ),
+
+        _message = message,
+        _message_done = false
     })
 end, {
     _shader = (function()
@@ -52,6 +55,10 @@ function bt.Animation.ENEMY_APPEARED:start()
         target_x - 0.5 * screen_w - w, target_y,
         target_x, target_y
     )
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -72,7 +79,8 @@ function bt.Animation.ENEMY_APPEARED:update(delta)
 
     return self._position_animation:get_is_done() and
         self._opacity_animation:get_is_done() and
-        self._black_animation:get_is_done()
+        self._black_animation:get_is_done() and
+        self._message_done
 end
 
 --- @override

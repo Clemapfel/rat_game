@@ -1,7 +1,8 @@
 --- @class
-bt.Animation.ENEMY_KILLED = meta.new_type("ENEMY_KILLED", rt.Animation, function(scene, entity)
+bt.Animation.ENEMY_KILLED = meta.new_type("ENEMY_KILLED", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     return meta.new(bt.Animation.ENEMY_KILLED, {
         _step_shader = rt.ComputeShader("battle/animations/kill_step.glsl"),
@@ -24,7 +25,10 @@ bt.Animation.ENEMY_KILLED = meta.new_type("ENEMY_KILLED", rt.Animation, function
 
         _duration = rt.TimedAnimation(2),
 
-        _elapsed = 0
+        _elapsed = 0,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -89,6 +93,10 @@ function bt.Animation.ENEMY_KILLED:start()
     self:_dispatch(self._initialize_shader)
 
     self._target:set_is_visible(false)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -132,7 +140,7 @@ function bt.Animation.ENEMY_KILLED:update(delta)
     self:_dispatch(self._step_shader)
 
     self._duration:update(delta)
-    return self._duration:get_is_done() and self._scene:get_are_sprites_done_repositioning()
+    return self._duration:get_is_done() and self._scene:get_are_sprites_done_repositioning() and self._message_done
 
     --[[
     local readback = love.graphics.readbackBuffer(self._n_done_counter)

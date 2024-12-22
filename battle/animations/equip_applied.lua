@@ -5,10 +5,11 @@ rt.settings.battle.animation.equip_applied = {
 }
 
 --- @class bt.Animation.EQUIP_APPLIED
-bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, function(scene, equip, entity)
+bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, function(scene, equip, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(equip, bt.EquipConfig)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
     local move_duration = rt.settings.battle.animation.equip_applied.move_duration
     local hold_duration = rt.settings.battle.animation.equip_applied.hold_duration
     local fade_duration = rt.settings.battle.animation.equip_applied.fade_duration
@@ -29,7 +30,10 @@ bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, functi
         _position_path = nil, -- rt.Path
         _hold_animation = rt.TimedAnimation(hold_duration, 1, 1, rt.InterpolationFunctions.CONSTANT),
         _opacity_animation = rt.TimedAnimation(fade_duration, 1, 0, rt.InterpolationFunctions.LINEAR),
-        _scale_animation = rt.TimedAnimation(fade_duration, 1, 3, rt.InterpolationFunctions.LINEAR)
+        _scale_animation = rt.TimedAnimation(fade_duration, 1, 3, rt.InterpolationFunctions.LINEAR),
+
+        _message = message,
+        _message_done = false
     })
 end, {
     _equip_to_sprite = {}
@@ -38,6 +42,10 @@ end, {
 --- @override
 function bt.Animation.EQUIP_APPLIED:start()
     self._target = self._scene:get_sprite(self._entity)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 
     local sprite = bt.Animation.EQUIP_APPLIED._equip_to_sprite[self._equip]
     local sprite_w, sprite_h
@@ -84,7 +92,8 @@ function bt.Animation.EQUIP_APPLIED:update(delta)
 
     return self._position_animation:get_is_done() and
         self._scale_animation:get_is_done() and
-        self._opacity_animation:get_is_done()
+        self._opacity_animation:get_is_done() and
+        self._message_done
 end
 
 --- @override

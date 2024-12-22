@@ -5,9 +5,10 @@ rt.settings.battle.animation.global_status_gained = {
 }
 
 --- @class bt.Animation
-bt.Animation.GLOBAL_STATUS_GAINED = meta.new_type("GLOBAL_STATUS_GAINED", rt.Animation, function(scene, status)
+bt.Animation.GLOBAL_STATUS_GAINED = meta.new_type("GLOBAL_STATUS_GAINED", rt.Animation, function(scene, status, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.GlobalStatusConfig)
+    if message ~= nil then meta.assert_string(message) end
     return meta.new(bt.Animation.GLOBAL_STATUS_GAINED, {
         _scene = scene,
         _status = status,
@@ -22,7 +23,10 @@ bt.Animation.GLOBAL_STATUS_GAINED = meta.new_type("GLOBAL_STATUS_GAINED", rt.Ani
             0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS
         ),
         _elapsed = 0,
-        _duration = rt.settings.battle.animation.global_status_gained.duration
+        _duration = rt.settings.battle.animation.global_status_gained.duration,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -55,6 +59,10 @@ function bt.Animation.GLOBAL_STATUS_GAINED:start()
         shape_x, shape_y + shape_h
     )
     self._shape:set_texture(self._sprite_texture)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -69,7 +77,7 @@ function bt.Animation.GLOBAL_STATUS_GAINED:update(delta)
         self._opacity_animation:update(delta)
         self._shape:set_opacity(self._opacity_animation:get_value())
     end
-    return self._opacity_animation:get_is_done()
+    return self._opacity_animation:get_is_done() and self._message_done
 end
 
 --- @override

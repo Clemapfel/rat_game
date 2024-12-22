@@ -3,10 +3,11 @@ rt.settings.battle.animation.consumable_consumed = {
 }
 
 --- @class bt.Animation.CONSUMABLE_CONSUMED
-bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Animation, function(scene, consumable, entity)
+bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Animation, function(scene, consumable, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(consumable, bt.ConsumableConfig)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
     local duration = rt.settings.battle.animation.consumable_consumed.duration
     local n_bites = 3
     return meta.new(bt.Animation.CONSUMABLE_CONSUMED, {
@@ -31,7 +32,10 @@ bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Anima
         _generate_circle = nil, -- Function
         _n_bites = n_bites * 2,
         _duration = duration,
-        _bite_elapsed = 0
+        _bite_elapsed = 0,
+
+        _message = message,
+        _message_done = false
     })
 end, {
     consumable_to_sprite = {}
@@ -83,6 +87,10 @@ function bt.Animation.CONSUMABLE_CONSUMED:start()
     end
 
     self._target:set_is_visible(false)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -106,7 +114,7 @@ function bt.Animation.CONSUMABLE_CONSUMED:update(delta)
 
     self._sprite_scale = self._scale_animation:get_value()
     self._target_scale = self._target_animation:get_value()
-    return self._scale_animation:get_is_done()
+    return self._scale_animation:get_is_done() and self._message_done
 end
 
 --- @override

@@ -528,7 +528,7 @@ function bt.BattleScene:get_are_sprites_done_repositioning()
 end
 
 --- @brief
-function bt.BattleScene:append_to_log(text, on_done_notify)
+function bt.BattleScene:send_message(text, on_done_notify)
     self._text_box:append(text, on_done_notify)
 end
 

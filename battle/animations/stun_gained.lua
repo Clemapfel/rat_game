@@ -1,9 +1,10 @@
 --- @class bt.Animation.STUN_GAINED
 --- @param scene bt.BattleScene
 --- @param sprite bt.EntitySprite
-bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(scene, entity)
+bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     local type = bt.Animation.STUN_GAINED
     if type._initialized == false then
@@ -41,6 +42,9 @@ bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(s
         _label_position_y = 0,
         _sprite_timer = nil, -- rt.TimedAnimation
         _label_timer = nil,
+
+        _message = message,
+        _message_done = false
     })
 end, {
     _path = nil, -- rt.Spline
@@ -75,6 +79,10 @@ function bt.Animation.STUN_GAINED:start()
     )
 
     self._label:set_opacity(0)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @overload
@@ -85,7 +93,7 @@ function bt.Animation.STUN_GAINED:update(delta)
 
     self._label_position_y = self._label_timer:get_value()
     self._label:set_opacity(self._sprite_timer:get_value())
-    return self._sprite_timer:get_is_done() and self._label_timer:get_is_done()
+    return self._sprite_timer:get_is_done() and self._label_timer:get_is_done() and self._message_done
 end
 
 --- @overload

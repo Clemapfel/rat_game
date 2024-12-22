@@ -4,10 +4,12 @@ rt.settings.battle.animation.status_lost = {
 }
 
 --- @class bt.Animation.STATUS_LOST
-bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(scene, status, entity)
+bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(scene, status, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.StatusConfig)
-    meta.assert_isa(sprite, bt.Entity)
+    meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
+
     return meta.new(bt.Animation.STATUS_LOST, {
         _scene = scene,
         _status = status,
@@ -23,7 +25,10 @@ bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(s
         _fade_out_animation = rt.TimedAnimation(rt.settings.battle.animation.status_lost.duration,
             0, 1, rt.InterpolationFunctions.GAUSSIAN_LOWPASS
         ),
-        _opacity = 0
+        _opacity = 0,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -85,6 +90,10 @@ function bt.Animation.STATUS_LOST:start()
         end
         y = y + step
         x = start_x
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
+        end)
     end
 end
 
@@ -111,7 +120,7 @@ function bt.Animation.STATUS_LOST:update(delta)
         self._opacity = self._fade_in_animation:get_value()
     end
 
-    return self._fade_out_animation:get_is_done()
+    return self._fade_out_animation:get_is_done() and self._message_done
 end
 
 --- @override

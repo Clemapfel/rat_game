@@ -468,8 +468,10 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _queue_animation(bt.Animation.STATUS_APPLIED(_scene, status, _get_native(entity_proxy)))
-        env.message(rt.Translation.battle.message.status_applied_f(entity_proxy, status_proxy))
+        _queue_animation(bt.Animation.STATUS_APPLIED(
+            _scene, status, _get_native(entity_proxy),
+            rt.Translation.battle.message.status_applied_f(entity_proxy, status_proxy)
+        ))
 
         _push_current_move_user(nil)
         _invoke(status[callback_id], status_proxy, entity_proxy, ...)
@@ -497,8 +499,10 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _queue_animation(bt.Animation.CONSUMABLE_APPLIED(_scene, slot_i, entity))
-        env.message(rt.Translation.battle.message.consumable_applied_f(holder_proxy, consumable_proxy))
+        _queue_animation(bt.Animation.CONSUMABLE_APPLIED(
+            _scene, slot_i, entity,
+            rt.Translation.battle.message.consumable_applied_f(holder_proxy, consumable_proxy)
+        ))
 
         _push_current_move_user(nil)
         _invoke(consumable[callback_id], consumable_proxy, holder_proxy, ...)
@@ -518,8 +522,10 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _queue_animation(bt.Animation.GLOBAL_STATUS_APPLIED(_scene, global_status))
-        env.message(rt.Translation.battle.message.global_status_applied_f(global_status_proxy))
+        _queue_animation(bt.Animation.GLOBAL_STATUS_APPLIED(
+            _scene, global_status,
+            rt.Translation.battle.message.global_status_applied_f(global_status_proxy)
+        ))
 
         _push_current_move_user(nil)
         _invoke(global_status[callback_id], global_status_proxy, ...)
@@ -541,8 +547,10 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
-        _queue_animation(bt.Animation.EQUIP_APPLIED(_scene, equip, _get_native(holder_proxy)))
-        env.message(rt.Translation.battle.message.equip_applied_f(holder_proxy, equip_proxy))
+        _queue_animation(bt.Animation.EQUIP_APPLIED(
+            _scene, equip, _get_native(holder_proxy)),
+            rt.Translation.battle.message.equip_applied_f(holder_proxy, equip_proxy)
+        )
 
         _push_current_move_user(nil)
         _invoke(equip[callback_id], equip_proxy, holder_proxy, ...)
@@ -949,7 +957,12 @@ function bt.BattleScene:create_simulation_environment()
 
         _state:entity_remove_consumable(entity, slot_i)
 
-        local animation = bt.Animation.OBJECT_LOST(_scene, consumable, entity)
+        local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
+        local animation = bt.Animation.OBJECT_LOST(
+            _scene, consumable, entity,
+            rt.Translation.battle.message.consumable_removed_f(entity_proxy, consumable_proxy)
+        )
+
         animation:signal_connect("start", function(_)
             local sprite = _scene:get_sprite(entity)
             sprite:remove_consumable(slot_i)
@@ -958,8 +971,6 @@ function bt.BattleScene:create_simulation_environment()
         _new_animation_node()
         _queue_animation(animation)
 
-        local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
-        env.message(rt.Translation.battle.message.consumable_removed_f(entity_proxy, consumable_proxy))
 
         _new_animation_node()
 
@@ -1015,15 +1026,13 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        env.message(rt.Translation.battle.message.consumable_added_f(entity_proxy, consumable_proxy))
-        if new_slot == nil then
-            env.message(rt.Translation.battle.message.consumable_no_space_f(entity_proxy, consumable_proxy))
-            return nil
-        end
 
         _state:entity_add_consumable(entity, new_slot, consumable)
 
-        local animation = bt.Animation.OBJECT_GAINED(_scene, consumable, entity)
+        local animation = bt.Animation.OBJECT_GAINED(
+            _scene, consumable, entity,
+            rt.Translation.battle.message.consumable_added_f(entity_proxy, consumable_proxy)
+        )
         animation:signal_connect("start", function(_)
             local sprite = _scene:get_sprite(entity)
             sprite:add_consumable(new_slot, consumable, consumable:get_max_n_uses())
@@ -1079,21 +1088,22 @@ function bt.BattleScene:create_simulation_environment()
 
         local consumable_proxy = bt.create_consumable_proxy(_scene, consumable)
         local animation
+        local message = rt.Translation.battle.message.consumable_consumed_f(entity_proxy, consumable_proxy)
+
         if was_used_up then
             _state:entity_remove_consumable(entity, slot_i)
 
-            animation = bt.Animation.CONSUMABLE_CONSUMED(_scene, consumable, entity)
+            animation = bt.Animation.CONSUMABLE_CONSUMED(_scene, consumable, entity, message)
             animation:signal_connect("finish", function()
                 _scene:get_sprite(entity):remove_consumable(slot_i)
             end)
         else
-            animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, entity)
+            animation = bt.Animation.CONSUMABLE_APPLIED(_scene, consumable, entity, message)
             animation:signal_connect("start", function()
                 _scene:get_sprite(entity):set_consumable_n_uses_left(max - (n_used + n))
             end)
         end
 
-        env.message(rt.Translation.battle.message.consumable_consumed_f(entity_proxy, consumable_proxy))
         _queue_animation(animation)
 
         _new_animation_node()
@@ -1233,16 +1243,17 @@ function bt.BattleScene:create_simulation_environment()
 
             local before = _state["entity_get_" .. which .. "_is_disabled"](_state, entity, slot_i)
             local now = b
+            local object_proxy = bt["create_" .. which .. "_proxy"](_scene, object)
 
             if before ~= now then
                 _state["entity_set_" .. which .. "_is_disabled"](_state, entity, slot_i, b)
-
-                local object_proxy = bt["create_" .. which .. "_proxy"](_scene, object)
                 _new_animation_node()
 
                 if before == false and now == true then
-                    _queue_animation(bt.Animation.OBJECT_DISABLED(_scene, object, entity))
-                    env.message(rt.Translation.battle.message.object_disabled_f(entity_proxy, object_proxy))
+                    _queue_animation(bt.Animation.OBJECT_DISABLED(
+                        _scene, object, entity,
+                        rt.Translation.battle.message.object_disabled_f(entity_proxy, object_proxy)
+                    ))
                 end
 
                 _new_animation_node()
@@ -1263,8 +1274,10 @@ function bt.BattleScene:create_simulation_environment()
                     end
                 end
             elseif before == true and now == false then
-                _queue_animation(bt.Animation.OBJECT_ENABLED(_scene, object, entity))
-                env.message(rt.Translation.battle.message.object_no_longer_disabled_f(entity_proxy, object_proxy))
+                _queue_animation(bt.Animation.OBJECT_ENABLED(
+                    _scene, object, entity,
+                    rt.Translation.battle.message.object_no_longer_disabled_f(entity_proxy, object_proxy)
+                ))
                 -- no callbacks on enable
             end
         end
@@ -1344,12 +1357,14 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.GLOBAL_STATUS_GAINED(_scene, global_status)
+        local animation = bt.Animation.GLOBAL_STATUS_GAINED(
+            _scene, global_status,
+            rt.Translation.battle.message.global_status_added_f(global_status_proxy)
+        )
         animation:signal_connect("start", function(_)
             _scene:add_global_status(global_status, global_status:get_max_duration())
         end)
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.global_status_added_f(global_status_proxy))
 
         _new_animation_node()
 
@@ -1392,12 +1407,14 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.GLOBAL_STATUS_LOST(_scene, global_status)
+        local animation = bt.Animation.GLOBAL_STATUS_LOST(
+            _scene, global_status,
+            rt.Translation.battle.message.global_status_removed_f(global_status_proxy)
+        )
         animation:signal_connect("finish", function(_)
             _scene:remove_global_status(global_status)
         end)
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.global_status_removed_f(global_status_proxy))
 
         _new_animation_node()
 
@@ -1531,7 +1548,10 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.STATUS_GAINED(_scene, status, entity)
+        local animation = bt.Animation.STATUS_GAINED(
+            _scene, status, entity,
+            rt.Translation.battle.message.status_added_f(entity_proxy, status_proxy)
+        )
         animation:signal_connect("start", function(_)
             _scene:get_sprite(entity):add_status(status, status:get_max_duration())
         end)
@@ -1541,7 +1561,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.status_added_f(entity_proxy, status_proxy))
 
         _new_animation_node()
 
@@ -1578,14 +1597,16 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.STATUS_GAINED(_scene, status, entity)
+        local animation = bt.Animation.STATUS_LOST(
+            _scene, status, entity,
+            rt.Translation.battle.message.status_removed_f(entity_proxy, status_proxy)
+        )
         animation:signal_connect("finish", function(_)
             _scene:get_sprite(entity):remove_status(status)
             _scene:set_priority_order(_state:list_entities_in_order())
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.status_removed_f(entity_proxy, status_proxy))
 
         _new_animation_node()
 
@@ -1752,11 +1773,12 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
+        local message = rt.Translation.battle.message.knocked_out_f(entity_proxy)
         local animation
         if env.get_is_enemy(entity_proxy) then
-            animation = bt.Animation.ENEMY_KNOCKED_OUT(_scene, entity)
+            animation = bt.Animation.ENEMY_KNOCKED_OUT(_scene, entity, message)
         else
-            animation = bt.Animation.ALLY_KNOCKED_OUT(_scene, entity)
+            animation = bt.Animation.ALLY_KNOCKED_OUT(_scene, entity, message)
         end
 
         animation:signal_connect("start", function(_)
@@ -1775,7 +1797,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.knocked_out_f(entity_proxy))
 
         _new_animation_node()
 
@@ -1825,11 +1846,12 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
+        local message = rt.Translation.battle.message.helped_up_f(entity_proxy)
         local animation
         if env.get_is_enemy(entity_proxy) then
-            animation = bt.Animation.ENEMY_HELPED_UP(_scene, entity)
+            animation = bt.Animation.ENEMY_HELPED_UP(_scene, entity, message)
         else
-            animation = bt.Animation.ALLY_HELPED_UP(_scene, entity)
+            animation = bt.Animation.ALLY_HELPED_UP(_scene, entity, message)
         end
 
         animation:signal_connect("start", function(_)
@@ -1849,8 +1871,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.helped_up_f(entity_proxy))
-
         _new_animation_node()
 
         for status_proxy in values(env.list_statuses(entity_proxy)) do
@@ -1889,11 +1909,12 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
+        local message = rt.Translation.battle.message.killed_f(entity_proxy)
         local animation
         if env.get_is_enemy(entity_proxy) then
-            animation = bt.Animation.ENEMY_KILLED(_scene, entity)
+            animation = bt.Animation.ENEMY_KILLED(_scene, entity, message)
         else
-            animation = bt.Animation.ALLY_KILLED(_scene, entity)
+            animation = bt.Animation.ALLY_KILLED(_scene, entity, message)
         end
 
         animation:signal_connect("start", function(_)
@@ -1918,7 +1939,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.killed_f(entity_proxy))
 
         _new_animation_node()
 
@@ -1964,7 +1984,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.ENTITY_REVIVED(self, entity)
+        local animation = bt.Animation.ENTITY_REVIVED(self, entity, rt.Translation.battle.message.revived_f(entity_proxy))
         animation:signal_connect("start", function(_)
             _scene:add_entity(entity)
             local sprite = _scene:get_sprite(entity)
@@ -1986,7 +2006,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.revived_f(entity_proxy))
 
         _new_animation_node()
 
@@ -2043,14 +2062,16 @@ function bt.BattleScene:create_simulation_environment()
         _new_animation_node()
 
         local difference = value -- unclamped value for animation display
-        local animation = bt.Animation.HP_GAINED(_scene, entity, difference)
+        local animation = bt.Animation.HP_GAINED(
+            _scene, entity, difference,
+            rt.Translation.battle.message.hp_gained_f(entity_proxy, difference)
+        )
 
         animation:signal_connect("start", function(_)
             _scene:get_sprite(entity):set_hp(clamp(hp_current + difference, 0, hp_base))
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.hp_gained_f(entity_proxy, difference))
 
         _new_animation_node()
 
@@ -2118,13 +2139,15 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.HP_LOST(_scene, entity, difference)
+        local animation = bt.Animation.HP_LOST(
+            _scene, entity, difference,
+            rt.Translation.battle.message.hp_lost_f(entity_proxy, difference)
+        )
         animation:signal_connect("start", function(_)
             _scene:get_sprite(entity):set_hp(clamp(hp_current - difference, 0))
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.hp_lost_f(entity_proxy, difference))
 
         _new_animation_node()
 
@@ -2246,11 +2269,19 @@ function bt.BattleScene:create_simulation_environment()
                 table.insert(entity_to_status_proxies[entity], status_proxy)
             end
 
+            local entity_proxy = bt.create_entity_proxy(_scene, entity)
+            local message
+            if env.get_is_enemy(entity_proxy) then
+                message = rt.Translation.battle.message.enemy_spawned_f(entity_proxy)
+            else
+                message = rt.Translation.battle.message.ally_spawned_f(entity_proxy)
+            end
+
             local animation
             if _state:entity_get_is_enemy(entity) then
-                animation = bt.Animation.ENEMY_APPEARED(_scene, entity)
+                animation = bt.Animation.ENEMY_APPEARED(_scene, entity, message)
             else
-                animation = bt.Animation.ALLY_APPEARED(_scene, entity)
+                animation = bt.Animation.ALLY_APPEARED(_scene, entity, message)
             end
 
             if is_first_animation then
@@ -2283,13 +2314,6 @@ function bt.BattleScene:create_simulation_environment()
             end)
 
             _queue_animation(animation)
-
-            local entity_proxy = bt.create_entity_proxy(_scene, entity)
-            if env.get_is_enemy(entity_proxy) then
-                env.message(rt.Translation.battle.message.enemy_spawned_f(entity_proxy))
-            else
-                env.message(rt.Translation.battle.message.ally_spawned_f(entity_proxy))
-            end
         end
 
         _new_animation_node()
@@ -2372,7 +2396,10 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        local animation = bt.Animation.SWAP(_scene, entity_a, entity_b)
+        local animation = bt.Animation.SWAP(
+            _scene, entity_a, entity_b,
+            rt.Translation.battle.message.swap_f(entity_a_proxy, entity_b_proxy)
+        )
         animation:signal_connect("finish", function(_)
             if entity_a:get_is_enemy() then -- == entity_b:get_is_enemy()
                 _scene:reformat_enemy_sprites()
@@ -2383,7 +2410,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.swap_f(entity_a_proxy, entity_b_proxy))
 
         -- for callbacks, sort by priority for deterministic ordering
         local a_prio, b_prio = _state:get_entity_priority(entity_a), _state:get_entity_priority(entity_b)
@@ -2830,14 +2856,16 @@ function bt.BattleScene:create_simulation_environment()
     env.quicksave = function()
         local texture = _state:create_quicksave()
 
-        local animation = rt.Animation.QUICKSAVE(self, _scene._quicksave_indicator, texture)
+        local animation = rt.Animation.QUICKSAVE(
+            self, _scene._quicksave_indicator, texture,
+            rt.Translation.battle.message.quicksave_created_f()
+        )
         animation:signal_connect("finish", function(_)
             _scene._quicksave_indicator:set_n_turns_elapsed(0)
         end)
 
         _new_animation_node()
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.quicksave_created_f())
     end
 
     env.quickload = function()
@@ -2848,7 +2876,10 @@ function bt.BattleScene:create_simulation_environment()
 
         _state:load_quicksave()
 
-        local animation = rt.Animation.QUICKLOAD(self, _scene._quicksave_indicator)
+        local animation = rt.Animation.QUICKLOAD(
+            self, _scene._quicksave_indicator,
+            rt.Translation.battle.message.quicksave_loaded_f()
+        )
         animation:signal_connect("finish", function(_)
             _scene._quicksave_indicator:set_screenshot(nil)
             _scene:create_from_state(self._state)
@@ -2856,7 +2887,6 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
         _queue_animation(animation)
-        env.message(rt.Translation.battle.message.quicksave_loaded_f())
     end
 
     env.start_battle = function(battle_id)

@@ -2,16 +2,16 @@ rt.settings.battle.animations.turn_start = {
     duration = 4
 }
 
-bt.Animation.TURN_START = function(scene)
-    return bt.Animation.TURN_START_END(scene, true)
+bt.Animation.TURN_START = function(scene, message)
+    return bt.Animation.TURN_START_END(scene, true, message)
 end
 
-bt.Animation.TURN_END = function(scene)
-    return bt.Animation.TURN_START_END(scene, false)
+bt.Animation.TURN_END = function(scene, message)
+    return bt.Animation.TURN_START_END(scene, false, message)
 end
 
 --- @class bt.Animation.TURN_START_END
-bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, function(scene, start_or_end)
+bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, function(scene, start_or_end, message)
     meta.assert_isa(scene, bt.Scene)
     meta.assert_boolean(start_or_end)
 
@@ -56,7 +56,10 @@ bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, func
         _screenshot_top = nil, -- rt.VertexShape
 
         _screenshot_bottom_vertex_data = {},
-        _screenshot_bottom = nil -- "
+        _screenshot_bottom = nil, -- "
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -161,6 +164,10 @@ do
         else
             self._label_path = rt.Path(label_right_x, label_y, label_left_x, label_y)
         end
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
+        end)
     end
 end
 
@@ -249,7 +256,7 @@ function bt.Animation.TURN_START_END:update(delta)
     self._label:update(delta)
     self._label:set_opacity(opacity)
     self._label_x, self._label_y = self._label_path:at(self._label_path_animation:get_value())
-    return is_done
+    return is_done and self._message_done
 end
 
 --- @override

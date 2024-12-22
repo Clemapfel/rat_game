@@ -3,9 +3,10 @@ rt.settings.battle.animation.object_gained = {
 }
 
 --- @class bt.Animation.OBJECT_GAINED
-bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, function(scene, object, entity)
+bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, function(scene, object, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     local duration = rt.settings.battle.animation.object_gained.duration
     return meta.new(bt.Animation.OBJECT_GAINED, {
@@ -35,7 +36,10 @@ bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, functi
             1, 5, rt.InterpolationFunctions.GAUSSIAN_HIGHPASS
         ),
 
-        _position_animation = rt.TimedAnimation
+        _position_animation = rt.TimedAnimation,
+
+        _message = message,
+        _message_done = false
     })
 end, {
     object_to_sprite = {}
@@ -68,6 +72,10 @@ function bt.Animation.OBJECT_GAINED:start()
     self._ray_aabb.y = 0
     self._ray_aabb.width = sprite_w
     self._ray_aabb.height = bottom_y + 0.5 * sprite_h
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -100,7 +108,7 @@ function bt.Animation.OBJECT_GAINED:update(delta)
     self._ray:set_vertex_color(3, rt.RGBA(1, 1, 1, down_opacity))
     self._ray:set_vertex_color(4, rt.RGBA(1, 1, 1, down_opacity))
 
-    return self._opacity_animation:get_is_done() and self._path_animation:get_is_done()
+    return self._opacity_animation:get_is_done() and self._path_animation:get_is_done() and self._message_done
 end
 
 --- @override

@@ -2,44 +2,45 @@ rt.settings.battle.animation.stat_changed = {
     duration = 3
 }
 
-function bt.Animation.ATTACK_RAISED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.ATTACK, true)
+function bt.Animation.ATTACK_RAISED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.ATTACK, true, message)
 end
 
-function bt.Animation.ATTACK_LOWERED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, false)
+function bt.Animation.ATTACK_LOWERED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, false, message)
 end
 
-function bt.Animation.DEFENSE_RAISED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, true)
+function bt.Animation.DEFENSE_RAISED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, true, message)
 end
 
-function bt.Animation.DEFESE_LOWERED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, false)
+function bt.Animation.DEFESE_LOWERED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.DEFENSE, false, message)
 end
 
-function bt.Animation.SPEED_RAISED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.SPEED, true)
+function bt.Animation.SPEED_RAISED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.SPEED, true, message)
 end
 
-function bt.Animation.SPEED_LOWERED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.SPEED, false)
+function bt.Animation.SPEED_LOWERED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.SPEED, false, message)
 end
 
-function bt.Animation.PRIORITY_RAISED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.PRIORITY, true)
+function bt.Animation.PRIORITY_RAISED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.PRIORITY, true, message)
 end
 
-function bt.Animation.PRIORITY_LOWERED(scene, sprite)
-    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.PRIORITY, false)
+function bt.Animation.PRIORITY_LOWERED(scene, sprite, message)
+    return bt.Animation.STAT_CHANGED(scene, sprite, bt.StatType.PRIORITY, false, message)
 end
 
 --- @class bt.Animation.STAT_CHANGED
-bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function(scene, entity, stat, direction)
+bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function(scene, entity, stat, direction, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_boolean(direction)
     meta.assert_enum_value(stat, bt.StatType)
+    if message ~= nil then meta.assert_string(message) end
 
     local settings = rt.settings.battle.animation.stat_changed
     return meta.new(bt.Animation.STAT_CHANGED, {
@@ -66,7 +67,10 @@ bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function
             0, 1, rt.InterpolationFunctions.SHELF, 0.97, 10
         ),
 
-        _elapsed = 0
+        _elapsed = 0,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -134,12 +138,10 @@ do
         end
         assert(color ~= nil)
         self._color = {rt.color_unpack(color)}
-        input = rt.InputController()
-        input:signal_connect("pressed", function()
-            self._shader:recompile()
-            println("recompile")
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
         end)
-        self._temp = input
     end
 end
 
@@ -160,7 +162,7 @@ function bt.Animation.STAT_CHANGED:update(delta)
     self._opacity = self._opacity_animation:get_value()
     self._label:set_opacity(self._opacity)
 
-    return is_done
+    return is_done and self._message_done
 end
 
 --- @override

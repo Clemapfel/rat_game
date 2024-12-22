@@ -1,7 +1,8 @@
 --- @class bt.Animation.OBJECT_LOST
-bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(scene, object, entity)
+bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(scene, object, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
     return meta.new(bt.Animation.OBJECT_LOST, {
         _scene = scene,
         _object = object,
@@ -24,6 +25,9 @@ bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(s
         _floor_body = nil, -- b2.Body
         _ball_shape = nil,  -- b2.Shape
         _floor_shape = nil, -- b2.Shape
+
+        _message = message,
+        _message_done = false
 })
 end, {
     object_to_sprite = {},
@@ -71,6 +75,10 @@ function bt.Animation.OBJECT_LOST:start()
     self._signal_handler = self._scene:signal_connect("update", function(scene)
         self.world.updated_this_frame = false
     end)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -90,7 +98,9 @@ function bt.Animation.OBJECT_LOST:update(delta)
     self._sprite_rotation = self._ball_body:get_angle()
     self._sprite_opacity = self._opacity_animation:get_value()
 
-    return self._opacity_animation:get_is_done() and select(2, self._ball_body:get_linear_velocity()) < 10e-3
+    return self._opacity_animation:get_is_done() and
+        select(2, self._ball_body:get_linear_velocity()) < 10e-3 and
+        self._message_done
 end
 
 --- @override

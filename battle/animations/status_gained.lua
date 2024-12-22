@@ -3,10 +3,11 @@ rt.settings.battle.animation.status_gained = {
 }
 
 --- @class bt.Animation.STATUS_APPLIED
-bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, function(scene, status, entity)
+bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, function(scene, status, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.StatusConfig)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     local duration = rt.settings.battle.animation.status_gained.duration
     local rotation = math.pi / 10
@@ -35,7 +36,10 @@ bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, functi
             0, 1,
             rt.InterpolationFunctions.LINEAR
         ),
-        _sprite_path = nil, -- rt.Spline
+        _sprite_path = nil, -- rt.Spline,
+
+        _message = message,
+        _message_done = false
     })
 end, {
     status_to_sprite = {}
@@ -65,6 +69,10 @@ function bt.Animation.STATUS_GAINED:start()
         x + 0.5 * w, y + (0.5 + offset) * h,
         x + 0.5 * w, y + (0.5 - offset) * h
     })
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @brief
@@ -88,7 +96,8 @@ function bt.Animation.STATUS_GAINED:update(delta)
 
     return self._rotation_animation:get_is_done() and
         self._opacity_animation:get_is_done() and
-        self._position_animation:get_is_done()
+        self._position_animation:get_is_done() and
+        self._message_done
 end
 
 --- @brie

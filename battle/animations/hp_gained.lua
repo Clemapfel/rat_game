@@ -3,10 +3,11 @@ rt.settings.battle.animations.hp_gained = {
 }
 
 --- @class bt.Animation.HP_GAINED
-bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene, entity, value)
+bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene, entity, value, message)
     meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_number(value)
+    if message ~= nil then meta.assert_string(message) end
 
     local settings = rt.settings.battle.animations.hp_gained
     return meta.new(bt.Animation.HP_GAINED, {
@@ -44,7 +45,10 @@ bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene
         _color_gradient_animation = rt.TimedAnimation(
             settings.duration, 1, 1 - 0.3,
             rt.InterpolationFunctions.BUTTERWORTH, 4
-        )
+        ),
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -132,6 +136,10 @@ do
         self._color_gradient_shader = _color_gradient_shader
 
         self._target:set_is_visible(false)
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
+        end)
     end
 end
 
@@ -162,7 +170,7 @@ function bt.Animation.HP_GAINED:update(delta)
     self._particle_emitter:update(delta)
 
     self._color_gradient_weight = self._color_gradient_animation:get_value()
-    return is_done
+    return is_done and self._message_done
 end
 
 --- @override

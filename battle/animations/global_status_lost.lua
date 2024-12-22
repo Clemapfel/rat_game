@@ -6,9 +6,10 @@ rt.settings.battle.animation.global_status_lost = {
 
 --- @class bt.Animation
 --- @param status bt.GlobalStatusConfig
-bt.Animation.GLOBAL_STATUS_LOST = meta.new_type("GLOBAL_STATUS_LOST", rt.Animation, function(scene, status)
+bt.Animation.GLOBAL_STATUS_LOST = meta.new_type("GLOBAL_STATUS_LOST", rt.Animation, function(scene, status, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(status, bt.GlobalStatusConfig)
+    if message ~= nil then meta.assert_string(message) end
     local hold = rt.settings.battle.animation.global_status_lost.hold_duration
     local total = rt.settings.battle.animation.global_status_lost.duration
     local blow = total - hold
@@ -28,7 +29,9 @@ bt.Animation.GLOBAL_STATUS_LOST = meta.new_type("GLOBAL_STATUS_LOST", rt.Animati
         _blow_animation = rt.TimedAnimation(blow, 0, 2),
         _hold_animation = rt.TimedAnimation(hold),
 
-        _duration = rt.settings.battle.animation.global_status_lost.duration
+        _duration = rt.settings.battle.animation.global_status_lost.duration,
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -61,6 +64,10 @@ function bt.Animation.GLOBAL_STATUS_LOST:start()
         shape_x, shape_y + shape_h
     )
     self._shape:set_texture(self._sprite_texture)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -80,6 +87,7 @@ function bt.Animation.GLOBAL_STATUS_LOST:update(delta)
     return self._opacity_animation:get_is_done()
         and self._hold_animation:get_is_done()
         and self._blow_animation:get_is_done()
+        and self._message_done
 end
 
 --- @override

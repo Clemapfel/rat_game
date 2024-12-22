@@ -6,9 +6,10 @@ rt.settings.battle.animation.object_disabled = {
 }
 
 --- @class bt.Animation.OBJECT_DISABLED
-bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, entity)
+bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, function(scene, object, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
     assert(object.get_sprite_id ~= nil)
     return meta.new(bt.Animation.OBJECT_DISABLED, {
         _scene = scene,
@@ -25,7 +26,10 @@ bt.Animation.OBJECT_DISABLED = meta.new_type("OBJECT_DISABLED", rt.Animation, fu
         _sprite_texture = rt.RenderTexture(),
 
         _hold_elapsed = 0,
-        _shatter_elapsed = 0
+        _shatter_elapsed = 0,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -165,6 +169,9 @@ function bt.Animation.OBJECT_DISABLED:start()
         end
     end
 
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -208,7 +215,7 @@ function bt.Animation.OBJECT_DISABLED:update(delta)
     love.graphics.translate(1 * self._render_texture_x, 1 * self._render_texture_y)
     self._render_texture:unbind()
 
-    return self._opacity_animation:get_is_done()
+    return self._opacity_animation:get_is_done() and self._message_done
 end
 
 --- @override

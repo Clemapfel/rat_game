@@ -10,10 +10,11 @@ do
 end
 
 --- @class bt.Animation.HP_LOST
-bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, entity, value)
+bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, entity, value, message)
     meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_number(value)
+    if message ~= nil then meta.assert_string(message) end
     local settings = rt.settings.battle.animations.hp_lost
     return meta.new(bt.Animation.HP_LOST, {
         _scene = scene,
@@ -64,7 +65,10 @@ bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, en
 
         _elapsed = 0,
         _duration = settings.duration,
-        _radius_fraction = 1
+        _radius_fraction = 1,
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -160,6 +164,10 @@ do
             })
         end
         self._particle_buffer:replace_data(data)
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
+        end)
     end
 end
 
@@ -197,7 +205,7 @@ function bt.Animation.HP_LOST:update(delta)
     self._step_shader:dispatch(self._n_particles, 1)
 
     self._label_scale = self._label_scale_animation:get_value()
-    return is_done
+    return is_done and self._message_done
 end
 
 --- @override

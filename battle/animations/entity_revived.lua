@@ -4,7 +4,7 @@ rt.settings.battle.animations.entity_revived = {
 }
 
 --- @class bt.Animation.ENTITY_REVIVED
-bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, function(scene, entity)
+bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.Scene)
     meta.assert_isa(entity, bt.Entity)
 
@@ -45,7 +45,10 @@ bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, func
         _particle_path_animation = rt.TimedAnimation(settings.duration),
         _particle_opacity = 1,
         _particle_floor = 0,
-        _particle_opacity_animation = rt.TimedAnimation(settings.duration, 0, 1, rt.InterpolationFunctions.HANN_LOWPASS, 6)
+        _particle_opacity_animation = rt.TimedAnimation(settings.duration, 0, 1, rt.InterpolationFunctions.HANN_LOWPASS, 6),
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -167,6 +170,10 @@ do
             0, -sprite_y - sprite_h,
             0, 0
         )
+
+        self._scene:send_message(self._message, function()
+            self._message_done = true
+        end)
     end
 end
 
@@ -222,7 +229,7 @@ function bt.Animation.ENTITY_REVIVED:update(delta)
     self._sprite:set_opacity(sprite_value)
     self._sprite_scale = self._sprite_animation:get_value()
     self._particle_opacity = self._particle_opacity_animation:get_value()
-    return self._shadow_fade_out_animation:get_is_done() and self._scene:get_are_sprites_done_repositioning()
+    return self._shadow_fade_out_animation:get_is_done() and self._scene:get_are_sprites_done_repositioning() and self._message_done
 end
 
 --- @override

@@ -6,9 +6,10 @@ rt.settings.battle.animation.object_enabled = {
 }
 
 --- @class bt.Animation.OBJECT_ENABLED
-bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, function(scene, object, entity)
+bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, function(scene, object, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_message(message) end
     assert(object.get_sprite_id ~= nil)
     return meta.new(bt.Animation.OBJECT_ENABLED, {
         _scene = scene,
@@ -28,7 +29,10 @@ bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, func
         _opacity = 1,
 
         _sprite_texture = rt.RenderTexture(),
-        _triangles = {}
+        _triangles = {},
+
+        _message = message,
+        _message_done = false
     })
 end, {
     _cache = {} -- store shards if caching enabled
@@ -213,6 +217,10 @@ function bt.Animation.OBJECT_ENABLED:start()
             [sprite_h] = self._triangles
         }
     end
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -232,7 +240,7 @@ function bt.Animation.OBJECT_ENABLED:update(delta)
         shape.current_x, shape.current_y = shape.path:at(fraction)
     end
 
-    return self._fade_out_animation:get_is_done() and self._fade_out_animation:get_is_done()
+    return self._fade_out_animation:get_is_done() and self._fade_out_animation:get_is_done() and self._message_done
 end
 
 --- @override

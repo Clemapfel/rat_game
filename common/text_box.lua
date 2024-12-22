@@ -2,8 +2,8 @@ rt.settings.text_box = {
     n_lines = 3,
     scroll_duration = 0.5, -- seconds
     letters_per_second = 60,
-    scroll_speed = 300, -- px / s, frame reveal/hide movement
-    label_hide_delay = 0.2, -- seconds, hold after line is done revealing but before scroll up
+    scroll_speed = 500, -- px / s, frame reveal/hide movement
+    label_hide_delay = 0.5, -- seconds, hold after line is done revealing but before scroll up
     advance_indicator_bounces_per_second = 1
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
@@ -76,8 +76,8 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._frame:fit_into(0, 0, width, frame_h)
 
     self._position_path = rt.Path(
-        x, 0 - frame_h * 1.3,
-        x, y
+        x, y,
+        x, y - frame_h * 1.3
     )
 
     self._manual_scroll_indicator_radius = 0.5 * m
@@ -149,7 +149,7 @@ function rt.TextBox:update(delta)
     -- update position
     local scrolling_speed = 1 / rt.settings.text_box.scroll_duration
     local current, target = self._position_current_value, self._position_target_value
-    local distance = math.abs(current - target) * 2
+    local distance = 1 --math.abs(current - target) * 2
     if current < target then
         current = current + delta * scrolling_speed -- sic, linear when leaving screen
         if current >= target then current = target end
@@ -185,7 +185,7 @@ function rt.TextBox:update(delta)
         local entry = self._entries[i]
         entry.label:update(delta)
 
-        if self._manual_mode and i > self._first_scrolling_entry and self._waiting_for_advance then break end
+        --if self._manual_mode and i > self._first_scrolling_entry and self._waiting_for_advance then break end
 
         local is_done, new_n_lines_visible = false, 0
         if is_previous_done then

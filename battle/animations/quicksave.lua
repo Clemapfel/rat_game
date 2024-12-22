@@ -3,9 +3,10 @@ rt.settings.battle.animations.quicksave = {
 }
 
 --- @class bt.Animation.QUICKSAVE
-bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target, snapshot)
+bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target, snapshot, message)
     meta.assert_isa(target, bt.QuicksaveIndicator)
     meta.assert_isa(snapshot, rt.RenderTexture)
+    if message ~= nil then meta.assert_string(message) end
     local flash = rt.settings.battle.animations.quicksave.flash_intensity
     return meta.new(bt.Animation.QUICKSAVE, {
         _scene = scene,
@@ -21,13 +22,19 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
             0.2,
             0, 1,
             rt.InterpolationFunctions.DERIVATIVE_OF_GAUSSIAN_EASE_OUT
-        )
+        ),
+
+        _message = message,
+        _message_done = false
     })
 end)
 
 --- @override
 function bt.Animation.QUICKSAVE:start()
-    -- noop, delayed until white flash in update
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
+    -- otherwise noop, delayed until white flash in update
 end
 
 --- @override
@@ -60,7 +67,7 @@ do
         end
 
         previous = value
-        return self._flash_animation:get_is_done() and self._is_done
+        return self._flash_animation:get_is_done() and self._is_done and self._message_done
     end
 end
 

@@ -4,9 +4,10 @@ rt.settings.battle.animations.swap = {
 }
 
 --- @class bt.Animation.SWAP
-bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, entity_a, entity_b)
+bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, entity_a, entity_b, message)
     meta.assert_isa(entity_a, bt.Entity)
     meta.assert_isa(entity_b, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     local duration = rt.settings.battle.animations.swap.duration
     return meta.new(bt.Animation.SWAP, {
@@ -31,6 +32,9 @@ bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, entity_a
 
         _a_path = nil, -- rt.Path
         _b_path = nil, -- rt.Path
+
+        _message = message,
+        _message_done = false
     })
 end)
 
@@ -79,6 +83,10 @@ function rt.Animation.SWAP:start()
 
     self._target_a:set_is_visible(false)
     self._target_b:set_is_visible(false)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -128,7 +136,7 @@ do
             self.draw = _b_before_a_draw
         end
 
-        return self._path_animation:get_is_done()
+        return self._path_animation:get_is_done() and self._message_done
     end
 
     bt.Animation.SWAP.draw = _a_before_b_draw

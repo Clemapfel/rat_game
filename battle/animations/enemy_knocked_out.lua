@@ -1,7 +1,8 @@
 --- @class bt.Animation.ENEMY_KNOCKED_OUT
-bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation, function(scene, entity)
+bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
 
     local fade_in = 0.1
     local hold = 2
@@ -26,7 +27,10 @@ bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation
         _sprite_y = 0,
 
         _knock_out_sprite_set = false,
-        _elapsed = 0
+        _elapsed = 0,
+
+        _message = message,
+        _message_done = false
     })
 end)
 

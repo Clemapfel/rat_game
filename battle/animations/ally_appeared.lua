@@ -1,7 +1,8 @@
 --- @class bt.Animation.ALLY_APPEARED
-bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, function(scene, entity)
+bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, function(scene, entity, message)
     meta.assert_isa(scene, bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
+    if message ~= nil then meta.assert_string(message) end
     local duration = rt.settings.battle.animation.enemy_appeared.duration
     return meta.new(bt.Animation.ALLY_APPEARED, {
         _scene = scene,
@@ -21,6 +22,9 @@ bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, functi
         _black_animation = rt.TimedAnimation(duration - 0.1, 0, 1,
             rt.InterpolationFunctions.GAUSSIAN_HIGHPASS
         ),
+
+        _message = message,
+        _message_done = false
     })
 end, {
     _shader = (function()
@@ -54,6 +58,10 @@ function bt.Animation.ALLY_APPEARED:start()
     )
 
     self._target:set_is_visible(false)
+
+    self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
 end
 
 --- @override
@@ -68,7 +76,8 @@ function bt.Animation.ALLY_APPEARED:update(delta)
 
     self._position_x, self._position_y = self._path:at(self._position_animation:get_value())
     return self._position_animation:get_is_done() and
-        self._black_animation:get_is_done()
+        self._black_animation:get_is_done() and
+        self._message_done
 end
 
 --- @override
