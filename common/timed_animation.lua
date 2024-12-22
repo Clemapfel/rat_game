@@ -227,6 +227,12 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
             -- \sqrt{\left(0.5\left(x-0.5\right)\right)}+0.5
             return math.sqrt(0.5 * (x - 0.5)) + 0.5
         end
+    end,
+
+    PARABOLA_BANDPASS = function(x)
+        -- 1-\left(2\left(x-0.5\right)\right)^{2}
+        if x < 0 then return 0 elseif x > 1 then return 0 end
+        return 1 - (2 * (x - 0.5))^2
     end
 })
 

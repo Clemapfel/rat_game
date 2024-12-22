@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added after-line delay">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -697,15 +695,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="28159000" />
-    </task>
-    <task id="LOCAL-01299" summary="sorting working">
-      <option name="closed" value="true" />
-      <created>1733347665628</created>
-      <option name="number" value="01299" />
-      <option name="presentableId" value="LOCAL-01299" />
-      <option name="project" value="LOCAL" />
-      <updated>1733347665628</updated>
+      <workItem from="1734643804197" duration="29812000" />
     </task>
     <task id="LOCAL-01300" summary="stashing enemy revived animation">
       <option name="closed" value="true" />
@@ -1091,7 +1081,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734811671477</updated>
     </task>
-    <option name="localTasksCounter" value="1348" />
+    <task id="LOCAL-01348" summary="added after-line delay">
+      <option name="closed" value="true" />
+      <created>1734828621371</created>
+      <option name="number" value="01348" />
+      <option name="presentableId" value="LOCAL-01348" />
+      <option name="project" value="LOCAL" />
+      <updated>1734828621371</updated>
+    </task>
+    <option name="localTasksCounter" value="1349" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1140,7 +1138,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing paralellogram" />
     <MESSAGE value="entity refactoring done" />
     <MESSAGE value="stashing config renaming" />
     <MESSAGE value="stashing metaballs" />
@@ -1165,7 +1162,8 @@
     <MESSAGE value="stashing textbox one line at a time" />
     <MESSAGE value="stashing new scroll method" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="added after-line delay" />
+    <option name="LAST_COMMIT_MESSAGE" value="added after-line delay" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -4,6 +4,7 @@ rt.settings.text_box = {
     letters_per_second = 60,
     scroll_speed = 300, -- px / s, frame reveal/hide movement
     label_hide_delay = 0.2, -- seconds, hold after line is done revealing but before scroll up
+    advance_indicator_bounces_per_second = 1
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
 
@@ -12,7 +13,8 @@ local _SHOWN = 0
 
 --- @class rt.TextBox
 --- @signal scrolling_done (self) -> nil
-rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
+rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function(needs_manual_advance)
+    if needs_manual_advance == nil then needs_manual_advance = false end
     local out = meta.new(rt.TextBox, {
         _frame = rt.Frame(),
         _stencil_aabb = rt.AABB(0, 0, 1, 1),
@@ -31,7 +33,19 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
 
         _entries = {},
         _n_entries = 0,
-        _first_scrolling_entry = 1
+        _first_scrolling_entry = 1,
+
+        _advance_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _advance_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _advance_indicator_animation = rt.TimedAnimation(
+            rt.settings.text_box.advance_indicator_bounces_per_second,
+            0, 1, rt.InterpolationFunctions.PARABOLA_BANDPASS
+        ),
+        _advance_indicator_path = nil, -- rt.Path
+        _advance_indicator_x = 0,
+        _advance_indicator_y = 0,
+        _waiting_for_advance = true,
+        _needs_manual_advance = needs_manual_advance
     })
 
     return out
@@ -41,6 +55,7 @@ end)
 function rt.TextBox:realize()
     if self:already_realized() then return end
     self._frame:realize()
+    self._advance_indicator_animation:set_should_loop(true)
 end
 
 --- @brief
@@ -61,13 +76,34 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._frame:fit_into(0, 0, width, frame_h)
 
     self._position_path = rt.Path(
-        x, y,
-        x, 0 - frame_h * 1.3
+        x, 0 - frame_h * 1.3,
+        x, y
     )
 
     self._manual_scroll_indicator_radius = 0.5 * m
     self._manual_scroll_indicator_x = frame_h - 2 * xm
     self._manual_scroll_indicator_y = height - 2 * ym
+
+    local advance_x, advance_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
+    local advance_r = m
+    local vertices = {}
+    for angle = 0.5 * math.pi, 2 * math.pi, 2 / 3 * math.pi do
+        table.insert(vertices, 0 + math.cos(angle) * advance_r)
+        table.insert(vertices, 0 + math.sin(angle) * advance_r)
+    end
+
+    self._advance_indicator = rt.Polygon(vertices)
+    self._advance_indicator_outline = rt.Polygon(vertices)
+
+    self._advance_indicator:set_color(rt.Palette.FOREGROUND)
+    self._advance_indicator_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+    self._advance_indicator_outline:set_is_outline(true)
+    self._advance_indicator_outline:set_line_width(3)
+
+    self._advance_indicator_path = rt.Path(
+        advance_x, advance_y,
+        advance_x, advance_y - advance_r
+    )
 end
 
 --- @brief
@@ -107,6 +143,9 @@ end
 
 --- @brief
 function rt.TextBox:update(delta)
+    self._advance_indicator_animation:update(delta)
+    self._advance_indicator_x, self._advance_indicator_y = self._advance_indicator_path:at(self._advance_indicator_animation:get_value())
+
     -- update position
     local scrolling_speed = 1 / rt.settings.text_box.scroll_duration
     local current, target = self._position_current_value, self._position_target_value
@@ -145,6 +184,8 @@ function rt.TextBox:update(delta)
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
         entry.label:update(delta)
+
+        if self._manual_mode and i > self._first_scrolling_entry and self._waiting_for_advance then break end
 
         local is_done, new_n_lines_visible = false, 0
         if is_previous_done then
@@ -206,6 +247,7 @@ function rt.TextBox:draw()
     end)
     rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL, stencil_value)
 
+    love.graphics.push()
     love.graphics.translate(x, y - self._current_line_y_offset)
     local n_drawn, max_lines = 0, self._max_n_lines
     for i = self._first_scrolling_entry, self._n_entries do
@@ -215,7 +257,13 @@ function rt.TextBox:draw()
     end
 
     rt.graphics.set_stencil_test()
+    love.graphics.pop()
 
+    if self._waiting_for_advance then
+        love.graphics.translate(self._advance_indicator_x, self._advance_indicator_y)
+        self._advance_indicator_outline:draw()
+        self._advance_indicator:draw()
+    end
     love.graphics.pop()
 end
 
@@ -248,8 +296,9 @@ end
 
 --- @brief
 function rt.TextBox:advance()
-    if self._manual_mode == false then
-        rt.warning("In rt.TextBox.advance: advancing textbox, even though it is not in manual advance mode")
-        -- TODO
+    if self._needs_manual_advance == false then
+        rt.warning("In rt.TextBox.advance: advancing textbox, but it is not in manual advance mode")
     end
+
+    self._waiting_for_advance = false
 end
