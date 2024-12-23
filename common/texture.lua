@@ -41,30 +41,26 @@ rt.TextureFormat = meta.new_enum("TextureFormat", {
 --- @class rt.Texture
 --- @param pathor_width String (or Number)
 --- @param height Number (or nil)
-rt.Texture = meta.new_type("Texture", rt.Drawable, function(path_or_image_or_width, height)
+rt.Texture = meta.new_type("Texture", rt.Drawable, function(path_or_image_or_width, height, ...)
     local out
     if meta.is_string(path_or_image_or_width) then
         local path = path_or_image_or_width
         out =  meta.new(rt.Texture, {
-            _native = love.graphics.newImage(path)
+            _native = love.graphics.newImage(path, ...)
         })
     elseif meta.isa(path_or_image_or_width, rt.Image) then
         local image = path_or_image_or_width
         out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage(image._native)
+            _native = love.graphics.newImage(image._native, ...)
         })
     elseif meta.is_number(path_or_image_or_width) then
         local width = path_or_image_or_width
         out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage(width, height)
-        })
-    elseif path_or_image_or_width == nil then
-        out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage()
+            _native = love.graphics.newImage(width, height, ...)
         })
     else -- love.ImageData
         out = meta.new(rt.Texture, {
-            _native = love.graphics.newImage(path_or_image_or_width)
+            _native = love.graphics.newImage(path_or_image_or_width, ...)
         })
     end
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
