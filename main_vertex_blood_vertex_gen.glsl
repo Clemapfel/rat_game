@@ -2,6 +2,10 @@ layout(std430) buffer segments_buffer {
     vec4 segments[];
 };
 
+layout(std430) buffer is_valid_buffer {
+    uint is_valid[];
+};
+
 layout(r32f) uniform image2D image;
 uniform int image_width;
 uniform int image_height;
@@ -23,7 +27,7 @@ void computemain() {
 
     float values[4];
     for (int i = 0; i < 4; ++i) {
-        values[i] = imageLoad(image, global_id + offsets[i]).a;
+        values[i] = imageLoad(image, global_id + offsets[i]).r;
     }
 
     int case_index = 0;
@@ -81,5 +85,7 @@ void computemain() {
             break;
     }
 
+
+    is_valid[global_id.y * image_width + global_id.x] = uint(p1 != vec2(0) && p2 != vec2(0));
     segments[global_id.y * image_width + global_id.x] = vec4(p1, p2);
 }

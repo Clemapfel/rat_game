@@ -22,12 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored message to be animation synched">
-      <change afterPath="$PROJECT_DIR$/main_vertex_blood.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main_vertex_blood_threshold.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_vertex_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_vertex_blood.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_vertex_blood_threshold.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_vertex_blood_threshold.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -709,15 +709,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="37109000" />
-    </task>
-    <task id="LOCAL-01302" summary="enemy revived animation done">
-      <option name="closed" value="true" />
-      <created>1733506235399</created>
-      <option name="number" value="01302" />
-      <option name="presentableId" value="LOCAL-01302" />
-      <option name="project" value="LOCAL" />
-      <updated>1733506235399</updated>
+      <workItem from="1734643804197" duration="40343000" />
     </task>
     <task id="LOCAL-01303" summary="stashing kill removes entity from state">
       <option name="closed" value="true" />
@@ -1103,7 +1095,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734911891686</updated>
     </task>
-    <option name="localTasksCounter" value="1351" />
+    <task id="LOCAL-01351" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1734979084185</created>
+      <option name="number" value="01351" />
+      <option name="presentableId" value="LOCAL-01351" />
+      <option name="project" value="LOCAL" />
+      <updated>1734979084186</updated>
+    </task>
+    <option name="localTasksCounter" value="1352" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1173,11 +1173,11 @@
     <MESSAGE value="stashing before messsage rework" />
     <MESSAGE value="stashing textbox one line at a time" />
     <MESSAGE value="stashing new scroll method" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added after-line delay" />
     <MESSAGE value="stashing manual mode" />
     <MESSAGE value="refactored message to be animation synched" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored message to be animation synched" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -8,8 +8,7 @@ rt.ComputeShader = meta.new_type("ComputeShader", function(filename, ...)
 
     return meta.new(rt.ComputeShader, {
         _native = shader,
-        _filename = filename,
-        _before = nil,
+        _filename = filename
     })
 end)
 
