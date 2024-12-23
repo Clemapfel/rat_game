@@ -43,10 +43,13 @@ function compute()
         max_n_vertices
     )
 
+    local is_valid_data = table.rep(0, max_n_vertices)
+    is_valid_buffer:replace_data(is_valid_data)
+
     vertex_gen_shader:send("segments_buffer", segments_buffer._native)
     vertex_gen_shader:send("is_valid_buffer", is_valid_buffer._native)
 
-    vertex_gen_shader:dispatch(texture_w, texture_h)
+    vertex_gen_shader:dispatch(texture_w / 32, texture_h / 32)
 
     local vertex_data = segments_buffer:readback_data()
     local is_valid_data = is_valid_buffer:readback_data()
