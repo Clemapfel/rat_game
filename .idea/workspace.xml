@@ -22,7 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing marchin squares">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing marching squares">
+      <change afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main_blood_lattice_render.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/main_blood_lattice_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_vertex_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_vertex_blood.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" afterDir="false" />
@@ -92,6 +96,7 @@
     "Lua Application.love12.executor": "Run",
     "Lua Application.main.executor": "Run",
     "Lua Application.main_blood.executor": "Run",
+    "Lua Application.main_blood_lattice.executor": "Run",
     "Lua Application.main_bounce.executor": "Run",
     "Lua Application.main_box2d.executor": "Run",
     "Lua Application.main_lichen.executor": "Run",
@@ -158,7 +163,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_vertex_blood.lua">
+  <component name="RunManager" selected="Lua Application.main_blood_lattice">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -180,6 +185,17 @@
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="main_blood.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_blood_lattice" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="main_blood_lattice.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -315,6 +331,7 @@
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_physics_blood" />
       <item itemvalue="Lua Application.main_vertex_blood.lua" />
+      <item itemvalue="Lua Application.main_blood_lattice" />
       <item itemvalue="Lua Application.main_tesselation" />
       <item itemvalue="Lua Application.main_blood" />
       <item itemvalue="Lua Application.main_bounce" />
@@ -707,15 +724,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="40966000" />
-    </task>
-    <task id="LOCAL-01304" summary="stashing before battle scene refactor">
-      <option name="closed" value="true" />
-      <created>1733510526773</created>
-      <option name="number" value="01304" />
-      <option name="presentableId" value="LOCAL-01304" />
-      <option name="project" value="LOCAL" />
-      <updated>1733510526773</updated>
+      <workItem from="1734643804197" duration="55177000" />
     </task>
     <task id="LOCAL-01305" summary="scene refactored, kill working">
       <option name="closed" value="true" />
@@ -1101,7 +1110,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734982235869</updated>
     </task>
-    <option name="localTasksCounter" value="1353" />
+    <task id="LOCAL-01353" summary="stashing marching squares">
+      <option name="closed" value="true" />
+      <created>1734983047896</created>
+      <option name="number" value="01353" />
+      <option name="presentableId" value="LOCAL-01353" />
+      <option name="project" value="LOCAL" />
+      <updated>1734983047896</updated>
+    </task>
+    <option name="localTasksCounter" value="1354" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1150,7 +1167,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before reworking animation to query sprite on start" />
     <MESSAGE value="refactored animations" />
     <MESSAGE value="refactored entity sprites" />
     <MESSAGE value="stashing before refactoring animation node system" />
@@ -1175,7 +1191,8 @@
     <MESSAGE value="refactored message to be animation synched" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing marchin squares" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing marchin squares" />
+    <MESSAGE value="stashing marching squares" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing marching squares" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

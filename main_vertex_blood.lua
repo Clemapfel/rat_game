@@ -77,6 +77,8 @@ function compute()
     dbg(threshold, n_valid)
 end
 
+compute = function()  end
+
 love.load = function()
     local texture_w, texture_h = texture:get_size()
     love.window.setMode(texture_w, texture_h, {
