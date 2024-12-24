@@ -33,7 +33,10 @@ vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
     vec4 data = texture(cell_texture, texture_coords);
     float height = data.r;
     vec2 velocity = data.gb;
+    float hitbox = data.a;
 
     float angle = (atan(velocity.y, velocity.x) + PI) / (2 * PI);
-    return vec4(lch_to_rgb(vec3(height, height, angle)), 1.0);
+    vec3 color = lch_to_rgb(vec3(height, height, angle));
+    color = mix(color, vec3(1), hitbox);
+    return vec4(color, 1.0);
 }

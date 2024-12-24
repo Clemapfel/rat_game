@@ -22,7 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing init compute">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="initialization done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
@@ -721,15 +721,7 @@
       <workItem from="1734131064062" duration="308000" />
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
-      <workItem from="1734643804197" duration="62097000" />
-    </task>
-    <task id="LOCAL-01307" summary="stashing swap animation">
-      <option name="closed" value="true" />
-      <created>1733529463656</created>
-      <option name="number" value="01307" />
-      <option name="presentableId" value="LOCAL-01307" />
-      <option name="project" value="LOCAL" />
-      <updated>1733529463656</updated>
+      <workItem from="1734643804197" duration="63366000" />
     </task>
     <task id="LOCAL-01308" summary="swap working">
       <option name="closed" value="true" />
@@ -1115,7 +1107,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735074127525</updated>
     </task>
-    <option name="localTasksCounter" value="1356" />
+    <task id="LOCAL-01356" summary="initialization done">
+      <option name="closed" value="true" />
+      <created>1735076140092</created>
+      <option name="number" value="01356" />
+      <option name="presentableId" value="LOCAL-01356" />
+      <option name="project" value="LOCAL" />
+      <updated>1735076140092</updated>
+    </task>
+    <option name="localTasksCounter" value="1357" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1164,7 +1164,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before refactoring animation node system" />
     <MESSAGE value="stashing refactoring" />
     <MESSAGE value="stashing before refactoring inventory state to be separate from battle state" />
     <MESSAGE value="stashing inventory state refactor" />
@@ -1189,7 +1188,8 @@
     <MESSAGE value="stashing marching squares" />
     <MESSAGE value="stashing triple texture" />
     <MESSAGE value="stashing init compute" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing init compute" />
+    <MESSAGE value="initialization done" />
+    <option name="LAST_COMMIT_MESSAGE" value="initialization done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

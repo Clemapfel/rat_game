@@ -52,10 +52,17 @@ float gaussian(float x, float ramp)
     return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
+float sdf_ring(vec2 p, float outerRadius, float innerRadius) {
+    float distToOuter = length(p) - outerRadius;
+    float distToInner = length(p) - innerRadius;
+    return max(distToInner, -distToOuter);
+}
+
 uniform layout(rgba32f) image2D cell_texture;
 
 #define INIT_DISTANCE 1
 #define INIT_GRADIENT 2
+#define INIT_HITBOX 3
 
 uniform int mode = INIT_DISTANCE;
 
@@ -71,7 +78,7 @@ void computemain() {
 
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
-            dist, current.yz, 1
+            dist, current.yz, current.w
         ));
     }
     else if (mode == INIT_GRADIENT) {
@@ -125,7 +132,24 @@ void computemain() {
         }
 
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
-            current.x, gradient.xy, 1
+            current.x, gradient.xy, current.w
         ));
+    }
+    else if (mode == INIT_HITBOX) {
+
+        vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
+
+        const float scale = 2.3;
+        vec2 top_left = vec2(1) * vec2(snoise(vec2(-100) + position / size * scale), snoise(vec2(100) + position / size * scale));
+        vec2 bottom_right = top_left + vec2(0.5, 0.5);
+
+        float hitbox = 0;
+        vec2 xy = position / size;
+        const float edgeThickness = 0.03;
+        float smoothX = smoothstep(top_left.x, top_left.x + edgeThickness, xy.x) * (1.0 - smoothstep(bottom_right.x - edgeThickness, bottom_right.x, xy.x));
+        float smoothY = smoothstep(top_left.y, top_left.y + edgeThickness, xy.y) * (1.0 - smoothstep(bottom_right.y - edgeThickness, bottom_right.y, xy.y));
+        hitbox = smoothX * smoothY;
+
+        imageStore(cell_texture, ivec2(position.x, position.y), vec4(current.xyz, hitbox));
     }
 }

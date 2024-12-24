@@ -34,6 +34,8 @@ love.load = function()
         init_shader:dispatch(texture_w, texture_h)
         init_shader:send("mode", 2) -- init gradient
         init_shader:dispatch(texture_w, texture_h)
+        init_shader:send("mode", 3) -- init hitboxes
+        init_shader:dispatch(texture_w, texture_h)
     end
 
     love.update(1 / 60)
