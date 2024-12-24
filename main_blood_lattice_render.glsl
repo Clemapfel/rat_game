@@ -1,4 +1,4 @@
-uniform sampler2D macroscopic; // r = density, g = x-velocity, b = y-velocity
+uniform sampler2D cell_texture; // r = density, g = x-velocity, b = y-velocity
 
 #define PI 3.1415926535897932384626433832795
 
@@ -30,10 +30,10 @@ vec3 lch_to_rgb(vec3 lch) {
 }
 
 vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
-    vec4 data = texture(macroscopic, texture_coords);
-    float density = (data.r - 0.8) / 0.4;
-    vec2 velocity = data.gb / 0.2 + 0.5;
+    vec4 data = texture(cell_texture, texture_coords);
+    float height = data.r;
+    vec2 velocity = data.gb;
 
     float angle = atan(velocity.y, velocity.x) / PI + 1;
-    return vec4(lch_to_rgb(vec3(length(velocity) * density, angle, density)), 1.0);
+    return vec4(lch_to_rgb(vec3(length(velocity) * height, angle, height)), 1.0);
 }

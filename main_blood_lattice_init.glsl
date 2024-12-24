@@ -46,45 +46,60 @@ float snoise(vec2 v) {
     return 130.0 * dot(m, g);
 }
 
-#define STATE_TEXTURE uniform layout(rgba32f) writeonly image2D
+#define PI 3.1415926535897932384626433832795
+float gaussian(float x, float ramp)
+{
+    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
+}
 
-STATE_TEXTURE velocity_texture_top_in;    // r = top-left,    g = top,    b = top-right
-STATE_TEXTURE velocity_texture_center_in; // r = left,        g = center, b = right
-STATE_TEXTURE velocity_texture_bottom_in; // r = bottom-left, g = bottom, b = bottom-right
-
-uniform vec2 lattice_size = vec2(512, 512);
+uniform layout(rg32f) writeonly image2D cell_texture;
 
 layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
     vec2 position = vec2(gl_GlobalInvocationID.xy);
-    vec2 center = vec2(lattice_size) / 2.0;
+    vec2 size = imageSize(cell_texture);
+    const float scale = 5;
 
-    // Gaussian distribution for density
-    float distance = length(position - center);
-    float radius = min(lattice_size.x, lattice_size.y) * 0.2;
-    float density = 1.0 + 0.2 * exp(-distance * distance / (2.0 * radius * radius));
+    vec2 center = 0.5 * size;
+    float dist = distance(position, center) / min(size.x, size.y);
+    dist = gaussian(dist, 2);
+    dist *= snoise(position / size * 4);
 
-    // Add Simplex noise to the density
-    float noise = snoise(position / lattice_size * 10.0);
-    float noise_strength = 0.2;
-    density += noise_strength * (noise - 0.5);
+    // Sobel kernels
+    const mat3 sobelX = mat3(
+        -1, 0, 1,
+        -2, 0, 2,
+        -1, 0, 1
+    );
 
-    // Introduce initial velocity variations
-    vec2 velocity = vec2(snoise(position / lattice_size * 5.0), snoise(position / lattice_size * 5.0 + 100.0));
-    velocity *= 0.1; // Scale the velocity
+    const mat3 sobelY = mat3(
+        -1, -2, -1,
+        0,  0,  0,
+        1,  2,  1
+    );
 
-    // Initialize equilibrium distributions with velocity influence
-    float w_center = 4.0 / 9.0;
-    float w_cardinal = 1.0 / 9.0;
-    float w_diagonal = 1.0 / 36.0;
+    // Compute the gradient using the Sobel operator
+    float gradient_x = 0.0;
+    float gradient_y = 0.0;
 
-    // Calculate equilibrium distribution based on velocity
-    vec3 equilibrium_top = vec3(w_diagonal, w_cardinal, w_diagonal) * density + vec3(velocity.y, velocity.x, -velocity.y);
-    vec3 equilibrium_center = vec3(w_cardinal, w_center, w_cardinal) * density + vec3(velocity.x, 0.0, velocity.x);
-    vec3 equilibrium_bottom = vec3(w_diagonal, w_cardinal, w_diagonal) * density + vec3(-velocity.y, -velocity.x, velocity.y);
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            vec2 offset = vec2(i, j);
+            vec2 pos = position + offset;
+            float sampleDist = distance(pos, center) / min(size.x, size.y);
+            sampleDist = gaussian(sampleDist, 2);
+            sampleDist *= snoise(pos / size * 4);
 
-    // Store values in textures
-    imageStore(velocity_texture_top_in,    ivec2(position.x, position.y), vec4(equilibrium_top, 1.0));
-    imageStore(velocity_texture_center_in, ivec2(position.x, position.y), vec4(equilibrium_center, 1.0));
-    imageStore(velocity_texture_bottom_in, ivec2(position.x, position.y), vec4(equilibrium_bottom, 1.0));
+            gradient_x += sampleDist * sobelX[i + 1][j + 1];
+            gradient_y += sampleDist * sobelY[i + 1][j + 1];
+        }
+    }
+
+    vec2 gradient = normalize(vec2(gradient_x, gradient_y));
+    imageStore(cell_texture, ivec2(position.x, position.y), vec4(
+        1,
+        gradient.x,
+        gradient.y,
+        1
+    ));
 }
