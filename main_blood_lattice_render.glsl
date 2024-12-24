@@ -34,6 +34,6 @@ vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
     float height = data.r;
     vec2 velocity = data.gb;
 
-    float angle = atan(velocity.y, velocity.x) / PI + 1;
-    return vec4(lch_to_rgb(vec3(length(velocity) * height, angle, height)), 1.0);
+    float angle = (atan(velocity.y, velocity.x) + PI) / (2 * PI);
+    return vec4(lch_to_rgb(vec3(height, height, angle)), 1.0);
 }

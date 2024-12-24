@@ -9,30 +9,34 @@ local relaxation_factor = 0.5
 local lattice_size = {texture_w, texture_h}
 local a_or_b = true
 
-local init_shader = rt.Shader("main_blood_lattice_init.glsl")
+local init_shader = rt.ComputeShader("main_blood_lattice_init.glsl")
 local step_shader = rt.ComputeShader("main_blood_lattice_step.glsl")
 local render_shader = rt.Shader("main_blood_lattice_render.glsl")
 local render_shape = nil -- rt.VertexRectangle
 
 love.load = function()
     love.window.setMode(texture_w, texture_h)
+    love.resize(512, 512)
+
     cell_texture_a = love.graphics.newCanvas(texture_w, texture_h, {
-        format = "rg32f",
+        format = "rgba32f",
         computewrite = true
     })
 
     cell_texture_b = love.graphics.newCanvas(texture_w, texture_h, {
-        format = "rg32f",
+        format = "rgba32f",
         computewrite = true
     })
 
     for texture in range(cell_texture_a, cell_texture_b) do
         init_shader:send("cell_texture", texture)
+        init_shader:send("mode", 1) -- init distance
+        init_shader:dispatch(texture_w, texture_h)
+        init_shader:send("mode", 2) -- init gradient
         init_shader:dispatch(texture_w, texture_h)
     end
 
     love.update(1 / 60)
-    love.resize(512, 512)
 end
 
 love.update = function(delta)

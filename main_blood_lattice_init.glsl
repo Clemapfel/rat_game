@@ -52,54 +52,80 @@ float gaussian(float x, float ramp)
     return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
 }
 
-uniform layout(rg32f) writeonly image2D cell_texture;
+uniform layout(rgba32f) image2D cell_texture;
+
+#define INIT_DISTANCE 1
+#define INIT_GRADIENT 2
+
+uniform int mode = INIT_DISTANCE;
 
 layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
-    vec2 position = vec2(gl_GlobalInvocationID.xy);
     vec2 size = imageSize(cell_texture);
-    const float scale = 5;
+    vec2 position = vec2(gl_GlobalInvocationID.xy);
 
-    vec2 center = 0.5 * size;
-    float dist = distance(position, center) / min(size.x, size.y);
-    dist = gaussian(dist, 2);
-    dist *= snoise(position / size * 4);
+    if (mode == INIT_DISTANCE) {
+        float dist = distance(position, 0.5 * size) / min(size.x, size.y);
+        dist = clamp(10 * gaussian(dist, 2), 0, 1);
+        dist *= snoise(position / size * 1.5);
 
-    // Sobel kernels
-    const mat3 sobelX = mat3(
-        -1, 0, 1,
-        -2, 0, 2,
-        -1, 0, 1
-    );
-
-    const mat3 sobelY = mat3(
-        -1, -2, -1,
-        0,  0,  0,
-        1,  2,  1
-    );
-
-    // Compute the gradient using the Sobel operator
-    float gradient_x = 0.0;
-    float gradient_y = 0.0;
-
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            vec2 offset = vec2(i, j);
-            vec2 pos = position + offset;
-            float sampleDist = distance(pos, center) / min(size.x, size.y);
-            sampleDist = gaussian(sampleDist, 2);
-            sampleDist *= snoise(pos / size * 4);
-
-            gradient_x += sampleDist * sobelX[i + 1][j + 1];
-            gradient_y += sampleDist * sobelY[i + 1][j + 1];
-        }
+        vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
+        imageStore(cell_texture, ivec2(position.x, position.y), vec4(
+            dist, current.yz, 1
+        ));
     }
+    else if (mode == INIT_GRADIENT) {
+        vec2 size = imageSize(cell_texture);
+        ivec2 pos = ivec2(position);
 
-    vec2 gradient = normalize(vec2(gradient_x, gradient_y));
-    imageStore(cell_texture, ivec2(position.x, position.y), vec4(
-        1,
-        gradient.x,
-        gradient.y,
-        1
-    ));
+        mat3 sobel_x = mat3(
+            -1, 0, 1,
+            -2, 0, 2,
+            -1, 0, 1
+        );
+
+        mat3 sobel_y = mat3(
+            -1, -2, -1,
+            0,  0,  0,
+            1,  2,  1
+        );
+
+        float gradient_x = 0.0;
+        float gradient_y = 0.0;
+
+        for (int i = -1; i <= 1; i++) {
+            for (int j = -1; j <= 1; j++) {
+                ivec2 neighbor_pos = pos + ivec2(i, j);
+                vec4 neighborColor = imageLoad(cell_texture, neighbor_pos);
+                float value = neighborColor.r;
+
+                int kernel_i = i + 1;
+                int kernel_j = j + 1;
+
+                gradient_x += value * sobel_x[kernel_i][kernel_j];
+                gradient_y += value * sobel_y[kernel_i][kernel_j];
+            }
+        }
+
+        vec2 gradient = normalize(vec2(gradient_x, gradient_y));
+
+        vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
+
+        // perturb lowe rareas
+        const float cutoff = 0.6;
+        if (current.x < cutoff) {
+            float noise = snoise(position / size * 20) * 2 * PI / 4;
+            float c = cos(noise);
+            float s = sin(noise);
+            vec2 perturbed_gradient = vec2(
+                gradient.x * c - gradient.y * s,
+                gradient.x * s + gradient.y * c
+            );
+            gradient = mix(gradient, perturbed_gradient, current.x * cutoff);
+        }
+
+        imageStore(cell_texture, ivec2(position.x, position.y), vec4(
+            current.x, gradient.xy, 1
+        ));
+    }
 }
