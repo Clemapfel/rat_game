@@ -31,11 +31,6 @@ love.load = function()
         computewrite = true
     })
 
-    cell_offset_texture = love.graphics.newCanvas(texture_w, texture_h, {
-        format = "r32i",
-        computewrite = true
-    })
-
     for texture in range(cell_texture_a, cell_texture_b) do
         init_shader:send("cell_texture", texture)
         init_shader:send("mode", 1) -- init distance
@@ -59,17 +54,16 @@ love.update = function(delta)
         texture_in, texture_out = cell_texture_b, cell_texture_a
     end
 
-    step_shader:send("delta", 1 / 60) --delta)
+    --step_shader:send("delta", 1 / 60) --delta)
+
+    step_shader:send("mode", 1)
     step_shader:send("cell_texture_in", texture_in)
     step_shader:send("cell_texture_out", texture_out)
-    step_shader:send("cell_offset_texture", cell_offset_texture)
-
-    step_shader:send("mode", 1) -- apply offset
     step_shader:dispatch(texture_w, texture_h)
-    step_shader:send("mode", 2) -- compute offset
-    step_shader:dispatch(texture_w, texture_h)
+   --step_shader:send("mode", 2)
+   --step_shader:dispatch(texture_w, texture_h)
 
-    --a_or_b = not a_or_b
+    a_or_b = not a_or_b
 end
 
 love.resize = function(w, h)

@@ -152,6 +152,6 @@ void computemain() {
         float smoothY = smoothstep(top_left.y, top_left.y + edgeThickness, xy.y) * (1.0 - smoothstep(bottom_right.y - edgeThickness, bottom_right.y, xy.y));
         hitbox = smoothX * smoothY;
 
-        imageStore(cell_texture, ivec2(position.x, position.y), vec4(current.xyz, hitbox));
+        imageStore(cell_texture, ivec2(position.x, position.y), vec4(max(current.x, 0), current.yz, 0));
     }
 }

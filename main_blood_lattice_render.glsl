@@ -36,7 +36,7 @@ vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
     float hitbox = data.a;
 
     float angle = (atan(velocity.y, velocity.x) + PI) / (2 * PI);
-    vec3 color = lch_to_rgb(vec3(height, height, angle));
+    vec3 color = lch_to_rgb(vec3(height, 0, angle));
     color = mix(color, vec3(1), hitbox);
     return vec4(color, 1.0);
 }
