@@ -118,6 +118,7 @@ void computemain() {
 
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
 
+        /*
         // perturb lowe rareas
         const float cutoff = 0.6;
         if (current.x < cutoff) {
@@ -130,6 +131,7 @@ void computemain() {
             );
             gradient = mix(gradient, perturbed_gradient, current.x * cutoff);
         }
+        */
 
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
             current.x, gradient.xy, current.w
