@@ -54,14 +54,14 @@ love.update = function(delta)
         texture_in, texture_out = cell_texture_b, cell_texture_a
     end
 
-    --step_shader:send("delta", 1 / 60) --delta)
+    for _ = 1, 10 do
+        step_shader:send("delta", 1 / 60) --delta)
+        step_shader:send("mode", 1)
+        step_shader:send("cell_texture_in", texture_in)
+        step_shader:send("cell_texture_out", texture_out)
+        step_shader:dispatch(texture_w, texture_h)
+    end
 
-    step_shader:send("mode", 1)
-    step_shader:send("cell_texture_in", texture_in)
-    step_shader:send("cell_texture_out", texture_out)
-    step_shader:dispatch(texture_w, texture_h)
-   --step_shader:send("mode", 2)
-   --step_shader:dispatch(texture_w, texture_h)
 
     a_or_b = not a_or_b
 end

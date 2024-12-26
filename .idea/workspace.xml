@@ -22,11 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing offset texture">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing maybe">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_render.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -723,15 +721,7 @@
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
       <workItem from="1734643804197" duration="66543000" />
-      <workItem from="1735080503580" duration="8537000" />
-    </task>
-    <task id="LOCAL-01311" summary="stashing scene before indexed sprite rework">
-      <option name="closed" value="true" />
-      <created>1733771856610</created>
-      <option name="number" value="01311" />
-      <option name="presentableId" value="LOCAL-01311" />
-      <option name="project" value="LOCAL" />
-      <updated>1733771856610</updated>
+      <workItem from="1735080503580" duration="9531000" />
     </task>
     <task id="LOCAL-01312" summary="added shader">
       <option name="closed" value="true" />
@@ -1117,7 +1107,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735173945377</updated>
     </task>
-    <option name="localTasksCounter" value="1360" />
+    <task id="LOCAL-01360" summary="stashing maybe">
+      <option name="closed" value="true" />
+      <created>1735246979440</created>
+      <option name="number" value="01360" />
+      <option name="presentableId" value="LOCAL-01360" />
+      <option name="project" value="LOCAL" />
+      <updated>1735246979440</updated>
+    </task>
+    <option name="localTasksCounter" value="1361" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1166,7 +1164,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing inventory state refactor" />
     <MESSAGE value="stashing inventory refactor" />
     <MESSAGE value="refactored templates" />
     <MESSAGE value="refactored template inventory" />
@@ -1191,7 +1188,8 @@
     <MESSAGE value="init complete" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing before removing offset texture" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing offset texture" />
+    <MESSAGE value="stashing maybe" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing maybe" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -22,31 +22,26 @@ void computemain() {
     ivec2 position = ivec2(gl_GlobalInvocationID.xy);
     vec2 size = imageSize(cell_texture_in);
     vec4 self = imageLoad(cell_texture_in, position);
-    const float viscosity = 0.5; // % outflow per second
+    const float viscosity = 10; // % outflow per second
 
     float total_outflow = 0.0;
     float total_inflow = 0.0;
 
     for (int i = 1; i < 9; ++i) {
         ivec2 neighbor_pos = position + ivec2(directions[i]);
-
-        // Apply periodic boundary conditions
         neighbor_pos.x = (neighbor_pos.x + int(size.x)) % int(size.x);
         neighbor_pos.y = (neighbor_pos.y + int(size.y)) % int(size.y);
 
         vec4 neighbor = imageLoad(cell_texture_in, neighbor_pos);
-        float gradient = self.r - neighbor.r;
+        float gradient = self.x - neighbor.x;
 
-        // Calculate outflow based on gradient and viscosity
-        float outflow = max(0.0, gradient);
+        float outflow = max(0.0, gradient) * viscosity * delta * self.x;
         total_outflow += outflow;
 
-        // Calculate inflow from the neighbor
-        float inflow = max(0.0, -gradient);
+        float inflow = max(0.0, -gradient) * viscosity * delta * neighbor.x;
         total_inflow += inflow;
     }
 
-    // Update the current cell's density
-    float new_density = self.r + total_inflow - total_outflow;
-    imageStore(cell_texture_out, position, vec4(new_density, self.g, self.b, self.a));
+    float new_density = max(self.x + total_inflow - total_outflow, 0);
+    imageStore(cell_texture_out, position, vec4(new_density, self.yzw));
 }

@@ -74,7 +74,7 @@ void computemain() {
     if (mode == INIT_DISTANCE) {
         float dist = distance(position, 0.5 * size) / min(size.x, size.y);
         dist = clamp(10 * gaussian(dist, 2), 0, 1);
-        dist *= snoise(position / size * 1.5);
+        dist *= snoise(position / size * 10);
 
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
