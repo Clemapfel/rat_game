@@ -269,3 +269,9 @@ function bt.OrderedBox:set_opacity(alpha)
         item.widget:set_opacity(item.current_opacity * self._opacity)
     end
 end
+
+--- @brief
+function bt.OrderedBox:clear()
+    self._widget_to_item = {}
+    self._widget_order = {}
+end

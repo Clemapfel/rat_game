@@ -88,7 +88,11 @@ function bt.GlobalStatusBar:_update_frame_position()
         total_sprite_w = total_sprite_w + select(1, sprite:measure())
     end
 
-    self._motion:set_target_value(love.graphics.getWidth() - 2 * m - total_sprite_w)
+    if total_sprite_w == 0 then
+        self._motion:set_target_value(love.graphics.getWidth() + m)
+    else
+        self._motion:set_target_value(love.graphics.getWidth() - 2 * m - total_sprite_w)
+    end
 end
 
 --- @brief
@@ -139,6 +143,15 @@ function bt.GlobalStatusBar:activate_global_status(status, on_done_notify)
 end
 
 --- @brief
+function bt.GlobalStatusBar:clear()
+    self._ordered_box:clear()
+    self._global_status_to_sprite = {}
+    self:_update_frame_position()
+    self:reformat()
+end
+
+--- @brief
 function bt.GlobalStatusBar:skip()
     self._ordered_box:skip()
+    self._motion:skip()
 end

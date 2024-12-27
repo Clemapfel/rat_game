@@ -1,9 +1,10 @@
 rt.settings.text_box = {
-    n_lines = 3,
+    max_n_lines = 7,
     scroll_duration = 0.5, -- seconds
     letters_per_second = 60,
     scroll_speed = 500, -- px / s, frame reveal/hide movement
-    label_hide_delay = 0.5, -- seconds, hold after line is done revealing but before scroll up
+    expand_speed = 500,
+    label_hide_delay = 0.2, -- seconds, hold after line is done revealing but before scroll up
     advance_indicator_bounces_per_second = 1
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
@@ -29,7 +30,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function(needs_ma
         _current_line_y_offset = 0,
         _target_line_y_offset = 0,
 
-        _max_n_lines = rt.settings.text_box.n_lines,
+        _n_lines = 0,
+        _max_n_lines = rt.settings.text_box.max_n_lines,
 
         _entries = {},
         _n_entries = 0,
@@ -44,8 +46,14 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function(needs_ma
         _advance_indicator_path = nil, -- rt.Path
         _advance_indicator_x = 0,
         _advance_indicator_y = 0,
-        _waiting_for_advance = true,
-        _needs_manual_advance = needs_manual_advance
+        _advance_indicator_offset_x = 0,
+        _advance_indicator_offset_y = 0,
+
+        _waiting_for_advance = false,
+        _needs_manual_advance = needs_manual_advance,
+        
+        _current_frame_h = 0,
+        _target_frame_h = 0,
     })
 
     return out
@@ -56,6 +64,18 @@ function rt.TextBox:realize()
     if self:already_realized() then return end
     self._frame:realize()
     self._advance_indicator_animation:set_should_loop(true)
+    self:_update_target_height_from_n_lines()
+end
+
+--- @brief
+function rt.TextBox:_update_target_height_from_n_lines()
+    local m = rt.settings.margin_unit
+    local xm = 2 * m + self._frame:get_thickness()
+    local ym = m + self._frame:get_thickness()
+
+    local stencil_h = math.max(self._n_lines, 1) * rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC):getHeight()
+    local frame_h = stencil_h + 2 * ym
+    self._target_frame_h = stencil_h
 end
 
 --- @brief
@@ -64,7 +84,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
     local xm = 2 * m + self._frame:get_thickness()
     local ym = m + self._frame:get_thickness()
 
-    local stencil_h = rt.settings.font.default:get_native(rt.FontStyle.BOLD_ITALIC):getHeight() * rt.settings.text_box.n_lines
+    local stencil_h = math.max(self._current_frame_h, m)
     self._stencil_aabb = rt.AABB(
         0 + xm,
         0 + ym,
@@ -77,14 +97,14 @@ function rt.TextBox:size_allocate(x, y, width, height)
 
     self._position_path = rt.Path(
         x, y,
-        x, y - frame_h * 1.3
+        x, 0 - frame_h - m
     )
 
     self._manual_scroll_indicator_radius = 0.5 * m
     self._manual_scroll_indicator_x = frame_h - 2 * xm
     self._manual_scroll_indicator_y = height - 2 * ym
 
-    local advance_x, advance_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
+    local advance_x, advance_y = 0, 0
     local advance_r = m
     local vertices = {}
     for angle = 0.5 * math.pi, 2 * math.pi, 2 / 3 * math.pi do
@@ -100,9 +120,10 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._advance_indicator_outline:set_is_outline(true)
     self._advance_indicator_outline:set_line_width(3)
 
+    self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
     self._advance_indicator_path = rt.Path(
-        advance_x, advance_y,
-        advance_x, advance_y - advance_r
+        0, 0,
+        0, 0 - advance_r
     )
 end
 
@@ -149,7 +170,7 @@ function rt.TextBox:update(delta)
     -- update position
     local scrolling_speed = 1 / rt.settings.text_box.scroll_duration
     local current, target = self._position_current_value, self._position_target_value
-    local distance = 1 --math.abs(current - target) * 2
+    local distance = math.abs(current - target) * 2
     if current < target then
         current = current + delta * scrolling_speed -- sic, linear when leaving screen
         if current >= target then current = target end
@@ -179,13 +200,13 @@ function rt.TextBox:update(delta)
     local n_lines_shown = 0
     local is_manual = self._manual_mode == true
 
+    local should_reformat = false
+
     local all_entries_done = self._first_scrolling_entry < self._n_entries
     local is_previous_done = true
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
         entry.label:update(delta)
-
-        --if self._manual_mode and i > self._first_scrolling_entry and self._waiting_for_advance then break end
 
         local is_done, new_n_lines_visible = false, 0
         if is_previous_done then
@@ -194,6 +215,11 @@ function rt.TextBox:update(delta)
             n_lines_shown = n_lines_shown + new_n_lines_visible
             if n_lines_shown > self._max_n_lines then
                 self._target_line_y_offset = self._target_line_y_offset + (new_n_lines_visible - entry.n_lines_visible ) * entry.line_height
+            end
+
+            if entry.n_lines_visible < new_n_lines_visible then
+                self._n_lines = math.min(self._n_lines + new_n_lines_visible - entry.n_lines_visible, self._max_n_lines)
+                self:_update_target_height_from_n_lines()
             end
             entry.n_lines_visible = new_n_lines_visible
         end
@@ -226,11 +252,46 @@ function rt.TextBox:update(delta)
     self._current_line_y_offset = current
 
     -- hide once scrolling is done
-    if not self._waiting_for_input and all_entries_done and self._current_line_y_offset >= self._target_line_y_offset then
+    if all_entries_done and self._current_line_y_offset >= self._target_line_y_offset and self._current_frame_h >= self._target_frame_h then
         self._position_target_value = _HIDDEN
         self._current_line_y_offset = 0
         self._target_line_y_offset = 0
         self._first_scrolling_entry = self._n_entries + 1
+        self._n_lines = 0
+        self:_update_target_height_from_n_lines()
+    end
+
+   -- smoothly transition sizes
+    local expand_speed = rt.settings.text_box.expand_speed
+    local current, target = self._current_frame_h, self._target_frame_h
+    if current < target then
+        current = current + delta * expand_speed
+        if current > target then current = target end
+    elseif current > target then
+        current = current - delta * expand_speed
+        if current < target then current = target end
+    end
+
+    if current ~= self._current_frame_h then
+        self._current_frame_h = current
+
+        local x, y, width, height = rt.aabb_unpack(self._bounds)
+        local m = rt.settings.margin_unit
+        local xm = 2 * m + self._frame:get_thickness()
+        local ym = m + self._frame:get_thickness()
+
+        local stencil_h = math.max(self._current_frame_h, m)
+        self._stencil_aabb = rt.AABB(
+            0 + xm,
+            0 + ym,
+            width - 2 * xm,
+            stencil_h
+        )
+
+        local frame_h = stencil_h + 2 * ym
+        self._frame:fit_into(0, 0, width, frame_h)
+
+        self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
     end
 end
 
@@ -259,8 +320,8 @@ function rt.TextBox:draw()
     rt.graphics.set_stencil_test()
     love.graphics.pop()
 
-    if self._waiting_for_advance then
-        love.graphics.translate(self._advance_indicator_x, self._advance_indicator_y)
+    if self._needs_manual_advance and self._waiting_for_advance then
+        love.graphics.translate(self._advance_indicator_x + self._advance_indicator_offset_x, self._advance_indicator_y + self._advance_indicator_offset_y)
         self._advance_indicator_outline:draw()
         self._advance_indicator:draw()
     end
@@ -283,6 +344,10 @@ function rt.TextBox:skip()
     self._first_scrolling_entry = self._n_entries + 1
     self._position_target_value = _HIDDEN
     self._position_current_value = _HIDDEN
+    self._n_lines = 0
+    self:_update_target_height_from_n_lines()
+    self._current_frame_h = self._target_frame_h
+    self:reformat()
 end
 
 --- @brief
@@ -292,6 +357,9 @@ function rt.TextBox:clear()
     self._entries = {}
     self._n_entries = 0
     self._first_scrolling_entry = 1
+    self._n_lines = 0
+    self:_update_target_height_from_n_lines()
+    self:reformat()
 end
 
 --- @brief

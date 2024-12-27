@@ -27,6 +27,7 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _direction = true, -- true: rectangle -> circle, false: circle -> rectangle
 
         _blur_shader = rt.Shader("battle/quicksave_indicator_blur.glsl"),
+        _initialized = false
     })
 end)
 meta.add_signal(bt.QuicksaveIndicator, "done")
@@ -185,6 +186,8 @@ do
 
         self._mesh = love.graphics.newMesh(_vertex_format, self._vertex_data, rt.MeshDrawMode.TRIANGLE_FAN)
         if self._screenshot ~= nil then self._mesh:setTexture(self._screenshot._native) end
+
+        self._initialized = true
     end
 end
 
@@ -258,6 +261,16 @@ function bt.QuicksaveIndicator:skip()
         self._value = 0
     end
     self:update(0)
+end
+
+--- @brief
+function bt.QuicksaveIndicator:clear()
+    if self._initialized ~= true then return end
+    self:set_screenshot(nil)
+    self:set_is_expanded(true)
+    self:update(POSITIVE_INFINITY)
+    self:skip()
+    dbg("called")
 end
 
 --- @brief

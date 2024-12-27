@@ -273,8 +273,14 @@ do
         local component = self[_metatable_index][_signal_component_index][name]
         if component[_signal_is_blocked_index] ~= true then
             local last
+            local args = {...}
             for callback in values(component[_signal_callbacks_index]) do
-                last = callback(self, ...)
+                local success, result = pcall(callback, self, ...)
+                if not success then
+                    rt.warning("In " .. meta.typeof(self) .. ".signal_emit(\"" .. name .. "\"): ", tostring(result))
+                else
+                    last = result
+                end
             end
             return last
         else

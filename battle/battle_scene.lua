@@ -81,6 +81,9 @@ end
 function bt.BattleScene:create_from_state()
 
     self._animation_queue:clear()
+    self._text_box:clear()
+    self._global_status_bar:clear()
+    self._quicksave_indicator:clear()
 
     self._enemy_sprites = {}
     self._party_sprites = {}
@@ -363,8 +366,6 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
-
-    self._text_box:draw_bounds()
 end
 
 --- @override
