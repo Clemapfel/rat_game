@@ -169,6 +169,11 @@ function bt.BattleConfig:load_config(id)
         return
     end
 
+    self._background = rt.Background[config.background_id]
+    if self._background == nil then
+        throw("In config.background_id: no background with id `" .. config.background_id)
+    end
+
     local enemy_i = 1
     for _, config_entry in pairs(config.enemies) do
         local enemy_id = config_entry.id
@@ -264,7 +269,7 @@ end
 
 --- @brief
 function bt.BattleConfig:get_background()
-    return rt.Background[self._background_id]
+    return self._background
 end
 
 --- @brief
@@ -273,7 +278,7 @@ function bt.BattleConfig:get_n_enemies()
 end
 
 --- @brief
-function bt.BattleConfig:get_global_statuses()
+function bt.BattleConfig:list_global_statuses()
     local out = {}
     for status in values(self._global_statuses) do
         table.insert(out, status)

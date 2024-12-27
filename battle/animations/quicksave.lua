@@ -3,9 +3,9 @@ rt.settings.battle.animations.quicksave = {
 }
 
 --- @class bt.Animation.QUICKSAVE
-bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target, snapshot, message)
+bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene, target, message)
+    -- snapshot set in signal_start
     meta.assert_isa(target, bt.QuicksaveIndicator)
-    meta.assert_isa(snapshot, rt.RenderTexture)
     if message ~= nil then meta.assert_string(message) end
     local flash = rt.settings.battle.animations.quicksave.flash_intensity
     return meta.new(bt.Animation.QUICKSAVE, {
@@ -40,6 +40,10 @@ end
 --- @override
 function bt.Animation.QUICKSAVE:finish()
     self._target:signal_disconnect("done", self._signal_id)
+
+    self._target:set_screenshot(self._snapshot)
+    self._target:set_is_expanded(false)
+    self._target:skip()
 end
 
 do

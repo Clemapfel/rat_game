@@ -1,6 +1,9 @@
 return {
     background_id = "CONFUSION",
-    global_statuses = {},
+    global_statuses = {
+        "DEBUG_GLOBAL_STATUS",
+        "RAIN"
+    },
     enemies = {
         [1] = {
             id = "BOULDER",

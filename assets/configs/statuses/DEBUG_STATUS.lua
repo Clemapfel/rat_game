@@ -98,7 +98,7 @@ return {
     on_global_status_gained = function(self, afflicted, gained_status)
         assert_is_status_proxy(self)
         assert_is_entity_proxy(afflicted)
-        assert_is_global_status(gained_status)
+        assert_is_global_status_proxy(gained_status)
         println(get_id(afflicted) .. " " .. get_id(self) .. " on_global_status_gained")
     end,
 

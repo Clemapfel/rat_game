@@ -14,9 +14,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _priority_queue = bt.PriorityQueue(),
         _quicksave_indicator = bt.QuicksaveIndicator(),
 
-        _global_status_bar = bt.OrderedBox(),
-        _global_status_to_sprite = {}, -- Table<bt.GlobalStatusConfig, rt.Sprite>
-
+        _global_status_bar = bt.GlobalStatusBar(),
         _entity_id_to_sprite = {},
 
         _party_sprites = {}, -- Table<bt.PartySprite>
@@ -191,15 +189,17 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = rt.settings.menu.inventory_scene.outer_margin
 
-    self._global_status_bar:fit_into(
-        x + width - outer_margin - tile_size, y + outer_margin,
-        tile_size, height - 2 * outer_margin
-    )
 
     local text_box_w = (4 / 3 * self._bounds.height) - 2 * outer_margin - 2 * tile_size
     self._text_box:fit_into(
         x + 0.5 * width - 0.5 * text_box_w, y + outer_margin,
         text_box_w, tile_size
+    )
+
+    local status_bar_x = x + 0.5 * width + 0.5 * text_box_w
+    self._global_status_bar:fit_into(
+        status_bar_x, y + outer_margin,
+        x + width - status_bar_x, tile_size
     )
 
     local queue_w = (width - 4 / 3 * height) / 2 - 2 * outer_margin
@@ -363,6 +363,8 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
+
+    self._text_box:draw_bounds()
 end
 
 --- @override
@@ -422,67 +424,22 @@ end
 
 --- @brief
 function bt.BattleScene:add_global_status(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatusConfig)
-    meta.assert_number(n_turns_left)
-
-    if self._global_status_to_sprite[status] ~= nil then
-        self:set_global_status_n_turns_left(status, n_turns_left)
-        return
-    end
-
-    local sprite = rt.Sprite(status:get_sprite_id())
-    if n_turns_left ~= POSITIVE_INFINITY then
-        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
-    end
-    sprite:set_minimum_size(sprite:get_resolution())
-
-    self._global_status_to_sprite[status] = sprite
-    self._global_status_bar:add(sprite, true)
+    self._global_status_bar:add_global_status(status, n_turns_left)
 end
 
 --- @brief
 function bt.BattleScene:remove_global_status(status)
-    meta.assert_isa(status, bt.GlobalStatusConfig)
-
-    local sprite = self._global_status_to_sprite[status]
-    if sprite == nil then
-        rt.error("In bt.BattleScene:remove_global_status: global status `" .. status:get_id() .. "` is not present")
-        return
-    end
-
-    self._global_status_to_sprite[status] = nil
-    self._global_status_bar:remove(sprite)
+   self._global_status_bar:remove_global_status(status)
 end
 
 --- @brief
 function bt.BattleScene:set_global_status_n_turns_left(status, n_turns_left)
-    meta.assert_isa(status, bt.GlobalStatusConfig)
-    meta.assert_number(n_turns_left)
-
-    local sprite = self._global_status_to_sprite[status]
-    if sprite == nil then
-        rt.error("In bt.BattleScene:set_global_status_n_turns_left: global status `" .. status:get_id() .. "` is not present")
-        return
-    end
-
-    if n_turns_left == POSITIVE_INFINITY then
-        sprite:set_bottom_right_child("")
-    else
-        sprite:set_bottom_right_child("<o>" .. n_turns_left .. "</o>")
-    end
+    self._global_status_bar:set_global_status_n_turns_left(status, n_turns_left)
 end
 
 --- @brief
 function bt.BattleScene:activate_global_status(status, on_done_notify)
-    meta.assert_isa(status, bt.StatusConfig)
-
-    local sprite = self._global_status_to_sprite[status]
-    if sprite == nil then
-        rt.error("In bt.BattleScene:activate_global_status: status `" .. status:get_id() .. "` is not present")
-        return
-    end
-
-    self._global_status_bar:activate(sprite, on_done_notify)
+    self._global_status_bar:activate_global_status(status, on_done_notify)
 end
 
 --- @brief
@@ -533,9 +490,17 @@ function bt.BattleScene:send_message(text, on_done_notify)
 end
 
 --- @brief
+function bt.BattleScene:set_background(background)
+    self._background:set_implementation(background)
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self._env.start_battle("DEBUG_BATTLE")
+        self._env.quicksave()
+        --self._animation_queue:clear()
+
         --[[
         local target = self._state:list_enemies()[1]
         local proxy = bt.create_entity_proxy(self, target)

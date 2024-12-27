@@ -209,19 +209,13 @@ function bt.QuicksaveIndicator:update(delta)
     self._frame_opacity = fs.SINUSOID_EASE_IN(2 * self._value)
     self._blur_strength = fs.EXPONENTIAL_ACCELERATION(self._value) * rt.settings.battle.quicksave_indicator.max_blur
 
-    local should_update =
-        (self._direction == true and self._value < 1) or
-        (self._direction == false and self._value > 0)
-
-    if should_update then
-        for i = 1, self._n_vertices do
-            local data = self._vertex_data[i]
-            data[1], data[2] = self._paths[i]:at(path_value)
-            data[3], data[4] = self._texture_paths[i]:at(path_value)
-        end
-
-        self._mesh:setVertices(self._vertex_data)
+    for i = 1, self._n_vertices do
+        local data = self._vertex_data[i]
+        data[1], data[2] = self._paths[i]:at(path_value)
+        data[3], data[4] = self._texture_paths[i]:at(path_value)
     end
+
+    self._mesh:setVertices(self._vertex_data)
 end
 
 --- @override

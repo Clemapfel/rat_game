@@ -2854,13 +2854,16 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.quicksave = function()
-        local texture = _state:create_quicksave()
-
         local animation = rt.Animation.QUICKSAVE(
-            self, _scene._quicksave_indicator, texture,
+            self, _scene._quicksave_indicator,
             rt.Translation.battle.message.quicksave_created_f()
         )
-        animation:signal_connect("finish", function(_)
+        animation:signal_connect("start", function(animation)
+            local texture = _state:create_quicksave()
+            animation._snapshot = texture
+        end)
+
+        animation:signal_connect("finish", function(animation)
             _scene._quicksave_indicator:set_n_turns_elapsed(0)
         end)
 
@@ -2904,6 +2907,7 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         _scene:create_from_state()
+        _scene:set_background(battle:get_background())
 
         -- spawn enemies
         local to_spawn = {}
@@ -2982,7 +2986,13 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         env.spawn(table.unpack(to_spawn))
+
+        for global_status in values(battle:list_global_statuses()) do
+            env.add_global_status(bt.create_global_status_proxy(_scene, global_status))
+        end
     end
+
+
 
     return env
 end

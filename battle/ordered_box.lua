@@ -45,7 +45,6 @@ function bt.OrderedBox:add(widget, left_or_right)
         on_opacity_reached_0 = nil, -- Function
     }
 
-
     self._widget_to_item[widget] = to_add
     table.insert(self._widget_order, widget)
 
@@ -247,11 +246,17 @@ function bt.OrderedBox:skip()
         end
         item.on_scale_reached = {}
 
-        item.current_opacity = item.target_opacity
-        if item.on_opacity_reached_0 ~= nil then
-            item.on_opacity_reached_0(item.widget)
-            item.on_opacity_reached_0 = nil
+        if item.target_opacity == 0 then
+            item.current_opacity = 0
+            if item.on_opacity_reached_0 ~= nil then
+                item.on_opacity_reached_0(item.widget)
+                item.on_opacity_reached_0 = nil
+            end
+        else
+            item.current_opacity = 1
+            item.target_opacity = 1
         end
+        item.widget:set_opacity(item.current_opacity)
 
         item.position_animation:skip()
     end
