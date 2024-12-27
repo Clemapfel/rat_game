@@ -31,12 +31,11 @@ vec3 lch_to_rgb(vec3 lch) {
 
 vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
     vec4 data = texture(cell_texture, texture_coords);
-    float height = data.r;
+    float height = clamp(data.r, 0, 1);
     vec2 velocity = data.gb;
     float hitbox = data.a;
 
     float angle = (atan(velocity.y, velocity.x) + PI) / (2 * PI);
-    vec3 color = lch_to_rgb(vec3(height, 0, angle));
-    color = mix(color, vec3(1), hitbox);
-    return vec4(color, 1.0);
+    vec3 color = lch_to_rgb(vec3(height, length(velocity), angle));
+    return vec4(vec3(color), 1.0);
 }

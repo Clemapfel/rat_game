@@ -72,9 +72,8 @@ void computemain() {
     vec2 position = vec2(gl_GlobalInvocationID.xy);
 
     if (mode == INIT_DISTANCE) {
-        float dist = distance(position, 0.5 * size) / min(size.x, size.y);
-        dist = clamp(10 * gaussian(dist, 2), 0, 1);
-        dist *= snoise(position / size * 10);
+        float dist = gaussian(distance(position / size, vec2(0.5)), 1);
+        dist *= snoise(position / size * 1.5);
 
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
@@ -115,7 +114,6 @@ void computemain() {
         }
 
         vec2 gradient = normalize(vec2(gradient_x, gradient_y));
-
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
 
         /*
@@ -134,9 +132,11 @@ void computemain() {
         */
 
         imageStore(cell_texture, ivec2(position.x, position.y), vec4(
-            current.x, gradient.xy, current.w
+            current.x, gradient.xy, distance(position.xy / size, vec2(position.y / size.y) * 1)
         ));
     }
+
+    /*
     else if (mode == INIT_HITBOX) {
 
         vec4 current = imageLoad(cell_texture, ivec2(position.x, position.y));
@@ -152,6 +152,7 @@ void computemain() {
         float smoothY = smoothstep(top_left.y, top_left.y + edgeThickness, xy.y) * (1.0 - smoothstep(bottom_right.y - edgeThickness, bottom_right.y, xy.y));
         hitbox = smoothX * smoothY;
 
-        imageStore(cell_texture, ivec2(position.x, position.y), vec4(max(current.x, 0), current.yz, 0));
+        imageStore(cell_texture, ivec2(position.x, position.y), vec4(current.xyz, position.x);
     }
+    */
 }

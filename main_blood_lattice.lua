@@ -2,7 +2,7 @@ require "include"
 
 -- https://www.sciencedirect.com/science/article/pii/S0022169422010198?via%3Dihub
 
-local texture_w, texture_h = 512, 512
+local texture_w, texture_h = 800, 800
 local cell_texture_a, cell_texture_b, cell_offset_texture
 
 local relaxation_factor = 0.5
@@ -19,7 +19,7 @@ love.load = function()
         vsync = 0,
         resizable = true
     })
-    love.resize(512, 512)
+    love.resize(texture_w, texture_w)
 
     cell_texture_a = love.graphics.newCanvas(texture_w, texture_h, {
         format = "rgba32f",
@@ -45,7 +45,7 @@ love.load = function()
 end
 
 love.update = function(delta)
-    if not love.keyboard.isDown("space") then return end
+    --if not love.keyboard.isDown("space") then return end
 
     local texture_in, texture_out
     if a_or_b == true then
@@ -54,14 +54,10 @@ love.update = function(delta)
         texture_in, texture_out = cell_texture_b, cell_texture_a
     end
 
-    for _ = 1, 10 do
-        step_shader:send("delta", 1 / 60) --delta)
-        step_shader:send("mode", 1)
-        step_shader:send("cell_texture_in", texture_in)
-        step_shader:send("cell_texture_out", texture_out)
-        step_shader:dispatch(texture_w, texture_h)
-    end
-
+    step_shader:send("delta", delta)
+    step_shader:send("cell_texture_in", texture_in)
+    step_shader:send("cell_texture_out", texture_out)
+    step_shader:dispatch(texture_w, texture_h)
 
     a_or_b = not a_or_b
 end
