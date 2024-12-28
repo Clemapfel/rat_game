@@ -242,8 +242,7 @@ end
 
 --- @brief
 function rt.Label:set_n_visible_characters(n)
-    if self._n_visible_characters == n then return end
-    self._n_visible_characters = n
+    self._n_visible_characters = math.min(n, self._n_characters)
     self:_update_n_visible_characters()
     self:_update_textures()
 end
@@ -903,8 +902,8 @@ do
             end
         end
 
-        self:_update_textures()
         local is_done = n_visible >= self._n_characters
+        self:_update_textures()
         local rest_delta = so_far
         return is_done, max_row, so_far
     end

@@ -65,8 +65,8 @@ function rt.Scrollbar:size_allocate(x, y, w, h)
     self._base:resize(x, y, w, h)
     self._base_outline:resize(x + t, y + t, w - 2 * t, h - 2 * t)
 
-    local cursor_h = self._page_size / self._n_pages * h
-    local cursor_y = y + self._page_index / self._n_pages * h - cursor_h
+    local cursor_h = math.max(self._page_size / self._n_pages * h, rt.settings.margin_unit / 2)
+    local cursor_y = y + self._page_index / self._n_pages * h - 0.5 * cursor_h
 
     self._cursor:resize(x, cursor_y, w, cursor_h)
     self._cursor_outline:resize(x + t, cursor_y + t, w - 2 * t, cursor_h - 2 * t)

@@ -594,12 +594,7 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     env.message = function(...)
-        local to_concat = {} -- table.concat does not invoke __concat metamethods
-        for x in range(...) do
-            table.insert(to_concat, tostring(x))
-        end
-
-        _queue_animation(bt.Animation.MESSAGE(_scene, table.concat(to_concat, " ")))
+        _queue_animation(bt.Animation.MESSAGE(_scene, string.concat(" ", ...)))
     end
 
     env.get_turn_i = function()

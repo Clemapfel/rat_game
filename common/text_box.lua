@@ -1,10 +1,10 @@
 rt.settings.text_box = {
-    max_n_lines = 7,
+    max_n_lines = 10,
     scroll_duration = 0.5, -- seconds
     letters_per_second = 60,
     scroll_speed = 500, -- px / s, frame reveal/hide movement
     expand_speed = 500,
-    label_hide_delay = 0.2, -- seconds, hold after line is done revealing but before scroll up
+    label_hide_delay = 0.5, -- seconds, hold after line is done revealing but before scroll up
     advance_indicator_bounces_per_second = 1
 }
 rt.settings.text_box.position_show_delay = rt.settings.text_box.scroll_duration * 1.3
@@ -37,6 +37,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function(needs_ma
         _n_entries = 0,
         _first_scrolling_entry = 1,
 
+        _indicator_r = rt.settings.margin_unit,
+
         _advance_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
         _advance_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
         _advance_indicator_animation = rt.TimedAnimation(
@@ -49,8 +51,23 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function(needs_ma
         _advance_indicator_offset_x = 0,
         _advance_indicator_offset_y = 0,
 
+        _scroll_up_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _scroll_up_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _scroll_up_indicator_x = 0,
+        _scroll_up_indicator_y = 0,
+
+        _scroll_down_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _scroll_down_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _scroll_down_indicator_x = 0,
+        _scroll_down_indicator_y = 0,
+
+        _scrollbar = rt.Scrollbar(),
+
         _waiting_for_advance = false,
         _needs_manual_advance = needs_manual_advance,
+
+        _history_mode_active = false,
+        _history_mode_first_entry = 0,
         
         _current_frame_h = 0,
         _target_frame_h = 0,
@@ -63,6 +80,7 @@ end)
 function rt.TextBox:realize()
     if self:already_realized() then return end
     self._frame:realize()
+    self._scrollbar:realize()
     self._advance_indicator_animation:set_should_loop(true)
     self:_update_target_height_from_n_lines()
 end
@@ -104,27 +122,60 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._manual_scroll_indicator_x = frame_h - 2 * xm
     self._manual_scroll_indicator_y = height - 2 * ym
 
-    local advance_x, advance_y = 0, 0
-    local advance_r = m
-    local vertices = {}
-    for angle = 0.5 * math.pi, 2 * math.pi, 2 / 3 * math.pi do
-        table.insert(vertices, 0 + math.cos(angle) * advance_r)
-        table.insert(vertices, 0 + math.sin(angle) * advance_r)
+    do
+        local vertices = {}
+        for angle = 0.5 * math.pi, 2 * math.pi, 2 / 3 * math.pi do
+            table.insert(vertices, 0 + math.cos(angle) * self._indicator_r)
+            table.insert(vertices, 0 + math.sin(angle) * self._indicator_r)
+        end
+
+        self._advance_indicator = rt.Polygon(vertices)
+        self._advance_indicator_outline = rt.Polygon(vertices)
+
+        self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
+        self._advance_indicator_path = rt.Path(
+            0, 0,
+            0, 0 - self._indicator_r
+        )
     end
 
-    self._advance_indicator = rt.Polygon(vertices)
-    self._advance_indicator_outline = rt.Polygon(vertices)
+    do
+        local down_vertices = {}
+        local up_vertices = {}
 
-    self._advance_indicator:set_color(rt.Palette.FOREGROUND)
-    self._advance_indicator_outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
-    self._advance_indicator_outline:set_is_outline(true)
-    self._advance_indicator_outline:set_line_width(3)
+        local up_offset = 0.5 * math.pi
+        local down_offset = 2 * math.pi - up_offset
+        for angle = 0, 2 * math.pi, 2 / 3 * math.pi do
+            table.insert(down_vertices, 0 + math.cos(angle - down_offset) * self._indicator_r)
+            table.insert(down_vertices, 0 + math.sin(angle - down_offset) * self._indicator_r)
+            table.insert(up_vertices, 0 + math.cos(angle - up_offset) * self._indicator_r)
+            table.insert(up_vertices, 0 + math.sin(angle - up_offset) * self._indicator_r)
+        end
 
-    self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
-    self._advance_indicator_path = rt.Path(
-        0, 0,
-        0, 0 - advance_r
-    )
+        self._scroll_down_indicator = rt.Polygon(down_vertices)
+        self._scroll_down_indicator_outline = rt.Polygon(down_vertices)
+
+        self._scroll_up_indicator = rt.Polygon(up_vertices)
+        self._scroll_up_indicator_outline = rt.Polygon(up_vertices)
+    end
+
+    for fill in range(
+        self._advance_indicator,
+        self._scroll_up_indicator,
+        self._scroll_down_indicator
+    ) do
+        fill:set_color(rt.Palette.FOREGROUND)
+    end
+
+    for outline in range(
+        self._advance_indicator_outline,
+        self._scroll_up_indicator_outline,
+        self._scroll_down_indicator_outline
+    ) do
+        outline:set_color(rt.Palette.BACKGROUND_OUTLINE)
+        outline:set_is_outline(true)
+        outline:set_line_width(3)
+    end
 end
 
 --- @brief
@@ -162,7 +213,8 @@ function rt.TextBox:append(msg, on_done_notify)
 
     self._position_target_value = _SHOWN
     self._position_show_delay = 0
-
+    
+    self:set_show_history_mode_active(false)
     return self._n_entries
 end
 
@@ -206,7 +258,7 @@ function rt.TextBox:update(delta)
 
     local should_reformat = false
 
-    local all_entries_done = self._first_scrolling_entry < self._n_entries
+    local all_entries_done = true
     local is_previous_done = true
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
@@ -228,11 +280,13 @@ function rt.TextBox:update(delta)
             entry.n_lines_visible = new_n_lines_visible
         end
 
-        if is_done and not self._waiting_for_input then
+        if is_done and not self._waiting_for_input and not self._history_mode_active then
             entry.delay_elapsed = entry.delay_elapsed + delta
             if entry.delay_elapsed > line_delay then
-                if entry.is_done == false and entry.on_done_f ~= nil then
-                    entry.on_done_f()
+                if entry.is_done == false then
+                    if entry.on_done_f ~= nil then
+                        entry.on_done_f()
+                    end
                     entry.is_done = true
                 end
             else
@@ -258,11 +312,11 @@ function rt.TextBox:update(delta)
     -- hide once scrolling is done
     if all_entries_done and self._current_line_y_offset >= self._target_line_y_offset and self._current_frame_h >= self._target_frame_h then
         self._position_target_value = _HIDDEN
-        self._current_line_y_offset = 0
-        self._target_line_y_offset = 0
         self._first_scrolling_entry = self._n_entries + 1
         self._n_lines = 0
         self:_update_target_height_from_n_lines()
+        self._current_line_y_offset = 0
+        self._target_line_y_offset = 0
     end
 
    -- smoothly transition sizes
@@ -280,6 +334,10 @@ function rt.TextBox:update(delta)
         self._current_frame_h = current
 
         local x, y, width, height = rt.aabb_unpack(self._bounds)
+        x = math.round(x)
+        y = math.round(y)
+        width = math.round(width)
+        height = math.round(height)
         local m = rt.settings.margin_unit
         local xm = 2 * m + self._frame:get_thickness()
         local ym = m + self._frame:get_thickness()
@@ -296,6 +354,19 @@ function rt.TextBox:update(delta)
         self._frame:fit_into(0, 0, width, frame_h)
 
         self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
+        local indicator_x = x + width - xm
+        self._scroll_up_indicator_x, self._scroll_up_indicator_y = indicator_x, y + 2 * ym
+        self._scroll_down_indicator_x, self._scroll_down_indicator_y = indicator_x, y + frame_h - 2 * ym
+
+        if self._history_mode_active then
+            local scrollbar_width = 2 * m
+            self._scrollbar:fit_into(
+                indicator_x - 2 * self._indicator_r + 0.5 * scrollbar_width,
+                y + 2 * ym + self._indicator_r,
+                scrollbar_width,
+                frame_h - 4 * self._indicator_r - 2 * ym - 0.5 * m
+            )
+        end
     end
 end
 
@@ -314,7 +385,6 @@ function rt.TextBox:draw()
 
     love.graphics.push()
     love.graphics.translate(x, y - self._current_line_y_offset)
-    local n_drawn, max_lines = 0, self._max_n_lines
     for i = self._first_scrolling_entry, self._n_entries do
         local entry = self._entries[i]
         entry.label:draw()
@@ -330,6 +400,26 @@ function rt.TextBox:draw()
         self._advance_indicator:draw()
     end
     love.graphics.pop()
+
+    if self._history_mode_active then
+        if self:history_mode_can_scroll_up() then
+            love.graphics.push()
+            love.graphics.translate(self._scroll_up_indicator_x, self._scroll_up_indicator_y)
+            self._scroll_up_indicator_outline:draw()
+            self._scroll_up_indicator:draw()
+            love.graphics.pop()
+        end
+
+        if self:history_mode_can_scroll_down() then
+            love.graphics.push()
+            love.graphics.translate(self._scroll_down_indicator_x, self._scroll_down_indicator_y)
+            self._scroll_down_indicator_outline:draw()
+            self._scroll_down_indicator:draw()
+            love.graphics.pop()
+        end
+
+        self._scrollbar:draw()
+    end
 end
 
 --- @brief
@@ -338,6 +428,7 @@ function rt.TextBox:skip(id)
         local offset = 0
         for entry in values(self._entries) do
             entry.label:set_n_visible_characters(POSITIVE_INFINITY)
+            entry.n_visible_lines = entry.n_lines
             if entry.on_done_f ~= nil and entry.is_done == false then
                 entry.on_done_f()
             end
@@ -352,7 +443,6 @@ function rt.TextBox:skip(id)
         self._n_lines = 0
         self:_update_target_height_from_n_lines()
         self._current_frame_h = self._target_frame_h
-        self:reformat()
     else
         local entry = self._entries[id]
         if entry == nil then
@@ -368,16 +458,6 @@ function rt.TextBox:skip(id)
             if entry.on_done_f ~= nil then entry.on_done_f() end
             entry.is_done = true
         end
-
-        local all_done = true
-        for i = self._first_scrolling_entry, self._n_entries do
-            if entry.is_done == false then
-                all_done = false
-                break
-            end
-        end
-
-        if all_done then self:skip() end
     end
 end
 
@@ -400,6 +480,63 @@ function rt.TextBox:advance()
     end
 
     self._waiting_for_advance = false
+end
+
+--- @brief
+function rt.TextBox:set_show_history_mode_active(b)
+    self._history_mode_active = b
+    if b then
+        self._n_lines = self._max_n_lines
+        self:_update_target_height_from_n_lines()
+        self._position_target_value = _SHOWN
+        self._first_scrolling_entry = self._n_entries
+        self._scrollbar:set_page_index(self._first_scrolling_entry, self._n_entries)
+    else
+        self._first_scrolling_entry = self._n_entries
+        self._n_lines = 0
+        self:_update_target_height_from_n_lines()
+    end
+end
+
+--- @brief
+function rt.TextBox:get_show_history_mode_active()
+    return self._history_mode_active
+end
+
+--- @brief
+function rt.TextBox:history_mode_scroll_up()
+    if self._history_mode_active == false then
+        self._history_mode_active(true)
+    end
+
+    if not self:history_mode_can_scroll_up() then return false end
+
+    self._first_scrolling_entry = self._first_scrolling_entry - 1
+    self._scrollbar:set_page_index(self._first_scrolling_entry)
+    return true
+end
+
+--- @brief
+function rt.TextBox:history_mode_scroll_down()
+    if self._history_mode_active == false then
+        self._history_mode_active(true)
+    end
+
+    if not self:history_mode_can_scroll_down() then return false end
+
+    self._first_scrolling_entry = self._first_scrolling_entry + 1
+    self._scrollbar:set_page_index(self._first_scrolling_entry)
+    return true
+end
+
+--- @brief
+function rt.TextBox:history_mode_can_scroll_up()
+    return self._first_scrolling_entry > 1
+end
+
+--- @brief
+function rt.TextBox:history_mode_can_scroll_down()
+    return self._first_scrolling_entry < self._n_entries
 end
 
 --- @brief

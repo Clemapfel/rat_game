@@ -603,9 +603,10 @@ function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self._env.start_battle("DEBUG_BATTLE")
         self._env.quicksave()
-        self:skip_all()
+        --self:skip_all()
 
-        self:_create_inspect_selection_graph()
+        --self:_create_inspect_selection_graph()
+        --self._text_box:set_show_history_mode_active(true)
 
         --[[
         local target = self._state:list_enemies()[1]
@@ -632,11 +633,17 @@ function bt.BattleScene:_handle_button_pressed(which)
         ]]--
 
         --self._game_over_screen:set_is_expanded(not self._game_over_screen:get_is_expanded())
-
     elseif which == rt.InputButton.B then
         self:skip()
+    elseif which == rt.InputButton.X then
+        --self._text_box:set_show_history_mode_active(not self._text_box:get_show_history_mode_active())
+        self._env.message("test")
     elseif which == rt.InputButton.DEBUG then
         self._game_over_screen._vignette_shader:recompile()
+    elseif which == rt.InputButton.UP then
+        self._text_box:history_mode_scroll_up()
+    elseif which == rt.InputButton.DOWN then
+        self._text_box:history_mode_scroll_down()
     end
 
     if which == rt.InputButton.X then self._text_box:advance() end
