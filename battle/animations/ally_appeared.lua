@@ -24,7 +24,8 @@ bt.Animation.ALLY_APPEARED = meta.new_type("ALLY_APPEARED", rt.Animation, functi
         ),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil,
     })
 end, {
     _shader = (function()
@@ -59,7 +60,7 @@ function bt.Animation.ALLY_APPEARED:start()
 
     self._target:set_is_visible(false)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -67,6 +68,7 @@ end
 --- @override
 function bt.Animation.ALLY_APPEARED:finish()
     self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

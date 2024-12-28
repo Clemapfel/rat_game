@@ -48,7 +48,8 @@ bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene
         ),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -137,7 +138,7 @@ do
 
         self._target:set_is_visible(false)
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -145,7 +146,7 @@ end
 
 --- @override
 function bt.Animation.HP_GAINED:finish()
-    self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

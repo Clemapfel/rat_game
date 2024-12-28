@@ -28,7 +28,8 @@ bt.Animation.ENEMY_KILLED = meta.new_type("ENEMY_KILLED", rt.Animation, function
         _elapsed = 0,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -94,7 +95,7 @@ function bt.Animation.ENEMY_KILLED:start()
 
     self._target:set_is_visible(false)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -102,6 +103,7 @@ end
 --- @override
 function bt.Animation.ENEMY_KILLED:finish()
     self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

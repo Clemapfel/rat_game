@@ -8,7 +8,8 @@ bt.Animation.QUICKLOAD = meta.new_type("QUICKLOAD", rt.Animation, function(scene
         _target = target,
         _is_done = false,
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -22,7 +23,7 @@ function bt.Animation.QUICKLOAD:start()
         self._is_done = true
     end)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -30,6 +31,7 @@ end
 --- @override
 function bt.Animation.QUICKLOAD:finish()
     self._target:signal_disconnect("done", self._signal_id)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

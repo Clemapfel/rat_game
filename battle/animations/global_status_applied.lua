@@ -8,7 +8,8 @@ bt.Animation.GLOBAL_STATUS_APPLIED = meta.new_type("GLOBAL_STATUS_APPLIED", rt.A
         _status = global_status,
         _status_done = false,
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -18,14 +19,14 @@ function bt.Animation.GLOBAL_STATUS_APPLIED:start()
         self._status_done = true
     end)
     
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
 
 --- @override
 function bt.Animation.GLOBAL_STATUS_APPLIED:finish()
-    -- noop
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

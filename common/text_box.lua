@@ -128,12 +128,14 @@ function rt.TextBox:size_allocate(x, y, width, height)
 end
 
 --- @brief
+--- @return Number id
 function rt.TextBox:append(msg, on_done_notify)
     if msg == nil or msg == "" then
         if on_done_notify ~= nil then on_done_notify() end
         return
     end
 
+    local id = self._current_id
     local entry = {
         label = rt.Label(msg),
         width = 0,
@@ -160,6 +162,8 @@ function rt.TextBox:append(msg, on_done_notify)
 
     self._position_target_value = _SHOWN
     self._position_show_delay = 0
+
+    return self._n_entries
 end
 
 --- @brief
@@ -329,25 +333,42 @@ function rt.TextBox:draw()
 end
 
 --- @brief
-function rt.TextBox:skip()
-    local offset = 0
-    for entry in values(self._entries) do
-        entry.label:set_n_visible_characters(POSITIVE_INFINITY)
-        if entry.on_done_f ~= nil and entry.is_done == false then
-            entry.on_done_f()
+function rt.TextBox:skip(id)
+    if id == nil then
+        local offset = 0
+        for entry in values(self._entries) do
+            entry.label:set_n_visible_characters(POSITIVE_INFINITY)
+            if entry.on_done_f ~= nil and entry.is_done == false then
+                entry.on_done_f()
+            end
+            entry.is_done = true
+            offset = offset + entry.height
         end
-        entry.is_done = true
-        offset = offset + entry.height
+        self._target_line_y_offset = 0
+        self._current_line_y_offset = 0
+        self._first_scrolling_entry = self._n_entries + 1
+        self._position_target_value = _HIDDEN
+        self._position_current_value = _HIDDEN
+        self._n_lines = 0
+        self:_update_target_height_from_n_lines()
+        self._current_frame_h = self._target_frame_h
+        self:reformat()
+    else
+        local entry = self._entries[id]
+        if entry == nil then
+            rt.error("In rt.TextBox.skip: no entry with id `" .. id .. "`")
+            return
+        end
+
+        entry.delay_elapsed = POSITIVE_INFINITY
+        entry.elapsed = POSITIVE_INFINITY
+        entry.label:set_n_visible_characters(POSITIVE_INFINITY)
+        entry.n_lines_visible = entry.n_lines
+        if entry.is_done == false then
+            if entry.on_done_f ~= nil then entry.on_done_f() end
+            entry.is_done = true
+        end
     end
-    self._target_line_y_offset = 0
-    self._current_line_y_offset = 0
-    self._first_scrolling_entry = self._n_entries + 1
-    self._position_target_value = _HIDDEN
-    self._position_current_value = _HIDDEN
-    self._n_lines = 0
-    self:_update_target_height_from_n_lines()
-    self._current_frame_h = self._target_frame_h
-    self:reformat()
 end
 
 --- @brief

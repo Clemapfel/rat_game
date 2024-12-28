@@ -68,7 +68,8 @@ bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, en
         _radius_fraction = 1,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -165,7 +166,7 @@ do
         end
         self._particle_buffer:replace_data(data)
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -174,6 +175,7 @@ end
 --- @override
 function bt.Animation.HP_LOST:finish()
     self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

@@ -25,13 +25,14 @@ bt.Animation.QUICKSAVE = meta.new_type("QUICKSAVE", rt.Animation, function(scene
         ),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
 --- @override
 function bt.Animation.QUICKSAVE:start()
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
     -- otherwise noop, delayed until white flash in update
@@ -40,6 +41,7 @@ end
 --- @override
 function bt.Animation.QUICKSAVE:finish()
     self._target:signal_disconnect("done", self._signal_id)
+    self._scene:skip_message(self._message_id)
 
     self._target:set_screenshot(self._snapshot)
     self._target:set_is_expanded(false)

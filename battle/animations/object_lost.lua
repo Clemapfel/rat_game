@@ -27,7 +27,8 @@ bt.Animation.OBJECT_LOST = meta.new_type("OBJECT_LOST", rt.Animation, function(s
         _floor_shape = nil, -- b2.Shape
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
 })
 end, {
     object_to_sprite = {},
@@ -76,7 +77,7 @@ function bt.Animation.OBJECT_LOST:start()
         self.world.updated_this_frame = false
     end)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -84,6 +85,7 @@ end
 --- @override
 function bt.Animation.OBJECT_LOST:finish()
     self._scene:signal_disconnect("update", self._signal_handler)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

@@ -39,7 +39,8 @@ bt.Animation.OBJECT_GAINED = meta.new_type("OBJECT_GAINED", rt.Animation, functi
         _position_animation = rt.TimedAnimation,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     object_to_sprite = {}
@@ -73,7 +74,7 @@ function bt.Animation.OBJECT_GAINED:start()
     self._ray_aabb.width = sprite_w
     self._ray_aabb.height = bottom_y + 0.5 * sprite_h
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -109,6 +110,11 @@ function bt.Animation.OBJECT_GAINED:update(delta)
     self._ray:set_vertex_color(4, rt.RGBA(1, 1, 1, down_opacity))
 
     return self._opacity_animation:get_is_done() and self._path_animation:get_is_done() and self._message_done
+end
+
+--- @override
+function bt.Animation.OBJECT_GAINED:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

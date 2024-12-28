@@ -30,7 +30,8 @@ bt.Animation.ENEMY_KNOCKED_OUT = meta.new_type("ENEMY_KNOCKED_OUT", rt.Animation
         _elapsed = 0,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -58,6 +59,7 @@ end
 --- @override
 function bt.Animation.ENEMY_KNOCKED_OUT:finish()
     self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

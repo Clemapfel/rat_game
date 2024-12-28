@@ -48,7 +48,8 @@ bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, func
         _particle_opacity_animation = rt.TimedAnimation(settings.duration, 0, 1, rt.InterpolationFunctions.HANN_LOWPASS, 6),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -171,7 +172,7 @@ do
             0, 0
         )
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -180,6 +181,7 @@ end
 --- @override
 function bt.Animation.ENTITY_REVIVED:finish()
     self._sprite:set_opacity(1)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

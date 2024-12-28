@@ -452,6 +452,19 @@ function string.size(str)
     return #str
 end
 
+--- @brief concat respecting meta methods
+function string.concat(delimiter, ...)
+    local out = ""
+    local n = select("#", ...)
+    for i = 1, n do
+        out = out .. select(i, ...)
+        if i < n then
+            out = out .. delimiter
+        end
+    end
+    return out
+end
+
 --- @brief
 function utf8.sub(s,i,j)
     -- src: http://lua-users.org/lists/lua-l/2014-04/msg00590.html

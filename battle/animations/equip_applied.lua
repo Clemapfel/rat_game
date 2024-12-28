@@ -33,7 +33,8 @@ bt.Animation.EQUIP_APPLIED = meta.new_type("EQUIP_APPLIED", rt.Animation, functi
         _scale_animation = rt.TimedAnimation(fade_duration, 1, 3, rt.InterpolationFunctions.LINEAR),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     _equip_to_sprite = {}
@@ -43,7 +44,7 @@ end, {
 function bt.Animation.EQUIP_APPLIED:start()
     self._target = self._scene:get_sprite(self._entity)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 
@@ -94,6 +95,11 @@ function bt.Animation.EQUIP_APPLIED:update(delta)
         self._scale_animation:get_is_done() and
         self._opacity_animation:get_is_done() and
         self._message_done
+end
+
+--- @override
+function bt.Animation.EQUIP_APPLIED:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

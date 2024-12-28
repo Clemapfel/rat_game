@@ -487,7 +487,12 @@ end
 
 --- @brief
 function bt.BattleScene:send_message(text, on_done_notify)
-    self._text_box:append(text, on_done_notify)
+    return self._text_box:append(text, on_done_notify)
+end
+
+--- @brief
+function bt.BattleScene:skip_message(id)
+    self._text_box:skip(id)
 end
 
 --- @brief

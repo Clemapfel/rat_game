@@ -35,7 +35,8 @@ bt.Animation.CONSUMABLE_CONSUMED = meta.new_type("CONSUMABLE_CONSUMED", rt.Anima
         _bite_elapsed = 0,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     consumable_to_sprite = {}
@@ -88,7 +89,7 @@ function bt.Animation.CONSUMABLE_CONSUMED:start()
 
     self._target:set_is_visible(false)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -96,6 +97,7 @@ end
 --- @override
 function bt.Animation.CONSUMABLE_CONSUMED:finish()
     self._target:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

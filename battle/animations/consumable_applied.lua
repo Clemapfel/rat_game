@@ -10,7 +10,8 @@ bt.Animation.CONSUMABLE_APPLIED = meta.new_type("CONSUMABLE_APPLIED", rt.Animati
         _entity = entity,
         _status_done = false,
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -21,13 +22,14 @@ function bt.Animation.CONSUMABLE_APPLIED:start()
         self._status_done = true
     end)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
 
 --- @override
 function bt.Animation.CONSUMABLE_APPLIED:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

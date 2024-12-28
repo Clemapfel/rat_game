@@ -59,7 +59,8 @@ bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, func
         _screenshot_bottom = nil, -- "
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -165,7 +166,7 @@ do
             self._label_path = rt.Path(label_right_x, label_y, label_left_x, label_y)
         end
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -173,7 +174,7 @@ end
 
 --- @override
 function bt.Animation.TURN_START_END:finish()
-    -- noop
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

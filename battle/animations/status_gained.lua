@@ -39,7 +39,8 @@ bt.Animation.STATUS_GAINED = meta.new_type("STATUS_GAINED", rt.Animation, functi
         _sprite_path = nil, -- rt.Spline,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     status_to_sprite = {}
@@ -70,7 +71,7 @@ function bt.Animation.STATUS_GAINED:start()
         x + 0.5 * w, y + (0.5 - offset) * h
     })
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -78,6 +79,7 @@ end
 --- @brief
 function bt.Animation.STATUS_GAINED:finish()
     self._sprite:set_opacity(0)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @brief

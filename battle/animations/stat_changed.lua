@@ -70,7 +70,8 @@ bt.Animation.STAT_CHANGED = meta.new_type("STAT_CHANGED", rt.Animation, function
         _elapsed = 0,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -139,7 +140,7 @@ do
         assert(color ~= nil)
         self._color = {rt.color_unpack(color)}
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -163,6 +164,11 @@ function bt.Animation.STAT_CHANGED:update(delta)
     self._label:set_opacity(self._opacity)
 
     return is_done and self._message_done
+end
+
+--- @override
+function bt.Animation.STAT_CHANGED:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

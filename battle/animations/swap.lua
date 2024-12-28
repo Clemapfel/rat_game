@@ -34,7 +34,8 @@ bt.Animation.SWAP = meta.new_type("SWAP", rt.Animation, function(scene, entity_a
         _b_path = nil, -- rt.Path
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -84,7 +85,7 @@ function rt.Animation.SWAP:start()
     self._target_a:set_is_visible(false)
     self._target_b:set_is_visible(false)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -93,6 +94,7 @@ end
 function bt.Animation.SWAP:finish()
     self._target_a:set_is_visible(true)
     self._target_b:set_is_visible(true)
+    self._scene:skip_message(self._message_id)
 end
 
 do

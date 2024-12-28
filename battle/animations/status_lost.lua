@@ -28,7 +28,8 @@ bt.Animation.STATUS_LOST = meta.new_type("STATUS_LOST", rt.Animation, function(s
         _opacity = 0,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -91,7 +92,7 @@ function bt.Animation.STATUS_LOST:start()
         y = y + step
         x = start_x
 
-        self._scene:send_message(self._message, function()
+        self._message_id = self._scene:send_message(self._message, function()
             self._message_done = true
         end)
     end
@@ -121,6 +122,11 @@ function bt.Animation.STATUS_LOST:update(delta)
     end
 
     return self._fade_out_animation:get_is_done() and self._message_done
+end
+
+--- @override
+function bt.Animation.STATUS_LOST:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

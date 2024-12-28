@@ -589,6 +589,10 @@ function bt.BattleScene:create_simulation_environment()
         return _get_native(object):get_id()
     end
 
+    function env.hash(object)
+        return meta.hash(_get_native(object))
+    end
+
     env.message = function(...)
         local to_concat = {} -- table.concat does not invoke __concat metamethods
         for x in range(...) do
@@ -1368,7 +1372,7 @@ function bt.BattleScene:create_simulation_environment()
 
         _new_animation_node()
 
-        _try_invoke_global_status_callback("on_gained", global_status_proxy)
+        _try_invoke_global_status_callback("on_gained", global_status_proxy, env.list_entities())
 
         local callback_id = "on_global_status_gained"
         for entity in values(_state:list_entities()) do
@@ -1386,7 +1390,7 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         for other_global_status_proxy in values(env.list_global_statuses()) do
-            if _get_native(other_global_status_proxy) ~= _get_native(global_status_proxy) then
+            if other_global_status_proxy ~= global_status_proxy then
                 _try_invoke_global_status_callback(callback_id, other_global_status_proxy, global_status_proxy)
             end
         end

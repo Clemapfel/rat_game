@@ -275,12 +275,15 @@ do
             local last
             local args = {...}
             for callback in values(component[_signal_callbacks_index]) do
+                --[[
                 local success, result = pcall(callback, self, ...)
                 if not success then
                     rt.warning("In " .. meta.typeof(self) .. ".signal_emit(\"" .. name .. "\"): ", tostring(result))
                 else
                     last = result
                 end
+                ]]--
+                last = callback(self, ...)
             end
             return last
         else

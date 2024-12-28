@@ -28,7 +28,8 @@ bt.Animation.ENEMY_APPEARED = meta.new_type("ENEMY_APPEARED", rt.Animation, func
         ),
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     _shader = (function()
@@ -56,7 +57,7 @@ function bt.Animation.ENEMY_APPEARED:start()
         target_x, target_y
     )
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -65,6 +66,7 @@ end
 function bt.Animation.ENEMY_APPEARED:finish()
     self._target:set_is_visible(true)
     self._target:set_animation_active(true)
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

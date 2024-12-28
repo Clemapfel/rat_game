@@ -32,7 +32,8 @@ bt.Animation.OBJECT_ENABLED = meta.new_type("OBJECT_ENABLED", rt.Animation, func
         _triangles = {},
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     _cache = {} -- store shards if caching enabled
@@ -218,7 +219,7 @@ function bt.Animation.OBJECT_ENABLED:start()
         }
     end
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -241,6 +242,11 @@ function bt.Animation.OBJECT_ENABLED:update(delta)
     end
 
     return self._fade_out_animation:get_is_done() and self._fade_out_animation:get_is_done() and self._message_done
+end
+
+--- @override
+function bt.Animation.OBJECT_ENABLED:finish()
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

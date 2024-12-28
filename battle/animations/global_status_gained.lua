@@ -26,7 +26,8 @@ bt.Animation.GLOBAL_STATUS_GAINED = meta.new_type("GLOBAL_STATUS_GAINED", rt.Ani
         _duration = rt.settings.battle.animation.global_status_gained.duration,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
@@ -60,14 +61,14 @@ function bt.Animation.GLOBAL_STATUS_GAINED:start()
     )
     self._shape:set_texture(self._sprite_texture)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
 
 --- @override
 function bt.Animation.GLOBAL_STATUS_GAINED:finish()
-
+    self._scene:skip_message(self._message_id)
 end
 
 --- @override

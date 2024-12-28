@@ -11,14 +11,15 @@ bt.Animation.STUN_LOST = meta.new_type("STUN_LOST", rt.Animation, function(scene
         _target = nil, -- bt.EntitySprite
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end)
 
 --- @overload
 function bt.Animation.STUN_LOST:start()
     self._target = self._scene:get_sprite(self._entity)
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -31,4 +32,5 @@ end
 --- @overload
 function bt.Animation.STUN_LOST:finish()
     self._target:set_is_stunned(false)
+    self._scene:skip_message(self._message_id)
 end

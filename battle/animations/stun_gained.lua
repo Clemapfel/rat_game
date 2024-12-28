@@ -44,7 +44,8 @@ bt.Animation.STUN_GAINED = meta.new_type("STUN_GAINED", rt.Animation, function(s
         _label_timer = nil,
 
         _message = message,
-        _message_done = false
+        _message_done = false,
+        _message_id = nil
     })
 end, {
     _path = nil, -- rt.Spline
@@ -80,7 +81,7 @@ function bt.Animation.STUN_GAINED:start()
 
     self._label:set_opacity(0)
 
-    self._scene:send_message(self._message, function()
+    self._message_id = self._scene:send_message(self._message, function()
         self._message_done = true
     end)
 end
@@ -109,4 +110,5 @@ end
 function bt.Animation.STUN_GAINED:finish()
     self._target:set_is_visible(true)
     self._target:set_is_stunned(true)
+    self._scene:skip_message(self._message_id)
 end
