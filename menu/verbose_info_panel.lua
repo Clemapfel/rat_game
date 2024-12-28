@@ -30,7 +30,8 @@ rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
     VISUAL_EFFECTS_WIDGET = "vfx_contrast_level_widget",
     KEYMAP = "keymap",
     DEADZONE = "deadzone",
-    DEADZONE_WIDGET = "deadzone_widget"
+    DEADZONE_WIDGET = "deadzone_widget",
+    QUICKSAVE = "quicksave"
 })
 
 --- @class mn.VerboseInfoPanel

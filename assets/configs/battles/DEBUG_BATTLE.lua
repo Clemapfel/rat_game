@@ -24,17 +24,34 @@ return {
         [2] = {
             id = "WALKING_SPROUT",
             attacks = {},
-            statuses = {},
-            consumables = {},
-            equips = {}
+            attacks = {
+                "DEBUG_ATTACK"
+            },
+            statuses = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                "DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
         },
 
         [3] = {
             id = "WALKING_SPROUT",
-            attacks = {},
-            statuses = {},
-            consumables = {},
-            equips = {}
+            attacks = {
+                "DEBUG_ATTACK"
+            },
+            statuses = {
+                "DEBUG_STATUS"
+            },
+            consumables = {
+                "DEBUG_CONSUMABLE"
+            },
+            equips = {
+                "DEBUG_EQUIP"
+            },
         }
     }
 }

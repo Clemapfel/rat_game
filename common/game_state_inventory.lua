@@ -7,9 +7,9 @@
         count
     }
 
-    shared_consumables[equip_id] = {
+    shared_consumables[consumable_id] = {
+        count
     }
-
 
     active_template_id = "default",
     templates[template_id] = {
@@ -549,6 +549,10 @@ function rt.GameState:initialize_debug_inventory()
     local consumables = {
         "SINGLE_CHERRY",
         "DOUBLE_CHERRY"
+    }
+
+    local status = {
+        "DEBUG_STATUS"
     }
 
     for move_id in values(moves) do

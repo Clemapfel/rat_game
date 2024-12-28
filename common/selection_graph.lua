@@ -111,7 +111,6 @@ end
 --- @brief
 
 function rt.SelectionGraphNode:draw(color)
-    error("do not call this")
     love.graphics.setColor(rt.color_unpack(color))
 
     local centroid_x, centroid_y = self._centroid_x, self._centroid_y

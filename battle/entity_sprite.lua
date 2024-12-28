@@ -311,3 +311,64 @@ end
 function bt.EntitySprite:get_position()
     return self._snapshot_position_x, self._snapshot_position_y
 end
+
+--- @brief
+function bt.EntitySprite:get_selection_nodes()
+    local nodes = {}
+    local n = 0
+    for status, sprite in pairs(self._status_to_sprite) do
+        local bounds = self._status_consumable_bar:get_widget_bounds(sprite)
+        bounds.x = bounds.x
+        bounds.y = bounds.y
+        local node = rt.SelectionGraphNode(bounds)
+        node.objects = { status }
+        table.insert(nodes, node)
+        n = n + 1
+    end
+
+    for slot_i, sprite in pairs(self._consumable_slot_to_sprite) do
+        local consumable = self._consumable_slot_to_consumable[slot_i]
+        local bounds = self._status_consumable_bar:get_widget_bounds(sprite)
+        bounds.x = bounds.x
+        bounds.y = bounds.y
+        local node = rt.SelectionGraphNode(bounds)
+        node.objects = { consumable }
+        table.insert(nodes, node)
+        n = n + 1
+    end
+
+    table.sort(nodes, function(a, b)
+        return a:get_bounds().x < b:get_bounds().x
+    end)
+
+    local sprite_node
+    do
+        local x, y = self:get_position()
+        local w, h = self:measure()
+        sprite_node = rt.SelectionGraphNode(rt.AABB(x, y, w, h))
+    end
+
+    local sprite_bounds = sprite_node:get_bounds()
+    for i = 1, n do
+        local node = nodes[i]
+        if i > 1 then
+            node:set_left(nodes[i - 1])
+        end
+
+        if i < n then
+            node:set_right(nodes[i + 1])
+        end
+
+        local current_bounds = node:get_bounds()
+        if current_bounds.y + 0.5 * current_bounds.height > sprite_bounds.y + 0.5 * sprite_bounds.height then
+            node:set_up(sprite_node)
+            sprite_node:set_down(node)
+        else
+            node:set_down(sprite_node)
+            sprite_node:set_up(node)
+        end
+    end
+
+    table.insert(nodes, sprite_node)
+    return nodes
+end

@@ -31,8 +31,6 @@ function bt.GlobalStatusBar:update(delta)
     self._motion:update(delta)
 end
 
-
-
 --- @brief
 function bt.GlobalStatusBar:add_global_status(status, n_turns_left)
     meta.assert_isa(status, bt.GlobalStatusConfig)
@@ -154,4 +152,37 @@ end
 function bt.GlobalStatusBar:skip()
     self._ordered_box:skip()
     self._motion:skip()
+end
+
+--- @brief
+function bt.GlobalStatusBar:get_selection_nodes()
+    local nodes = {}
+    local n = 0
+    local offset_x = self._motion:get_target_value()
+    for global_status, sprite in pairs(self._global_status_to_sprite) do
+        local bounds = self._ordered_box:get_widget_bounds(sprite)
+        bounds.x = bounds.x + offset_x
+        bounds.y = bounds.y
+        local node = rt.SelectionGraphNode(bounds)
+        node.objects = { global_status }
+        table.insert(nodes, node)
+        n = n + 1
+    end
+
+    table.sort(nodes, function(a, b)
+        return a:get_bounds().x < b:get_bounds().x
+    end)
+
+    for i = 1, n do
+        local node = nodes[i]
+        if i > 1 then
+            node:set_left(nodes[i - 1])
+        end
+
+        if i < n then
+            node:set_right(nodes[i + 1])
+        end
+    end
+
+    return nodes
 end

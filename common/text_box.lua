@@ -348,7 +348,7 @@ function rt.TextBox:skip(id)
         self._current_line_y_offset = 0
         self._first_scrolling_entry = self._n_entries + 1
         self._position_target_value = _HIDDEN
-        self._position_current_value = _HIDDEN
+        -- hide slowly, to avoid teleporting when skipping animations
         self._n_lines = 0
         self:_update_target_height_from_n_lines()
         self._current_frame_h = self._target_frame_h
@@ -368,6 +368,16 @@ function rt.TextBox:skip(id)
             if entry.on_done_f ~= nil then entry.on_done_f() end
             entry.is_done = true
         end
+
+        local all_done = true
+        for i = self._first_scrolling_entry, self._n_entries do
+            if entry.is_done == false then
+                all_done = false
+                break
+            end
+        end
+
+        if all_done then self:skip() end
     end
 end
 
@@ -390,4 +400,11 @@ function rt.TextBox:advance()
     end
 
     self._waiting_for_advance = false
+end
+
+--- @brief
+function rt.TextBox:get_selection_nodes()
+    return {
+        rt.SelectionGraphNode(self._bounds)
+    }
 end

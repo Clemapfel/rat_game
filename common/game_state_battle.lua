@@ -611,7 +611,7 @@ for which_type in range(
 
         local n_slots = self["entity_get_n_" .. which .. "_slots"](self, entity)
         if slot_i <= 0 or math.fmod(slot_i, 1) ~= 0 or slot_i > n_slots then
-            rt.error("In rt.GameState:entity_add_" .. which .. ": slot index `" .. slot_i .. "` is out of range for an entity with `" .. n_slots .. "` slots")
+            rt.error("In rt.GameState:entity_add_" .. which .. ": slot index `" .. slot_i .. "` is out of range for an `" .. entity:get_id() .. "` which has `" .. n_slots .. "` slots")
             return
         end
 
@@ -1350,10 +1350,7 @@ do
             self._quicksave_screenshot = rt.RenderTexture(bounds.width, bounds.height, 0, rt.TextureFormat.RGB5A1)
         end
 
-        self._quicksave_screenshot:bind()
-        love.graphics.clear(0, 0, 0, 0)
-        scene:draw()
-        self._quicksave_screenshot:unbind()
+        scene:create_quicksave_screenshot(self._quicksave_screenshot)
 
         self._state.quicksave = nil
         local state_copy = _deep_copy(self._state)

@@ -275,3 +275,17 @@ function bt.OrderedBox:clear()
     self._widget_to_item = {}
     self._widget_order = {}
 end
+
+--- @brief
+function bt.OrderedBox:get_widget_bounds(widget)
+    local item = self._widget_to_item[widget]
+    if item == nil then
+        rt.error("In bt.OrderedBox.get_widget_bounds: item `" .. meta.typeof(widget) .. "` is not present")
+        return rt.AABB(0, 0, 1, 1)
+    end
+
+    local x, y = item.position_animation:get_target_position()
+    x = x - 0.5 * item.size_x
+    y = y - 0.5 * item.size_y
+    return rt.AABB(x, y, item.size_x, item.size_y)
+end

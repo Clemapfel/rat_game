@@ -42,7 +42,6 @@ end
 function bt.Animation.QUICKSAVE:finish()
     self._target:signal_disconnect("done", self._signal_id)
     self._scene:skip_message(self._message_id)
-
     self._target:set_screenshot(self._snapshot)
     self._target:set_is_expanded(false)
     self._target:skip()

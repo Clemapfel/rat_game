@@ -30,7 +30,9 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _game_over_screen = bt.GameOverScreen(),
         _game_over_screen_active = false,
 
-        _is_first_size_allocate = true
+        _is_first_size_allocate = true,
+
+        _selection_graph = nil, -- rt.SelectionGraph?
     })
 
     return out
@@ -366,6 +368,36 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
+
+    if self._selection_graph ~= nil then
+        self._selection_graph:draw()
+    end
+end
+
+--- @brief
+function bt.BattleScene:create_quicksave_screenshot(texture)
+    meta.assert_isa(texture, rt.RenderTexture)
+    texture:bind()
+
+    self._background:draw()
+
+    for sprite in values(self._party_sprites) do
+        local motion = self._party_sprites_motion[sprite]
+        love.graphics.push()
+        love.graphics.translate(motion:get_position())
+        sprite:draw()
+        love.graphics.pop()
+    end
+
+    for sprite in values(self._enemy_sprites_render_order) do
+        local motion = self._enemy_sprites_motion[sprite]
+        love.graphics.push()
+        love.graphics.translate(motion:get_position())
+        sprite:draw()
+        love.graphics.pop()
+    end
+
+    texture:unbind()
 end
 
 --- @override
@@ -473,6 +505,12 @@ function bt.BattleScene:skip()
 end
 
 --- @brief
+function bt.BattleScene:skip_all()
+    self._animation_queue:clear()
+    self:skip()
+end
+
+--- @brief
 function bt.BattleScene:get_are_sprites_done_repositioning()
     for list in range(self._enemy_sprites_motion, self._party_sprites_motion) do
         for motion in values(list) do
@@ -501,11 +539,73 @@ function bt.BattleScene:set_background(background)
 end
 
 --- @brief
+function bt.BattleScene:_create_inspect_selection_graph()
+    local graph = rt.SelectionGraph()
+    local priority_queue_nodes = self._priority_queue:get_selection_nodes()
+    local global_status_bar_nodes = self._global_status_bar:get_selection_nodes()
+    local quicksave_nodes = self._quicksave_indicator:get_selection_nodes()
+    local textbox_nodes = self._text_box:get_selection_nodes()
+    local enemy_nodes = {}
+    local party_nodes = {}
+
+    do
+        local enemy_sprites = {}
+        for enemy_sprite in values(self._enemy_sprites) do
+            table.insert(enemy_sprites, enemy_sprite)
+        end
+
+        table.sort(enemy_sprites, function(a, b)
+            return a:get_bounds().x < b:get_bounds().x
+        end)
+
+        for enemy_sprite in values(enemy_sprites) do
+            for node in values(enemy_sprite:get_selection_nodes()) do
+                table.insert(enemy_nodes, node)
+            end
+        end
+    end
+
+    do
+        local party_sprites = {}
+        for party_sprite in values(self._party_sprites) do
+            table.insert(party_sprites, party_sprite)
+        end
+
+        table.sort(party_sprites, function(a, b)
+            return a:get_bounds().x < b:get_bounds().x
+        end)
+
+        for party_sprite in values(party_sprites) do
+            for node in values(party_sprite:get_selection_nodes()) do
+                table.insert(party_nodes, node)
+            end
+        end
+    end
+
+    for nodes in range(
+        priority_queue_nodes,
+        global_status_bar_nodes,
+        quicksave_nodes,
+        enemy_nodes,
+        party_nodes,
+        textbox_nodes
+    ) do
+        for node in values(nodes) do
+            graph:add(node)
+        end
+    end
+
+    self._selection_graph = graph
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_pressed(which)
     if which == rt.InputButton.A then
         self._env.start_battle("DEBUG_BATTLE")
         self._env.quicksave()
-        --self._animation_queue:clear()
+        self:skip_all()
+
+        self:_create_inspect_selection_graph()
 
         --[[
         local target = self._state:list_enemies()[1]

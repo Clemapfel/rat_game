@@ -295,4 +295,17 @@ function bt.QuicksaveIndicator:set_n_turns_elapsed(n)
     if self._is_realized then
         self._n_turns_label:set_text("<b><o>" .. n .. "</o></b>")
     end
-end 
+end
+
+--- @brief
+function bt.QuicksaveIndicator:get_selection_nodes()
+    local bounds = self._frame:get_bounds()
+    bounds.x = bounds.x + self._frame_x
+    bounds.y = bounds.y + self._frame_y
+
+    local node = rt.SelectionGraphNode(bounds)
+    node.objects = { rt.VerboseInfoObject.QUICKSAVE }
+    return {
+        node
+    }
+end

@@ -24,6 +24,7 @@ function bt.PriorityQueue:_element_new(entity)
     local suffix = entity:get_name_suffix()
 
     local element = {
+        entity = entity,
         motions = {},
         multiplicity = 0,
         sprite = rt.Sprite(entity:get_config():get_portrait_sprite_id()),
@@ -376,4 +377,36 @@ function bt.PriorityQueue:skip()
             motion:skip()
         end
     end
+end
+
+--- @brief
+function bt.PriorityQueue:get_selection_nodes()
+    local nodes = {}
+    local n = 0
+    for item_motion in values(self._render_order) do
+        local item, motion = table.unpack(item_motion)
+
+        local bounds = item.frame:get_bounds()
+        local x, y = motion:get_target_position()
+        bounds.x = bounds.x + x - 0.5 * bounds.width
+        bounds.y = bounds.y + y
+        local to_add = rt.SelectionGraphNode(bounds)
+        to_add.objects = { item.entity }
+
+        table.insert(nodes, to_add)
+        n = n + 1
+    end
+
+    for i = 1, n do
+        local current = nodes[i]
+        if i > 1 then
+            current:set_up(nodes[i - 1])
+        end
+
+        if i < n then
+            current:set_down(nodes[i + 1])
+        end
+    end
+
+    return nodes
 end

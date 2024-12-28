@@ -10,8 +10,8 @@ return {
     portrait_sprite_index = "WALKING_SPROUT",
 
     is_enemy = true,
-    n_equip_slots = 0,
-    n_consumable_slots = 0,
+    n_equip_slots = 1,
+    n_consumable_slots = 1,
 
     attack_base = 100,
     defense_base = 100,
