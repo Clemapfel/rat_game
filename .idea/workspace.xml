@@ -22,9 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored textbox done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="history mode working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -723,15 +723,7 @@
       <workItem from="1734630565045" duration="7042000" />
       <workItem from="1734643804197" duration="66543000" />
       <workItem from="1735080503580" duration="51673000" />
-      <workItem from="1735430498839" duration="16718000" />
-    </task>
-    <task id="LOCAL-01322" summary="stashing paralellogram">
-      <option name="closed" value="true" />
-      <created>1734130804491</created>
-      <option name="number" value="01322" />
-      <option name="presentableId" value="LOCAL-01322" />
-      <option name="project" value="LOCAL" />
-      <updated>1734130804491</updated>
+      <workItem from="1735430498839" duration="18441000" />
     </task>
     <task id="LOCAL-01323" summary="entity refactoring done">
       <option name="closed" value="true" />
@@ -1117,7 +1109,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735503083695</updated>
     </task>
-    <option name="localTasksCounter" value="1371" />
+    <task id="LOCAL-01371" summary="history mode working">
+      <option name="closed" value="true" />
+      <created>1735504378531</created>
+      <option name="number" value="01371" />
+      <option name="presentableId" value="LOCAL-01371" />
+      <option name="project" value="LOCAL" />
+      <updated>1735504378531</updated>
+    </task>
+    <option name="localTasksCounter" value="1372" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1171,7 +1171,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed ordered box scale animation" />
     <MESSAGE value="stashing before adding power to moves" />
     <MESSAGE value="stashing before messsage rework" />
     <MESSAGE value="stashing textbox one line at a time" />
@@ -1196,7 +1195,8 @@
     <MESSAGE value="stashing new lattice" />
     <MESSAGE value="9-direction flux working" />
     <MESSAGE value="refactored textbox done" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored textbox done" />
+    <MESSAGE value="history mode working" />
+    <option name="LAST_COMMIT_MESSAGE" value="history mode working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

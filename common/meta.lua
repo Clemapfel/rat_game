@@ -270,24 +270,15 @@ do
 
     --- @brief
     local _meta_signal_emit = function(self, name, ...)
+        local error_handler = function(message)
+            rt.warning("In " .. meta.typeof(self) .. ".signal_emit(\"" .. name .. "\"): " .. message .. "\n" .. debug.traceback())
+        end
+
         local component = self[_metatable_index][_signal_component_index][name]
         if component[_signal_is_blocked_index] ~= true then
-            local last
-            local args = {...}
             for callback in values(component[_signal_callbacks_index]) do
-                --[[
-                local success, result = pcall(callback, self, ...)
-                if not success then
-                    rt.warning("In " .. meta.typeof(self) .. ".signal_emit(\"" .. name .. "\"): ", tostring(result))
-                else
-                    last = result
-                end
-                ]]--
-                last = callback(self, ...)
+                xpcall(callback, error_handler, self, ...)
             end
-            return last
-        else
-            return nil
         end
     end
 

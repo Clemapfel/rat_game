@@ -48,12 +48,13 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _scroll_down_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
         _scroll_down_indicator_x = 0,
         _scroll_down_indicator_y = 0,
-        _is_first_update = true,
 
         _scrollbar = rt.Scrollbar(),
+        _frame_h_scrollbar_visible_threshold = 0,
 
         _current_frame_h = 0,
-        _target_frame_h = 0
+        _target_frame_h = 0,
+        _on_frame_minimized = nil -- Function
     })
 end)
 
@@ -131,6 +132,8 @@ function rt.TextBox:size_allocate(x, y, width, height)
     for entry in values(self._entries) do
         entry.label:fit_into(0, 0, self._stencil_aabb.width)
     end
+
+    self._frame_h_scrollbar_visible_threshold = 2 * self._indicator_r + 2 * m
 end
 
 --- @brief
@@ -163,7 +166,7 @@ function rt.TextBox:append(message, on_done_notify)
 
     self._position_target_value = _SHOWN
     self._all_entries_done_delay = 0
-    self._scrollbar:set_page_index(self._first_visible_entry, self._n_entries)
+    self._scrollbar:set_page_index(self._first_visible_entry, self._n_entries - (self._max_n_lines - 1) + 1)
 
     return self._n_entries
 end
@@ -306,12 +309,17 @@ function rt.TextBox:update(delta)
             if current > target then current = target end
         elseif current > target then
             current = current - delta * expand_speed
-            if current < target then current = target end
+            if current <= target then
+                current = target
+                if self._on_frame_minimized ~= nil then
+                    self._on_frame_minimized()
+                    self._on_frame_minimized = nil
+                end
+            end
         end
 
-        if current ~= self._current_frame_h or self._is_first_update then
+        if current ~= self._current_frame_h then
             self:_resize_frame(current)
-            self._is_first_update = false
         end
     end
 end
@@ -348,19 +356,21 @@ function rt.TextBox:draw()
     love.graphics.pop()
     rt.graphics.set_stencil_test()
 
-    love.graphics.push()
-    love.graphics.translate(self._scroll_up_indicator_x, self._scroll_up_indicator_y)
-    self._scroll_up_indicator_outline:draw()
-    self._scroll_up_indicator:draw()
-    love.graphics.pop()
+    if self._history_mode_active then --and self._current_frame_h > self._frame_h_scrollbar_visible_threshold then
+        love.graphics.push()
+        love.graphics.translate(self._scroll_up_indicator_x, self._scroll_up_indicator_y)
+        self._scroll_up_indicator_outline:draw()
+        self._scroll_up_indicator:draw()
+        love.graphics.pop()
 
-    love.graphics.push()
-    love.graphics.translate(self._scroll_down_indicator_x, self._scroll_down_indicator_y)
-    self._scroll_down_indicator_outline:draw()
-    self._scroll_down_indicator:draw()
-    love.graphics.pop()
+        love.graphics.push()
+        love.graphics.translate(self._scroll_down_indicator_x, self._scroll_down_indicator_y)
+        self._scroll_down_indicator_outline:draw()
+        self._scroll_down_indicator:draw()
+        love.graphics.pop()
 
-    self._scrollbar:draw()
+        self._scrollbar:draw()
+    end
 
     love.graphics.pop()
 end
@@ -425,8 +435,8 @@ end
 function rt.TextBox:set_history_mode_active(b)
     if b == self._history_mode_active then return end
 
-    self._history_mode_active = b
     if b then
+        self._history_mode_active = b
         for entry in values(self._entries) do
             entry.label:set_n_visible_characters(POSITIVE_INFINITY)
             entry.n_lines_visible = entry.n_lines
@@ -444,9 +454,17 @@ function rt.TextBox:set_history_mode_active(b)
         self._scrollbar:set_page_index(self._first_visible_entry)
         self._n_lines = self._max_n_lines
         self:_update_target_frame_h()
+
+        for _ = 1, self._max_n_lines - 2 do
+            if not self:scroll_up() then break end
+        end
     else
         self._n_lines = 0
         self:_update_target_frame_h()
+
+        self._on_frame_minimized = function() -- delay for nicer closing animation
+            self._history_mode_active = false
+        end
     end
 end
 
@@ -461,9 +479,10 @@ function rt.TextBox:scroll_up()
         self:set_history_mode_active(true)
     end
 
-    if not self:can_scroll_up() then return end
+    if not self:can_scroll_up() then return false end
     self._first_visible_entry = self._first_visible_entry - 1
     self._scrollbar:set_page_index(self._first_visible_entry)
+    return true
 end
 
 --- @brief
@@ -472,9 +491,10 @@ function rt.TextBox:scroll_down()
         self:set_history_mode_active(true)
     end
 
-    if not self:can_scroll_down() then return end
+    if not self:can_scroll_down() then return false end
     self._first_visible_entry = self._first_visible_entry + 1
     self._scrollbar:set_page_index(self._first_visible_entry)
+    return true
 end
 
 --- @brief
@@ -484,5 +504,5 @@ end
 
 --- @brief
 function rt.TextBox:can_scroll_down()
-    return self._first_visible_entry < self._n_entries
+    return self._first_visible_entry < self._n_entries - (self._max_n_lines - 1) + 1
 end
