@@ -219,6 +219,7 @@ function rt.TextBox:append(msg, on_done_notify)
 end
 
 --- @brief
+--- @brief
 function rt.TextBox:update(delta)
     self._advance_indicator_animation:update(delta)
     self._advance_indicator_x, self._advance_indicator_y = self._advance_indicator_path:at(self._advance_indicator_animation:get_value())
@@ -280,13 +281,11 @@ function rt.TextBox:update(delta)
             entry.n_lines_visible = new_n_lines_visible
         end
 
-        if is_done and not self._waiting_for_input and not self._history_mode_active then
+        if is_done and not self._waiting_for_input then
             entry.delay_elapsed = entry.delay_elapsed + delta
             if entry.delay_elapsed > line_delay then
-                if entry.is_done == false then
-                    if entry.on_done_f ~= nil then
-                        entry.on_done_f()
-                    end
+                if entry.is_done == false and entry.on_done_f ~= nil then
+                    entry.on_done_f()
                     entry.is_done = true
                 end
             else
@@ -312,14 +311,14 @@ function rt.TextBox:update(delta)
     -- hide once scrolling is done
     if all_entries_done and self._current_line_y_offset >= self._target_line_y_offset and self._current_frame_h >= self._target_frame_h then
         self._position_target_value = _HIDDEN
+        self._current_line_y_offset = 0
+        self._target_line_y_offset = 0
         self._first_scrolling_entry = self._n_entries + 1
         self._n_lines = 0
         self:_update_target_height_from_n_lines()
-        self._current_line_y_offset = 0
-        self._target_line_y_offset = 0
     end
 
-   -- smoothly transition sizes
+    -- smoothly transition sizes
     local expand_speed = rt.settings.text_box.expand_speed
     local current, target = self._current_frame_h, self._target_frame_h
     if current < target then
@@ -334,10 +333,6 @@ function rt.TextBox:update(delta)
         self._current_frame_h = current
 
         local x, y, width, height = rt.aabb_unpack(self._bounds)
-        x = math.round(x)
-        y = math.round(y)
-        width = math.round(width)
-        height = math.round(height)
         local m = rt.settings.margin_unit
         local xm = 2 * m + self._frame:get_thickness()
         local ym = m + self._frame:get_thickness()
@@ -354,19 +349,6 @@ function rt.TextBox:update(delta)
         self._frame:fit_into(0, 0, width, frame_h)
 
         self._advance_indicator_offset_x, self._advance_indicator_offset_y = 0 + width - 1 * xm, 0 + frame_h - 2 * ym
-        local indicator_x = x + width - xm
-        self._scroll_up_indicator_x, self._scroll_up_indicator_y = indicator_x, y + 2 * ym
-        self._scroll_down_indicator_x, self._scroll_down_indicator_y = indicator_x, y + frame_h - 2 * ym
-
-        if self._history_mode_active then
-            local scrollbar_width = 2 * m
-            self._scrollbar:fit_into(
-                indicator_x - 2 * self._indicator_r + 0.5 * scrollbar_width,
-                y + 2 * ym + self._indicator_r,
-                scrollbar_width,
-                frame_h - 4 * self._indicator_r - 2 * ym - 0.5 * m
-            )
-        end
     end
 end
 

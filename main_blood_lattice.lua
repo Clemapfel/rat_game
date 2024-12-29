@@ -3,15 +3,16 @@ require "include"
 -- https://www.sciencedirect.com/science/article/pii/S0022169422010198?via%3Dihub
 
 local texture_w, texture_h = 800, 800
-local cell_texture_a, cell_texture_b, cell_offset_texture
+local cell_texture_a, cell_texture_b -- r:depth, g:x-velocity, b:y-velocity, a:elevation
+local flux_texture_a, flux_texture_b -- r:top g:right, b:bottom, a:left
 
 local relaxation_factor = 0.5
 local lattice_size = {texture_w, texture_h}
 local a_or_b = true
 
-local init_shader = rt.ComputeShader("main_blood_lattice_init.glsl")
-local step_shader = rt.ComputeShader("main_blood_lattice_step.glsl")
-local render_shader = rt.Shader("main_blood_lattice_render.glsl")
+local init_shader
+local step_shader
+local render_shader
 local render_shape = nil -- rt.VertexRectangle
 
 love.load = function()
@@ -20,6 +21,10 @@ love.load = function()
         resizable = true
     })
     love.resize(texture_w, texture_w)
+
+    init_shader = rt.ComputeShader("main_blood_lattice_init.glsl")
+    step_shader = rt.ComputeShader("main_blood_lattice_step.glsl")
+    render_shader = rt.Shader("main_blood_lattice_render.glsl")
 
     cell_texture_a = love.graphics.newCanvas(texture_w, texture_h, {
         format = "rgba32f",
@@ -31,32 +36,56 @@ love.load = function()
         computewrite = true
     })
 
-    for texture in range(cell_texture_a, cell_texture_b) do
-        init_shader:send("cell_texture", texture)
-        init_shader:send("mode", 1) -- init distance
-        init_shader:dispatch(texture_w, texture_h)
-        init_shader:send("mode", 2) -- init gradient
-        init_shader:dispatch(texture_w, texture_h)
-        init_shader:send("mode", 3) -- init hitboxes
-        --init_shader:dispatch(texture_w, texture_h)
-    end
+    flux_texture_a = love.graphics.newCanvas(texture_w, texture_h, {
+        format = "rgba32f",
+        computewrite = true
+    })
 
-    love.update(1 / 60)
+    flux_texture_b = love.graphics.newCanvas(texture_w, texture_h, {
+        format = "rgba32f",
+        computewrite = true
+    })
+
+    init_shader:send("cell_texture", cell_texture_a)
+    init_shader:send("flux_texture", flux_texture_a)
+    init_shader:send("mode", 1) -- init depth
+    init_shader:dispatch(texture_w, texture_h)
+    init_shader:send("mode", 2) -- init velocities and flux
+    init_shader:dispatch(texture_w, texture_h)
+
+    init_shader:send("cell_texture", cell_texture_b)
+    init_shader:send("flux_texture", flux_texture_b)
+    init_shader:send("mode", 1) -- init depth
+    init_shader:dispatch(texture_w, texture_h)
+    init_shader:send("mode", 2) -- init velocities and flux
+    init_shader:dispatch(texture_w, texture_h)
 end
 
 love.update = function(delta)
     --if not love.keyboard.isDown("space") then return end
 
-    local texture_in, texture_out
+    local cell_texture_in, cell_texture_out, flux_texture_in, flux_texture_out
     if a_or_b == true then
-        texture_in, texture_out = cell_texture_a, cell_texture_b
+        cell_texture_in, cell_texture_out = cell_texture_a, cell_texture_b
+        flux_texture_in, flux_texture_out = flux_texture_a, flux_texture_b
     else
-        texture_in, texture_out = cell_texture_b, cell_texture_a
+        cell_texture_in, cell_texture_out = cell_texture_b, cell_texture_a
+        flux_texture_in, flux_texture_out = flux_texture_b, flux_texture_a
     end
 
+
     step_shader:send("delta", delta)
-    step_shader:send("cell_texture_in", texture_in)
-    step_shader:send("cell_texture_out", texture_out)
+    step_shader:send("cell_texture_in", cell_texture_in)
+    step_shader:send("cell_texture_out", cell_texture_out)
+
+    step_shader:send("mode", 1) -- calculate flux
+    step_shader:send("flux_texture_in", flux_texture_in)
+    step_shader:send("flux_texture_out", flux_texture_out)
+
+    step_shader:dispatch(texture_w, texture_h)
+
+    step_shader:send("mode", 2) -- apply flux to update depth
+    step_shader:send("flux_texture_in", flux_texture_out) -- now holds result
     step_shader:dispatch(texture_w, texture_h)
 
     a_or_b = not a_or_b
@@ -70,8 +99,6 @@ love.keypressed = function(which)
     if which == "b" then love.load() end
 end
 
-local temp_shader = love.graphics.newShader("main_blood_lattice_temp.glsl")
-
 love.draw = function()
     love.graphics.setColor(1, 1, 1, 1)
 
@@ -84,5 +111,6 @@ love.draw = function()
     render_shape:draw()
     render_shader:unbind()
 
+    love.graphics.draw(flux_texture_a)
     love.graphics.print(love.timer.getFPS(), 0, 0)
 end

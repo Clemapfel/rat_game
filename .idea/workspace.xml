@@ -22,14 +22,15 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added get_selection_nodes">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/common/~~~text_box.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/message.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/message.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/scrollbar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/scrollbar.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_temp.glsl" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,68 +84,68 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "CMake Application.box2d.executor": "Run",
-    "CMake Application.test.executor": "Run",
-    "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
-    "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
-    "Lua Application.Unnamed.executor": "Run",
-    "Lua Application.keybinding_scene.lua.executor": "Run",
-    "Lua Application.love.executor": "Run",
-    "Lua Application.love11.executor": "Run",
-    "Lua Application.love12.executor": "Run",
-    "Lua Application.main.executor": "Run",
-    "Lua Application.main_blood.executor": "Run",
-    "Lua Application.main_blood_lattice.executor": "Run",
-    "Lua Application.main_bounce.executor": "Run",
-    "Lua Application.main_box2d.executor": "Run",
-    "Lua Application.main_lichen.executor": "Run",
-    "Lua Application.main_linux.executor": "Run",
-    "Lua Application.main_midi.executor": "Run",
-    "Lua Application.main_normal_map.executor": "Run",
-    "Lua Application.main_overworld_windows.executor": "Run",
-    "Lua Application.main_physics_blood.executor": "Run",
-    "Lua Application.main_rope.executor": "Run",
-    "Lua Application.main_rope_windows.executor": "Run",
-    "Lua Application.main_signal.executor": "Run",
-    "Lua Application.main_sort.executor": "Run",
-    "Lua Application.main_swirl.executor": "Run",
-    "Lua Application.main_tesselation.executor": "Run",
-    "Lua Application.main_thread.executor": "Run",
-    "Lua Application.main_vertex_blood.lua.executor": "Run",
-    "Lua Application.main_windows.executor": "Run",
-    "Lua Application.main_windows_battle.executor": "Run",
-    "Lua Application.main_windows_menu.executor": "Run",
-    "Lua Application.meta.lua.executor": "Run",
-    "Lua Application.overworld.executor": "Run",
-    "Lua Application.quicksave_indicator.lua.executor": "Run",
-    "Lua Application.rope.executor": "Run",
-    "Makefile Target.Makefile.executor": "Run",
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.RadMigrateCodeStyle": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "cf.advertisement.text.has.clang-format": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "deletionFromPopupRequiresConfirmation": "false",
-    "git-widget-placeholder": "main",
-    "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/assets",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "run.code.analysis.last.selected.profile": "pProject Default",
-    "settings.editor.selected.configurable": "Errors",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;CMake Application.box2d.executor&quot;: &quot;Run&quot;,
+    &quot;CMake Application.test.executor&quot;: &quot;Run&quot;,
+    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
+    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
+    &quot;Lua Application.Unnamed.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.keybinding_scene.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_blood.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_blood_lattice.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_bounce.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_box2d.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_linux.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_midi.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_normal_map.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_overworld_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_physics_blood.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_rope.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_rope_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_sort.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_tesselation.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_vertex_blood.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows_battle.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.main_windows_menu.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.meta.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.quicksave_indicator.lua.executor&quot;: &quot;Run&quot;,
+    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
+    &quot;Makefile Target.Makefile.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/assets&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;Errors&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="false" />
   </component>
@@ -164,7 +165,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood_lattice">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -726,15 +727,8 @@
       <workItem from="1734193768056" duration="73265000" />
       <workItem from="1734630565045" duration="7042000" />
       <workItem from="1734643804197" duration="66543000" />
-      <workItem from="1735080503580" duration="51353000" />
-    </task>
-    <task id="LOCAL-01318" summary="added debug configs">
-      <option name="closed" value="true" />
-      <created>1734034183119</created>
-      <option name="number" value="01318" />
-      <option name="presentableId" value="LOCAL-01318" />
-      <option name="project" value="LOCAL" />
-      <updated>1734034183119</updated>
+      <workItem from="1735080503580" duration="51673000" />
+      <workItem from="1735430498839" duration="5889000" />
     </task>
     <task id="LOCAL-01319" summary="stashing 4 vertices">
       <option name="closed" value="true" />
@@ -1120,7 +1114,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735411185356</updated>
     </task>
-    <option name="localTasksCounter" value="1367" />
+    <task id="LOCAL-01367" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1735417943055</created>
+      <option name="number" value="01367" />
+      <option name="presentableId" value="LOCAL-01367" />
+      <option name="project" value="LOCAL" />
+      <updated>1735417943055</updated>
+    </task>
+    <option name="localTasksCounter" value="1368" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1143,6 +1145,11 @@
         <option value="Default.Subject" />
         <option value="Space.CommitStatus" />
       </list>
+    </option>
+    <option name="COLUMN_ID_WIDTH">
+      <map>
+        <entry key="Table.Space.CommitStatus.ColumnIdWidth" value="15" />
+      </map>
     </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -1189,12 +1196,12 @@
     <MESSAGE value="stashing before removing offset texture" />
     <MESSAGE value="stashing maybe" />
     <MESSAGE value="spread working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added global status bar" />
     <MESSAGE value="reset working correclty now" />
     <MESSAGE value="added skipping individual messages" />
     <MESSAGE value="added get_selection_nodes" />
-    <option name="LAST_COMMIT_MESSAGE" value="added get_selection_nodes" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
