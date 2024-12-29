@@ -391,7 +391,6 @@ function bt.PriorityQueue:get_selection_nodes()
         bounds.x = bounds.x + x - 0.5 * bounds.width
         bounds.y = bounds.y + y
         local to_add = rt.SelectionGraphNode(bounds)
-        to_add.objects = { item.entity }
 
         table.insert(nodes, to_add)
         n = n + 1

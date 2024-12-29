@@ -584,6 +584,45 @@ function bt.BattleScene:_create_inspect_selection_graph()
         end
     end
 
+    -- linking
+
+    do
+        local left_nodes = {
+            enemy_nodes[1],
+            party_nodes[1],
+            textbox_nodes[1]
+        }
+
+        local _last_priority_node = nil
+
+        for node in values(priority_queue_nodes) do
+            local self_y = node:get_bounds().y + 0.5 * node:get_bounds().height
+            local y_distance = POSITIVE_INFINITY
+            local nearest_other
+            for other in values(left_nodes) do
+                local other_y = other:get_bounds().y + 0.5 * other:get_bounds().height
+                if math.abs(self_y - other_y) < y_distance then
+                    y_distance = self_y - other_y
+                    nearest_other = other
+                end
+            end
+
+            node:set_right(function(self)
+                _last_priority_node = self
+                return nearest_other
+            end)
+        end
+
+        --[[
+        for node in values(left_nodes) do
+            node:set_left(function(self)
+                return _last_priority_node
+            end)
+        end
+        ]]--
+    end
+
+    -- add
     for nodes in range(
         priority_queue_nodes,
         global_status_bar_nodes,
@@ -607,7 +646,7 @@ function bt.BattleScene:_handle_button_pressed(which)
         self._env.quicksave()
         self:skip_all()
 
-        --self:_create_inspect_selection_graph()
+        self:_create_inspect_selection_graph()
         --self._text_box:set_show_history_mode_active(true)
 
         --[[
@@ -642,8 +681,12 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.DEBUG then
         self._game_over_screen._vignette_shader:recompile()
     elseif which == rt.InputButton.UP then
-        self._text_box:scroll_up()
+    elseif which == rt.InputButton.RIGHT then
     elseif which == rt.InputButton.DOWN then
-        self._text_box:scroll_down()
+    elseif which == rt.InputButton.LEFT then
+    end
+
+    if self._selection_graph ~= nil then
+        self._selection_graph:handle_button(which)
     end
 end

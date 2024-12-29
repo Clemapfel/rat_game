@@ -270,7 +270,6 @@ function bt.QuicksaveIndicator:clear()
     self:set_is_expanded(true)
     self:update(POSITIVE_INFINITY)
     self:skip()
-    dbg("called")
 end
 
 --- @brief
@@ -304,7 +303,6 @@ function bt.QuicksaveIndicator:get_selection_nodes()
     bounds.y = bounds.y + self._frame_y
 
     local node = rt.SelectionGraphNode(bounds)
-    node.objects = { rt.VerboseInfoObject.QUICKSAVE }
     return {
         node
     }

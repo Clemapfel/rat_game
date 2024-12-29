@@ -321,7 +321,6 @@ function bt.EntitySprite:get_selection_nodes()
         bounds.x = bounds.x
         bounds.y = bounds.y
         local node = rt.SelectionGraphNode(bounds)
-        node.objects = { status }
         table.insert(nodes, node)
         n = n + 1
     end
@@ -332,7 +331,6 @@ function bt.EntitySprite:get_selection_nodes()
         bounds.x = bounds.x
         bounds.y = bounds.y
         local node = rt.SelectionGraphNode(bounds)
-        node.objects = { consumable }
         table.insert(nodes, node)
         n = n + 1
     end
@@ -369,6 +367,8 @@ function bt.EntitySprite:get_selection_nodes()
         end
     end
 
-    table.insert(nodes, sprite_node)
+
+
+    table.insert(nodes, 1, sprite_node)
     return nodes
 end
