@@ -1,5 +1,7 @@
 uniform sampler2D cell_texture;
-uniform sampler2D flux_texture;
+uniform sampler2D flux_texture_top;
+uniform sampler2D flux_texture_center;
+uniform sampler2D flux_texture_bottom;
 
 #define PI 3.1415926535897932384626433832795
 
@@ -32,22 +34,45 @@ vec3 lch_to_rgb(vec3 lch) {
 
 uniform float gravity = 1;
 
+vec2 directions[9] = vec2[9](
+    vec2(-1, -1),
+    vec2(0, -1),
+    vec2(1, -1),
+
+    vec2(-1, 0),
+    vec2(0, 0),
+    vec2(1, 0),
+
+    vec2(-1, 1),
+    vec2(0, 1),
+    vec2(1, 1)
+);
+
 vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
     vec4 cell = texture(cell_texture, texture_coords);
-    vec4 flux = texture(flux_texture, texture_coords);
+    vec4 flux_top = texture(flux_texture_top, texture_coords);
+    vec4 flux_center = texture(flux_texture_center, texture_coords);
+    vec4 flux_bottom = texture(flux_texture_bottom, texture_coords);
 
-    const vec2 up = vec2(0, -1);
-    const vec2 right = vec2(1, 0);
-    const vec2 down = vec2(0, 1);
-    const vec2 left = vec2(-1, 0);
-    vec2 flux_sum = up * flux.x + right * flux.y + down * flux.z + left * flux.w;
+    float flux[9];
+    flux[0] = flux_top.x;
+    flux[1] = flux_top.y;
+    flux[2] = flux_top.z;
+    flux[3] = flux_center.x;
+    flux[4] = flux_center.y;
+    flux[5] = flux_center.z;
+    flux[6] = flux_bottom.x;
+    flux[7] = flux_bottom.y;
+    flux[8] = flux_bottom.z;
 
-    float height = cell.x;
-    float bed = cell.w;
-    vec2 velocity = cell.yz;
-    float angle = (atan(velocity.y, velocity.x) + PI) / (2 * PI);
+    vec2 flux_sum = vec2(0);
+    for (int i = 0; i < 9; ++i) {
+        flux_sum += directions[i] * flux[i];
+    }
 
-    float bernoulli_head = bed + height + (velocity.x * velocity.x + velocity.y * velocity.y) / (2 * gravity);
-    vec3 color = lch_to_rgb(vec3(bed + height, bernoulli_head - bed, angle));
-    return vec4(color, 1.0);
+    float angle = (atan(flux_sum.y, flux_sum.x) + PI) / (2 * PI);
+    float magnitude = length(flux_sum);
+
+    vec3 color = lch_to_rgb(vec3(cell.x, min(magnitude, 1), angle));
+    return vec4(vec3(color), 1.0);
 }

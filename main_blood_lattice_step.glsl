@@ -14,11 +14,15 @@ const ivec2 idirections[N] = ivec2[](
     ivec2(-1, 0)
 );
 
-uniform layout(rgba32f) image2D cell_texture_in; // r:depth, g:x-velocity, b:y-velocity, a:elevation
-uniform layout(rgba32f) image2D cell_texture_out;
+uniform layout(rgba32f) image2D cell_texture_in;
+uniform layout(rgba32f) image2D flux_texture_top_in;
+uniform layout(rgba32f) image2D flux_texture_center_in;
+uniform layout(rgba32f) image2D flux_texture_bottom_in;
 
-uniform layout(rgba32f) image2D flux_texture_in; // r:top g:right, b:bottom, a:left
-uniform layout(rgba32f) image2D flux_texture_out;
+uniform layout(rgba32f) image2D cell_texture_out;
+uniform layout(rgba32f) image2D flux_texture_top_out;
+uniform layout(rgba32f) image2D flux_texture_center_out;
+uniform layout(rgba32f) image2D flux_texture_bottom_out;
 
 uniform float delta = 1.0 / 60.0;
 uniform float gravity = 1;
@@ -45,8 +49,23 @@ layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
     ivec2 cell_position = ivec2(gl_GlobalInvocationID.xy);
     vec4 cell_data = imageLoad(cell_texture_in, cell_position);
-    vec4 flux_data = imageLoad(flux_texture_in, cell_position);
+    vec4 flux_data_top = imageLoad(flux_texture_top_in, cell_position);
+    vec4 flux_data_center = imageLoad(flux_texture_center_in, cell_position);
+    vec4 flux_data_bottom = imageLoad(flux_texture_bottom_in, cell_position);
 
+    if (mode == MODE_UPDATE_FLUX) {
+        flux_data_top.xyz += vec3(delta / 100);
+        flux_data_bottom.xyz += vec3(delta / 99);
+
+        imageStore(flux_texture_top_out, cell_position, flux_data_top);
+        imageStore(flux_texture_center_out, cell_position, flux_data_center);
+        imageStore(flux_texture_bottom_out, cell_position, flux_data_bottom);
+    }
+    else if (mode == MODE_UPDATE_DEPTH) {
+        imageStore(cell_texture_out, cell_position, cell_data + vec4(0, 0, 0, 1));
+    }
+
+    /*
     if (mode == MODE_UPDATE_FLUX) {
         if (cell_data.x <= MIN_WATER_DEPTH) return;
 
@@ -104,4 +123,5 @@ void computemain() {
         cell_data.x = max(cell_data.x, 0);
         imageStore(cell_texture_out, cell_position, cell_data);
     }
+    */
 }

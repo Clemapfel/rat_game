@@ -55,11 +55,18 @@ float gaussian(float x, float ramp)
 #define MODE_INIT_DEPTH 1
 #define MODE_INIT_VELOCITIES 2
 
-uniform layout(rgba32f) image2D cell_texture; // r:depth, g:x-velocity, b:y-velocity, a:elevation
-uniform layout(rgba32f) image2D flux_texture; // r:top g:right, b:bottom, a:left
+uniform layout(rgba32f) image2D cell_texture_a;
+uniform layout(rgba32f) image2D flux_texture_top_a;
+uniform layout(rgba32f) image2D flux_texture_center_a;
+uniform layout(rgba32f) image2D flux_texture_bottom_a;
+
+uniform layout(rgba32f) image2D cell_texture_b;
+uniform layout(rgba32f) image2D flux_texture_top_b;
+uniform layout(rgba32f) image2D flux_texture_center_b;
+uniform layout(rgba32f) image2D flux_texture_bottom_b;
+
 uniform int mode;
 
-uniform float delta = 1.0 / 60.0;
 uniform float gravity = 1;
 uniform float viscosity = 1;
 
@@ -71,26 +78,27 @@ float bernoulli_hydraulic_head(vec4 data) {
     return bed + depth + (velocity.x * velocity.x + velocity.y + velocity.y) / (2 * gravity);
 }
 
-
 layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
-    vec2 size = imageSize(cell_texture);
+    vec2 size = imageSize(cell_texture_a);
     vec2 position = vec2(gl_GlobalInvocationID.xy);
     ivec2 cell_position = ivec2(gl_GlobalInvocationID.xy);
 
+    /*
     const float wall = 0.01;
     if (cell_position.x <= wall * size.x || cell_position.x >= (1 - wall) * size.x || cell_position.y <= wall * size.x || cell_position.y >= (1 - wall) * size.y)
     {
-        imageStore(cell_texture, cell_position, vec4(0, 0, 0, 999));
-        imageStore(flux_texture, cell_position, vec4(0, 0, 0, 0));
-        return;
-    }
+        imageStore(cell_texture_a, cell_position, vec4(0, 0, 0, 999));
+        imageStore(cell_texture_b, cell_position, vec4(0, 0, 0, 999));
+    }*/
 
     if (mode == MODE_INIT_DEPTH) {
-        position /= imageSize(cell_texture);
+        position /= size;
         float depth = gaussian(distance(position, vec2(0.5)), 2.75);;
         depth *= snoise(position * 2 + vec2(2));
-        imageStore(cell_texture, cell_position, vec4(depth, 0, 0, 0));
+
+        imageStore(cell_texture_a, cell_position, vec4(depth, 0, 0, 0));
+        imageStore(cell_texture_b, cell_position, vec4(depth, 0, 0, 0));
     }
     else if (mode == MODE_INIT_VELOCITIES) {
         const mat3 sobel_x = mat3(
@@ -111,7 +119,7 @@ void computemain() {
         for (int i = -1; i <= 1; i++) {
             for (int j = -1; j <= 1; j++) {
                 ivec2 neighbor_pos = ivec2(position.x, position.y) + ivec2(i, j);
-                vec4 neighbor_color = imageLoad(cell_texture, neighbor_pos);
+                vec4 neighbor_color = imageLoad(cell_texture_a, neighbor_pos);
                 float value = neighbor_color.r;
 
                 int kernel_i = i + 1;
@@ -122,22 +130,14 @@ void computemain() {
             }
         }
 
-        vec4 current = imageLoad(cell_texture, cell_position);
-        imageStore(cell_texture, cell_position, vec4(current.r, gradient_x, gradient_y, current.a));
-
-        const float scale = 0.01;
-
-        float self_head = bernoulli_hydraulic_head(imageLoad(cell_texture, cell_position + ivec2(0, 0)));
-        float up_head = bernoulli_hydraulic_head(imageLoad(cell_texture, cell_position + ivec2(0, -1)));
-        float right_head = bernoulli_hydraulic_head(imageLoad(cell_texture, cell_position + ivec2(1, 0)));
-        float bottom_head = bernoulli_hydraulic_head(imageLoad(cell_texture, cell_position + ivec2(0, 1)));
-        float left_head = bernoulli_hydraulic_head(imageLoad(cell_texture, cell_position + ivec2(-1, 0)));
-
-        imageStore(flux_texture, cell_position, vec4(
-            self_head - up_head,
-            self_head - right_head,
-            self_head - bottom_head,
-            self_head - left_head
-        ));
+        vec4 current = imageLoad(cell_texture_a, cell_position);
+        imageStore(cell_texture_a, cell_position, vec4(current.r, gradient_x, gradient_y, current.a));
+        imageStore(cell_texture_b, cell_position, vec4(current.r, gradient_x, gradient_y, current.a));
+        imageStore(flux_texture_top_a, cell_position, vec4(vec3(0), 1));
+        imageStore(flux_texture_top_b, cell_position, vec4(vec3(0), 1));
+        imageStore(flux_texture_center_a, cell_position, vec4(vec3(0), 1));
+        imageStore(flux_texture_center_b, cell_position, vec4(vec3(0), 1));
+        imageStore(flux_texture_bottom_a, cell_position, vec4(vec3(0), 1));
+        imageStore(flux_texture_bottom_b, cell_position, vec4(vec3(0), 1));
     }
 }
