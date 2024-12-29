@@ -867,6 +867,7 @@ do
 
     --- @brief
     function rt.Label:update_n_visible_characters_from_elapsed(elapsed, scroll_speed)
+        if self:get_is_realized() ~= true then self:realize() end
         local so_far = elapsed
         local step = 1 / which(scroll_speed, rt.settings.label.scroll_speed)
         local n_visible = 0
