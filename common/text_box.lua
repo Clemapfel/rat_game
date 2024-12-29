@@ -1,5 +1,5 @@
 rt.settings.text_box = {
-    max_n_lines = 3,
+    max_n_lines = 10,
     letters_per_second = 60,
     reveal_duration = 0.5, -- seconds
     scroll_speed = 500, -- px / s, frame reveal/hide movement
@@ -284,7 +284,7 @@ function rt.TextBox:update(delta)
     end
 
     -- hide if done
-    if all_entries_done then
+    if all_entries_done and not self._history_mode_active then
         self._all_entries_done_delay = self._all_entries_done_delay + delta
         if self._all_entries_done_delay > rt.settings.text_box.all_entries_done_delay then
             self._position_target_value = _HIDDEN
@@ -367,7 +367,6 @@ end
 
 --- @brief
 function rt.TextBox:skip()
-    dbg("skip")
     for entry in values(self._entries) do
         entry.label:set_n_visible_characters(POSITIVE_INFINITY)
         entry.n_lines_visible = entry.n_lines
@@ -420,4 +419,70 @@ function rt.TextBox:clear()
     self._n_lines = 0
     self:_update_target_frame_h()
     self:reformat()
+end
+
+--- @brief
+function rt.TextBox:set_history_mode_active(b)
+    if b == self._history_mode_active then return end
+
+    self._history_mode_active = b
+    if b then
+        for entry in values(self._entries) do
+            entry.label:set_n_visible_characters(POSITIVE_INFINITY)
+            entry.n_lines_visible = entry.n_lines
+            if entry.on_done_f ~= nil and entry.is_done == false then
+                entry.on_done_f()
+                entry.is_done = true
+            end
+        end
+
+        self._position_target_value = _SHOWN
+        self._target_text_y_offset = 0
+        self._current_text_y_offset = 0
+        self._text_scroll_overlap_entry_offset = 0
+        self._first_visible_entry = math.max(self._n_entries, 1)
+        self._scrollbar:set_page_index(self._first_visible_entry)
+        self._n_lines = self._max_n_lines
+        self:_update_target_frame_h()
+    else
+        self._n_lines = 0
+        self:_update_target_frame_h()
+    end
+end
+
+--- @brief
+function rt.TextBox:get_history_mode_active()
+    return self._history_mode_active
+end
+
+--- @brief
+function rt.TextBox:scroll_up()
+    if self._history_mode_active == false then
+        self:set_history_mode_active(true)
+    end
+
+    if not self:can_scroll_up() then return end
+    self._first_visible_entry = self._first_visible_entry - 1
+    self._scrollbar:set_page_index(self._first_visible_entry)
+end
+
+--- @brief
+function rt.TextBox:scroll_down()
+    if self._history_mode_active == false then
+        self:set_history_mode_active(true)
+    end
+
+    if not self:can_scroll_down() then return end
+    self._first_visible_entry = self._first_visible_entry + 1
+    self._scrollbar:set_page_index(self._first_visible_entry)
+end
+
+--- @brief
+function rt.TextBox:can_scroll_up()
+    return self._first_visible_entry > 1
+end
+
+--- @brief
+function rt.TextBox:can_scroll_down()
+    return self._first_visible_entry < self._n_entries
 end

@@ -638,14 +638,12 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.B then
         self:skip()
     elseif which == rt.InputButton.X then
-        self._text_box:set_show_history_mode_active(not self._text_box:get_show_history_mode_active())
+        self._text_box:set_history_mode_active(not self._text_box:get_history_mode_active())
     elseif which == rt.InputButton.DEBUG then
         self._game_over_screen._vignette_shader:recompile()
     elseif which == rt.InputButton.UP then
-        self._text_box:history_mode_scroll_up()
+        self._text_box:scroll_up()
     elseif which == rt.InputButton.DOWN then
-        self._text_box:history_mode_scroll_down()
+        self._text_box:scroll_down()
     end
-
-    if which == rt.InputButton.X then self._text_box:advance() end
 end
