@@ -94,7 +94,7 @@ void computemain() {
 
     if (mode == MODE_INIT_DEPTH) {
         position /= size;
-        float depth = gaussian(distance(position, vec2(0.5)), 2.75);;
+        float depth = gaussian(distance(position, vec2(0.5)), 0);;
         depth *= snoise(position * 2 + vec2(2));
 
         imageStore(cell_texture_a, cell_position, vec4(depth, 0, 0, 0));

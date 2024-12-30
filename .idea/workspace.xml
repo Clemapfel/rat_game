@@ -22,16 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="textbox done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing selection node linking">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -166,7 +162,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood_lattice">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -729,15 +725,8 @@
       <workItem from="1734630565045" duration="7042000" />
       <workItem from="1734643804197" duration="66543000" />
       <workItem from="1735080503580" duration="51673000" />
-      <workItem from="1735430498839" duration="20220000" />
-    </task>
-    <task id="LOCAL-01324" summary="stashing config renaming">
-      <option name="closed" value="true" />
-      <created>1734208787747</created>
-      <option name="number" value="01324" />
-      <option name="presentableId" value="LOCAL-01324" />
-      <option name="project" value="LOCAL" />
-      <updated>1734208787747</updated>
+      <workItem from="1735430498839" duration="20879000" />
+      <workItem from="1735579525460" duration="2380000" />
     </task>
     <task id="LOCAL-01325" summary="stashing metaballs">
       <option name="closed" value="true" />
@@ -1123,7 +1112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735506222912</updated>
     </task>
-    <option name="localTasksCounter" value="1373" />
+    <task id="LOCAL-01373" summary="stashing selection node linking">
+      <option name="closed" value="true" />
+      <created>1735507887436</created>
+      <option name="number" value="01373" />
+      <option name="presentableId" value="LOCAL-01373" />
+      <option name="project" value="LOCAL" />
+      <updated>1735507887436</updated>
+    </task>
+    <option name="localTasksCounter" value="1374" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1177,7 +1174,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before messsage rework" />
     <MESSAGE value="stashing textbox one line at a time" />
     <MESSAGE value="stashing new scroll method" />
     <MESSAGE value="added after-line delay" />
@@ -1202,7 +1198,8 @@
     <MESSAGE value="refactored textbox done" />
     <MESSAGE value="history mode working" />
     <MESSAGE value="textbox done" />
-    <option name="LAST_COMMIT_MESSAGE" value="textbox done" />
+    <MESSAGE value="stashing selection node linking" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing selection node linking" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

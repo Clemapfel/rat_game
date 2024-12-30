@@ -62,7 +62,6 @@ end
 
 love.update = function(delta)
     --if not love.keyboard.isDown("space") then return end
-
     local cell_texture_in, cell_texture_out
     local flux_texture_top_in, flux_texture_top_out
     local flux_texture_center_in, flux_texture_center_out
@@ -88,7 +87,7 @@ love.update = function(delta)
         flux_texture_bottom_out = flux_texture_bottom_a
     end
 
-    step_shader:send("mode", 1)
+    step_shader:send("mode", 1) -- update flux
     step_shader:send("cell_texture_in", cell_texture_in)
     step_shader:send("cell_texture_out", cell_texture_out)
     step_shader:send("flux_texture_top_in", flux_texture_top_in)
@@ -99,15 +98,15 @@ love.update = function(delta)
     step_shader:send("flux_texture_bottom_out", flux_texture_bottom_out)
     step_shader:dispatch(texture_w, texture_h)
 
-    step_shader:send("mode", 2)
+    step_shader:send("mode", 2) -- update depth and velocities
     step_shader:send("cell_texture_in", cell_texture_in)
     step_shader:send("cell_texture_out", cell_texture_out)
-    step_shader:send("flux_texture_top_in", flux_texture_top_in)
-    step_shader:send("flux_texture_top_out", flux_texture_top_out)
-    step_shader:send("flux_texture_center_in", flux_texture_center_in)
-    step_shader:send("flux_texture_center_out", flux_texture_center_out)
-    step_shader:send("flux_texture_bottom_in", flux_texture_bottom_in)
-    step_shader:send("flux_texture_bottom_out", flux_texture_bottom_out)
+    step_shader:send("flux_texture_top_in", flux_texture_top_out) -- out holds newest state
+    step_shader:send("flux_texture_top_out", flux_texture_top_in)
+    step_shader:send("flux_texture_center_in", flux_texture_center_out)
+    step_shader:send("flux_texture_center_out", flux_texture_center_in)
+    step_shader:send("flux_texture_bottom_in", flux_texture_bottom_out)
+    step_shader:send("flux_texture_bottom_out", flux_texture_bottom_in)
     step_shader:dispatch(texture_w, texture_h)
 
     a_or_b = not a_or_b

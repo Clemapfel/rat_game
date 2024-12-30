@@ -1,17 +1,27 @@
 
-#define N 4 // number of directions
-const vec2 directions[N] = vec2[](
-    vec2(0, -1),
-    vec2(1, 0),
-    vec2(0, 1),
-    vec2(-1, 0)
+#define N 9
+vec2 directions[N] = vec2[N](
+    vec2(-1.0, -1.0),  // top left
+    vec2( 0.0, -1.0),  // top
+    vec2( 1.0, -1.0),  // top right
+    vec2(-1.0,  0.0),  // left
+    vec2( 0.0,  0.0),  // center
+    vec2( 1.0,  0.0),  // right
+    vec2(-1.0,  1.0),  // bottom left
+    vec2( 0.0,  1.0),  // bottom
+    vec2( 1.0,  1.0)   // bottom right
 );
 
-const ivec2 idirections[N] = ivec2[](
-    ivec2(0, -1),
-    ivec2(1, 0),
-    ivec2(0, 1),
-    ivec2(-1, 0)
+ivec2 idirections[N] = ivec2[N](
+    ivec2(-1, -1),  // top left
+    ivec2( 0, -1),  // top
+    ivec2( 1, -1),  // top right
+    ivec2(-1,  0),  // left
+    ivec2( 0,  0),  // center
+    ivec2( 1,  0),  // right
+    ivec2(-1,  1),  // bottom left
+    ivec2( 0,  1),  // bottom
+    ivec2( 1,  1)   // bottom right
 );
 
 uniform layout(rgba32f) image2D cell_texture_in;
@@ -48,21 +58,68 @@ const float cell_length = 1;
 layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
     ivec2 cell_position = ivec2(gl_GlobalInvocationID.xy);
-    vec4 cell_data = imageLoad(cell_texture_in, cell_position);
+    vec4 self_data = imageLoad(cell_texture_in, cell_position);
     vec4 flux_data_top = imageLoad(flux_texture_top_in, cell_position);
     vec4 flux_data_center = imageLoad(flux_texture_center_in, cell_position);
     vec4 flux_data_bottom = imageLoad(flux_texture_bottom_in, cell_position);
 
     if (mode == MODE_UPDATE_FLUX) {
-        flux_data_top.xyz += vec3(delta / 100);
-        flux_data_bottom.xyz += vec3(delta / 99);
 
-        imageStore(flux_texture_top_out, cell_position, flux_data_top);
-        imageStore(flux_texture_center_out, cell_position, flux_data_center);
-        imageStore(flux_texture_bottom_out, cell_position, flux_data_bottom);
+        float self_head = bernoulli_hydraulic_head(self_data);
+        float flux_results[9];
+        for (int i = 0; i < N; ++i) {
+            if (i == 4) continue; // skip center
+
+            vec4 other_data = imageLoad(cell_texture_in, cell_position + idirections[i]);
+            float other_head = bernoulli_hydraulic_head(other_data);
+            float average_depth = (self_data.x + other_data.x) / (2 * length(directions[i])); // average depth at cell edge
+
+            float mann_flux = 1 / viscosity * pow(average_depth, 5 / 3) * sqrt(self_head - other_head);
+
+            float h0 = self_head - max(self_data.w, other_data.w);
+            float hi = other_head - max(self_data.w, other_data.w);
+            float psi = pow(1 - pow(hi / h0, 1.5), 0.385);
+            float weir_flux = 2 / 3 * sqrt(2 * gravity) * pow(psi, 3 / 2);
+
+            flux_results[i] = max(mann_flux, weir_flux);
+        }
+
+        imageStore(flux_texture_top_out, cell_position, vec4(
+            flux_results[0],
+            flux_results[1],
+            flux_results[2],
+            1
+        ));
+
+        imageStore(flux_texture_center_out, cell_position, vec4(
+            flux_results[3],
+            0, // flux on self is always 0
+            flux_results[5],
+            1
+        ));
+
+        imageStore(flux_texture_bottom_out, cell_position, vec4(
+            flux_results[6],
+            flux_results[7],
+            flux_results[8],
+            1
+        ));
     }
     else if (mode == MODE_UPDATE_DEPTH) {
-        imageStore(cell_texture_out, cell_position, cell_data + vec4(0, 0, 0, 1));
+
+        float fluxes[N] = float[](
+            flux_data_top.x, flux_data_top.y, flux_data_top.z,
+            flux_data_center.x, flux_data_center.y, flux_data_center.z,
+            flux_data_bottom.x, flux_data_bottom.y, flux_data_bottom.z
+        );
+
+        float flux_sum = 0;
+        for (int i = 0; i < N; ++i) {
+            flux_sum += fluxes[i];
+        }
+
+        float new_depth = self_data.x - delta * flux_sum;
+        imageStore(cell_texture_out, cell_position, vec4(new_depth, self_data.yzw));
     }
 
     /*
