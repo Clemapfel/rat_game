@@ -95,7 +95,7 @@ void computemain() {
     if (mode == MODE_INIT_DEPTH) {
         position /= size;
         float depth = gaussian(distance(position, vec2(0.5)), 0);;
-        depth *= snoise(position * 2 + vec2(2));
+        depth *= 1 * snoise(position * 6 + vec2(2));
 
         imageStore(cell_texture_a, cell_position, vec4(depth, 0, 0, 0));
         imageStore(cell_texture_b, cell_position, vec4(depth, 0, 0, 0));
@@ -130,9 +130,11 @@ void computemain() {
             }
         }
 
+        float terrain = (1 - cell_position.y / size.y);
+
         vec4 current = imageLoad(cell_texture_a, cell_position);
-        imageStore(cell_texture_a, cell_position, vec4(current.r, gradient_x, gradient_y, current.a));
-        imageStore(cell_texture_b, cell_position, vec4(current.r, gradient_x, gradient_y, current.a));
+        imageStore(cell_texture_a, cell_position, vec4(current.r, gradient_x, gradient_y, terrain));
+        imageStore(cell_texture_b, cell_position, vec4(current.r, gradient_x, gradient_y, terrain));
         imageStore(flux_texture_top_a, cell_position, vec4(vec3(0), 1));
         imageStore(flux_texture_top_b, cell_position, vec4(vec3(0), 1));
         imageStore(flux_texture_center_a, cell_position, vec4(vec3(0), 1));

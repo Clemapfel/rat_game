@@ -22,7 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing selection node linking">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing paper formulas not working">
+      <change afterPath="$PROJECT_DIR$/~main_blood_lattice_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood_lattice_init.glsl" afterDir="false" />
@@ -726,15 +727,7 @@
       <workItem from="1734643804197" duration="66543000" />
       <workItem from="1735080503580" duration="51673000" />
       <workItem from="1735430498839" duration="20879000" />
-      <workItem from="1735579525460" duration="2380000" />
-    </task>
-    <task id="LOCAL-01325" summary="stashing metaballs">
-      <option name="closed" value="true" />
-      <created>1734296666471</created>
-      <option name="number" value="01325" />
-      <option name="presentableId" value="LOCAL-01325" />
-      <option name="project" value="LOCAL" />
-      <updated>1734296666471</updated>
+      <workItem from="1735579525460" duration="11572000" />
     </task>
     <task id="LOCAL-01326" summary="stashing before reworking animation to query sprite on start">
       <option name="closed" value="true" />
@@ -1120,7 +1113,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735507887436</updated>
     </task>
-    <option name="localTasksCounter" value="1374" />
+    <task id="LOCAL-01374" summary="stashing paper formulas not working">
+      <option name="closed" value="true" />
+      <created>1735582028108</created>
+      <option name="number" value="01374" />
+      <option name="presentableId" value="LOCAL-01374" />
+      <option name="project" value="LOCAL" />
+      <updated>1735582028108</updated>
+    </task>
+    <option name="localTasksCounter" value="1375" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1174,7 +1175,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing textbox one line at a time" />
     <MESSAGE value="stashing new scroll method" />
     <MESSAGE value="added after-line delay" />
     <MESSAGE value="stashing manual mode" />
@@ -1199,7 +1199,8 @@
     <MESSAGE value="history mode working" />
     <MESSAGE value="textbox done" />
     <MESSAGE value="stashing selection node linking" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing selection node linking" />
+    <MESSAGE value="stashing paper formulas not working" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing paper formulas not working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
