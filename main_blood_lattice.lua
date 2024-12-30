@@ -92,6 +92,9 @@ love.update = function(delta)
         --step_shader:send("mode", 1) -- update flux
         step_shader:send("cell_texture_in", cell_texture_in)
         step_shader:send("cell_texture_out", cell_texture_out)
+        step_shader:dispatch(texture_w, texture_h)
+
+        --[[
         step_shader:send("flux_texture_top_in", flux_texture_top_in)
         step_shader:send("flux_texture_top_out", flux_texture_top_out)
         step_shader:send("flux_texture_center_in", flux_texture_center_in)
