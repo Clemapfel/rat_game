@@ -2,34 +2,35 @@
 // sequentially radix sort an array of pairs by hash
 //
 
+// #define N_NUMBERS
+
 layout(std430) buffer input_buffer {
     uint data_in[];
-}; // size: n_numbers
+}; // size: N_NUMBERS
 
 layout(std430) buffer output_buffer {
     uint data_out[];
-}; // size: n_numbers
-
-uniform uint n_numbers;
+}; // size: N_NUMBERS
 
 shared uint global_counts[256];
-shared uint count_locks[256];
+shared uint i_to_masked[N_NUMBERS]; // cache masked values
 
-#define GET(pass, i) (pass % 2 == 0 ? data_in[i] : data_out[i])
+shared uint masked_to_last_i[256];  // used to limit search range in scatter step
+shared uint masked_to_first_i[256];
 
 #define n_threads 256
-layout (local_size_x = n_threads, local_size_y = 1, local_size_z = 1) in;
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void computemain()
 {
-    uint thread_x = gl_GlobalInvocationID.x;
+    uint thread_x = gl_GlobalInvocationID.y * 16 + gl_GlobalInvocationID.x;
     bool is_sequential_worker = thread_x == 0;
 
     const uint n_bins = 256;
     const uint bitmask = 0xFFu;
 
-    uint n_per_thread = uint(ceil(n_numbers / float(n_threads)));
+    uint n_per_thread = (N_NUMBERS + n_threads - 1) / n_threads;
     uint start = thread_x * n_per_thread;
-    uint end = min(start + n_per_thread, n_numbers);
+    uint end = min(start + n_per_thread, N_NUMBERS);
 
     for (uint pass = 0; pass < 4; ++pass) {
         uint shift = 8 * pass;
@@ -39,7 +40,8 @@ void computemain()
         if (thread_x < n_bins)
         {
             global_counts[thread_x] = 0u;
-            count_locks[thread_x] = 0u;
+            masked_to_last_i[thread_x] = N_NUMBERS;
+            masked_to_first_i[thread_x] = 0u;
         }
 
         barrier();
@@ -47,7 +49,10 @@ void computemain()
         // accumulate counts
 
         for (uint i = start; i < end; ++i) {
-            uint masked = (GET(pass, i) >> shift) & bitmask;
+            uint masked = ((pass % 2 == 0 ? data_in[i] : data_out[i]) >> shift) & bitmask;
+            i_to_masked[i] = masked;
+            atomicMin(masked_to_first_i[masked], i);
+            atomicMax(masked_to_last_i[masked], i + 1);
             atomicAdd(global_counts[masked], 1u);
         }
 
@@ -63,7 +68,7 @@ void computemain()
             barrier();
         }
 
-        if (thread_x == 0) {
+        if (is_sequential_worker) {
             global_counts[n_bins - 1] = 0;
         }
 
@@ -79,23 +84,19 @@ void computemain()
             barrier();
         }
 
-        barrier();
+        // scatter only if masked matches thread, this way only one thread operates on each global_counts
 
-        for (uint i = 0; i < n_numbers; ++i) {
-            uint masked = (GET(pass, i) >> shift) & bitmask;
-            if (atomicExchange(count_locks[masked], 1) != 0) {
-                // if count is being modified, bail out and wait at barrier
-                // this is suboptimal but faster than waiting in this loop
-                break;
-            }
+        uint max_i = masked_to_last_i[thread_x];
+        uint min_i = masked_to_first_i[thread_x];
+        for (uint i = min_i; i < max_i; ++i) {
+            uint masked = i_to_masked[i];
+            if (masked != thread_x) continue;
 
             uint count = global_counts[masked]++;
             if (pass % 2 == 0)
                 data_out[count] = data_in[i];
             else
                 data_in[count] = data_out[i];
-
-            atomicExchange(count_locks[masked], 0);
         }
 
         barrier();

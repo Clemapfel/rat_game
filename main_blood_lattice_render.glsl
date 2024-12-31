@@ -70,8 +70,8 @@ vec4 effect(vec4 _, Image __, vec2 texture_coords, vec2 screen_coords) {
         flux_sum += directions[i] * flux[i];
     }
 
-    float angle = (atan(cell.y, cell.x) + PI) / (2 * PI);
-    float magnitude = length(cell.xy);
+    float angle = (atan(cell.z, cell.y) + PI) / (2 * PI);
+    float magnitude = length(cell.yz);
 
 
     vec3 color = lch_to_rgb(vec3(cell.x, min(magnitude, 1), angle));

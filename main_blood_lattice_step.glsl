@@ -8,70 +8,68 @@ uniform float viscosity = 1.0;
 
 #define N 9
 vec2 directions[N] = vec2[N](
-vec2(-1.0, -1.0),  // top left
-vec2( 0.0, -1.0),  // top
-vec2( 1.0, -1.0),  // top right
-vec2(-1.0,  0.0),  // left
-vec2( 0.0,  0.0),  // center
-vec2( 1.0,  0.0),  // right
-vec2(-1.0,  1.0),  // bottom left
-vec2( 0.0,  1.0),  // bottom
-vec2( 1.0,  1.0)   // bottom right
+    vec2(-1.0, -1.0),  // top left
+    vec2( 0.0, -1.0),  // top
+    vec2( 1.0, -1.0),  // top right
+    vec2(-1.0,  0.0),  // left
+    vec2( 0.0,  0.0),  // center
+    vec2( 1.0,  0.0),  // right
+    vec2(-1.0,  1.0),  // bottom left
+    vec2( 0.0,  1.0),  // bottom
+    vec2( 1.0,  1.0)   // bottom right
 );
 
 ivec2 idirections[N] = ivec2[N](
-ivec2(-1, -1),  // top left
-ivec2( 0, -1),  // top
-ivec2( 1, -1),  // top right
-ivec2(-1,  0),  // left
-ivec2( 0,  0),  // center
-ivec2( 1,  0),  // right
-ivec2(-1,  1),  // bottom left
-ivec2( 0,  1),  // bottom
-ivec2( 1,  1)   // bottom right
+    ivec2(-1, -1),  // top left
+    ivec2( 0, -1),  // top
+    ivec2( 1, -1),  // top right
+    ivec2(-1,  0),  // left
+    ivec2( 0,  0),  // center
+    ivec2( 1,  0),  // right
+    ivec2(-1,  1),  // bottom left
+    ivec2( 0,  1),  // bottom
+    ivec2( 1,  1)   // bottom right
 );
-
-float bernoulli_hydraulic_head(vec4 data) {
-    float bed = data.w;
-    float depth = data.x;
-    vec2 velocity = data.yz;
-    return bed + depth + (velocity.x * velocity.x + velocity.y * velocity.y) / (2.0 * gravity);
-}
 
 void computemain() {
     ivec2 cell_position = ivec2(gl_GlobalInvocationID.xy);
     ivec2 size = imageSize(cell_texture_in);
 
-    vec4 self_data = imageLoad(cell_texture_in, cell_position);
-    float self_head = bernoulli_hydraulic_head(self_data);
+    // Read the current cell's data
+    vec4 current_cell = imageLoad(cell_texture_in, cell_position);
+    float current_depth = current_cell.x;
+    vec2 current_velocity = current_cell.yz;
 
-    float other_heads[N];
+    // Initialize total_flux
+    vec2 total_flux = vec2(0.0);
+
+    // Iterate over all neighboring directions
     for (int i = 0; i < N; ++i) {
         ivec2 neighbor_position = cell_position + idirections[i];
-        if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y) {
-            other_heads[i] = self_head; // Use self_head for out-of-bound neighbors
-        } else {
-            vec4 neighbor_data = imageLoad(cell_texture_in, neighbor_position);
-            other_heads[i] = bernoulli_hydraulic_head(neighbor_data);
+
+        // Check if the neighbor is within bounds
+        if (neighbor_position.x < 0 || neighbor_position.x >= size.x ||
+        neighbor_position.y < 0 || neighbor_position.y >= size.y) {
+            continue;
         }
+
+        // Read the neighbor cell's data
+        vec4 neighbor_cell = imageLoad(cell_texture_in, neighbor_position);
+        float neighbor_depth = neighbor_cell.x;
+        vec2 neighbor_velocity = neighbor_cell.yz;
+        vec2 relative_velocity = neighbor_velocity - current_velocity;
+
+        // Calculate the flux based on the relative velocity and depth difference
+        total_flux += (current_depth - neighbor_depth) * directions[i];
     }
 
-    float fluxes[N];
-    vec2 flux_velocity = vec2(0);
-    float net_flux = 0;
-    for (int i = 0; i < N; ++i) {
-        float head_difference = self_head - other_heads[i];
-        float flux = head_difference * gravity * delta;
-        fluxes[i] = flux;
-        flux_velocity += flux * directions[i];
-        net_flux += flux;
-    }
+    // Update the current cell's depth
+    float new_depth = current_depth + (total_flux.x + total_flux.y) * delta;
+    new_depth = max(new_depth, 0);
 
-    float new_depth = max(self_data.x + net_flux * delta, 0.0);
-    vec2 new_velocity = self_data.yz;
-    if (new_depth > 0.0) {
-        new_velocity += (flux_velocity / new_depth) * delta;
-    }
+    // Calculate the new velocity
+    vec2 new_velocity = current_velocity + total_flux * delta ;
 
-    imageStore(cell_texture_out, cell_position, vec4(new_depth, new_velocity, self_data.w));
+    // Write the updated depth and velocity back to the output texture
+    imageStore(cell_texture_out, cell_position, vec4(new_depth, new_velocity, current_cell.w));
 }
