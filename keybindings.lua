@@ -1,5 +1,3 @@
--- ### keybinding config for rat_game
--- ### for a list of available constants, see below
 return {
     A = {
         gamepad = rt.GamepadButton.RIGHT,

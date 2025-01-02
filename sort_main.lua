@@ -4,8 +4,6 @@ love.window.setMode(800, 600, {
     vsync = 0
 })
 
-
-
 n_numbers = 14000
 shader = rt.ComputeShader("sort_pass.glsl", {
     defines = {
