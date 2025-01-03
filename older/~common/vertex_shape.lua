@@ -374,7 +374,6 @@ end
 
 --- @brief
 function rt.VertexCircle(x, y, x_radius, y_radius, n_outer_vertices)
-    dbg("called")
     y_radius = which(y_radius, x_radius)
     n_outer_vertices = which(n_outer_vertices, 8)
     local vertices = {}

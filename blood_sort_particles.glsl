@@ -1,25 +1,34 @@
 //
-// sequentially radix sort an array of pairs by hash
+// radix sort particles by cell hash
 //
 
-// #define N_NUMBERS
+#ifndef N_PARTICLES
+    #error "N_PARTICLES undefined"
+#endif
 
-layout(std430) buffer input_buffer {
-    uint data_in[];
-}; // size: N_NUMBERS
+struct Particle {
+    vec2 position;
+    vec2 velocity;
+    uint cell_hash;
+};
 
-layout(std430) buffer output_buffer {
-    uint data_out[];
-}; // size: N_NUMBERS
+layout(std430) buffer particle_buffer_a {
+    Particle particles_a[];
+}; // size: n_particles
+
+layout(std430) buffer particle_buffer_b {
+    Particle particles_b[];
+}; // size: n_particles
 
 shared uint global_counts[256];
-shared uint i_to_masked[N_NUMBERS]; // cache masked values
+shared uint i_to_masked[N_PARTICLES]; // cache masked values
 
 shared uint masked_to_last_i[256];  // used to limit search range in scatter step
 shared uint masked_to_first_i[256];
 
 #define n_threads 256
-layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
+
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in; // dispatch with 1, 1
 void computemain()
 {
     uint thread_x = gl_GlobalInvocationID.y * 16 + gl_GlobalInvocationID.x;
@@ -28,9 +37,9 @@ void computemain()
     const uint n_bins = 256;
     const uint bitmask = 0xFFu;
 
-    uint n_per_thread = (N_NUMBERS + n_threads - 1) / n_threads;
+    uint n_per_thread = (N_PARTICLES + n_threads - 1) / n_threads;
     uint start = thread_x * n_per_thread;
-    uint end = min(start + n_per_thread, N_NUMBERS);
+    uint end = min(start + n_per_thread, N_PARTICLES);
 
     for (uint pass = 0; pass < 4; ++pass) {
         uint shift = 8 * pass;
@@ -40,7 +49,7 @@ void computemain()
         if (thread_x < n_bins)
         {
             global_counts[thread_x] = 0u;
-            masked_to_last_i[thread_x] = N_NUMBERS;
+            masked_to_last_i[thread_x] = N_PARTICLES;
             masked_to_first_i[thread_x] = 0u;
         }
 
@@ -49,7 +58,8 @@ void computemain()
         // accumulate counts
 
         for (uint i = start; i < end; ++i) {
-            uint masked = ((pass % 2 == 0 ? data_in[i] : data_out[i]) >> shift) & bitmask;
+            uint value = (pass % 2 == 0 ? particles_a[i].cell_hash : particles_b[i].cell_hash);
+            uint masked = (value >> shift) & bitmask;
             i_to_masked[i] = masked;
             atomicMin(masked_to_first_i[masked], i);
             atomicMax(masked_to_last_i[masked], i + 1);
@@ -94,9 +104,9 @@ void computemain()
 
             uint count = global_counts[masked]++;
             if (pass % 2 == 0)
-                data_out[count] = data_in[i];
+                particles_b[count] = particles_a[i];
             else
-                data_in[count] = data_out[i];
+                particles_a[count] = particles_b[i];
         }
 
         barrier();

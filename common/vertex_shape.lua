@@ -27,10 +27,10 @@ rt.VertexFormat = {
 }
 
 --- @class rt.VertexShape
-rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(data, draw_mode)
+rt.VertexShape = meta.new_type("VertexShape", rt.Drawable, function(data, draw_mode, format)
     local out = meta.new(rt.VertexShape, {
         _native = love.graphics.newMesh(
-            rt.VertexFormat,
+            which(format, rt.VertexFormat),
             data,
             which(draw_mode, rt.MeshDrawMode.TRIANGLE_FAN),
             rt.GraphicsBufferUsage.DYNAMIC
@@ -74,7 +74,7 @@ do
         y_radius = which(y_radius, x_radius)
         n_outer_vertices = which(n_outer_vertices, 8)
         local data = {
-            {center_x, center_y, 0, 0, 1, 1, 1, 1}
+            {center_x, center_y, 0, 0, 1, 1, 1, 1},
         }
 
         local step = 2 * math.pi / n_outer_vertices

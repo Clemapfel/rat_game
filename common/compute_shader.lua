@@ -1,6 +1,11 @@
+rt.settings.compute_shader = {
+    allow_unused_uniform = true
+}
 --- @class rt.ComputeShader
-rt.ComputeShader = meta.new_type("ComputeShader", function(filename, ...)
-    local success, shader = pcall(love.graphics.newComputeShader, filename, ...)
+rt.ComputeShader = meta.new_type("ComputeShader", function(filename, defines)
+    local success, shader = pcall(love.graphics.newComputeShader, filename, {
+        defines = defines
+    })
     if not success then
         rt.error("In rt.ComputeShader: Error when evaluating shader at `" .. filename .. "`:\n" .. shader)
         return
@@ -17,9 +22,9 @@ end)
 --- @param value
 function rt.ComputeShader:send(name, value)
     assert(value ~= nil)
-    --if self._native:hasUniform(name) then
+    if rt.settings.compute_shader.allow_unused_uniform and self._native:hasUniform(name) then
         self._native:send(name, value)
-    --end
+    end
 end
 
 --- @brief

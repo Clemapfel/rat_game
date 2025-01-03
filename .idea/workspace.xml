@@ -22,27 +22,21 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="optimized radix sort to be parallell in all passes">
-      <change afterPath="$PROJECT_DIR$/old_main/main_blood.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="moved old mains">
+      <change afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_render_particles.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_sort_particles.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_update_cell_hash.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/debug_savefile.lua" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/keybindings.lua" beforeDir="false" afterPath="$PROJECT_DIR$/keybindings.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main_blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_blood_lattice.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_blood_lattice_init.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_blood_lattice_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_blood_lattice_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_blood_particles.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_blood_particles.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_bounce.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_bounce.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_box2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_box2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_normal_map.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_normal_map.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_physics_blood.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_physics_blood.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_physics_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_physics_blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_rope.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_rope.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_tesselation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_tesselation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_vertex_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_vertex_blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_vertex_blood_threshold.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_vertex_blood_threshold.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main_vertex_blood_vertex_gen.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old_main/main_vertex_blood_vertex_gen.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main_blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_render_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/random.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/older/~common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sort_merge.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_reset_memory_mapping.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sort_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/sort_pass.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -178,7 +172,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_sort">
+  <component name="RunManager" selected="Lua Application.main_blood">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -199,7 +193,7 @@
     <configuration name="main_blood" type="lua.app" factoryName="Lua Application">
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
-      <option name="file" value="main_blood.lua" />
+      <option name="file" value="blood_main.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -659,15 +653,8 @@
       <workItem from="1735080503580" duration="51673000" />
       <workItem from="1735430498839" duration="20879000" />
       <workItem from="1735579525460" duration="20149000" />
-      <workItem from="1735836818558" duration="289000" />
-    </task>
-    <task id="LOCAL-01329" summary="stashing before refactoring animation node system">
-      <option name="closed" value="true" />
-      <created>1734467301020</created>
-      <option name="number" value="01329" />
-      <option name="presentableId" value="LOCAL-01329" />
-      <option name="project" value="LOCAL" />
-      <updated>1734467301020</updated>
+      <workItem from="1735836818558" duration="17770000" />
+      <workItem from="1735920333401" duration="5417000" />
     </task>
     <task id="LOCAL-01330" summary="stashing refactoring">
       <option name="closed" value="true" />
@@ -1053,7 +1040,15 @@
       <option name="project" value="LOCAL" />
       <updated>1735604773975</updated>
     </task>
-    <option name="localTasksCounter" value="1378" />
+    <task id="LOCAL-01378" summary="moved old mains">
+      <option name="closed" value="true" />
+      <created>1735837187606</created>
+      <option name="number" value="01378" />
+      <option name="presentableId" value="LOCAL-01378" />
+      <option name="project" value="LOCAL" />
+      <updated>1735837187606</updated>
+    </task>
+    <option name="localTasksCounter" value="1379" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1107,7 +1102,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing manual mode" />
     <MESSAGE value="refactored message to be animation synched" />
     <MESSAGE value="stashing marchin squares" />
     <MESSAGE value="stashing marching squares" />
@@ -1132,7 +1126,8 @@
     <MESSAGE value="stashing before redo" />
     <MESSAGE value="stashing" />
     <MESSAGE value="optimized radix sort to be parallell in all passes" />
-    <option name="LAST_COMMIT_MESSAGE" value="optimized radix sort to be parallell in all passes" />
+    <MESSAGE value="moved old mains" />
+    <option name="LAST_COMMIT_MESSAGE" value="moved old mains" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1167,11 +1162,6 @@
           <line>220</line>
           <log-expression expression="o&#10;    local lg = love.graphics&#10;&#10;    --- @brief&#10;    function rt.Camera:bind()&#10;        lg.push()&#10;        lg.origin()&#10;&#10;        if self._blur_strength &gt; 0 then&#10;            lg.setCanvas({ self._render_texture_b, stencil = true })&#10;            lg.clear(true, false, false)&#10;        else&#10;            lg.translate(self._offset_x, self._offset_y) -- shake separate, applied to padded mesh to avoid bordering&#10;        end&#10;&#10;        lg.translate(self._current_x, self._current_y)&#10;        lg.scale(self._current_scale)&#10;        lg.rotate(self._current_angle)&#10;        lg.translate( -0.5 * self._aabb.width, -0.5 * self._aabb.height)&#10;    end&#10;&#10;    -- scene draw here&#10;&#10;    --- @brief&#10;    function rt.Camera:unbind()&#10;        if self._blur_strength &gt; 0 then&#10;            lg.origin()&#10;&#10;            local a, b = self._render_texture_a, self._render_texture_b&#10;            for i = 1, self._blur_strength do&#10;                lg.setShader(self._blur_shader_horizontal)&#10;                lg.setCanvas(a)&#10;                lg.draw(b)&#10;&#10;                lg.setShader(self._blur_shader_vertical)&#10;                lg.setCanvas(b)&#10;                lg.draw(a)&#10;            end&#10;&#10;            lg.setCanvas()&#10;            lg.translate(self._offset_x, self._offset_y)&#10;            lg.draw(self._render_texture_mesh)&#10;        end&#10;&#10;        lg.pop()&#10;    end&#10;end" language="Lua" />
           <option name="timeStamp" value="28" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/older/~common/vertex_shape.lua</url>
-          <line>376</line>
-          <option name="timeStamp" value="31" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
           <url>file://$PROJECT_DIR$/common/scrollbar.lua</url>

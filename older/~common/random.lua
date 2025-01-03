@@ -106,5 +106,5 @@ end
 
 --- @brief
 function rt.random.noise(x, y)
-    return love.math.simplexNoise(x, y)
+    return love.math.simplexNoise(x * math.pi, y * -math.pi)
 end
