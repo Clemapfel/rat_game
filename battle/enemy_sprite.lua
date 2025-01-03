@@ -1,6 +1,7 @@
 --- @class bt.EnemySprite
 bt.EnemySprite = meta.new_type("EnemySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.EnemySprite, {
+        _entity = entity,
         _sprite_id = entity:get_config():get_sprite_id(),
         _frame = rt.Frame(),
         _suffix = entity:get_name_suffix(),

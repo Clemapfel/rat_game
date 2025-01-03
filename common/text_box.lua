@@ -506,13 +506,3 @@ end
 function rt.TextBox:can_scroll_down()
     return self._first_visible_entry < self._n_entries - (self._max_n_lines - 1) + 1
 end
-
---- @brief
-function rt.TextBox:get_selection_nodes()
-    local bounds = self._bounds
-    local node = rt.SelectionGraphNode(bounds)
-    node.objects = {}
-    return {
-        node
-    }
-end

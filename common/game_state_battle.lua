@@ -1,6 +1,7 @@
 --[[
     entity_id_to_multiplicity[entity_id] = count,
     turn_i = 1,
+    is_battle_active = true,
 
     entities = {
         id       -- EntityID
@@ -55,6 +56,17 @@
         state = {}
     }
 ]]--
+
+--- @brief
+function rt.GameState:get_is_battle_active()
+    return self._state.is_battle_active
+end
+
+--- @brief
+function rt.GameState:set_is_battle_active(b)
+    meta.assert_boolean(b)
+    self._state.is_battle_active = b
+end
 
 --- @brief
 function rt.GameState:create_entity(config)

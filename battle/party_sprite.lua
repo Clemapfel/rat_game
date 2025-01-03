@@ -1,6 +1,7 @@
 --- @class bt.PartySprite
 bt.PartySprite = meta.new_type("PartySprite", bt.EntitySprite, function(entity)
     return meta.new(bt.PartySprite, {
+        _entity = entity,
         _sprite_id = entity:get_config():get_sprite_id(),
         _name = rt.Label("<o><b>" .. entity:get_name() .. "</b></o>"),
         _frame = rt.Frame(),

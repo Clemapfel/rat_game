@@ -392,19 +392,12 @@ function bt.PriorityQueue:get_selection_nodes()
         bounds.y = bounds.y + y
         local to_add = rt.SelectionGraphNode(bounds)
 
-        table.insert(nodes, to_add)
+        table.insert(nodes, 1, to_add)
         n = n + 1
     end
 
-    for i = 1, n do
-        local current = nodes[i]
-        if i > 1 then
-            current:set_up(nodes[i - 1])
-        end
-
-        if i < n then
-            current:set_down(nodes[i + 1])
-        end
+    for i = 1, sizeof(nodes) do
+        nodes[i].object = self._order[i]
     end
 
     return nodes

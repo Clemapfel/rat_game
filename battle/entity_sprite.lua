@@ -313,7 +313,17 @@ function bt.EntitySprite:get_position()
 end
 
 --- @brief
-function bt.EntitySprite:get_selection_nodes()
+function bt.EntitySprite:get_sprite_selection_node()
+    local x, y = self:get_position()
+    local w, h = self:measure()
+    local out = rt.SelectionGraphNode(rt.AABB(x, y, w, h))
+    assert(meta.isa(self._entity, bt.Entity), "In bt.EntitySprite:get_sprite_selection_node: _entity is not set")
+    out.object = self._entity
+    return out
+end
+
+--- @brief
+function bt.EntitySprite:get_status_consumable_selection_nodes()
     local nodes = {}
     local n = 0
     for status, sprite in pairs(self._status_to_sprite) do
@@ -321,6 +331,7 @@ function bt.EntitySprite:get_selection_nodes()
         bounds.x = bounds.x
         bounds.y = bounds.y
         local node = rt.SelectionGraphNode(bounds)
+        node.object = status
         table.insert(nodes, node)
         n = n + 1
     end
@@ -331,6 +342,7 @@ function bt.EntitySprite:get_selection_nodes()
         bounds.x = bounds.x
         bounds.y = bounds.y
         local node = rt.SelectionGraphNode(bounds)
+        node.object = self._consumable_slot_to_consumable[slot_i]
         table.insert(nodes, node)
         n = n + 1
     end
@@ -339,36 +351,12 @@ function bt.EntitySprite:get_selection_nodes()
         return a:get_bounds().x < b:get_bounds().x
     end)
 
-    local sprite_node
-    do
-        local x, y = self:get_position()
-        local w, h = self:measure()
-        sprite_node = rt.SelectionGraphNode(rt.AABB(x, y, w, h))
-    end
+    return nodes
+end
 
-    local sprite_bounds = sprite_node:get_bounds()
-    for i = 1, n do
-        local node = nodes[i]
-        if i > 1 then
-            node:set_left(nodes[i - 1])
-        end
-
-        if i < n then
-            node:set_right(nodes[i + 1])
-        end
-
-        local current_bounds = node:get_bounds()
-        if current_bounds.y + 0.5 * current_bounds.height > sprite_bounds.y + 0.5 * sprite_bounds.height then
-            node:set_up(sprite_node)
-            sprite_node:set_down(node)
-        else
-            node:set_down(sprite_node)
-            sprite_node:set_up(node)
-        end
-    end
-
-
-
-    table.insert(nodes, 1, sprite_node)
+--- @brief
+function bt.EntitySprite:get_selection_nodes()
+    local nodes = self:get_status_consumable_selection_nodes()
+    table.insert(nodes, 1, self:get_sprite_selection_node())
     return nodes
 end

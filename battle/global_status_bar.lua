@@ -164,6 +164,7 @@ function bt.GlobalStatusBar:get_selection_nodes()
         bounds.x = bounds.x + offset_x
         bounds.y = bounds.y
         local node = rt.SelectionGraphNode(bounds)
+        node.object = global_status
         table.insert(nodes, node)
         n = n + 1
     end

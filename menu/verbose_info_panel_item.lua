@@ -993,6 +993,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         }
 
         local translation = rt.Translation.verbose_info
+        local is_battle = STATE:get_is_battle_active()
 
         for stat_color_label in range(
             {"hp", "HP", translation.hp_label},
@@ -1004,7 +1005,15 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             local prefix_label = self._prefix(label, color)
             prefix_label:realize()
             local colon = self._colon()
-            local value_label = self._number("<color=" .. color .. ">" .. tostring(STATE["active_template_get_" .. stat](STATE, entity)) .. "</color>")
+
+            local value
+            if not is_battle then
+                value = STATE["active_template_get_" .. stat](STATE, entity)
+            else
+                value = STATE["entity_get_" .. stat](STATE, entity)
+            end
+
+            local value_label = self._number("<color=" .. color .. ">" .. tostring(value) .. "</color>")
 
             self[stat .. "_prefix_label"] = prefix_label
             self[stat .. "_colon_label"] = colon
@@ -1028,7 +1037,13 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         self.consumable_sprites = {}
         self.consumable_names = {}
 
-        local n_move_slots, move_slots = STATE:active_template_list_move_slots(entity)
+        local n_move_slots, move_slots
+        if not is_battle then
+            n_move_slots, move_slots = STATE:active_template_list_move_slots(entity)
+        else
+            n_move_slots, move_slots = STATE:entity_list_move_slots(entity)
+        end
+
         for i = 1, n_move_slots do
             if move_slots[i] ~= nil then
                 table.insert(self.move_sprites, rt.Sprite(move_slots[i]:get_sprite_id()))
@@ -1040,7 +1055,13 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.move_names, self._description(translation.no_moves))
         end
 
-        local n_equip_slots, equip_slots = STATE:active_template_list_equip_slots(entity)
+        local n_equip_slots, equip_slots
+        if not is_battle then
+            n_equip_slots, equip_slots = STATE:active_template_list_equip_slots(entity)
+        else
+            n_equip_slots, equip_slots = STATE:entity_list_equip_slots(entity)
+        end
+
         for i = 1, n_equip_slots do
             if equip_slots[i] ~= nil then
                 table.insert(self.equip_sprites, rt.Sprite(equip_slots[i]:get_sprite_id()))
@@ -1052,7 +1073,13 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.equip_names, self._description(translation.no_equips))
         end
 
-        local n_consumable_slots, consumable_slots = STATE:active_template_list_consumable_slots(entity)
+        local n_consumable_slots, consumable_slots
+        if not is_battle then
+            n_consumable_slots, consumable_slots = STATE:active_template_list_consumable_slots(entity)
+        else
+            n_consumable_slots, consumable_slots = STATE:entity_list_consumable_slots(entity)
+        end
+
         for i = 1, n_consumable_slots do
             if consumable_slots[i] ~= nil then
                 table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
