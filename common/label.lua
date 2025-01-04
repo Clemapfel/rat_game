@@ -29,7 +29,7 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, 
     meta.assert_string(text)
     if font == nil then font = rt.settings.font.default end
     if monospace_font == nil then monospace_font = rt.settings.font.default_mono end
-
+    local black = rt.Palette.BLACK
     local out = meta.new(rt.Label, {
         _raw = text,
         _font = font,
@@ -61,6 +61,11 @@ rt.Label = meta.new_type("Label", rt.Widget, rt.Updatable, function(text, font, 
         _outline_texture_w = 1,
         _outline_texture_h = 1,
 
+        _outline_color_r = black.r,
+        _outline_color_g = black.g,
+        _outline_color_b = black.b,
+        _outline_color_a = black.a,
+
         _width = 0,
         _height = 0,
         _first_wrap = true
@@ -78,7 +83,6 @@ function rt.Label:_glyph_new(
     is_underlined,
     is_strikethrough,
     is_outlined,
-    outline_r, outline_g, outline_b,
     is_effect_shake,
     is_effect_wave,
     is_effect_rainbow
@@ -91,7 +95,6 @@ function rt.Label:_glyph_new(
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
         is_outlined = is_outlined,
-        outline_color = {outline_r, outline_g, outline_b, 1},
         is_effect_shake = is_effect_shake,
         is_effect_rainbow = is_effect_rainbow,
         is_effect_wave = is_effect_wave,
@@ -219,6 +222,24 @@ end
 --- @brief
 function rt.Label:set_justify_mode(mode)
     self._justify_mode = mode
+end
+
+--- @brief
+function rt.Label:set_outline_color(color)
+    if meta.is_hsva(color) then color = rt.hsva_to_rgba(color) end
+    self._outline_color_r, self._outline_color_g, self._outline_color_b, self._outline_color_a = rt.color_unpack(color)
+    self._use_outline = true
+    self:_update_textures()
+end
+
+--- @brief
+function rt.Label:get_outline_color()
+    return rt.RGBA(
+        self._outline_color_r,
+        self._outline_color_g,
+        self._outline_color_b,
+        self._outline_color_a
+    )
 end
 
 --- @brief
@@ -409,8 +430,6 @@ do
 
             color = "TRUE_WHITE",
             color_active = false,
-            outline_color = "TRUE_BLACK",
-            outline_color_active = false,
 
             is_mono = false,
 
@@ -448,11 +467,6 @@ do
             if not settings.is_effect_rainbow and settings.color_active then
                 color_r, color_g, color_b = _rt_color_unpack(_rt_palette[settings.color])
             end
-            
-            local outline_color_r, outline_color_g, outline_color_b = 0, 0, 0
-            if settings.outline_color_active then
-                outline_color_r, outline_color_g, outline_color_b = _rt_color_unpack(_rt_palette[settings.outline_color])
-            end
 
             local to_insert = self:_glyph_new(
                 _concat(current_word), font, style,
@@ -460,7 +474,6 @@ do
                 settings.is_underlined,
                 settings.is_strikethrough,
                 settings.is_outlined,
-                outline_color_r, outline_color_g, outline_color_b,
                 settings.is_effect_shake,
                 settings.is_effect_wave,
                 settings.is_effect_rainbow
@@ -570,21 +583,6 @@ do
                     end
 
                     if found == nil then
-                        for color_tag in keys(_syntax.OUTLINE_COLOR_TAG_START) do
-                            found, _, new_color = _find(sequence, color_tag)
-                            if found ~= nil then
-                                if rt.Palette[new_color] == nil then
-                                    throw_parse_error("malformed color tag: color `" .. new_color .. "` unknown")
-                                end
-
-                                settings.outline_color = new_color
-                                settings.outline_color_active = true
-                                break
-                            end
-                        end
-                    end
-
-                    if found == nil then
                         throw_parse_error("unrecognized tag `" .. sequence .. "`")
                     end
                 end
@@ -601,7 +599,6 @@ do
         if settings.is_bold then throw_parse_error("reached end of text, but bold region is still open") end
         if settings.is_italic then throw_parse_error("reached end of text, but italic region is still open") end
         if settings.color_active then throw_parse_error("reached end of text, but colored region is still open") end
-        if settings.outline_color_active then throw_parse_error("reached end of text, but outline color region is still open") end
         if settings.is_effect_shake then throw_parse_error("reached end of text, but effect shake region is still open") end
         if settings.is_effect_wave then throw_parse_error("reached end of text, but effect wave region is still open") end
         if settings.is_effect_rainbow then throw_parse_error("reached end of text, but effect rainbow region is still open") end
@@ -773,7 +770,7 @@ do
             if self._outline_texture ~= nil then self._outline_texture:free() end
             self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
-            self.outline_shader:send("outline_color", { rt.color_unpack(rt.Palette.BLACK) })
+            self.outline_shader:send("outline_color", { self._outline_color_r, self._outline_color_g, self._outline_color_b, self._outline_color_a})
         end
 
         if self._swap_texture ~= nil then self._swap_texture:free() end
@@ -833,6 +830,7 @@ do
             love.graphics.clear(true, false, false)
             self.outline_shader:bind()
             self.outline_shader:send("texture_resolution", {self._outline_texture_width, self._outline_texture_height})
+            self.outline_shader:send("outline_color", { self._outline_color_r, self._outline_color_g, self._outline_color_b, self._outline_color_a})
             self._swap_texture:draw(0, 0)
             self.outline_shader:unbind()
             self._outline_texture:unbind()
@@ -841,7 +839,7 @@ do
         self._swap_texture:bind()
         love.graphics.clear(true, false, false)
         self.render_shader:bind()
-        for glyph in values(self._non_outlined_glyphs) do
+        for glyph in values(self._glyphs) do
             self.render_shader:send("n_visible_characters", glyph.n_visible_characters)
             self.render_shader:send("is_effect_rainbow", glyph.is_effect_rainbow)
             self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
