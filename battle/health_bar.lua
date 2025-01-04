@@ -1,12 +1,12 @@
 rt.settings.battle.health_bar = {
     hp_font = rt.settings.font.default_mono_small,
 
-    hp_color_100 = rt.Palette.MINT_2,
-    hp_color_75 = rt.Palette.GREEN_1,
+    hp_color_100 = rt.Palette.PURPLE_3,
+    hp_color_75 = rt.Palette.PURPLE_3,
     hp_color_50 = rt.Palette.YELLOW_2,
     hp_color_25 = rt.Palette.YELLOW_2,
-    hp_color_10 = rt.Palette.YELLOW_2,
-    hp_color_0 = rt.Palette.YELLOW_2,
+    hp_color_10 = rt.Palette.RED_2,
+    hp_color_0 = rt.Palette.RED_2,
 
     hp_background_color = rt.Palette.GREEN_3,
     scroll_speed = 200,
