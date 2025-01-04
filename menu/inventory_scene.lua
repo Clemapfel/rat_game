@@ -28,7 +28,7 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _shared_consumable_list = mn.ScrollableList(),
         _shared_template_list = mn.ScrollableList(),
 
-        _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info = mn.VerboseInfoPanel(self._state),
         _verbose_info_frame = rt.Frame(),
         _selection_graph = rt.SelectionGraph(),
         _grabbed_object_sprite = nil,

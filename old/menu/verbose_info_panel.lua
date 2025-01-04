@@ -4,8 +4,9 @@ rt.settings.menu.verbose_info_panel = {
 }
 
 --- @class mn.VerboseInfoPanel
-mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function()
+mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(state)
     return meta.new(mn.VerboseInfoPanel, {
+        _state = state,
         _items = {},
         _current_item_i = 0,
         _n_items = 0,

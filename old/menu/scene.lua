@@ -24,7 +24,7 @@ mn.Scene = meta.new_type("MenuScene", rt.Scene, function()
         _shared_consumable_list = mn.ScrollableList(),
         _shared_template_list = mn.ScrollableList(),
 
-        _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info = mn.VerboseInfoPanel(self._),
 
         _selection_graph = rt.SelectionGraph(),
         _grabbed_object_sprite = nil,

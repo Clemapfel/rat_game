@@ -31,8 +31,8 @@ end
 
 --- @brief
 function mn.VerboseInfoPanel.Item:create_from(object)
-    if meta.is_enum_value(object, rt.VerboseInfoObject) then
-        self:create_from_enum(object)
+    if object == rt.VerboseInfoObject.QUICKSAVE then
+        self:create_from_quicksave()
     elseif meta.isa(object, bt.Entity) then
         self:create_from_entity(object)
     elseif meta.isa(object, bt.EquipConfig) then
@@ -47,6 +47,8 @@ function mn.VerboseInfoPanel.Item:create_from(object)
         self:create_from_global_status(object)
     elseif meta.isa(object, mn.Template) then
         self:create_from_template(object)
+    elseif meta.is_enum_value(object, rt.VerboseInfoObject) then
+        self:create_from_enum(object)
     else
         rt.error("In mn.VerboseInfoPanel.Item.create_from: unrecognized type `" .. meta.typeof(object) .. "`")
     end
@@ -1199,6 +1201,55 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
     return self
 end
 
+--- @brief
+function mn.VerboseInfoPanel.Item:create_from_quicksave(enum)
+    self.object = enum
+    self._is_realized = false
+    local translation = rt.Translation.verbose_info.objects
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+        self.title_label = self._title(translation.quicksave_title)
+        self.description_label = self._description(translation.quicksave_description)
+        self.n_turns_prefix_label = self._prefix(translation.quicksave_n_turns_passed_prefix_label)
+        self.n_turns_colon_label = self._colon()
+        self.n_turns_value_label = self._number(self._state:get_quicksave_n_turns_elapsed())
+
+        self.content = {
+            self.title_label,
+            self.description_label,
+            self.n_turns_prefix_label,
+            self.n_turns_colon_label,
+            self.n_turns_value_label
+        }
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local current_y = y + 2 * ym
+        local current_x = x + xm
+        local w = width - 2 * xm
+
+        self.title_label:fit_into(current_x, current_y, w)
+        current_y = current_y + select(2, self.title_label:measure()) + m
+        self.n_turns_prefix_label:fit_into(current_x, current_y, w)
+        local prefix_w, prefix_h = self.n_turns_prefix_label:measure()
+        local colon_w, colon_h = self.n_turns_colon_label:measure()
+        self.n_turns_colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y, w)
+        local value_w, value_h = self.n_turns_value_label:measure()
+        self.n_turns_value_label:fit_into(x + w - value_w, current_y, w)
+        current_y = current_y + colon_h + m
+        self.description_label:fit_into(current_x, current_y, w)
+        current_y = current_y + select(2, self.description_label:measure()) + m
+
+        local final_height = current_y - y
+        self.frame:fit_into(x, y, width, final_height)
+        self.final_height = final_height
+    end
+
+    return self
+end
+
 --- @brief party info
 function mn.VerboseInfoPanel.Item:create_from_enum(which)
     self.object = nil
@@ -1249,7 +1300,8 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title(translation.visual_effects_title),
         [rt.VerboseInfoObject.MSAA] = format_title(translation.msaa_title),
         [rt.VerboseInfoObject.DEADZONE] = format_title(translation.deadzone_title),
-        [rt.VerboseInfoObject.KEYMAP] = format_title(translation.keymap_title)
+        [rt.VerboseInfoObject.KEYMAP] = format_title(translation.keymap_title),
+        [rt.VerboseInfoObject.BATTLE_LOG] = format_title(translation.battle_log_title)
     }
 
     local descriptions = {
@@ -1277,7 +1329,8 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = translation.visual_effects_description,
 
         [rt.VerboseInfoObject.DEADZONE] = translation.deadzone_description,
-        [rt.VerboseInfoObject.KEYMAP] = translation.keymap_description
+        [rt.VerboseInfoObject.KEYMAP] = translation.keymap_description,
+        [rt.VerboseInfoObject.BATTLE_LOG] = translation.battle_log_description
     }
 
     self.realize = function()
@@ -1437,7 +1490,6 @@ function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
         self.widget:update(delta)
     end
 end
-
 
 function mn.VerboseInfoPanel.Item:create_as_msaa_widget()
     self.object = nil

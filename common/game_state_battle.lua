@@ -53,6 +53,7 @@
 
     quicksave = {
         time = "",
+        turn_i = 0,
         state = {}
     }
 ]]--
@@ -1368,6 +1369,7 @@ do
         local state_copy = _deep_copy(self._state)
         local quicksave = {
             time = os.time(),
+            turn_i = self._state.turn_i,
             state = {}
         }
 

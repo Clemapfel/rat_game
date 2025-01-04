@@ -9,7 +9,8 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _env = nil,
 
         _background = rt.Background(),
-        _verbose_info = mn.VerboseInfoPanel(),
+        _verbose_info = mn.VerboseInfoPanel(state),
+        _verbose_info_width = 0,
 
         _text_box = rt.TextBox(),
         _priority_queue = bt.PriorityQueue(),
@@ -42,6 +43,7 @@ end)
 --- @override
 function bt.BattleScene:realize()
     if self:already_realized() then return end
+    self._verbose_info:set_frame_visible(false)
 
     for widget in range(
         self._background,
@@ -49,7 +51,8 @@ function bt.BattleScene:realize()
         self._priority_queue,
         self._global_status_bar,
         self._quicksave_indicator,
-        self._game_over_screen
+        self._game_over_screen,
+        self._verbose_info
     ) do
         widget:realize()
     end
@@ -220,11 +223,13 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         tile_size, tile_size
     )
 
-    local verbose_info_w = 0.5 * width
+    local verbose_info_h = height - 2 * outer_margin
+    local verbose_info_w = 1/3 * (width - 2 * outer_margin)
     self._verbose_info:fit_into(
-        x + width - outer_margin - verbose_info_w, y + outer_margin, queue_w,
-        height - 2 * outer_margin
+        x + width - outer_margin - verbose_info_w, y + outer_margin,
+        verbose_info_w, verbose_info_h
     )
+    self._verbose_info_width = verbose_info_w
 
     self:reformat_enemy_sprites()
     self:reformat_party_sprites()
@@ -550,6 +555,94 @@ function bt.BattleScene:set_background(background)
 end
 
 --- @brief
+function bt.BattleScene:_verbose_info_show_next_to(object, node_bounds)
+    meta.assert_aabb(node_bounds)
+    self._verbose_info:show(object)
+    local scene_bounds = self._bounds
+    local w = self._verbose_info_width
+    local h = select(2, self._verbose_info:measure())
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+    local left_w = math.abs(node_bounds.x - scene_bounds.x) - m
+    local right_w = math.abs((node_bounds.x + node_bounds.width) - (scene_bounds.x + scene_bounds.width)) - m
+    local top_h = math.abs(node_bounds.y - scene_bounds.y) - m
+    local bottom_h = math.abs((node_bounds.y + node_bounds.height) - (scene_bounds.y + scene_bounds.height)) - m
+
+    local final_x, final_y
+    local horizontally_placed = true
+    if  w < right_w then
+        final_x = node_bounds.x - m - w
+    elseif w < left_w then
+        final_x = node_bounds.x + node_bounds.width + m
+    else
+        final_x = node_bounds.x
+        horizontally_placed = false
+    end
+
+    if horizontally_placed then
+        final_y = node_bounds.y
+        local free_space = math.abs((scene_bounds.y + scene_bounds.height) - node_bounds.y) - outer_margin
+        if h > free_space then final_y = final_y - math.abs(h - free_space) end
+        final_x = math.min(math.max(final_x, scene_bounds.x + outer_margin), scene_bounds.x + scene_bounds.width - outer_margin)
+    else
+        if h < bottom_h then
+            final_y = node_bounds.y + node_bounds.height + m
+        else
+            final_y = node_bounds.y - m - h
+        end
+    end
+    self._verbose_info:fit_into(final_x, final_y, w)
+end
+
+--- @brief
+function bt.BattleScene:_verbose_info_show_next_to(object, node_bounds)
+    self._verbose_info:show(object)
+    local scene_bounds = self._bounds
+    local info_w = self._verbose_info_width
+    local info_h = select(2, self._verbose_info:measure())
+
+    local m = rt.settings.margin_unit
+    local outer_margin = 2 * m
+    local distance = function(a, b)
+        return math.abs(a - b)
+    end
+
+    local left_w = distance(node_bounds.x - m, scene_bounds.x + outer_margin)
+    local right_w = distance(node_bounds.x + node_bounds.width + m, scene_bounds.x + scene_bounds.width - outer_margin)
+    local top_h = distance(node_bounds.y - m, scene_bounds.y + outer_margin)
+    local bottom_h = distance(node_bounds.y + node_bounds.height + m, scene_bounds.y + scene_bounds.height - outer_margin)
+
+    local final_x, final_y = scene_bounds.x + outer_margin, scene_bounds.y + outer_margin
+    if info_w <= right_w then
+        final_x = node_bounds.x + node_bounds.width + m
+        final_y = node_bounds.y
+    elseif info_w <= left_w then
+        final_x = node_bounds.x - m - info_w
+        final_y = node_bounds.y
+    else
+        final_x = node_bounds.x + 0.5 * node_bounds.width - 0.5 * info_w
+        if info_h <= bottom_h then
+            final_y = node_bounds.y + node_bounds.height + m
+        elseif info_h <= top_h then
+            final_y = node_bounds.y - m - info_h
+        end
+    end
+
+    if final_y + info_h > scene_bounds.y + scene_bounds.height - outer_margin then
+        final_y = final_y - distance(final_y + info_h, scene_bounds.y + scene_bounds.height - outer_margin)
+    end
+
+    if final_y < scene_bounds.y + m then
+        final_y = final_y + distance(final_y, scene_bounds.y + m)
+    end
+
+    final_x = math.min(math.max(final_x, scene_bounds.x + outer_margin), scene_bounds.x + scene_bounds.width - outer_margin)
+    final_y = math.min(math.max(final_y, scene_bounds.y + outer_margin), scene_bounds.y + scene_bounds.height - outer_margin)
+
+    self._verbose_info:fit_into(final_x, final_y, info_w)
+end
+
+--- @brief
 function bt.BattleScene:_create_inspect_selection_graph()
     local graph = rt.SelectionGraph()
 
@@ -774,7 +867,7 @@ function bt.BattleScene:_create_inspect_selection_graph()
         for node in values(nodes) do
             assert(node.object ~= nil)
             node:signal_connect("enter", function(self)
-                scene._verbose_info:show(self.object)
+                scene:_verbose_info_show_next_to(self.object, self:get_bounds())
             end)
 
             graph:add(node)

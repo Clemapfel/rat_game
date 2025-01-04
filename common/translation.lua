@@ -201,9 +201,15 @@ rt.Translation = rt.initialize_translation({
             deadzone_description = "Minimum distance from center the joysticks have to be moved for an input to register",
 
             keymap_title = "Controls",
-            keymap_description = "Remap keyboard / controller controls"
-        }
+            keymap_description = "Remap keyboard / controller controls",
 
+            battle_log_title = "Battle Log",
+            battle_log_description = "View past battle messages",
+
+            quicksave_title = "Quick Save",
+            quicksave_description = "TODO",
+            quicksave_n_turns_passed_prefix_label = "# Turns"
+        }
     },
 
     -- mn.OptionsScene

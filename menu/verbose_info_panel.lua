@@ -36,8 +36,9 @@ rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
 })
 
 --- @class mn.VerboseInfoPanel
-mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function()
+mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(state)
     return meta.new(mn.VerboseInfoPanel, {
+        _state = state,
         _items = {},
         _current_item_i = 0,
         _n_items = 0,
@@ -64,7 +65,14 @@ function mn.VerboseInfoPanel:show(...)
     -- recursively list all items and their see_also
     local function process_item(object)
         local item = mn.VerboseInfoPanel.Item()
+        item._state = self._state
         item:create_from(object)
+        if self._frame_visible then
+            item.frame:set_corner_radius(0)
+        else
+            item.frame:set_corner_radius(rt.settings.frame.corner_radius)
+        end
+
         item:realize()
         table.insert(self._items, item)
         rt.savepoint_maybe()
@@ -247,13 +255,19 @@ end
 
 --- @brief
 function mn.VerboseInfoPanel:can_scroll_up()
-    local last_item = self._items[#self._items]
+    local n = sizeof(self._items)
+    if n < 2 then return false end
+
+    local last_item = self._items[n]
     if last_item == nil then return false end
     return last_item._bounds.y + select(2, last_item:measure()) + self._y_offset > self._bounds.y + self._bounds.height
 end
 
 --- @brief
 function mn.VerboseInfoPanel:scroll_down()
+    local n = sizeof(self._items)
+    if n < 2 then return false end
+
     self._indicator_down_duration = 0
     if self:can_scroll_down() then
         self._current_item_i = self._current_item_i + 1
@@ -363,4 +377,9 @@ end
 --- @brief
 function mn.VerboseInfoPanel:set_frame_visible(b)
     self._frame_visible = b
+end
+
+--- @brief
+function mn.VerboseInfoPanel:measure()
+    return self._bounds.width, self._total_height
 end
