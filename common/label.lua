@@ -128,21 +128,7 @@ function rt.Label:_glyph_new(
     return out
 end
 
---- @brief [internal]
-function rt.Label:_glyph_set_n_visible_characters(glyph, n)
-    glyph.n_visible_characters = n
-    if glyph.is_underlined or glyph.is_strikethrough then
-        local new_width = glyph.font:getWidth(string.sub(glyph.text, 1, glyph.n_visible_characters))
 
-        if glyph.is_underlined then
-            glyph.underline_bx = glyph.underline_ax + new_width
-        end
-
-        if glyph.is_strikethrough then
-            glyph.strikethrough_bx = glyph.strikethrough_bx + new_width
-        end
-    end
-end
 
 --- @override
 function rt.Label:draw()
@@ -649,6 +635,22 @@ do
     local _padding = rt.settings.label.outline_offset_padding
 
     --- @brief [internal]
+    function rt.Label:_glyph_set_n_visible_characters(glyph, n)
+        glyph.n_visible_characters = n
+        if glyph.is_underlined or glyph.is_strikethrough then
+            local new_width = glyph.font:getWidth(string.sub(glyph.text, 1, glyph.n_visible_characters))
+
+            if glyph.is_underlined then
+                glyph.underline_bx = glyph.x + _padding + new_width
+            end
+
+            if glyph.is_strikethrough then
+                glyph.strikethrough_bx = glyph.x + _padding + new_width
+            end
+        end
+    end
+
+    --- @brief [internal]
     function rt.Label:_apply_wrapping()
         local current_line_width = 0
         local max_line_w = 0
@@ -685,6 +687,13 @@ do
         local max_outline_row_w = NEGATIVE_INFINITY
 
         local last_glyph_was_mono = false
+
+        local last_glyph_was_underlined = false
+        local last_glyph_underline_bx = NEGATIVE_INFINITY
+
+        local last_glyph_was_strikethrough = false
+        local last_glyph_strikethrough_bx = NEGATIVE_INFINITY
+
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
                 if glyph_x ~= 0 then -- skip pre-trailing whitespaces
@@ -700,6 +709,8 @@ do
                 last_glyph_was_mono = false
             elseif glyph == _syntax.NEWLINE then
                 newline()
+                last_glyph_was_underlined = false
+                last_glyph_was_strikethrough = false
             elseif glyph == _syntax.BEAT then
                 -- noop
             else
@@ -722,14 +733,22 @@ do
                     local strikethrough_y = font:getBaseline() - 2
 
                     if glyph.is_underlined then
-                        glyph.underline_ax = glyph.x + _padding
+                        if last_glyph_was_underlined then
+                            glyph.underline_ax = last_glyph_underline_bx
+                        else
+                            glyph.underline_ax = glyph.x + _padding
+                        end
                         glyph.underline_ay = _ceil(glyph.y + underline_y)
                         glyph.underline_bx = glyph.x + glyph.width + _padding
                         glyph.underline_by = glyph.underline_ay
                     end
 
                     if glyph.is_strikethrough then
-                        glyph.strikethrough_ax = glyph.x + _padding
+                        if last_glyph_was_strikethrough then
+                            glyph.strikethrough_ax = last_glyph_underline_bx
+                        else
+                            glyph.strikethrough_ax = glyph.x + _padding
+                        end
                         glyph.strikethrough_ay = _ceil(glyph.y + strikethrough_y)
                         glyph.strikethrough_bx = glyph.x + glyph.width + _padding
                         glyph.strikethrough_by = glyph.strikethrough_ay
@@ -743,6 +762,19 @@ do
 
                 glyph_x = glyph_x + glyph.width
                 last_glyph_was_mono = glyph.is_mono
+                last_glyph_was_underlined = glyph.is_underlined
+                if glyph.is_underlined then
+                    last_glyph_underline_bx = glyph.underline_bx - _padding
+                else
+                    last_glyph_underline_bx = NEGATIVE_INFINITY
+                end
+
+                last_glyph_was_strikethrough = glyph.is_strikethrough
+                if glyph.is_strikethrough then
+                    last_glyph_strikethrough_bx = glyph.strikethrough_bx - _padding
+                else
+                    last_glyph_strikethrough_bx = NEGATIVE_INFINITY
+                end
             end
 
             min_x = math.min(min_x, glyph_x) -- consider non-glyphs for size

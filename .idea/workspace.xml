@@ -22,18 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="label now has global outline color">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented in-battle entity verbose info">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_outline.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_outline.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -651,23 +642,7 @@
       <workItem from="1735430498839" duration="20879000" />
       <workItem from="1735579525460" duration="20149000" />
       <workItem from="1735836818558" duration="17770000" />
-      <workItem from="1735920333401" duration="25085000" />
-    </task>
-    <task id="LOCAL-01334" summary="stashing inventory refactor">
-      <option name="closed" value="true" />
-      <created>1734637364899</created>
-      <option name="number" value="01334" />
-      <option name="presentableId" value="LOCAL-01334" />
-      <option name="project" value="LOCAL" />
-      <updated>1734637364899</updated>
-    </task>
-    <task id="LOCAL-01335" summary="refactored templates">
-      <option name="closed" value="true" />
-      <created>1734646010251</created>
-      <option name="number" value="01335" />
-      <option name="presentableId" value="LOCAL-01335" />
-      <option name="project" value="LOCAL" />
-      <updated>1734646010252</updated>
+      <workItem from="1735920333401" duration="26052000" />
     </task>
     <task id="LOCAL-01336" summary="refactored template inventory">
       <option name="closed" value="true" />
@@ -1045,7 +1020,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736019620580</updated>
     </task>
-    <option name="localTasksCounter" value="1383" />
+    <task id="LOCAL-01383" summary="fixed mono space width">
+      <option name="closed" value="true" />
+      <created>1736022180938</created>
+      <option name="number" value="01383" />
+      <option name="presentableId" value="LOCAL-01383" />
+      <option name="project" value="LOCAL" />
+      <updated>1736022180938</updated>
+    </task>
+    <task id="LOCAL-01384" summary="implemented in-battle entity verbose info">
+      <option name="closed" value="true" />
+      <created>1736022307890</created>
+      <option name="number" value="01384" />
+      <option name="presentableId" value="LOCAL-01384" />
+      <option name="project" value="LOCAL" />
+      <updated>1736022307890</updated>
+    </task>
+    <option name="localTasksCounter" value="1385" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1099,8 +1090,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing init compute" />
-    <MESSAGE value="initialization done" />
     <MESSAGE value="init complete" />
     <MESSAGE value="stashing before removing offset texture" />
     <MESSAGE value="stashing maybe" />
@@ -1124,7 +1113,9 @@
     <MESSAGE value="stashing selection graph, TODO: quicksave and textbox verbose info, add status to entity item" />
     <MESSAGE value="stashing before branching verbose info entity info for battle and non-battle" />
     <MESSAGE value="label now has global outline color" />
-    <option name="LAST_COMMIT_MESSAGE" value="label now has global outline color" />
+    <MESSAGE value="fixed mono space width" />
+    <MESSAGE value="implemented in-battle entity verbose info" />
+    <option name="LAST_COMMIT_MESSAGE" value="implemented in-battle entity verbose info" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
