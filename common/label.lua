@@ -78,7 +78,7 @@ end, {
 
 --- @brief
 function rt.Label:_glyph_new(
-    text, font, style,
+    text, font, style, is_mono,
     color_r, color_g, color_b,
     is_underlined,
     is_strikethrough,
@@ -92,6 +92,7 @@ function rt.Label:_glyph_new(
         text = text, -- necessary for beat weights
         glyph = love.graphics.newTextBatch(font_native, text),
         font = font_native,
+        is_mono = is_mono,
         is_underlined = is_underlined,
         is_strikethrough = is_strikethrough,
         is_outlined = is_outlined,
@@ -469,7 +470,7 @@ do
             end
 
             local to_insert = self:_glyph_new(
-                _concat(current_word), font, style,
+                _concat(current_word), font, style, settings.is_mono,
                 color_r, color_g, color_b,
                 settings.is_underlined,
                 settings.is_strikethrough,
@@ -612,21 +613,29 @@ do
         local n_rows = 1
 
         local space_w = self._font:measure_glyph(_syntax.SPACE)
-        local tab_w = self._font:measure_glyph(_syntax.TAB)
+        local mono_space_w = self._monospace_font:measure_glyph(_syntax.SPACE)
 
+        local tab_w = self._font:measure_glyph(_syntax.TAB)
+        local mono_tab_w = self._monospace_font:measure_glyph(_syntax.TAB)
+
+        local last_glyph_was_mono = false
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
-                width = width + space_w
+                width = width + ternary(last_glyph_was_mono, mono_space_w, space_w)
+                last_glyph_was_mono = false
             elseif glyph == _syntax.TAB then
-                width = width + tab_w
+                width = width + ternary(last_glyph_was_mono, mono_tab_w, tab_w)
+                last_glyph_was_mono = false
             elseif glyph == _syntax.NEWLINE then
                 max_width = _max(max_width, width)
                 width = 0
                 n_rows = n_rows + 1
+                last_glyph_was_mono = false
             elseif glyph == _syntax.BEAT then
                 -- noop
             else
                 width = width + glyph.width
+                last_glyph_was_mono = glyph.is_mono
             end
         end
 
@@ -645,8 +654,10 @@ do
         local max_line_w = 0
 
         local bold_italic = self._font:get_native(rt.FontStyle.BOLD_ITALIC)
-        local space_w = bold_italic:getWidth(_syntax.SPACE)
-        local tab_w = bold_italic:getWidth(_syntax.TAB)
+        local space_w = self._font:measure_glyph(_syntax.SPACE)
+        local mono_space_w = self._monospace_font:measure_glyph(_syntax.SPACE)
+        local tab_w = self._font:measure_glyph(_syntax.TAB)
+        local mono_tab_w = self._monospace_font:measure_glyph(_syntax.TAB)
         local line_height = bold_italic:getHeight()
 
         local glyph_x, glyph_y = 0, 0
@@ -673,17 +684,20 @@ do
         local min_outline_y, max_outline_y = POSITIVE_INFINITY, NEGATIVE_INFINITY
         local max_outline_row_w = NEGATIVE_INFINITY
 
+        local last_glyph_was_mono = false
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
                 if glyph_x ~= 0 then -- skip pre-trailing whitespaces
-                    glyph_x = glyph_x + space_w
+                    glyph_x = glyph_x + ternary(last_glyph_was_mono, mono_space_w, space_w)
                     row_w = row_w + space_w
                 end
                 if glyph_x > max_w then newline() end
+                last_glyph_was_mono = false
             elseif glyph == _syntax.TAB then
-                glyph_x = glyph_x + tab_w
+                glyph_x = glyph_x + ternary(last_glyph_was_mono, mono_tab_w, tab_w)
                 row_w = row_w + tab_w
                 if glyph_x > max_w then newline() end
+                last_glyph_was_mono = false
             elseif glyph == _syntax.NEWLINE then
                 newline()
             elseif glyph == _syntax.BEAT then
@@ -728,7 +742,11 @@ do
                 max_y = _max(max_y, glyph.y + glyph.height)
 
                 glyph_x = glyph_x + glyph.width
+                last_glyph_was_mono = glyph.is_mono
             end
+
+            min_x = math.min(min_x, glyph_x) -- consider non-glyphs for size
+            max_x = math.max(max_x, glyph_x)
 
             is_first_word = false
         end
@@ -839,7 +857,7 @@ do
         self._swap_texture:bind()
         love.graphics.clear(true, false, false)
         self.render_shader:bind()
-        for glyph in values(self._glyphs) do
+        for glyph in values(self._glyphs_only) do
             self.render_shader:send("n_visible_characters", glyph.n_visible_characters)
             self.render_shader:send("is_effect_rainbow", glyph.is_effect_rainbow)
             self.render_shader:send("is_effect_wave", glyph.is_effect_wave)
