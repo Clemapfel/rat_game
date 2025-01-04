@@ -34,7 +34,11 @@ function mn.VerboseInfoPanel.Item:create_from(object)
     if object == rt.VerboseInfoObject.QUICKSAVE then
         self:create_from_quicksave()
     elseif meta.isa(object, bt.Entity) then
-        self:create_from_entity(object)
+        if self._state:get_is_battle_active() then
+            self:create_from_battle_entity(object)
+        else
+            self:create_from_template_entity(object)
+        end
     elseif meta.isa(object, bt.EquipConfig) then
         self:create_from_equip(object)
     elseif meta.isa(object, bt.MoveConfig) then
@@ -404,9 +408,8 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         current_y = current_y + title_max_h
 
         do
-            local value_w, value_h = self.power_value_label:measure()
+            local value_w, value_h = self.power_value_label:measure() -- TODO: why does this measure wrongly?
             local colon_w, colon_h = self.power_colon_label:measure()
-
             self.power_prefix_label:fit_into(current_x, current_y)
             self.power_colon_label:fit_into(current_x + value_w + m, current_y)
             self.power_value_label:fit_into(current_x + value_w + m + colon_w + m, current_y)
@@ -426,7 +429,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
             local value_w, value_h = value_label:measure()
             prefix_label:fit_into(current_x, current_y)
             local colon_w = select(1, colon_label:measure())
-            colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y)
+            colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
             value_label:fit_into(current_x + w - value_w, current_y)
 
             current_y = current_y + value_h
@@ -631,7 +634,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
         local value_w, value_h = self.max_duration_value_label:measure()
         self.max_duration_value_label:fit_into(current_x + w - value_w, current_y)
         local colon_w, colon_h = self.max_duration_colon_label:measure()
-        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+        self.max_duration_colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
 
         current_y = current_y + math.max(value_h, colon_h) + m
 
@@ -653,7 +656,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
                 local colon_w, colon_h = offset_colon_label:measure()
                 local value_w, value_h = offset_value_label:measure()
                 offset_prefix_label:fit_into(current_x, current_y)
-                offset_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+                offset_colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
                 offset_value_label:fit_into(current_x + w - value_w, current_y)
                 current_y = current_y + value_h
 
@@ -668,7 +671,7 @@ function mn.VerboseInfoPanel.Item:create_from_status(status)
                 local colon_w, colon_h = factor_colon_label:measure()
                 local value_w, value_h = factor_value_label:measure()
                 factor_prefix_label:fit_into(current_x, current_y)
-                factor_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+                factor_colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
                 factor_value_label:fit_into(current_x + w - value_w, current_y)
                 current_y = current_y + value_h
 
@@ -766,7 +769,7 @@ function mn.VerboseInfoPanel.Item:create_from_global_status(status)
         local value_w, value_h = self.max_duration_value_label:measure()
         self.max_duration_value_label:fit_into(current_x + w - value_w, current_y)
         local colon_w, colon_h = self.max_duration_colon_label:measure()
-        self.max_duration_colon_label:fit_into(current_x + 0.5 * w - 0.5 * colon_w, current_y)
+        self.max_duration_colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
 
         current_y = current_y + math.max(value_h, colon_h) + m
 
@@ -972,16 +975,14 @@ function mn.VerboseInfoPanel.Item:create_from_template(template)
 end
 
 --- @brief party info
-function mn.VerboseInfoPanel.Item:create_from_entity(entity)
+function mn.VerboseInfoPanel.Item:create_from_template_entity(entity)
     self.object = entity
     self._is_realized = false
 
     local format_title = function(str)
         return "<b><u>" .. str .. "</u></b>"
     end
-
-    -- TODO: don't use global STATE
-
+    
     self.realize = function()
         self._is_realized = true
         self.frame:realize()
@@ -995,8 +996,8 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         }
 
         local translation = rt.Translation.verbose_info
-        local is_battle = STATE:get_is_battle_active()
-
+        local state = self._state
+        
         for stat_color_label in range(
             {"hp", "HP", translation.hp_label},
             {"attack", "ATTACK", translation.attack_label},
@@ -1005,16 +1006,9 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         ) do
             local stat, color, label = table.unpack(stat_color_label)
             local prefix_label = self._prefix(label, color)
-            prefix_label:realize()
             local colon = self._colon()
 
-            local value
-            if not is_battle then
-                value = STATE["active_template_get_" .. stat](STATE, entity)
-            else
-                value = STATE["entity_get_" .. stat](STATE, entity)
-            end
-
+            local value = state["active_template_get_" .. stat](state, entity)
             local value_label = self._number("<color=" .. color .. ">" .. tostring(value) .. "</color>")
 
             self[stat .. "_prefix_label"] = prefix_label
@@ -1039,12 +1033,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
         self.consumable_sprites = {}
         self.consumable_names = {}
 
-        local n_move_slots, move_slots
-        if not is_battle then
-            n_move_slots, move_slots = STATE:active_template_list_move_slots(entity)
-        else
-            n_move_slots, move_slots = STATE:entity_list_move_slots(entity)
-        end
+        local n_move_slots, move_slots = state:active_template_list_move_slots(entity)
 
         for i = 1, n_move_slots do
             if move_slots[i] ~= nil then
@@ -1057,12 +1046,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.move_names, self._description(translation.no_moves))
         end
 
-        local n_equip_slots, equip_slots
-        if not is_battle then
-            n_equip_slots, equip_slots = STATE:active_template_list_equip_slots(entity)
-        else
-            n_equip_slots, equip_slots = STATE:entity_list_equip_slots(entity)
-        end
+        local n_equip_slots, equip_slots = state:active_template_list_equip_slots(entity)
 
         for i = 1, n_equip_slots do
             if equip_slots[i] ~= nil then
@@ -1075,13 +1059,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
             table.insert(self.equip_names, self._description(translation.no_equips))
         end
 
-        local n_consumable_slots, consumable_slots
-        if not is_battle then
-            n_consumable_slots, consumable_slots = STATE:active_template_list_consumable_slots(entity)
-        else
-            n_consumable_slots, consumable_slots = STATE:entity_list_consumable_slots(entity)
-        end
-
+        local n_consumable_slots, consumable_slots = state:active_template_list_consumable_slots(entity)
         for i = 1, n_consumable_slots do
             if consumable_slots[i] ~= nil then
                 table.insert(self.consumable_sprites, rt.Sprite(consumable_slots[i]:get_sprite_id()))
@@ -1141,7 +1119,7 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
                 local value_w, value_h = value_label:measure()
                 prefix_label:fit_into(current_x, current_y)
                 local colon_w = select(1, colon_label:measure())
-                colon_label:fit_into(current_x + w / 2 - colon_w / 2, current_y)
+                colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
                 value_label:fit_into(current_x + w - value_w, current_y)
 
                 current_y = current_y + value_h
@@ -1196,6 +1174,137 @@ function mn.VerboseInfoPanel.Item:create_from_entity(entity)
 
     self.measure = function(self)
         return self._bounds.width, self.final_height
+    end
+
+    return self
+end
+
+--- @brief
+function mn.VerboseInfoPanel.Item:create_from_battle_entity(entity)
+    self.object = entity
+    self._is_realized = false
+    local state = self._state
+    local is_obfuscated = state:entity_get_is_obfuscated(entity)
+
+    self.realize = function()
+        self._is_realized = true
+        self.frame:realize()
+        local translation = rt.Translation.verbose_info
+
+        self.title_label = self._title(entity:get_name())
+        self.title_label:realize()
+        self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
+
+        self.state_prefix_label = self._prefix(translation.entity_state_label)
+        self.state_colon_label = self._colon()
+        local entity_state = state:entity_get_state(entity)
+        local state_value
+        local outline_color
+        if entity_state == bt.EntityState.ALIVE then
+            state_value = "<color=GREEN><o><b>" .. translation.entity_state_alive .. "</b></o></color>"
+            outline_color = rt.Palette.GREEN_6
+        elseif entity_state == bt.EntityState.ALIVE then
+            state_value = "<color=BLACK><o><b>" .. translation.entity_state_dead .. "</b></o></color>"
+            outline_color = rt.Palette.WHITE
+        elseif entity_state == bt.EntityState.ALIVE then
+            state_value = "<color=ORANGE_1><o><b>" .. translation.entity_state_knocked_out .. "</b></o></color>"
+            outline_color = rt.Palette.RED_5
+        else
+            assert(false, "unhandled entity state")
+        end
+
+        self.state_value_label = self._description(state_value)
+        self.state_value_label:set_outline_color(outline_color)
+
+        self.content = {
+            self.title_label,
+            self.state_prefix_label,
+            self.state_colon_label,
+            self.state_value_label
+        }
+
+        for stat_color_label in range(
+            {"hp", "HP", translation.hp_label},
+            {"attack", "ATTACK", translation.attack_label},
+            {"defense", "DEFENSE", translation.defense_label},
+            {"speed", "SPEED", translation.speed_label}
+        ) do
+            local stat, color, label = table.unpack(stat_color_label)
+            local prefix_label = self._prefix(label, color)
+            local colon = self._colon()
+
+            local value = "?"
+            if not is_obfuscated then
+                value = state["entity_get_" .. stat](state, entity)
+                if stat == "hp" then
+                    value = math.ceil(value / state:entity_get_hp_base(entity)) * 100
+                end
+            end
+
+            local postfix = ternary(stat == "hp", "1%", "1 ")
+            local value_label = self._number("<color=" .. color .. ">" .. postfix .. tostring(value) .. "</color>")
+            value_label:realize()
+
+            self[stat .. "_prefix_label"] = prefix_label
+            self[stat .. "_colon_label"] = colon
+            self[stat .. "_value_label"] = value_label
+
+            for label in range(prefix_label, colon, value_label) do
+                table.insert(self.content, label)
+            end
+        end
+
+        local flavor_text = entity:get_config():get_flavor_text()
+        if #flavor_text ~= 0 then
+            self.spacer = self._hrule()
+            self.flavor_text_label = self._flavor_text(flavor_text)
+
+            table.insert(self.content, self.spacer)
+            table.insert(self.content, self.flavor_text_label)
+        end
+    end
+
+    self.size_allocate = function(self, x, y, width, height)
+        local m, xm, ym = self._get_margin()
+        local current_x, current_y = x + xm, y + 2 * ym
+        local w = width - 2 * xm
+
+        self.title_label:fit_into(current_x, current_y, w)
+        local value_w, value_h = self.state_value_label:measure()
+        self.state_value_label:fit_into(current_x + w - value_w, current_y, w)
+        current_y = current_y + select(2, self.title_label:measure()) + m
+
+
+        for stat in range("hp", "attack", "defense", "speed") do
+            local prefix_label = self[stat .. "_prefix_label"]
+            local colon_label = self[stat .. "_colon_label"]
+            local value_label = self[stat .. "_value_label"]
+
+            if value_label ~= nil then
+                local value_w, value_h = value_label:measure()
+                prefix_label:fit_into(current_x, current_y)
+                local colon_w = select(1, colon_label:measure())
+                colon_label:fit_into(x + 0.5 * width - 0.5 * colon_w, current_y)
+                value_label:fit_into(current_x + w - value_w, current_y)
+
+                current_y = current_y + value_h
+            end
+        end
+
+        current_y = current_y + m
+
+        if self.spacer ~= nil then
+            self.spacer:fit_into(current_x, current_y, w, 0)
+            current_y = current_y + select(2, self.spacer:measure()) + m
+
+            self.flavor_text_label:fit_into(current_x, current_y, w)
+            current_y = current_y + select(2, self.flavor_text_label:measure()) + m
+            current_y = current_y + ym
+        end
+
+        local total_height = current_y - y
+        self.frame:fit_into(x, y, width, total_height)
+        self.final_height = total_height
     end
 
     return self

@@ -142,6 +142,11 @@ rt.Translation = rt.initialize_translation({
         entity_equip_heading = "Equips:",
         entity_consumable_heading = "Consumables:",
 
+        entity_state_label = "State",
+        entity_state_alive = "ALIVE",
+        entity_state_dead = "DEAD",
+        entity_state_knocked_out = "KO",
+
         objects = {
             hp_title = "Health (<color=HP>HP</color>)",
             hp_description = "When a characters HP reaches 0, they are knocked out. If damaged while knocked out, they die",

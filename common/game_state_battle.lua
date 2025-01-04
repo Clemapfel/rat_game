@@ -10,6 +10,7 @@
         state    -- bt.EntityState
         index    -- Unsigned
         priority -- Signed
+        is_obfuscated -- Boolean
 
         storage = {}, -- Table<String, Any>
         
@@ -82,6 +83,7 @@ function rt.GameState:create_entity(config)
         hp = -1,
         id = "",
         state = bt.EntityState.ALIVE,
+        is_obfuscated = config:get_is_enemy(),
         moves = {},
         equips = {},
         consumables = {},
@@ -306,6 +308,30 @@ function rt.GameState:entity_get_is_enemy(entity)
         return
     end
     return bt.EntityConfig(entry.id):get_is_enemy()
+end
+
+--- @brief
+function rt.GameState:entity_get_is_obfuscated(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_is_obfuscated: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    return entry.is_obfuscated
+end
+
+--- @brief
+function rt.GameState:entity_set_is_obfuscated(entity, b)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_boolean(b)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_set_is_obfuscated: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+    entry.is_obfuscated = b
 end
 
 --- @brief

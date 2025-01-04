@@ -55,7 +55,7 @@ rt.GameState = meta.new_type("GameState", function()
         entities = {},
         global_statuses = {},
         turn_i = 1,
-        is_battle_active = true,
+        is_battle_active = false,
         quicksave = nil,
 
         -- inventory

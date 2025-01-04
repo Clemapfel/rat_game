@@ -28,7 +28,7 @@ mn.InventoryScene = meta.new_type("InventoryScene", rt.Scene, function(state)
         _shared_consumable_list = mn.ScrollableList(),
         _shared_template_list = mn.ScrollableList(),
 
-        _verbose_info = mn.VerboseInfoPanel(self._state),
+        _verbose_info = mn.VerboseInfoPanel(state),
         _verbose_info_frame = rt.Frame(),
         _selection_graph = rt.SelectionGraph(),
         _grabbed_object_sprite = nil,
@@ -2060,6 +2060,7 @@ function mn.InventoryScene:make_active()
     if self._is_realized == false then self:realize() end
     self._is_active = true
     self._input_controller:signal_unblock_all()
+    self._state:set_is_battle_active(false)
 end
 
 --- @override

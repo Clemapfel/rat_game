@@ -44,7 +44,7 @@ vec4 effect(vec4 color, Image tex, vec2 texture_coords, vec2 screen_coords)
 
     vec4 outline = vec4(outline_color.rgb, sum.a);
     outline.a *= outline_intensity * outline_color.a;
-    return vec4((outline + self).rgb, outline.a);
+    return vec4(outline_color.rgb, outline.a);
 }
 
 #endif

@@ -7,6 +7,10 @@ STATE:initialize_debug_state()
 
 camera = STATE:get_camera()
 
+local label = rt.Label("? ")
+label:realize()
+label:fit_into(50, 50)
+
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -41,7 +45,7 @@ end)
 love.load = function()
     STATE:load()
 
-    STATE:set_current_scene(bt.BattleScene)
+    STATE:set_current_scene(bt.BattleScene)--mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
@@ -51,6 +55,7 @@ end
 
 love.draw = function()
     STATE:draw()
+    label:draw()
 end
 
 love.resize = function(new_width, new_height)

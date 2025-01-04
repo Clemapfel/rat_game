@@ -452,6 +452,7 @@ end
 --- @override
 function bt.BattleScene:make_active()
     self._input:signal_unblock_all()
+    self._state:set_is_battle_active(true)
 end
 
 --- @override

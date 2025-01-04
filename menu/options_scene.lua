@@ -747,6 +747,7 @@ function mn.OptionsScene:make_active()
     self._selection_graph:set_current_node(self._default_node)
     self:_update_snapshot()
     self._input_controller:signal_unblock_all()
+    self._state:set_is_battle_active(false)
 end
 
 --- @override
