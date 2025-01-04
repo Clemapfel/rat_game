@@ -166,7 +166,7 @@ rt.Translation = rt.initialize_translation({
             equips_title = "Equips \u{2B23}",
             equips_description = "Equip Description, TODO",
 
-            moves_title = "Moves  \u{25A0}",
+            moves_title = "Moves \u{25A0}",
             moves_description = "Move Description, TODO",
 
             templates_title = "Templates",

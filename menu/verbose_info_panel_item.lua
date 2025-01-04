@@ -1241,8 +1241,8 @@ function mn.VerboseInfoPanel.Item:create_from_battle_entity(entity)
                 end
             end
 
-            local postfix = ternary(stat == "hp", "1%", "1 ")
-            local value_label = self._number("<color=" .. color .. ">" .. postfix .. tostring(value) .. "</color>")
+            local postfix = ternary(stat == "hp", "%", " ") -- aligned bc of mono
+            local value_label = self._number("<color=" .. color .. ">" .. tostring(value) .. postfix .. "</color>")
             value_label:realize()
 
             self[stat .. "_prefix_label"] = prefix_label

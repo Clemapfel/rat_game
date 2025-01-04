@@ -694,6 +694,8 @@ do
         local last_glyph_was_strikethrough = false
         local last_glyph_strikethrough_bx = NEGATIVE_INFINITY
 
+        local last_r, last_g, last_b
+
         for glyph in values(self._glyphs) do
             if glyph == _syntax.SPACE then
                 if glyph_x ~= 0 then -- skip pre-trailing whitespaces
@@ -711,11 +713,15 @@ do
                 newline()
                 last_glyph_was_underlined = false
                 last_glyph_was_strikethrough = false
+                last_r, last_g, last_b = nil, nil, nil
             elseif glyph == _syntax.BEAT then
                 -- noop
             else
                 if glyph_x + glyph.width >= max_w then
                     newline()
+                    last_glyph_was_underlined = false
+                    last_glyph_was_strikethrough = false
+                    last_r, last_g, last_b = nil, nil, nil
                 end
 
                 glyph.x = glyph_x
@@ -727,13 +733,18 @@ do
                     max_outline_y = _max(max_outline_y, glyph.y + glyph.height)
                 end
 
+                local color_matches = true
+                if last_r ~= nil and last_g ~= nil and last_b ~= nil then
+                    color_matches = last_r == glyph.color_r and last_g == glyph.color_g and last_b == glyph.color_b
+                end
+
                 if glyph.is_underlined or glyph.is_strikethrough then
                     local font = glyph.font
                     local underline_y = font:getBaseline() + 0.5 * font:getHeight() + font:getDescent() + 2
                     local strikethrough_y = font:getBaseline() - 2
 
                     if glyph.is_underlined then
-                        if last_glyph_was_underlined then
+                        if last_glyph_was_underlined and color_matches then
                             glyph.underline_ax = last_glyph_underline_bx
                         else
                             glyph.underline_ax = glyph.x + _padding
@@ -744,7 +755,7 @@ do
                     end
 
                     if glyph.is_strikethrough then
-                        if last_glyph_was_strikethrough then
+                        if last_glyph_was_strikethrough and color_matches then
                             glyph.strikethrough_ax = last_glyph_underline_bx
                         else
                             glyph.strikethrough_ax = glyph.x + _padding
@@ -761,20 +772,24 @@ do
                 max_y = _max(max_y, glyph.y + glyph.height)
 
                 glyph_x = glyph_x + glyph.width
+
                 last_glyph_was_mono = glyph.is_mono
-                last_glyph_was_underlined = glyph.is_underlined
-                if glyph.is_underlined then
+                last_glyph_was_underlined = glyph.is_underlined and color_matches
+
+                if glyph.is_underlined and color_matches then
                     last_glyph_underline_bx = glyph.underline_bx - _padding
                 else
                     last_glyph_underline_bx = NEGATIVE_INFINITY
                 end
 
                 last_glyph_was_strikethrough = glyph.is_strikethrough
-                if glyph.is_strikethrough then
+                if glyph.is_strikethrough and color_matches then
                     last_glyph_strikethrough_bx = glyph.strikethrough_bx - _padding
                 else
                     last_glyph_strikethrough_bx = NEGATIVE_INFINITY
                 end
+
+                last_r, last_g, last_b = glyph.color_r, glyph.color_g, glyph.color_b
             end
 
             min_x = math.min(min_x, glyph_x) -- consider non-glyphs for size

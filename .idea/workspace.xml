@@ -22,9 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="implemented in-battle entity verbose info">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="linked underline and strikethrough between words">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -642,15 +643,7 @@
       <workItem from="1735430498839" duration="20879000" />
       <workItem from="1735579525460" duration="20149000" />
       <workItem from="1735836818558" duration="17770000" />
-      <workItem from="1735920333401" duration="26052000" />
-    </task>
-    <task id="LOCAL-01336" summary="refactored template inventory">
-      <option name="closed" value="true" />
-      <created>1734647186707</created>
-      <option name="number" value="01336" />
-      <option name="presentableId" value="LOCAL-01336" />
-      <option name="project" value="LOCAL" />
-      <updated>1734647186707</updated>
+      <workItem from="1735920333401" duration="26797000" />
     </task>
     <task id="LOCAL-01337" summary="added entity id to debug message">
       <option name="closed" value="true" />
@@ -1036,7 +1029,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736022307890</updated>
     </task>
-    <option name="localTasksCounter" value="1385" />
+    <task id="LOCAL-01385" summary="linked underline and strikethrough between words">
+      <option name="closed" value="true" />
+      <created>1736023188867</created>
+      <option name="number" value="01385" />
+      <option name="presentableId" value="LOCAL-01385" />
+      <option name="project" value="LOCAL" />
+      <updated>1736023188868</updated>
+    </task>
+    <option name="localTasksCounter" value="1386" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1090,7 +1091,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="init complete" />
     <MESSAGE value="stashing before removing offset texture" />
     <MESSAGE value="stashing maybe" />
     <MESSAGE value="spread working" />
@@ -1115,7 +1115,8 @@
     <MESSAGE value="label now has global outline color" />
     <MESSAGE value="fixed mono space width" />
     <MESSAGE value="implemented in-battle entity verbose info" />
-    <option name="LAST_COMMIT_MESSAGE" value="implemented in-battle entity verbose info" />
+    <MESSAGE value="linked underline and strikethrough between words" />
+    <option name="LAST_COMMIT_MESSAGE" value="linked underline and strikethrough between words" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
