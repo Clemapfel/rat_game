@@ -22,16 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="changed color to HP purple">
-      <change afterPath="$PROJECT_DIR$/smoke_jump_flood.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/smoke_main.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/smoke_render.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before float">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/render_texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_jump_flood.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_jump_flood.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_render.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -664,23 +659,7 @@
       <workItem from="1735836818558" duration="17770000" />
       <workItem from="1735920333401" duration="28260000" />
       <workItem from="1736026929737" duration="1195000" />
-      <workItem from="1736102224811" duration="9344000" />
-    </task>
-    <task id="LOCAL-01339" summary="fixed animation deadlock">
-      <option name="closed" value="true" />
-      <created>1734717756067</created>
-      <option name="number" value="01339" />
-      <option name="presentableId" value="LOCAL-01339" />
-      <option name="project" value="LOCAL" />
-      <updated>1734717756067</updated>
-    </task>
-    <task id="LOCAL-01340" summary="movement polish">
-      <option name="closed" value="true" />
-      <created>1734717764329</created>
-      <option name="number" value="01340" />
-      <option name="presentableId" value="LOCAL-01340" />
-      <option name="project" value="LOCAL" />
-      <updated>1734717764329</updated>
+      <workItem from="1736102224811" duration="18194000" />
     </task>
     <task id="LOCAL-01341" summary="fixed animation ordering on spawn">
       <option name="closed" value="true" />
@@ -1058,7 +1037,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736023992264</updated>
     </task>
-    <option name="localTasksCounter" value="1388" />
+    <task id="LOCAL-01388" summary="stashing before switching to rgba32f">
+      <option name="closed" value="true" />
+      <created>1736111637189</created>
+      <option name="number" value="01388" />
+      <option name="presentableId" value="LOCAL-01388" />
+      <option name="project" value="LOCAL" />
+      <updated>1736111637190</updated>
+    </task>
+    <task id="LOCAL-01389" summary="stashing before float">
+      <option name="closed" value="true" />
+      <created>1736112610894</created>
+      <option name="number" value="01389" />
+      <option name="presentableId" value="LOCAL-01389" />
+      <option name="project" value="LOCAL" />
+      <updated>1736112610894</updated>
+    </task>
+    <option name="localTasksCounter" value="1390" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1112,8 +1107,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="spread working" />
-    <MESSAGE value="added global status bar" />
     <MESSAGE value="reset working correclty now" />
     <MESSAGE value="added skipping individual messages" />
     <MESSAGE value="added get_selection_nodes" />
@@ -1137,7 +1130,9 @@
     <MESSAGE value="linked underline and strikethrough between words" />
     <MESSAGE value="verbose info now correctly displays battle entity info" />
     <MESSAGE value="changed color to HP purple" />
-    <option name="LAST_COMMIT_MESSAGE" value="changed color to HP purple" />
+    <MESSAGE value="stashing before switching to rgba32f" />
+    <MESSAGE value="stashing before float" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before float" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

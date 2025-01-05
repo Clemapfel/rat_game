@@ -8,19 +8,24 @@ local max_distance_buffer
 
 local jump_flood_shader, render_shader
 local a_or_b = true
+local elapsed = 0
 
 love.load = function()
-    sprite = rt.Sprite("why")
+    love.window.setMode(screen_w, screen_h, {
+        vsync = 0
+    })
+
+    sprite = rt.Sprite("why_opaque")
     sprite:realize()
     local sprite_w, sprite_h = sprite:measure()
-    sprite_w = sprite_w * 2
-    sprite_h = sprite_h * 2
+    sprite_w = sprite_w * 1
+    sprite_h = sprite_h * 1
     sprite:fit_into(0, 0, sprite_w, sprite_h)
 
-    texture_w, texture_h = 800 + 2 * padding, 600 + 2 * padding
+    texture_w, texture_h = screen_w + 2 * padding, screen_h + 2 * padding
     sprite_texture = rt.RenderTexture(texture_w, texture_h, 0, rt.TextureFormat.RGBA8, true)
-    sdf_texture_a = rt.RenderTexture(texture_w, texture_h, 0, rt.TextureFormat.RG32UI, true)
-    sdf_texture_b = rt.RenderTexture(texture_w, texture_h, 0, rt.TextureFormat.RG32UI, true)
+    sdf_texture_a = rt.RenderTexture(texture_w, texture_h, 0, rt.TextureFormat.RGBA32F, true)
+    sdf_texture_b = rt.RenderTexture(texture_w, texture_h, 0, rt.TextureFormat.RGBA32F, true)
 
     jump_flood_shader = rt.ComputeShader("smoke_jump_flood.glsl")
     render_shader = rt.Shader("smoke_render.glsl")
@@ -45,9 +50,16 @@ love.load = function()
     jump_flood_shader:send("output_texture", sdf_texture_b._native)
     jump_flood_shader:dispatch(texture_w, texture_h)
 
+    jump = math.max(texture_w, texture_h) / 2
     jump_flood_shader:send("mode", 1) -- compute sdf
-    local jump_distance = ffi.new("int32_t", 128)
-    while (jump_distance > 0) do
+end
+
+local allow_update = false
+love.update = function(delta)
+    if not love.keyboard.isDown("c") then return end
+    elapsed = elapsed + delta
+
+    if allow_update and jump > 0.5 then
         if a_or_b then
             jump_flood_shader:send("input_texture", sdf_texture_a._native)
             jump_flood_shader:send("output_texture", sdf_texture_b._native)
@@ -56,29 +68,28 @@ love.load = function()
             jump_flood_shader:send("output_texture", sdf_texture_a._native)
         end
 
-        jump_flood_shader:send("jump_distance", tonumber(jump_distance))
+        jump_flood_shader:send("jump_distance", jump)
         jump_flood_shader:dispatch(texture_w, texture_h)
-        jump_distance = jump_distance / 2
 
         a_or_b = not a_or_b
+        jump = jump / 2
+        allow_update = false
     end
-end
-
-love.update = function(delta)
-
 end
 
 love.draw = function()
-    sprite_texture:draw()
-
-    if a_or_b then
-        render_shader:send("image", sdf_texture_b._native)
-    else
-        render_shader:send("image", sdf_texture_a._native)
-    end
+    --sprite_texture:draw()
 
     render_shader:bind()
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+    render_shader:send("elapsed", elapsed)
+    render_shader:send("init_texture", sprite_texture._native)
+    if a_or_b then
+        render_shader:send("sdf_texture", sdf_texture_a._native)
+        sdf_texture_b:draw()
+    else
+        render_shader:send("sdf_texture", sdf_texture_b._native)
+        sdf_texture_a:draw()
+    end
     render_shader:unbind()
 
     do
@@ -90,5 +101,5 @@ love.draw = function()
 end
 
 love.keypressed = function(which)
-    if which == "b" then love.load() end
+    if which == "b" then love.load() elseif which == "space" then allow_update = true end
 end
