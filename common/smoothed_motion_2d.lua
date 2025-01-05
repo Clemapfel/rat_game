@@ -34,7 +34,8 @@ end
 function rt.SmoothedMotion2D:update(delta)
     local distance_x = self._target_position_x - self._current_position_x
     local distance_y = self._target_position_y - self._current_position_y
-
+    if rt.magnitude(distance_x, distance_y) <= 1 then return end
+    
     local step_x = distance_x * self._speed * delta * delta
     local step_y = distance_y * self._speed * delta * delta
 

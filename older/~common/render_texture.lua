@@ -9,7 +9,8 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
     local out = meta.new(rt.RenderTexture, {
         _native = love.graphics.newCanvas(width, height, {
             msaa = msaa,
-            format = format
+            format = format,
+            computewrite = true
         }),
         _before = {}, -- love.Canvas
     })
