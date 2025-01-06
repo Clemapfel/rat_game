@@ -339,23 +339,18 @@ function bt.PriorityQueue:_element_update_state(element)
 end
 
 --- @override
-function bt.PriorityQueue:set_selection(selected_entities, should_unselect_others)
-    local is_selected = {}
-    for entity in values(selected_entities) do is_selected[entity] = true end
-
-    for entity, item in pairs(self._entity_to_item) do
-        local before = item.selection_state
-        if is_selected[entity] then
-            item.selection_state = rt.SelectionState.ACTIVE
-        elseif should_unselect_others then
-            item.selection_state = rt.SelectionState.UNSELECTED
-        else
-            item.selection_state = rt.SelectionState.INACTIVE
-        end
-        if item.selection_state ~= before then
-            self:_element_update_state(item)
-        end
+function bt.PriorityQueue:set_selection_state(entity, state)
+    local item = self._entity_to_item[entity]
+    for self_entity, item in pairs(self._entity_to_item) do
+        dbg(self_entity:get_id(), entity:get_id(), self_entity:get_multiplicity(), entity:get_multiplicity())
     end
+    if item == nil then
+        rt.warning("In bt.PriorityQueue:set_selection_state: entity `" .. entity:get_id() .. "` is not present in queue")
+        return
+    end
+
+    item.selection_state = state
+    self:_element_update_state(item)
 end
 
 --- @override

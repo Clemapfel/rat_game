@@ -400,7 +400,7 @@ function bt.BattleScene:draw()
     self._verbose_info:draw()
 
     if self._selection_graph ~= nil then
-        self._selection_graph:draw()
+        --self._selection_graph:draw()
     end
 end
 
@@ -914,24 +914,48 @@ function bt.BattleScene:_create_inspect_selection_graph()
         end
     end)
 
+    do
+        local on_entity_node_enter = function(self)
+            scene:_set_entity_selection_state(self.object, rt.SelectionState.ACTIVE)
+        end
 
-    for nodes in range(
-        enemy_sprite_nodes,
-        enemy_status_consumable_nodes,
-        party_sprite_nodes,
-        party_status_consumable_nodes,
-        priority_queue_nodes,
-        global_status_bar_nodes,
-        quicksave_nodes,
-        textbox_nodes
-    ) do
-        for node in values(nodes) do
-            assert(node.object ~= nil)
-            node:signal_connect("enter", function(self)
-                scene:_verbose_info_show_next_to(self.object, self:get_bounds())
-            end)
+        local on_entity_node_exit = function(self)
+            scene:_set_entity_selection_state(self.object, rt.SelectionState.INACTIVE)
+        end
 
-            graph:add(node)
+        for nodes in range(
+            enemy_sprite_nodes,
+            party_sprite_nodes,
+            priority_queue_nodes
+        ) do
+            for entity_node in values(nodes) do
+                entity_node:signal_connect("enter", on_entity_node_enter)
+                entity_node:signal_connect("exit", on_entity_node_exit)
+            end
+        end
+    end
+
+    do
+        local on_enter_show_verbose_info = function(self)
+            scene:_verbose_info_show_next_to(self.object, self:get_bounds())
+        end
+
+        for nodes in range(
+            enemy_sprite_nodes,
+            enemy_status_consumable_nodes,
+            party_sprite_nodes,
+            party_status_consumable_nodes,
+            priority_queue_nodes,
+            global_status_bar_nodes,
+            quicksave_nodes,
+            textbox_nodes
+        ) do
+            for node in values(nodes) do
+                assert(node.object ~= nil)
+                node:signal_connect("enter", on_enter_show_verbose_info)
+
+                graph:add(node)
+            end
         end
     end
 
@@ -944,15 +968,19 @@ function bt.BattleScene:_set_textbox_scroll_mode_active(b)
     if b then
         self._text_box:set_history_mode_active(true)
         self._text_box:set_reveal_indicator_visible(false)
+        self._text_box:set_selection_state(rt.SelectionState.ACTIVE)
     else
         self._text_box:set_history_mode_active(false)
         self._text_box:set_reveal_indicator_visible(true)
+        self._text_box:set_selection_state(rt.SelectionState.INACTIVE)
     end
 end
 
 --- @brief
-function bt.BattleScene:_set_entity_selected(entity, state)
-    -- TODO
+function bt.BattleScene:_set_entity_selection_state(entity, state)
+    local sprite = self:get_sprite(entity)
+    sprite:set_selection_state(state)
+    self._priority_queue:set_selection_state(entity, state)
 end
 
 --- @brief

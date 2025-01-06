@@ -563,3 +563,8 @@ end
 function rt.TextBox:get_bounds()
     return rt.AABB(self._bounds.x, self._bounds.y, self:measure())
 end
+
+--- @brief
+function rt.TextBox:set_selection_state(state)
+    self._frame:set_selection_state(state)
+end

@@ -16,6 +16,7 @@ function bt.EnemySprite:realize()
 
     self._frame:realize()
     self._frame:set_base_color(rt.RGBA(0, 0, 0, 0))
+    self._frame:set_selection_state(rt.SelectionState.ACTIVE)
 
     if self._suffix ~= nil then
         self._id_offset_label = rt.Label("<b><o>" .. self._suffix .. "</o></b>")

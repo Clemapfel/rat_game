@@ -1,3 +1,8 @@
+local _entity_comparison_function = function(a, b)
+    dbg("called")
+    return a:get_id() == b:get_id()
+end
+
 --- @class bt.Entity
 bt.Entity = meta.new_type("BattleEntity", function(config, multiplicity)
     meta.assert_isa(config, bt.EntityConfig)
@@ -6,9 +11,8 @@ bt.Entity = meta.new_type("BattleEntity", function(config, multiplicity)
         _config = config,
         _multiplicity = multiplicity
     })
-    getmetatable(out).__eq = function(a, b)
-        return a._config == b._config and a._multiplicity == b._multiplicity
-    end
+    getmetatable(out).__eq = _entity_comparison_function
+    println(getmetatable(out))
     return out
 end)
 

@@ -50,7 +50,7 @@ function rt.Frame:_update_draw()
 
     self.draw = function(self)
         love.graphics.setLineWidth(thickness + 2)
-        love.graphics.setColor(stencil_r, stencil_g, stencil_b, opacity)
+        love.graphics.setColor(stencil_r, stencil_g, stencil_b, opacity * stencil_a)
         love.graphics.rectangle(
             "fill",
             x, y, w, h,
