@@ -1,6 +1,5 @@
 --- @class rt.InterpolationFunction
 rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
-
     CONSTANT_ZERO = function(x)
         return 0
     end,
@@ -241,8 +240,6 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 --- @param start_value
 --- @param end_value
 --- @param interpolation_function
---- @param should_loop
---- @signal finish (self) -> nil
 rt.TimedAnimation = meta.new_type("TimedAnimation", function(duration, start_value, end_value, interpolation_function, ...)
     meta.assert_number(duration)
     if start_value == nil then start_value = 0 end

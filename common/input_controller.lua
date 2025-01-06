@@ -77,12 +77,12 @@ meta.add_signals(rt.InputController,
 )
 
 --- @brief
-function rt.InputController:is_down(key)
+function rt.InputController:get_is_down(key)
     return rt.InputControllerState.button_state[key] == true
 end
 
 --- @brief
-function rt.InputController:is_up(key)
+function rt.InputController:get_is_up(key)
     return rt.InputControllerState.button_state[key] == false
 end
 

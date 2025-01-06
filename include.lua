@@ -211,6 +211,7 @@ require "common.smoothed_motion_1d"
 
 -- menu
 require "menu.template"
+require "menu.scroll_indicator"
 require "menu.verbose_info_panel"
 require "menu.verbose_info_panel_item"
 require "menu.tab_bar"

@@ -266,6 +266,7 @@ do
 
     local _signal_is_blocked_index = 1
     local _signal_callbacks_index = 2
+    local _signal_callbacks_in_order_index = 3
     local _handler_hash = 1
 
     --- @brief
@@ -276,7 +277,7 @@ do
 
         local component = self[_metatable_index][_signal_component_index][name]
         if component[_signal_is_blocked_index] ~= true then
-            for callback in values(component[_signal_callbacks_index]) do
+            for i, callback in ipairs(component[_signal_callbacks_in_order_index]) do
                 --xpcall(callback, error_handler, self, ...)
                 callback(self, ...)
             end
@@ -293,6 +294,8 @@ do
 
         local handler_index = _handler_hash
         component[_signal_callbacks_index][handler_index] = callback
+        table.insert(component[_signal_callbacks_in_order_index], callback)
+
         _handler_hash = _handler_hash + 1
         return handler_index
     end
@@ -420,6 +423,7 @@ do
             signal_component[name] = {
                 [_signal_is_blocked_index] = false,
                 [_signal_callbacks_index] = {},
+                [_signal_callbacks_in_order_index] = meta.make_weak({})
             }
         end
 

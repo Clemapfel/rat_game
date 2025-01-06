@@ -15,14 +15,14 @@ const float INFINITY = 3.402823466e+38 - 1;
 const float threshold = 0.2;
 
 const ivec2 directions[8] = ivec2[](
-ivec2(-1, -1),
-ivec2( 0, -1),
-ivec2( 1, -1),
-ivec2(-1,  0),
-ivec2( 1,  0),
-ivec2(-1,  1),
-ivec2( 0,  1),
-ivec2( 1,  1)
+    ivec2(-1, -1),
+    ivec2( 0, -1),
+    ivec2( 1, -1),
+    ivec2(-1,  0),
+    ivec2( 1,  0),
+    ivec2(-1,  1),
+    ivec2( 0,  1),
+    ivec2( 1,  1)
 );
 
 bool is_wall(vec4 data) {
@@ -55,15 +55,15 @@ void computemain() {
         for (int i = 0; i < 8; ++i) {
             ivec2 neighbor_position = position + directions[i] * jump_distance;
             if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
-            continue;
+                continue;
 
             vec4 neighbor = imageLoad(input_texture, neighbor_position);
-            if (neighbor.x < 0 || neighbor.y < 0) continue; // unitialized
+            if (neighbor.x < 0 || neighbor.y < 0)
+                continue;
 
             float dist = distance(vec2(position), vec2(neighbor.xy));
-            if (dist < best.z) {
+            if (dist < best.z)
                 best = vec4(neighbor.xy, dist, 0);
-            }
         }
 
         imageStore(output_texture, position, best);

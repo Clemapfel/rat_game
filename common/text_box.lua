@@ -1,11 +1,12 @@
 rt.settings.text_box = {
     max_n_lines = 10,
     letters_per_second = 60,
-    reveal_duration = 0.5, -- seconds
-    scroll_speed = 500, -- px / s, frame reveal/hide movement
+    reveal_duration = 0.3, -- seconds, frame reveal / hide
+    scroll_speed = 500, -- px / s, text scroll
     expand_speed = 500, -- px / s, frame resize
     label_hide_delay = 0.5, -- seconds, hold after line is done revealing but before scroll up
     all_entries_done_delay = 1, -- hold, waiting for new append to continue "combo"
+    reveal_indicator_bounce_per_second = 0.75
 }
 
 local _HIDDEN = 1
@@ -23,6 +24,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _position_y = 0,
         _position_current_value = _HIDDEN,
         _position_target_value = _HIDDEN,
+        _position_target_override_value = nil,
 
         _current_text_y_offset = 0,
         _target_text_y_offset = 0,
@@ -54,7 +56,16 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
 
         _current_frame_h = 0,
         _target_frame_h = 0,
-        _on_frame_minimized = nil -- Function
+        _on_frame_minimized = nil, -- Function
+
+        _reveal_indicator_visible = false,
+        _reveal_indicator = mn.ScrollIndicator(),
+        _reveal_indicator_animation = rt.TimedAnimation(
+            1 / rt.settings.text_box.reveal_indicator_bounce_per_second,
+            0, 1, rt.InterpolationFunctions.PARABOLA_BANDPASS
+        ),
+        _reveal_indicator_current_offset = 0,
+        _reveal_indicator_max_y_offset = 0
     })
 end)
 
@@ -69,6 +80,8 @@ function rt.TextBox:realize()
 
     self._frame:realize()
     self._scrollbar:realize()
+    self._reveal_indicator_animation:set_should_loop(true)
+
     self:_update_target_frame_h()
 end
 
@@ -134,6 +147,10 @@ function rt.TextBox:size_allocate(x, y, width, height)
     end
 
     self._frame_h_scrollbar_visible_threshold = 2 * self._indicator_r + 2 * m
+
+    local up_x, up_y = x + 0.5 * width, 0
+    self._reveal_indicator:reformat(up_x, up_y)
+    self._reveal_indicator_max_y_offset = 2 * m
 end
 
 --- @brief
@@ -199,9 +216,21 @@ end
 
 --- @brief
 function rt.TextBox:update(delta)
+    if self._reveal_indicator_visible then
+        self._reveal_indicator_animation:update(delta)
+        self._reveal_indicator_current_offset = self._reveal_indicator_max_y_offset
+            * self._reveal_indicator_animation:get_value()
+            + math.max(self._current_frame_h + self._position_y + self._bounds.y, 0)
+            + 0.5 * rt.settings.margin_unit
+    end
+
     do -- update frame position
         local scrolling_speed = 1 / rt.settings.text_box.reveal_duration
         local current, target = self._position_current_value, self._position_target_value
+        if self._position_target_override_value ~= nil then
+            target = self._position_target_override_value
+        end
+
         local distance = math.abs(current - target) * 2
         if current < target then
             current = current + delta * scrolling_speed
@@ -373,6 +402,13 @@ function rt.TextBox:draw()
     end
 
     love.graphics.pop()
+
+    if self._reveal_indicator_visible then
+        love.graphics.push()
+        love.graphics.translate(0, self._reveal_indicator_current_offset)
+        self._reveal_indicator:draw()
+        love.graphics.pop()
+    end
 end
 
 --- @brief
@@ -505,4 +541,25 @@ end
 --- @brief
 function rt.TextBox:can_scroll_down()
     return self._first_visible_entry < self._n_entries - (self._max_n_lines - 1) + 1
+end
+
+--- @brief
+function rt.TextBox:set_reveal_indicator_visible(b)
+    self._reveal_indicator_visible = b
+end
+
+--- @brief
+function rt.TextBox:get_reveal_indicator_visible()
+    return self._reveal_indicator_visible
+end
+
+--- @override
+function rt.TextBox:measure()
+    local frame_bounds = self._frame:get_bounds()
+    return frame_bounds.width, frame_bounds.height
+end
+
+--- @override
+function rt.TextBox:get_bounds()
+    return rt.AABB(self._bounds.x, self._bounds.y, self:measure())
 end

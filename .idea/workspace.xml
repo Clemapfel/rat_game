@@ -22,11 +22,22 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before float">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="jfa working">
+      <change afterPath="$PROJECT_DIR$/menu/scroll_indicator.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/input_controller.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/inventory_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/options_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/options_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/smoke_jump_flood.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_jump_flood.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/smoke_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/smoke_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/smoke_render.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -163,7 +174,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_smoke">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -659,15 +670,7 @@
       <workItem from="1735836818558" duration="17770000" />
       <workItem from="1735920333401" duration="28260000" />
       <workItem from="1736026929737" duration="1195000" />
-      <workItem from="1736102224811" duration="18194000" />
-    </task>
-    <task id="LOCAL-01341" summary="fixed animation ordering on spawn">
-      <option name="closed" value="true" />
-      <created>1734722288716</created>
-      <option name="number" value="01341" />
-      <option name="presentableId" value="LOCAL-01341" />
-      <option name="project" value="LOCAL" />
-      <updated>1734722288716</updated>
+      <workItem from="1736102224811" duration="26084000" />
     </task>
     <task id="LOCAL-01342" summary="fixed ordered box scale animation">
       <option name="closed" value="true" />
@@ -1053,7 +1056,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736112610894</updated>
     </task>
-    <option name="localTasksCounter" value="1390" />
+    <task id="LOCAL-01390" summary="jfa working">
+      <option name="closed" value="true" />
+      <created>1736120551951</created>
+      <option name="number" value="01390" />
+      <option name="presentableId" value="LOCAL-01390" />
+      <option name="project" value="LOCAL" />
+      <updated>1736120551951</updated>
+    </task>
+    <option name="localTasksCounter" value="1391" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1107,7 +1118,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="reset working correclty now" />
     <MESSAGE value="added skipping individual messages" />
     <MESSAGE value="added get_selection_nodes" />
     <MESSAGE value="stashing new lattice" />
@@ -1132,7 +1142,8 @@
     <MESSAGE value="changed color to HP purple" />
     <MESSAGE value="stashing before switching to rgba32f" />
     <MESSAGE value="stashing before float" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before float" />
+    <MESSAGE value="jfa working" />
+    <option name="LAST_COMMIT_MESSAGE" value="jfa working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1172,11 +1183,6 @@
           <url>file://$PROJECT_DIR$/common/scrollbar.lua</url>
           <line>47</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/battle/quicksave_indicator.lua</url>
-          <line>29</line>
-          <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

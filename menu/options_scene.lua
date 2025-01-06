@@ -8,7 +8,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
     local fields = {
         _state = state,
         _items = {},
-        _verbose_info = mn.VerboseInfoPanel(self._state),
+        _verbose_info = mn.VerboseInfoPanel(state),
         _selection_graph = rt.SelectionGraph(),
         _default_node = nil, -- rt.SelectionGraphNode
         _input_controller = rt.InputController(),
@@ -704,9 +704,9 @@ function mn.OptionsScene:update(delta)
             self._scale_tick_elapsed = self._scale_tick_elapsed + delta
             while self._scale_tick_elapsed > self._scale_tick_duration do
                 self._scale_tick_elapsed = self._scale_tick_elapsed - self._scale_tick_duration
-                if self._scale_tick_direction == true and self._input_controller:is_down(rt.InputButton.RIGHT) then
+                if self._scale_tick_direction == true and self._input_controller:get_is_down(rt.InputButton.RIGHT) then
                     self._selected_scale:move_right()
-                elseif self._input_controller:is_down(rt.InputButton.LEFT) then
+                elseif self._input_controller:get_is_down(rt.InputButton.LEFT) then
                     self._selected_scale:move_left()
                 end
             end
@@ -714,13 +714,13 @@ function mn.OptionsScene:update(delta)
     end
 
     local speed = rt.settings.menu.inventory_scene.verbose_info_scroll_speed
-    if self._input_controller:is_down(rt.InputButton.L) then
+    if self._input_controller:get_is_down(rt.InputButton.L) then
         if self._verbose_info:can_scroll_down() then
             self._verbose_info:advance_scroll(delta * speed)
         end
     end
 
-    if self._input_controller:is_down(rt.InputButton.R) then
+    if self._input_controller:get_is_down(rt.InputButton.R) then
         if self._verbose_info:can_scroll_up() then
             self._verbose_info:advance_scroll(delta * speed * -1)
         end

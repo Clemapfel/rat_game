@@ -46,11 +46,9 @@ mn.VerboseInfoPanel = meta.new_type("MenuVerboseInfoPanel", rt.Widget, function(
         _total_height = 0,
         _frame = rt.Frame(),
         _frame_visible = true,
-        _scroll_up_indicator = rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
-        _scroll_up_indicator_outline =  rt.Polygon(0, 0, 1, 1, 0.5, 0.5),
+        _scroll_up_indicator = mn.ScrollIndicator(),
         _scroll_up_indicator_visible = true,
-        _scroll_down_indicator =  rt.Polygon(0, 0, 1, 1, 0.5, 0.5), -- rt.Polygon
-        _scroll_down_indicator_outline = rt.Polygon(0, 0, 1, 1, 0.5, 0.5), -- rt.Polygon
+        _scroll_down_indicator = mn.ScrollIndicator(),
         _scroll_down_indicator_visible = true,
         _indicator_up_duration = POSITIVE_INFINITY,
         _indicator_down_duration = POSITIVE_INFINITY,
@@ -104,25 +102,14 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     self._frame:fit_into(x, y, width, height)
 
     local m = rt.settings.margin_unit
-    local angle = 120
+    local angle = (2 * math.pi) / 3
     local arrow_width = 6 * m
     local thickness = m
     local up_x, up_y = x + 0.5 * width, y - thickness
-    self._scroll_down_indicator = rt.Polygon(self:_generate_hat_arrow(up_x, up_y, arrow_width, thickness, angle))
-    self._scroll_down_indicator_outline = rt.LineStrip(self:_generate_hat_arrow_outline(up_x, up_y, arrow_width, thickness, angle))
+    self._scroll_up_indicator:reformat(up_x, up_y, angle, arrow_width, thickness)
 
     local down_x, down_y = x + 0.5 * width, y + height + thickness
-    self._scroll_up_indicator = rt.Polygon(self:_generate_hat_arrow(down_x, down_y, arrow_width, thickness, 360 - angle))
-    self._scroll_up_indicator_outline = rt.LineStrip(self:_generate_hat_arrow_outline(down_x, down_y, arrow_width, thickness, 360 - angle))
-
-    for body in range(self._scroll_up_indicator, self._scroll_down_indicator) do
-        body:set_color(rt.settings.menu.verbose_info_panel.indicator_base_color)
-    end
-
-    for line in range(self._scroll_down_indicator_outline, self._scroll_up_indicator_outline) do
-        line:set_line_width(1)
-        line:set_color(rt.Palette.BASE_OUTLINE)
-    end
+    self._scroll_down_indicator:reformat(down_x, down_y, (2 * math.pi) - angle, arrow_width, thickness)
 
     local current_x, current_y = x, y
     local total_height = 0
@@ -178,12 +165,10 @@ function mn.VerboseInfoPanel:draw()
 
     if self._scroll_up_indicator_visible then
         self._scroll_up_indicator:draw()
-        self._scroll_up_indicator_outline:draw()
     end
 
     if self._scroll_down_indicator_visible then
         self._scroll_down_indicator:draw()
-        self._scroll_down_indicator_outline:draw()
     end
 end
 
@@ -289,89 +274,6 @@ function mn.VerboseInfoPanel:advance_scroll(delta)
 
     self._y_offset = self._y_offset + delta
     self:_update_scroll_indicators()
-end
-
---- @brief
---- @param thickness
---- @param angle Number lower angle of hat, > 180 for downwards pointing
-function mn.VerboseInfoPanel:_generate_hat_arrow(centroid_x, centroid_y, width, thickness, angle)
-
-    angle = which(angle, 90)
-    angle = 180 - angle
-
-    local center_x, center_y = centroid_x, centroid_y
-    local right_x, right_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, rt.degrees_to_radians((angle / 2)))
-    local left_x, left_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, -1 * rt.degrees_to_radians(180 + (angle / 2)))
-
-
-    local top = function(x, y)
-        return rt.translate_point_by_angle(x, y, 0.5 * thickness, -1 * rt.degrees_to_radians(90))
-    end
-
-    local bottom = function(x, y)
-        return rt.translate_point_by_angle(x, y, 0.5 * thickness, rt.degrees_to_radians(90))
-    end
-
-    local center_top_x, center_top_y = top(center_x, center_y)
-    local center_bottom_x, center_bottom_y = bottom(center_x, center_y)
-    local right_top_x, right_top_y = top(right_x, right_y)
-    local right_bottom_x, right_bottom_y = bottom(right_x, right_y)
-    local left_top_x, left_top_y = top(left_x, left_y)
-    local left_bottom_x, left_bottom_y = bottom(left_x, left_y)
-
-    return {
-        center_top_x, center_top_y,
-        right_top_x, right_top_y,
-        right_bottom_x, right_bottom_y,
-
-        center_bottom_x, center_bottom_y,
-        center_top_x, center_top_y,
-        right_bottom_x, right_bottom_y,
-
-        center_top_x, center_top_y,
-        left_top_x, left_top_y,
-        left_bottom_x, left_bottom_y,
-
-        center_top_x, center_top_y,
-        center_bottom_x, center_bottom_y,
-        left_bottom_x, left_bottom_y
-    }
-end
-
-function mn.VerboseInfoPanel:_generate_hat_arrow_outline(centroid_x, centroid_y, width, thickness, angle)
-
-    angle = which(angle, 90)
-    angle = 180 - angle
-
-    local center_x, center_y = centroid_x, centroid_y
-    local right_x, right_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, rt.degrees_to_radians((angle / 2)))
-    local left_x, left_y = rt.translate_point_by_angle(center_x, center_y, 0.5 * width, -1 * rt.degrees_to_radians(180 + (angle / 2)))
-
-
-    local top = function(x, y)
-        return rt.translate_point_by_angle(x, y, 0.5 * thickness, -1 * rt.degrees_to_radians(90))
-    end
-
-    local bottom = function(x, y)
-        return rt.translate_point_by_angle(x, y, 0.5 * thickness, rt.degrees_to_radians(90))
-    end
-
-    local center_top_x, center_top_y = top(center_x, center_y)
-    local center_bottom_x, center_bottom_y = bottom(center_x, center_y)
-    local right_top_x, right_top_y = top(right_x, right_y)
-    local right_bottom_x, right_bottom_y = bottom(right_x, right_y)
-    local left_top_x, left_top_y = top(left_x, left_y)
-    local left_bottom_x, left_bottom_y = bottom(left_x, left_y)
-
-    return {
-        center_top_x, center_top_y,
-        right_top_x, right_top_y,
-        right_bottom_x, right_bottom_y,
-        center_bottom_x, center_bottom_y,
-        left_bottom_x, left_bottom_y,
-        left_top_x, left_top_y,
-        center_top_x, center_top_y,
-    }
 end
 
 --- @brief

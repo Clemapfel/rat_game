@@ -1,11 +1,18 @@
 rt.settings.battle.battle_scene = {
-    enemy_sprite_speed = 500 -- px per second
+    enemy_sprite_speed = 500, -- px per second
+    text_box_scroll_ticks_per_second = 6,
+    text_box_scroll_delay = 0.1
 }
+
+bt.BattleSceneState = meta.new_enum("BattleSceneState", {
+    INSPECT = "inspect"
+})
 
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
     local out = meta.new(bt.BattleScene, {
         _state = state,
+        _scene_state = nil,
         _env = nil,
 
         _background = rt.Background(),
@@ -13,6 +20,12 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _verbose_info_width = 0,
 
         _text_box = rt.TextBox(),
+        _text_box_scroll_mode_active = false, -- show history during inspect
+        _text_box_scroll_tick_elapsed = 0,
+        _text_box_scroll_delay_elapsed = 0,
+        _text_box_scroll_up_active = false,
+        _text_box_scroll_down_active = false,
+
         _priority_queue = bt.PriorityQueue(),
         _quicksave_indicator = bt.QuicksaveIndicator(),
 
@@ -36,7 +49,6 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _selection_graph = nil, -- rt.SelectionGraph?
     })
-
     return out
 end)
 
@@ -67,6 +79,10 @@ function bt.BattleScene:realize()
 
     self._input:signal_connect("pressed", function(_, which)
         self:_handle_button_pressed(which)
+    end)
+
+    self._input:signal_connect("released", function(_, which)
+        self:_handle_button_released(which)
     end)
 
     self:create_from_state(self._state)
@@ -416,6 +432,26 @@ end
 
 --- @override
 function bt.BattleScene:update(delta)
+    do -- auto scroll while button is held
+        local up_active = self._input:get_is_down(rt.InputButton.UP)
+        local down_active = self._input:get_is_down(rt.InputButton.DOWN)
+        if self._text_box_scroll_mode_active and (up_active or down_active) then
+            self._text_box_scroll_delay_elapsed = self._text_box_scroll_delay_elapsed + delta
+            if self._text_box_scroll_delay_elapsed > rt.settings.battle.battle_scene.text_box_scroll_delay then
+                self._text_box_scroll_tick_elapsed = self._text_box_scroll_tick_elapsed + delta
+                local tick_duration = 1 / rt.settings.battle.battle_scene.text_box_scroll_ticks_per_second
+                while self._text_box_scroll_tick_elapsed > tick_duration do
+                    self._text_box_scroll_tick_elapsed = self._text_box_scroll_tick_elapsed - tick_duration
+                    if up_active then
+                        self._text_box:scroll_up()
+                    elseif down_active then
+                        self._text_box:scroll_down()
+                    end
+                end
+            end
+        end
+    end
+
     if self._game_over_screen_active then
         self._game_over_screen:update(delta)
         return
@@ -854,7 +890,31 @@ function bt.BattleScene:_create_inspect_selection_graph()
         closest_node:set_down(node)
     end
 
+    -- behavior
     local scene = self
+
+    local textbox_node = textbox_nodes[1]
+    textbox_node:signal_connect("enter", function(self)
+        scene:_set_textbox_scroll_mode_active(true)
+        self.is_active = true
+    end)
+
+    textbox_node:signal_connect("exit", function(self)
+        scene:_set_textbox_scroll_mode_active(false)
+        self.is_active = false
+    end)
+
+    textbox_node.get_bounds = function(self) -- override to account for resizing textbox
+        return scene._text_box:get_bounds()
+    end
+
+    scene:signal_connect("update", function()
+        if textbox_node.is_active then
+            textbox_node:signal_emit("enter") -- reformat verbose info
+        end
+    end)
+
+
     for nodes in range(
         enemy_sprite_nodes,
         enemy_status_consumable_nodes,
@@ -879,13 +939,66 @@ function bt.BattleScene:_create_inspect_selection_graph()
 end
 
 --- @brief
+function bt.BattleScene:_set_textbox_scroll_mode_active(b)
+    self._text_box_scroll_mode_active = b
+    if b then
+        self._text_box:set_history_mode_active(true)
+        self._text_box:set_reveal_indicator_visible(false)
+    else
+        self._text_box:set_history_mode_active(false)
+        self._text_box:set_reveal_indicator_visible(true)
+    end
+end
+
+--- @brief
+function bt.BattleScene:_set_entity_selected(entity, state)
+    -- TODO
+end
+
+--- @brief
+function bt.BattleScene:_set_mode(state)
+    if state == bt.BattleSceneState.INSPECT then
+        self:_create_inspect_selection_graph()
+        self._text_box:set_reveal_indicator_visible(true)
+    else
+        rt.error("In bt.BattleScene:_set_mode: unhandled state `" .. tostring(state) .. "`")
+    end
+end
+
+--- @brief
+function bt.BattleScene:_handle_button_released(which)
+    self._text_box_scroll_delay_elapsed = 0
+    self._text_box_scroll_tick_elapsed = 0
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_pressed(which)
+    if self._text_box_scroll_mode_active then
+        local should_exit = false
+        if which == rt.InputButton.UP then
+            self._text_box:scroll_up()
+        elseif which == rt.InputButton.DOWN then
+            local can_scroll = self._text_box:scroll_down()
+            if not can_scroll then
+                should_exit = true
+            end
+        elseif which == rt.InputButton.LEFT or which == rt.InputButton.RIGHT then
+            should_exit = true
+        end
+
+        if should_exit then
+            self:_set_textbox_scroll_mode_active(false)
+            -- enter selection graph
+        else
+            return -- do not invoke other elements
+        end
+    end
+
     if which == rt.InputButton.A then
         self._env.start_battle("DEBUG_BATTLE")
         self._env.quicksave()
         self:skip_all()
-
-        self:_create_inspect_selection_graph()
+        self:_set_mode(bt.BattleSceneState.INSPECT)
         --self._text_box:set_show_history_mode_active(true)
 
         --[[

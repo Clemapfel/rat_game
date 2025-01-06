@@ -11,6 +11,7 @@ local label = rt.Label("? ")
 label:realize()
 label:fit_into(50, 50)
 
+
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)

@@ -352,13 +352,13 @@ function mn.InventoryScene:update(delta)
         self._template_apply_unsuccesfull_dialog:update(delta)
     else
         local speed = rt.settings.menu.inventory_scene.verbose_info_scroll_speed
-        if self._input_controller:is_down(rt.InputButton.L) then
+        if self._input_controller:get_is_down(rt.InputButton.L) then
             if self._verbose_info:can_scroll_down() then
                 self._verbose_info:advance_scroll(delta * speed)
             end
         end
 
-        if self._input_controller:is_down(rt.InputButton.R) then
+        if self._input_controller:get_is_down(rt.InputButton.R) then
             if self._verbose_info:can_scroll_up() then
                 self._verbose_info:advance_scroll(delta * speed * -1)
             end

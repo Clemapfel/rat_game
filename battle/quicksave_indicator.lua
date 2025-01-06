@@ -9,6 +9,9 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
     return meta.new(bt.QuicksaveIndicator, {
         _frame = rt.Circle(0, 0, 1, 1),
         _frame_outline = rt.Circle(0, 0, 1, 1),
+        _frame_x = 0,
+        _frame_y = 0,
+
         _base = rt.Circle(0, 0, 1, 1),
         _frame_opacity = 0,
         _frame_snapshot = nil, -- rt.RenderTexture
