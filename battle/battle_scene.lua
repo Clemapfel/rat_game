@@ -47,6 +47,25 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _is_first_size_allocate = true,
         _selection_graph = nil, -- rt.SelectionGraph?
+
+        _selection_graph_arrow_up = nil,
+        _selection_graph_arrow_up_outline = nil,
+        _selection_grpah_arrow_up_visible = false,
+
+        _selection_graph_arrow_right = nil,
+        _selection_graph_arrow_right_outline = nil,
+        _selection_grpah_arrow_right_visible = false,
+
+        _selection_graph_arrow_down = nil,
+        _selection_graph_arrow_down_outline = nil,
+        _selection_grpah_arrow_down_visible = false,
+
+        _selection_graph_arrow_left = nil,
+        _selection_graph_arrow_left_outline = nil,
+        _selection_grpah_arrow_left_visible = false,
+
+        _selection_graph_frame = rt.Frame(),
+        _selection_graph_frame_visible = false
     })
     return out
 end)
@@ -67,6 +86,11 @@ function bt.BattleScene:realize()
     ) do
         widget:realize()
     end
+
+    self._selection_graph_frame:realize()
+    self._selection_graph_frame:set_selection_state(rt.SelectionState.ACTIVE)
+    self._selection_graph_frame:set_base_color(rt.RGBA(0, 0, 0, 0))
+    self._selection_graph_frame:set_corner_radius(32 / 4)
 
     for sprite in values(self._enemy_sprites) do
         sprite:realize()
@@ -397,6 +421,30 @@ function bt.BattleScene:draw()
     self._text_box:draw()
 
     self._verbose_info:draw()
+
+    if self._selection_graph_arrow_up_visible then
+        self._selection_graph_arrow_up:draw()
+        self._selection_graph_arrow_up_outline:draw()
+    end
+
+    if self._selection_graph_arrow_right_visible then
+        self._selection_graph_arrow_right:draw()
+        self._selection_graph_arrow_right_outline:draw()
+    end
+
+    if self._selection_graph_arrow_down_visible then
+        self._selection_graph_arrow_down:draw()
+        self._selection_graph_arrow_down_outline:draw()
+    end
+
+    if self._selection_graph_arrow_left_visible then
+        self._selection_graph_arrow_left:draw()
+        self._selection_graph_arrow_left_outline:draw()
+    end
+
+    if self._selection_graph_frame_visible then
+        self._selection_graph_frame:draw()
+    end
 
     if self._selection_graph ~= nil then
         --self._selection_graph:draw()
@@ -907,6 +955,15 @@ function bt.BattleScene:_create_inspect_selection_graph()
         return scene._text_box:get_bounds()
     end
 
+    local quicksave_node = quicksave_nodes[1]
+    quicksave_node:signal_connect("enter", function(self)
+        scene._quicksave_indicator:set_selection_state(rt.SelectionState.ACTIVE)
+    end)
+
+    quicksave_node:signal_connect("exit", function(self)
+        scene._quicksave_indicator:set_selection_state(rt.SelectionState.INACTIVE)
+    end)
+
     scene:signal_connect("update", function()
         if textbox_node.is_active then
             textbox_node:signal_emit("enter") -- reformat verbose info
@@ -934,9 +991,30 @@ function bt.BattleScene:_create_inspect_selection_graph()
         end
     end
 
+    local on_small_node_enter = function()
+        scene._selection_graph_frame_visible = true
+        dbg(true)
+    end
+
+    local on_small_node_exit = function()
+        scene._selection_graph_frame_visible = false
+    end
+
+    for nodes in range(
+        global_status_bar_nodes,
+        enemy_status_consumable_nodes,
+        party_status_consumable_nodes
+    ) do
+        for node in values(nodes) do
+            node:signal_connect("enter", on_small_node_enter)
+            node:signal_connect("exit", on_small_node_exit)
+        end
+    end
+
     do
         local on_enter_show_verbose_info = function(self)
             scene:_verbose_info_show_next_to(self.object, self:get_bounds())
+            scene:_update_selection_graph_arrows(self)
         end
 
         for nodes in range(
@@ -959,6 +1037,70 @@ function bt.BattleScene:_create_inspect_selection_graph()
     end
 
     self._selection_graph = graph
+end
+
+--- @brief
+function bt.BattleScene:_update_selection_graph_arrows(node)
+    local bounds = node:get_bounds()
+    local m = rt.settings.margin_unit
+    local outline_thickness = 1
+    local r = m
+    local offset = r * math.cos(2 * math.pi / 3 / 2) + self._selection_graph_frame:get_thickness() + 4 * outline_thickness
+
+    local generate_polygons = function(center_x, center_y, angle)
+        local a_x, a_y = rt.translate_point_by_angle(center_x, center_y, r, angle + (2 * math.pi) * (0 / 3))
+        local b_x, b_y = rt.translate_point_by_angle(center_x, center_y, r, angle + (2 * math.pi) * (1 / 3))
+        local c_x, c_y = rt.translate_point_by_angle(center_x, center_y, r, angle + (2 * math.pi) * (2 / 3))
+
+        local body = rt.Polygon(a_x, a_y, b_x, b_y, c_x, c_y)
+        body:set_color(rt.Palette.SELECTION)
+
+        local outline = rt.Polygon(a_x, a_y, b_x, b_y, c_x, c_y)
+        outline:set_color(rt.Palette.BLACK)
+        outline:set_is_outline(true)
+        outline:set_line_width(outline_thickness)
+
+        return body, outline
+    end
+
+    self._selection_graph_arrow_up_visible = node:get_up() ~= nil
+    if self._selection_graph_arrow_up_visible then
+        self._selection_graph_arrow_up, self._selection_graph_arrow_up_outline = generate_polygons(
+            bounds.x + 0.5 * bounds.width,
+            bounds.y - offset,
+            -0.5 * math.pi
+        )
+    end
+
+    self._selection_graph_arrow_right_visible = node:get_right() ~= nil
+    if self._selection_graph_arrow_right_visible then
+        self._selection_graph_arrow_right, self._selection_graph_arrow_right_outline = generate_polygons(
+            bounds.x + bounds.width + offset,
+            bounds.y + 0.5 * bounds.height,
+            0
+        )
+    end
+
+    self._selection_graph_arrow_down_visible = node:get_down() ~= nil
+    if self._selection_graph_arrow_down_visible then
+        self._selection_graph_arrow_down, self._selection_graph_arrow_down_outline = generate_polygons(
+            bounds.x + 0.5 * bounds.width,
+            bounds.y + bounds.height + offset,
+            0.5 * math.pi
+        )
+    end
+
+    self._selection_graph_arrow_left_visible = node:get_left() ~= nil
+    if self._selection_graph_arrow_left_visible then
+        self._selection_graph_arrow_left, self._selection_graph_arrow_left_outline = generate_polygons(
+            bounds.x - offset,
+            bounds.y + 0.5 * bounds.height,
+            1 * math.pi
+        )
+    end
+
+    local thickness = self._selection_graph_frame:get_thickness()
+    self._selection_graph_frame:fit_into(bounds.x - thickness, bounds.y - thickness, bounds.width + 2 * thickness, bounds.height + 2 * thickness)
 end
 
 --- @brief

@@ -16,6 +16,7 @@ bt.EntitySprite = meta.new_abstract_type("EntitySprite", rt.Widget, {
     _health_bar = nil, -- bt.Healthbar
     _speed_value = nil, -- bt.SpeedValue
     _status_consumable_bar = nil, -- bt.OrderedBox
+    _status_consumable_selection_frame = rt.Frame(),
     _sprite = nil, -- rt.Sprite
 
     _ui_visible = true,
@@ -62,6 +63,9 @@ function bt.EntitySprite:_realize_super(sprite_id)
     self._status_to_sprite = {}
     self._consumable_slot_to_sprite = {}
     self._consumable_slot_to_consumable = {}
+    self._status_consumable_selection_frame:realize()
+    self._status_consumable_selection_frame:set_selection_state(rt.SelectionState.ACTIVE)
+    self._status_consumable_selection_frame:set_base_color(rt.RGBA(0, 0, 0, 0))
 
     if not self._sprite:has_animation(bt.EntitySpriteState.IDLE) then
         rt.warning("In bt.EntitySprite._initialize_super: sprite `" .. sprite_id .. "` does not have animation with id \"idle\"")

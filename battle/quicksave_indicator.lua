@@ -16,6 +16,7 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _frame_opacity = 0,
         _frame_snapshot = nil, -- rt.RenderTexture
         _thickness = rt.settings.frame.thickness,
+        _selection_state = rt.SelectionState.INACTIVE,
 
         _n_turns_elapsed = 0,
         _n_turns_label = nil, -- rt.Label
@@ -65,6 +66,23 @@ do
         {name = "VertexTexCoord", format = "floatvec2"}
     }
 
+    --- @brief
+    function bt.QuicksaveIndicator:_update_frame_snapshot()
+        local padding = rt.settings.label.outline_offset_padding
+
+        love.graphics.push()
+        love.graphics.origin()
+        love.graphics.translate(padding, padding)
+        self._frame_snapshot:bind()
+        love.graphics.clear(1, 0, 1, 1)
+        self._base:draw()
+        self._frame_outline:draw()
+        self._frame:draw()
+        self._n_turns_label:draw()
+        self._frame_snapshot:unbind()
+        love.graphics.pop()
+    end
+
     --- @override
     function bt.QuicksaveIndicator:size_allocate(x, y, width, height)
         local center_x, center_y = x + 0.5 * width, y + 0.5 * height
@@ -88,17 +106,9 @@ do
             4
         )
         
-        self._frame_x = x
-        self._frame_y = y
-        love.graphics.push()
-        love.graphics.origin()
-        self._frame_snapshot:bind()
-        self._base:draw()
-        self._frame_outline:draw()
-        self._frame:draw()
-        self._n_turns_label:draw()
-        self._frame_snapshot:unbind()
-        love.graphics.pop()
+        self._frame_x = x - padding
+        self._frame_y = y - padding
+        self:set_selection_state(self._selection_state) -- also updates snapshot
 
         local n_vertices = self._n_vertices
         local thickness = self._thickness + 2
@@ -309,4 +319,20 @@ function bt.QuicksaveIndicator:get_selection_nodes()
     return {
         node
     }
+end
+
+--- @brief
+function bt.QuicksaveIndicator:set_selection_state(state)
+    self._selection_state = state
+    if state == rt.SelectionState.ACTIVE then
+        self._frame:set_color(rt.Palette.SELECTION)
+        self._frame:set_line_width(rt.settings.frame.thickness + 2)
+        self._frame_outline:set_line_width(rt.settings.frame.thickness + 2 + 1)
+    else
+        self._frame:set_color(rt.Palette.FOREGROUND)
+        self._frame:set_line_width(rt.settings.frame.thickness)
+        self._frame_outline:set_line_width(rt.settings.frame.thickness + 1)
+    end
+
+    self:_update_frame_snapshot()
 end

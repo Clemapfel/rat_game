@@ -35,7 +35,7 @@ end
 rt.GameState = meta.new_type("GameState", function()
     local state = {
         -- system settings
-        vsync_mode = rt.VSyncMode.ON,
+        vsync_mode = rt.VSyncMode.OFF,
         msaa_quality = rt.MSAAQuality.OFF,
         gamma = 1,
         is_fullscreen = false,
