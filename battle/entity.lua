@@ -1,20 +1,20 @@
-local _entity_comparison_function = function(a, b)
-    dbg("called")
-    return a:get_id() == b:get_id()
-end
+local is_first = true
+local first = nil
+local t = {}
 
 --- @class bt.Entity
 bt.Entity = meta.new_type("BattleEntity", function(config, multiplicity)
     meta.assert_isa(config, bt.EntityConfig)
     meta.assert_number(multiplicity)
-    local out = meta.new(bt.Entity, {
+    return meta.new(bt.Entity, {
         _config = config,
         _multiplicity = multiplicity
     })
-    getmetatable(out).__eq = _entity_comparison_function
-    println(getmetatable(out))
-    return out
 end)
+
+meta.get_instance_metatable(bt.Entity).__eq = function(a, b)
+    return a:get_id() == b:get_id()
+end
 
 function bt.Entity:_get_suffixes()
     local n = self._multiplicity

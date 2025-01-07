@@ -1,624 +1,666 @@
---- @module meta Introspection and basic type sytem
-meta = {}
-meta.types = {}
-
---- @brief is x a lua string?
---- @param x any
-function meta.is_string(x)
-    return type(x) == "string"
-end
-
---- @brief is x a lua table?
---- @param x any
-function meta.is_table(x)
-    return type(x) == "table"
-end
-
---- @brief is x a lua number?
---- @param x any
-function meta.is_number(x)
-    return type(x) == "number"
-end
-
---- @brief
-function meta.is_signed(x)
-    return meta.is_number(x) and math.fmod(x, 1) == 0
-end
-
---- @brief
-function meta.is_unsigned(x)
-    return meta.is_number(x) and math.fmod(x, 1) == 0 and x >= 0
-end
-
---- @brief
-function meta.is_inf(x)
-    if not meta.is_number(x) then return false end
-    return x == POSITIVE_INFINITY or x == NEGATIVE_INFINITY
-end
-
---- @brief is x a lua boolean?
---- @param x any
-function meta.is_boolean(x)
-    return x == true or x == false
-end
-
---- @brief is x nil?
---- @param x any
-function meta.is_nil(x)
-    return x == nil
-end
-
----@brief is callable
---- @param x any
-function meta.is_function(x)
-    if type(x) == "function" then
-        return true
-    elseif meta.is_table(x) and getmetatable(x) ~= nil then
-        return meta.is_function(getmetatable(x).__call)
-    else
-        return false
-    end
-end
-
---- @brief
-function meta.is_raw_table(x)
-    return getmetatable(x) == nil and typeof(x) == "table" and sizeof(x) == #x
-end
-
--- meta._new auxiliaries
-meta._hash = 1
-meta._new_newindex = function(this, property_name, property_value)
-    local metatable = this[1]
-    if not metatable[2] then
-        rt.error("In " .. metatable[meta._name_index] .. ".__newindex: Cannot set property `" .. property_name .. "`, because the object was declared immutable.")
-    end
-    metatable[1][property_name] = property_value
-end
-
-meta._new_tostring = function(this)
-    return "(" .. this[1][meta._name_index] .. ") " .. meta.serialize(this)
-end
-
-meta._new_eq = function(self, other)
-    return self[1][meta._hash_index] == other[1][meta._hash_index]
-end
-
-meta._new_pairs = function(self)
-    return pairs(self[1][1])
-end
-
-meta._properties_index = 1
-meta._is_mutable_index = 2
-meta._hash_index = 3
-meta._name_index = 4
-meta._components_index = 5
-meta._super_index = 6
-
---- @brief [internal] Create new empty object
---- @param typename String
-function meta._new(typename)
-    -- uses indices instead of proper names or getmetatable for micro optimization
-    local out = {}
-    out[1] = {}  -- metatable
-    local metatable = out[1]
-
-    metatable[meta._properties_index] = {}
-    metatable[meta._is_mutable_index] = true
-    metatable[meta._name_index] = typename._typename
-    metatable[meta._hash_index] = meta._hash
-    meta._hash = meta._hash + 1
-
-    metatable[meta._components_index] = {}
-    metatable[meta._super_index] = {}
-
-    metatable.__index = out[1][1]
-    metatable.__newindex = meta._new_newindex
-    metatable.__tostring = meta._new_tostring
-    metatable.__eq = meta._new_eq
-    metatable.__pairs = meta._new_pairs
-
-    setmetatable(out, metatable)
-    return out, metatable
-end
-
---- @brief is meta object
---- @param x any
---- @return Boolean
-function meta.is_object(x)
-    if not meta.is_table(x) then
-        return false
-    end
-    local metatable = getmetatable(x)
-    return not (metatable == nil or metatable[meta._name_index] == nil)
-end
-
---- @brief get typename identifier
-function meta.typeof(x)
-    if meta.is_object(x) then
-        return rawget(x, 1)[meta._name_index]
-    else
-        return type(x)
-    end
-end
-
---- @brief check if instance has type as super
-function meta.inherits(x, super)
-    if meta.is_object(x) then
-        for _, name in pairs(rawget(x, 1)[meta._super_index]) do
-            if name == super._typename then
-                return true
-            end
-        end
-    end
-    return false
-end
-
---- @brief [internal] print type assertion error message
---- @param b Boolean true if no error, false otherwise
---- @param x meta.Object
---- @param type String typename
-function meta._assert_aux(b, x, type)
-    if b then return true end
-    local name = debug.getinfo(2, "n").name
-    rt.error("In " .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
-    return false
-end
-
---- @brief throw if false
---- @param b Boolean
-function meta.assert(b)
-    if not b then
-        local name = debug.getinfo(2, "n").name
-        rt.error("In " .. name .. ": Assertion failed")
-    end
-end
-
---- @brief throw if object is not a boolean
---- @param x any
-function meta.assert_boolean(x, ...)
-    meta._assert_aux(meta.is_boolean(x), x, "boolean")
-    for n in range(...) do
-        meta._assert_aux(meta.is_boolean(n), n, "boolean")
-    end
-end
-
---- @brief throw if object is not a table
---- @param x any
-function meta.assert_table(x, ...)
-    meta._assert_aux(meta.is_table(x), x, "table")
-    for n in range(...) do
-        meta._assert_aux(meta.is_table(n), n, "table")
-    end
-end
-
---- @brief throw if object is not callable
---- @param x any
-function meta.assert_function(x, ...)
-    meta._assert_aux(meta.is_function(x), x, "function")
-    for n in range(...) do
-        meta._assert_aux(meta.is_function(n), n, "function")
-    end
-end
-
---- @brief throw if object is not a string
---- @param x any
-function meta.assert_string(x, ...)
-    meta._assert_aux(meta.is_string(x), x, "string")
-end
-
---- @brief throw if object is not a number
---- @param x any
-function meta.assert_number(x, ...)
-    meta._assert_aux(meta.is_number(x), x, "number")
-    for number in range(...) do
-        meta._assert_aux(meta.is_number(number), number, "number")
-    end
-end
-
---- @brief
-function meta.assert_unsigned(...)
-    for number in range(...) do
-        meta._assert_aux(meta.is_number(x) and x > 0 and math.fmod(x, 1) == 0, x, "unsigned")
-    end
-end
-
---- @brief
-function meta.assert_signed(...)
-    for number in range(...) do
-        meta._assert_aux(meta.is_number(x) and math.fmod(x, 1) == 0, x, "signed")
-    end
-end
-
---- @brief throw if object is not nil
---- @param x any
-function meta.assert_nil(x, ...)
-    meta._assert_aux(meta.is_nil(x), x, "typeof(nil)")
-    for number in range(...) do
-        meta._assert_aux(meta.is_nil(number), number, "typeof(nil)")
-    end
-end
-
---- @brief assert that object was created using `meta.new`
---- @param x any
-function meta.assert_object(x, ...)
-    meta._assert_aux(meta.is_object(x), x, "meta.Object")
-    for number in range(...) do
-        meta._assert_aux(meta.is_object(number), number, "meta.Object")
-    end
-end
-
---- @brief assert that instance inherits from type
---- @param x any
-function meta.assert_inherits(x, type)
-    if meta.typeof(type) == "Type" then
-        meta._assert_aux(meta.inherits(x, type), x, type._typename)
-    else
-        meta._assert_aux(meta.inherits(x, type), x, type)
-    end
-end
-
---- @brief
-function meta.assert_is_subtype(x, supertype)
-    meta.assert_isa(x, meta.Type)
-    meta.assert_isa(supertype, meta.Type)
-
-    for super in values(x._super) do
-        if super == supertype then
-            return
-        end
-    end
-
-    rt.error("In meta.assert_is_subtype: " .. x._typename .. "` is not a subtype of `" .. supertype._typename .. "`")
-end
-
---- @brief [internal] add a property, set to intial value
---- @param x meta.Object
---- @param property_name String
-function meta.uninstall_property(x, property_name)
-    rawget(x, 1)[1][property_name] = nil
-end
-
---- @brief add property after construction
-function meta.install_property(x, name, value)
-    rawget(x, 1)[1][name] = value
-end
-
---- @brief get whether property is installed
---- @param x meta.Object
---- @param property_name String
---- @return Boolean
-function meta.has_property(x, property_name)
-    return not meta.is_nil(rawget(x, 1)[1][property_name])
-end
-
---- @brief get list of all property names
---- @param x meta.Object
---- @return Table
-function meta.get_property_names(x)
-    local out = {}
-    for name, _ in pairs(rawget(x, 1)[1]) do
-        table.insert(out, name)
-    end
-    return out
-end
-
---- @brief get single property
---- @return Table
-function meta.get_property(x, name)
-    return rawget(x, 1)[1][name]
-end
-
---- @brief get list of properties
---- @return Table
-function meta.get_properties(x)
-    return rawget(x, 1)[1]
-end
-
---- @brief add list of properties, useful for types
---- @param x meta.Type
---- @param properties Table
-function meta.add_properties(x, properties)
-    for name, value in pairs(properties) do
-        meta.install_property(x, name, value)
-    end
-end
-
---- @brief make object immutable, this should be done inside the objects constructor
---- @param x meta.Object
---- @param b Boolean
-function meta.set_is_mutable(x, b)
-    rawget(x, 1)[meta._is_mutable_index] = b
-end
-
---- @brief check if object is immutable
---- @param x meta.Object
---- @return Boolean
-function meta.get_is_mutable(x)
-    return rawget(x, 1)[meta._is_mutable_index]
-end
-
---- @brief [internal] recursively install all types and super types of types, used in meta.new
-function meta._install_super(metatable, type)
-    if metatable[meta._super_index][type._typename] ~= true then
-        metatable[meta._super_index][type._typename] = true
-        for key, value in pairs(type[1][1]) do  -- getmetatable(type).properties
-            if metatable[1][key] == nil then -- properties[key]
-                metatable[1][key] = value
-            end
-        end
-
-        for _, supersuper in pairs(type._super) do
-            meta._install_super(metatable, supersuper)
-        end
-    end
-end
-
---- @brief [internal]
-function meta._install_signals(instance, type)
-    for name in values(type._signals) do
-        instance:signal_add(name)
-    end
-
-    for super in values(type._super) do
-        meta._install_signals(instance, super)
-    end
-end
-
---- @brief create a new object instance
---- @param type meta.Type
---- @param fields Table property_name -> property_value
-function meta.new(type, fields)
-    local out, metatable = meta._new(type)
-
-    if fields ~= nil then
-        for name, value in pairs(fields) do
-            metatable[1][name] = value
-        end
-    end
-
-    for key, value in pairs(type[1][1]) do   -- getmetatable(type).properties
-        metatable[1][key] = value
-    end
-
-    meta._install_super(metatable, type)
-    --meta._install_signals(out, type)
-    return out
-end
-
---- @class meta.Enum
-meta.Enum = "Enum"
-
---- @brief create a new immutable object
---- @param fields Table
-function meta.new_enum(fields)
-    if is_empty(fields) then
-        rt.error("In meta.new_enum: list of values cannot be empty")
-    end
-
-    local out, metatable = meta._new(meta.Enum)
-
-    local i = 0
-    for name, value in _G.pairs(fields) do
-        if meta.is_table(value) then
-            rt.error("In meta.new_enum: Enum value for key `" .. name .. "` is a `" .. meta.typeof(value) .. "`, which is not a primitive.")
-        end
-        metatable[1][name] = value
-    end
-
-    metatable.__index = function(self, key)
-        local res = metatable[1][key]
-        if res == nil then
-            rt.error("In Enum.__index: enum has no member with name `" .. key .. "`")
-        end
-        return res
-    end
-
-    meta.set_is_mutable(out, false)
-    return out
-end
-
---- @brief
-function meta.instances(enum)
-    return enum[1][1]
-end
-
---- @brief check if type of object is as given
---- @param type meta.Type (or String)
---- @return Boolean
-function meta.isa(x, type)
-    local metatable = getmetatable(x)
-    if metatable == nil or metatable[meta._super_index] == nil then
-        return false
-    else
-        return metatable[meta._super_index][type._typename] == true
-    end
-end
-
---- @brief check if value is part of enum
---- @param x any
---- @param enum meta.Enum
-function meta.is_enum_value(x, enum)
-    for _, value in pairs(enum) do
-        if x == value then
-            return true
-        end
-    end
-    return false
-end
-
---- @brief throw if object is not an enum value
---- @param x any
---- @param enum meta.Enum
-function meta.assert_enum_value(x, enum)
-    if not meta.is_enum_value(x, enum) then
-        rt.error("In assert_enum: Value `" .. meta.typeof(x) .. "` is not a value of enum `" .. serialize(enum[1][1]) .. "`")
-    end
-end
-
---- @brief throw if object is not of given type
---- @param x any
---- @param type meta.Type
-function meta.assert_isa(x, type)
-    meta._assert_aux(meta.isa(x, type), x, type._typename)
-end
-
---- @brief [internal] add meta.is_* and meta.assert_* given type
-function meta._define_type_assertion(typename)
-    if string.len(typename) == 0 or typename == "nil" or typename == "number" or typename == "table" or typename == "boolean" or typename == "function" or typename == "userdata" then return end
-
-    function string.to_snake_case(str, screaming)
-        local out = {""}
-        table.insert(out, string.lower(string.sub(str, 1, 1)))
-        for i = 2, string.len(str) do
-            local c = string.sub(str, i, i)
-            if string.is_upper(c) then
-                table.insert(out, "_")
-            end
-            table.insert(out, ternary(screaming == true, string.upper(c), string.lower(c)))
-        end
-        return table.concat(out)
-    end
-
-    local assert_name = "assert_" .. string.to_snake_case(typename)
-    local is_name = "is_" .. string.to_snake_case(typename)
-
-    if type(meta[assert_name] == "nil") then
-        load("function meta." .. assert_name .. "(x)\n meta.assert_isa(x, meta.types[\"" .. typename .. "\"])\nend")()
-    end
-
-    if type(meta[is_name] == "nil") then
-        load("function meta." .. is_name .. "(x)\n return meta.isa(x, meta.types[\"" .. typename .. "\"])\nend")()
-    end
-end
-
-meta._typenames = {}
-
---- @brief [internal]
-function meta._type_id_to_typename(id)
-    return meta._typenames[id]
-end
-
---- @brief [internal]
-function meta._default_ctor(self)
-    return meta.new(self)
-end
-
---- @brief
-function meta.new_type(typename, ...)
-    local out = meta._new("Type")
-    local metatable = out[1]
-    metatable[meta._name_index] = "Type"
-    metatable[meta._super_index] = {
-        ["Type"] = true
+if meta == nil then meta = {} end
+
+do
+    -- use consecutive indices instead of string keys for better performance
+    local _metatable_index = 1
+
+    local _properties_index = 1
+    local _is_mutable_index = 2
+    local _instance_hash_index = 3
+    local _typename_hash_index = 4
+    local _super_hashes_index = 5
+    local _signal_component_index = 6
+
+    local _type_super_index = 7
+    local _type_fields_index = 8
+    local _type_signals_index = 9
+    local _type_typename_index = 10
+    local _type_typename_hash_index = 11
+    local _type_super_hashes_index = 12
+
+    local _enum_instances_index = 7
+    local _enum_typename_index = 8
+
+    -- upvalues instead of globals
+    local _meta_current_hash = 3
+    local _type_typename_hash = 1
+    local _meta_types = {}
+    local _meta_type_hash_to_name = {
+        [_type_typename_hash] = "Type"
     }
 
-    local super, fields, ctor = {}, {}, nil
-    local fields_seen, ctor_seen = false, false
-    for _, value in pairs({...}) do
-        if meta.isa(value, meta.Type) then
-            table.insert(super, value)
-        elseif meta.is_function(value) then
-            ctor = value
-            if ctor_seen then
-                rt.error("In meta.new_type: more than one constructor in variadic argument")
-            end
-            ctor_seen = true
-        elseif meta.is_table(value) then
-            fields = value
-            if fields_seen then
-                rt.error("In meta.new_type: more than one property table in variadic argument")
-            end
-            fields_seen = true
+    --- @param typename_hash Number
+    function meta._new(typename_hash)
+        local out = {}
+        local metatable = {}
+        out[_metatable_index] = metatable
+
+        metatable[_properties_index] = {}                    -- Table<String, Any>
+        metatable[_is_mutable_index] = true                  -- Boolean
+        metatable[_typename_hash_index] = typename_hash      -- Number
+        metatable[_super_hashes_index] = {}                  -- Set<Number>
+        metatable[_instance_hash_index] = _meta_current_hash -- Number
+
+        _meta_current_hash = _meta_current_hash + 1
+
+        local properties = metatable[_properties_index]
+        metatable.__index = properties
+        metatable.__newindex = function(self, key, value)
+            properties[key] = value
+        end
+
+        setmetatable(out, metatable)
+        return out, metatable
+    end
+
+    --- @brief
+    function meta.hash(x)
+        return rawget(x, _metatable_index)[_instance_hash_index]
+    end
+
+    --- @brief
+    function meta.typeof(x)
+        local native_type = type(x)
+        if native_type == "table" then
+            local metatable = rawget(x, _metatable_index)
+            if metatable == nil then return native_type end
+            local typename_hash = metatable[_typename_hash_index]
+            if typename_hash == nil then return native_type end
+            local typename = _meta_type_hash_to_name[typename_hash]
+            if typename == nil then return native_type end
+            return typename
         else
-            rt.error("In meta.new_type: Unrecognized variadic argument `" .. tostring(value) .. "` of type `" .. meta.typeof(value) .. "`")
+            return native_type
         end
     end
 
-    metatable[1]._typename = typename
-    metatable[1]._type_id = string.hash(typename)
-    metatable[1]._super = super
-    metatable[1]._signals = {}
+    local _typeof = meta.typeof
 
-    if not meta.is_nil(ctor) then
-        -- custom constructor
-        metatable.__call = function(self, ...)
-            local out = ctor(...)
-            if not meta.isa(out, self) then
-                rt.error("In " .. self._typename .. ".__call: Constructor does not return object of type `" .. self._typename .. "`.")
+    local _is_mutable_newindex = function(self, _, _)
+        error("In " .. _typeof(self) .. ".__newindex: trying to modifiyng object, but it was declared immutable")
+    end
+
+    --- @brief
+    function meta.set_is_mutable(x, b)
+        local metatable = rawget(x, _metatable_index) -- faster than `getmetatable`
+        if b == false then
+            metatable.__newindex = _is_mutable_newindex
+        else
+            metatable.__newindex = metatable[_properties_index]
+        end
+    end
+
+    --- @brief
+    function meta.get_is_mutable(x)
+        local metatable = rawget(x, _metatable_index)
+        return metatable.__newindex == metatable[_properties_index]
+    end
+
+    local _select = _G._select
+
+    local _meta_new = meta.new
+    local _new_type_default_constructor = function(self)
+        return _meta_new(self, {})
+    end
+
+    local _new_type_define_type_assertion = function(typename_hash)
+        local typename = _meta_type_hash_to_name[typename_hash]
+        local as_snake_case = {}
+        table.insert(as_snake_case, string.lower(string.sub(typename, 1, 1)))
+        for i = 2, #typename do
+            local c = string.sub(typename, i, i)
+            if string.is_upper(c) then
+                table.insert(as_snake_case, "_")
+            end
+            table.insert(as_snake_case, string.lower(c))
+        end
+        as_snake_case = table.concat(as_snake_case)
+
+        local assert_name = "assert_" .. as_snake_case
+        local is_name = "is_" .. as_snake_case
+
+        --- @brief
+        meta[is_name] = function(x)
+            local metatable = rawget(x, _metatable_index)
+            if metatable == nil or type(metatable) ~= "table" then return false end
+            return metatable[_typename_hash_index] == typename_hash
+        end
+
+        --- @brief
+        meta[assert_name] = function(x)
+            local should_error = false
+            local metatable = rawget(x, _metatable_index)
+            if metatable == nil or type(metatable) ~= "table" then
+                should_error = true
+                goto throw
+            end
+            if metatable[_typename_hash_index] == typename_hash then
+                should_error = true
+                goto throw
+            end
+
+            ::throw::
+            if should_error then
+                error("In meta." .. assert_name .. ": expected `" .. typename .. "`, got `" .. _typeof(x) .. "`")
+            end
+        end
+    end
+
+    local function _new_type_collect_fields_and_signals(self, fields, signals, super_hashes)
+        local metatable = rawget(self, _metatable_index)
+        super_hashes[metatable[_type_typename_hash_index]] = true
+
+        for name, value in pairs(metatable[_type_fields_index]) do
+            if fields[name] == nil then
+                fields[name] = value
+            end
+        end
+
+
+        for name, _ in pairs(metatable[_type_signals_index]) do
+            signals[name] = true
+        end
+
+        for super, _ in pairs(metatable[_type_super_index]) do
+            _new_type_collect_fields_and_signals(super, fields, signals, super_hashes)
+        end
+    end
+
+    local _meta__new = meta._new
+
+    --- @brief
+    function meta.new_type(typename, ...)
+        assert(type(typename) == "string", "In meta.new_type: expected typename as string for argument #1, got `" .. type(typename) .. "`")
+        local out, metatable = _meta__new(_type_typename_hash)
+
+        metatable[_type_super_index] = {}    -- Set<Type>
+        metatable[_type_fields_index] = {}   -- Table<String, Any>
+        metatable[_type_signals_index] = {}  -- Set<String>
+        local constructor = nil
+        metatable[_type_typename_index] = typename   -- String
+        metatable[_type_typename_hash_index] = _meta_current_hash -- Number
+        metatable[_type_super_hashes_index] = {}     -- Set<Number>
+        _meta_current_hash = _meta_current_hash + 1
+
+        local n_args = _select("#", ...)
+        for i = 1, n_args do
+            local arg = _select(i, ...)
+            if type(arg) == "function" then
+                if constructor ~= nil then
+                    error("In meta.new_type: more than one constructor specified when creating type `" .. typename .. "`")
+                end
+                constructor = arg
+            elseif type(arg) == "table" then
+                if _typeof(arg) == "Type" then
+                    metatable[_type_super_index][arg] = true
+                else
+                    metatable[_type_fields_index] = arg
+                end
+            else
+                error("In meta.new_type: more than one table of static fields when creating type `" .. typename .. "`")
+            end
+        end
+
+        if constructor == nil then
+            constructor = _new_type_default_constructor
+        end
+
+        -- collect all fields / signals from super types
+        _new_type_collect_fields_and_signals(out, metatable[_type_fields_index], metatable[_type_signals_index], metatable[_type_super_hashes_index])
+
+        if _meta_type_hash_to_name[metatable[_type_typename_hash_index]]  ~= nil then
+            error("In meta.new_type: A type with name `" .. typename .. "` already exists")
+        end
+        _meta_type_hash_to_name[metatable[_type_typename_hash_index]] = metatable[_type_typename_index]
+
+        local fields = metatable[_type_fields_index]
+        metatable.__index = fields
+        metatable.__newindex = function(_, key, value)
+            fields[key] = value
+        end
+
+        metatable.__tostring = function(_)
+            return typename
+        end
+
+        metatable.__call = function(_, ...)
+            local out = constructor(...)
+            -- check if type of returned instance is self
+            if _typeof(out) ~= typename then
+                error("In " .. typename .. "__call: Constructor does not return an object of type `" .. typename .. "`")
             end
             return out
         end
-    else
-        -- default constructor
-        metatable.__call = meta._default_ctor
+
+        _new_type_define_type_assertion(metatable[_type_typename_hash_index])
+        return out
     end
 
-    if not meta.is_nil(meta.types[typename]) then
-        rt.error("In meta.new_type: A type with name `" .. typename .. "` already exists.")
+    function meta.add_signals(type, ...)
+        local n_args = _select("#", ...)
+        local metatable = rawget(type, _metatable_index)
+        for i = 1, n_args do
+            local arg = _select(i, ...)
+            assert(_G.type(arg) == "string")
+            metatable[_type_signals_index][arg] = true
+        end
     end
-    meta.types[typename] = out
-    meta._define_type_assertion(typename)
+    meta.add_signal = meta.add_signals
 
-    for key, value in pairs(fields) do
-        meta.install_property(out, key, value)
+    function meta.get_typename(type)
+        return rawget(type, _metatable_index)[_type_typename_index]
     end
-    return out
-end
 
---- @brief
-function meta.add_signal(type, name)
-    local properties = type[1][1]
-    local signal_emitter_seen = false
-    for super in values(properties._super) do
-        if super == rt.SignalEmitter then
-            signal_emitter_seen = true
+    local _new_abstract_type_constructor = function(self)
+        error("In " .. self[_type_typename_index] .. ".__call: Trying to instantiate abstract type")
+        return nil
+    end
+
+    local _meta_new_type = meta.new_type
+
+    --- @brief
+    function meta.new_abstract_type(name, ...)
+        local out = _meta_new_type(name, ...)
+        rawget(out, _metatable_index).__call = _new_abstract_type_constructor
+        return out
+    end
+
+    local _signal_is_blocked_index = 1
+    local _signal_callbacks_index = 2
+    local _signal_callbacks_in_order_index = 3
+    local _handler_hash = 1
+
+    --- @brief
+    local _meta_signal_emit = function(self, name, ...)
+        local error_handler = function(message)
+            rt.error("In " .. meta.typeof(self) .. ".signal_emit(\"" .. name .. "\"): " .. message .. "\n" .. debug.traceback())
+        end
+
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component[_signal_is_blocked_index] ~= true then
+            for i, callback in ipairs(component[_signal_callbacks_in_order_index]) do
+                --xpcall(callback, error_handler, self, ...)
+                callback(self, ...)
+            end
         end
     end
 
-    if not signal_emitter_seen then
-        rt.warning("In meta.add_signal: Trying to add signal to type `" .. properties._typename .. "`, but it is not a subtype of rt.SignalEmitter")
-        table.insert(properties._super, rt.SignalEmitter)
+    --- @brief
+    local _meta_signal_connect = function(self, name, callback)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_connect: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        local handler_index = _handler_hash
+        component[_signal_callbacks_index][handler_index] = callback
+        table.insert(component[_signal_callbacks_in_order_index], callback)
+
+        _handler_hash = _handler_hash + 1
+        return handler_index
     end
 
-    table.insert(properties._signals, name)
+    --- @brief
+    local _meta_signal_disconnect = function(self, name, handler_id)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_disconnect: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        if handler_id == nil then
+            component[_signal_callbacks_index] = {}
+        elseif component[_signal_callbacks_index][handler_id] ~= nil then
+            component[_signal_callbacks_index][handler_id] = nil
+        end
+    end
+
+    --- @brief
+    local _meta_signal_list_handler_ids = function(self, name)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_list_handler_ids: object has no signal with id `" .. name .. "`")
+            return
+        end
+        local out = {}
+        for id, _ in pairs(component[_signal_callbacks_index]) do
+            table.insert(out, id)
+        end
+        return out
+    end
+
+    --- @brief
+    local _meta_signal_disconnect_all = function(self, name)
+        if name == nil then
+            local signals = self[_metatable_index][_signal_component_index]
+            for _, signal in pairs(signals) do
+                signals[_signal_callbacks_index] = {}
+            end
+        else
+            local component = self[_metatable_index][_signal_component_index][name]
+            if component == nil then
+                error("In " .. _typeof(self) .. ".signal_disconnect_all: object has no signal with id `" .. name .. "`")
+                return
+            end
+            component[_signal_callbacks_index] = {}
+        end
+    end
+
+    --- @brief
+    local _meta_signal_set_is_blocked = function(self, name, is_blocked)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_set_is_blocked: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        component[_signal_is_blocked_index] = is_blocked
+    end
+
+    --- @brief
+    local _meta_signal_get_is_blocked = function(self, name)
+        local component = self[_metatable_index][_signal_component_index][name]
+        if component == nil then
+            error("In " .. _typeof(self) .. ".signal_get_is_blocked: object has no signal with id `" .. name .. "`")
+            return
+        end
+
+        return component[_signal_is_blocked_index]
+    end
+
+    --- @brief
+    local _meta_signal_block_all = function(self, name)
+        local signals = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(signals) do
+            handler[_signal_is_blocked_index] = true
+        end
+    end
+
+    --- @brief
+    local _meta_signal_unblock_all = function(self, name)
+        local signals = self[_metatable_index][_signal_component_index]
+        for _, handler in pairs(signals) do
+            handler[_signal_is_blocked_index] = false
+        end
+    end
+
+    --- @brief
+    local _meta_signal_has_signal = function(self, name)
+        return self[_metatable_index][_signal_component_index][name] ~= nil
+    end
+
+    --- @brief
+    function meta.new(type, fields)
+        local type_metatable = rawget(type, _metatable_index)
+        local out, metatable = _meta__new(type_metatable[_type_typename_hash_index])
+        local properties = metatable[_properties_index]
+
+        -- install inherited static fields
+        for name, value in pairs(type_metatable[_type_fields_index]) do
+            properties[name] = value
+        end
+
+        -- install per-instance fields
+        if fields ~= nil then
+            for name, value in pairs(fields) do
+                properties[name] = value
+            end
+        end
+
+        -- install super hash (reference)
+        metatable[_super_hashes_index] = type_metatable[_type_super_hashes_index]
+
+        -- install signals
+        local signals = type_metatable[_type_signals_index]
+        local is_initialized, signal_component = false, nil
+        for name, _ in pairs(signals) do
+            if is_initialized == false then
+                metatable[_signal_component_index] = {}
+                signal_component = metatable[_signal_component_index]
+                is_initialized = true
+            end
+
+            signal_component[name] = {
+                [_signal_is_blocked_index] = false,
+                [_signal_callbacks_index] = {},
+                [_signal_callbacks_in_order_index] = meta.make_weak({})
+            }
+        end
+
+        properties.signal_emit = _meta_signal_emit
+        properties.signal_connect = _meta_signal_connect
+        properties.signal_disconnect = _meta_signal_disconnect
+        properties.signal_list_handler_ids = _meta_signal_list_handler_ids
+        properties.signal_disconnect_all = _meta_signal_disconnect_all
+        properties.signal_set_is_blocked = _meta_signal_set_is_blocked
+        properties.signal_get_is_blocked = _meta_signal_get_is_blocked
+        properties.signal_block_all = _meta_signal_block_all
+        properties.signal_unblock_all = _meta_signal_unblock_all
+        properties.signal_has_signal = _meta_signal_has_signal
+
+        return out
+    end
+
+    local _meta_set_is_mutable = meta.set_is_mutable
+
+    --- @brief
+    function meta.new_enum(name, fields)
+        assert(type(name) == "string", "In meta.new_enum: wrong argument #1, expected `string`, got `" .. _typeof(name) .. "`")
+
+        local typename_hash = _meta_current_hash
+        local typename = name
+        _meta_current_hash = _meta_current_hash + 1
+
+        if _meta_type_hash_to_name[typename_hash]  ~= nil then
+            error("In meta.new_enum: A type with name `" .. typename .. "` already exists")
+        end
+
+        _meta_type_hash_to_name[typename_hash] = typename
+
+        local out, metatable = _meta__new(typename_hash)
+        local properties = metatable[_properties_index]
+        local values = {} -- for fast checking if value is in enum
+        for name, value in pairs(fields) do
+            properties[name] = value
+            values[value] = true
+        end
+
+        metatable[_enum_instances_index] = values
+        metatable[_enum_typename_index] = name
+        metatable.__index = function(self, key)
+            local res = metatable[1][key]
+            if res == nil then
+                error("In " .. name .. ".__index: enum has no member with name `" .. key .. "`")
+            end
+            return res
+        end
+
+        _meta_set_is_mutable(out, false)
+        return out
+    end
+
+    --- @brief
+    function meta.instances(enum)
+        return rawget(enum, _metatable_index)[_properties_index]
+    end
+
+    --- @brief
+    function meta.is_enum_value(value, enum)
+        return rawget(enum, _metatable_index)[_enum_instances_index][value] == true
+    end
+
+    --- @brief
+    function meta.assert_enum_value(value, enum)
+        local metatable = rawget(enum, _metatable_index)
+        if metatable[_enum_instances_index][value] ~= true then
+            error("In meta.assert_enum_value_value: value `" .. tostring(value) .. "` is not part of enum `" .. metatable[_enum_typename_index] .. "`")
+        end
+    end
+
+    --- @type Type
+    meta.Type = "Type"
+
+    --- @type Enum
+    meta.Enum = "Enum"
+
+    --- @type Table
+    meta.Table = "table"
+
+    --- @type Number
+    meta.Number = "number"
+
+    --- @type Boolean
+    meta.Boolean = "boolean"
+
+    --- @type Function
+    meta.Function = "function"
+
+    meta.noop_function = function() return nil end
+
+    --- @brief
+    function meta.isa(x, super)
+        if x == nil and super ~= "nil" then return false end
+
+        if type(super) == "string" then
+            return _typeof(x) == super
+        else
+            if type(x) ~= "table" then
+                return false
+            end
+
+            local metatable = rawget(x, _metatable_index)
+            if metatable == nil then
+                return false
+            end
+
+            local typename_hash = rawget(super, _metatable_index)[_type_typename_hash_index]
+            for hash, _ in pairs(metatable[_super_hashes_index]) do
+                if hash == typename_hash then return true end
+            end
+
+            return false
+        end
+    end
+
+    local _assert_isa_throw = function(x, super)
+        error("In meta.assert_isa: expected `" .. tostring(super) .. "`, got `" .. _typeof(x) .. "`")
+    end
+
+    --- @brief
+    function meta.assert_isa(x, super)
+        if type(super) == "string" then
+            if _typeof(x) ~= super then
+                error("In meta.assert_isa: expected `" .. super .. "`, got `" .. _typeof(x) .. "`")
+            end
+        else
+            if type(x) ~= "table" then
+                _assert_isa_throw(x, super)
+            end
+
+            local metatable = rawget(x, _metatable_index)
+            if metatable == nil then
+                _assert_isa_throw(x, super)
+            end
+
+            local typename_hash = rawget(super, _metatable_index)[_type_typename_hash_index]
+            for hash, _ in pairs(metatable[_super_hashes_index]) do
+                if hash == typename_hash then return end
+            end
+
+            _assert_isa_throw(x, super)
+        end
+    end
+
+    for _, which in pairs({
+        "table",
+        "number",
+        "boolean",
+        "function",
+        "string",
+        "nil"
+    }) do
+        --- @brief
+        meta["is_" .. which] = function(x)
+            return type(x) == which
+        end
+
+        --- @brief
+        meta["assert_" .. which] = function(...)
+            local n_args = _select("#", ...)
+            for i = 1, n_args do
+                local arg = _select(i, ...)
+                if type(arg) ~= which then
+                    error("In meta.assert_" .. which .. ": expected `" .. which .. "`, got `" .. _typeof(arg) .. "`")
+                end
+            end
+        end
+    end
+
+    --- @brief
+    function meta.is_signed(x)
+        return type(x) == "number" and math.fmod(x, 1) == 0
+    end
+
+    --- @brief
+    function meta.is_unsigned(x)
+        return type(x) == "number" and math.fmod(x, 1) == 0 and x >= 0
+    end
+
+    --- @brief
+    function meta.is_inf(x)
+        return x == POSITIVE_INFINITY or x == NEGATIVE_INFINITY
+    end
+
+    --- @brief
+    function meta.is_subtype(sub, super)
+        local supers = rawget(sub, _metatable_index)[_type_super_index]
+        for type, _ in pairs(supers) do
+            if type == super then return true end
+        end
+        return false
+    end
+
+    --- @brief
+    function meta.assert_is_subtype(sub, super)
+        local supers = rawget(sub, _metatable_index)[_type_super_index]
+        for type, _ in pairs(supers) do
+            if type == super then return end
+        end
+        error("In meta.assert_is_subtype: type `" .. tostring(sub) .. "` is not a subtype of `" .. tostring(super) .. "`")
+    end
+
+    --- @brief
+    function meta.get_properties(x)
+        return rawget(x, _metatable_index)[_properties_index]
+    end
+end
+
+--- @brief make it such that indexing a table will autt
+function meta.make_auto_extend(x, recursive)
+    if recursive == nil then recursive = false end
+    local metatable = getmetatable(x)
+    if metatable == nil then
+        metatable = {}
+        setmetatable(x, metatable)
+    end
+
+    if metatable.__index ~= nil then
+        error("In make_auto_extend_table: table already has a metatable with an __index method")
+    end
+
+    metatable.__index = function(self, key)
+        local out = {}
+        self[key] = out
+
+        if recursive then
+            meta.make_auto_extend(out, recursive)
+        end
+        return out
+    end
 end
 
 --- @brief
-function meta.new_abstract_type(name, ...)
-    local to_splat = {}
-    table.insert(to_splat, function()
-        rt.error("In " .. name .. "._call: Type `" .. name .. "` is abstract, it cannot be instanced")
-    end)
-
-    for value in range(...) do
-        table.insert(to_splat, value)
-    end
-
-    return meta.new_type(name, splat(to_splat))
-end
-
---- @brief get all super types of instance or type
-function meta.get_supertypes(instance)
-    return instance[1][meta._super_index]
-end
-
---- @class meta.Type
-meta.Type = meta.new_type("Type", function()
-    return meta.new(meta.Type)
-end)
-
---- @type Function
---- @type String
---- @type Table
---- @type Boolean
---- @type Signed
---- @type Unsigned
---- @type Number
-
---- @brief make table weak, meaning it does not increase the reference count of its values
---- @param x Table
---- @param weak_keys Boolean
---- @param weak_values Boolean
 function meta.make_weak(t, weak_keys, weak_values)
     if weak_keys == nil then weak_keys = true end
     if weak_values == nil then weak_values = true end
@@ -641,58 +683,44 @@ function meta.make_weak(t, weak_keys, weak_values)
     return t
 end
 
---- @brief create an empty weak table
---- @param weak_keys Boolean
---- @param weak_values Boolean
-function meta.weak_table(weak_keys, weak_values)
-    local out = {}
-    meta.make_weak(out, weak_keys, weak_values)
-    return out
-end
+--- @brief adds proxy table such that original table is read-only
+function meta.as_immutable(t)
+    local metatable ={
+        __index = function(_, key)
+            local out = t[key]
+            if out == nil then
+                bt.error_function("trying to access `" .. key .. "` of `" .. tostring(t) .. "`, but this value does not exist")
+                return nil
+            end
+            return out
+        end,
 
---- @brief make it such that indexing a table will autt
-function meta.make_auto_extend(x, recursive)
-    if recursive == nil then recursive = false end
-    local metatable = getmetatable(table)
-    if metatable == nil then
-        metatable = {}
-        setmetatable(x, metatable)
-    end
-
-    if metatable.__index ~= nil then
-        error("In make_auto_extend_table: table already has a metatable with an __index method")
-    end
-
-    metatable.__index = function(self, key)
-        local out = {}
-        self[key] = out
-
-        if recursive then
-            meta.make_auto_extend(out, recursive)
+        __newindex = function(_, key, value)
+            bt.error_function("trying to modify table `" .. tostring(t) .. "`, but it is immutable")
         end
-        return out
-    end
+    }
+
+    return setmetatable({}, metatable), metatable
 end
 
---- @brief Add abstract method that needs to be overloaded or an assertion is raised
---- @param super meta.Type
---- @param name String
-function meta.declare_abstract_method(super, name)
-    super[name] = function(self)
-        rt.error("In " .. super._typename .. "." .. name .. ": Abstract method called by object of type `" .. meta.typeof(self) .. "`")
+-- TEST
+do
+    SuperA = meta.new_type("SuperA")
+    function SuperA:new_function(x)
+        return 1234
     end
-end
+    meta.add_signal(SuperA, "super_test")
 
---- @brief hash object, each instance has a unique ID
-function meta.hash(x)
-    return rawget(x, 1)[meta._hash_index]
-end
-
---- @brief
-function meta.is_love_type(x, which)
-    if which == nil then
-        return x.type ~= nil
-    else
-        return x.type ~= nil and x:type() == which
+    Sub = meta.new_type("Sub", SuperA, function()
+        return meta.new(Sub)
+    end)
+    meta.add_signal(Sub, "sub_test")
+    function Sub:test_new_function(x)
+        return self:new_function(1234)
     end
+
+    instance = Sub()
+    instance:signal_connect("super_test", function() end)
+    instance:signal_connect("sub_test", function() end)
+    assert(instance:test_new_function() == 1234)
 end

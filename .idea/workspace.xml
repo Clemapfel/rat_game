@@ -22,9 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/background.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/~meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/~meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -659,15 +666,7 @@
       <workItem from="1736026929737" duration="1195000" />
       <workItem from="1736102224811" duration="27995000" />
       <workItem from="1736208153761" duration="360000" />
-      <workItem from="1736265205191" duration="392000" />
-    </task>
-    <task id="LOCAL-01344" summary="stashing before messsage rework">
-      <option name="closed" value="true" />
-      <created>1734802280392</created>
-      <option name="number" value="01344" />
-      <option name="presentableId" value="LOCAL-01344" />
-      <option name="project" value="LOCAL" />
-      <updated>1734802280392</updated>
+      <workItem from="1736265205191" duration="15627000" />
     </task>
     <task id="LOCAL-01345" summary="stashing textbox one line at a time">
       <option name="closed" value="true" />
@@ -1053,7 +1052,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736191614533</updated>
     </task>
-    <option name="localTasksCounter" value="1393" />
+    <task id="LOCAL-01393" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736265708067</created>
+      <option name="number" value="01393" />
+      <option name="presentableId" value="LOCAL-01393" />
+      <option name="project" value="LOCAL" />
+      <updated>1736265708067</updated>
+    </task>
+    <option name="localTasksCounter" value="1394" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1115,7 +1122,6 @@
     <MESSAGE value="stashing selection node linking" />
     <MESSAGE value="stashing paper formulas not working" />
     <MESSAGE value="stashing before redo" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="optimized radix sort to be parallell in all passes" />
     <MESSAGE value="moved old mains" />
     <MESSAGE value="optimized threadgroup usage, added sort step" />
@@ -1132,7 +1138,8 @@
     <MESSAGE value="jfa working" />
     <MESSAGE value="text box reveal working" />
     <MESSAGE value="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1172,6 +1179,11 @@
           <url>file://$PROJECT_DIR$/common/scrollbar.lua</url>
           <line>47</line>
           <option name="timeStamp" value="43" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/battle/priority_queue.lua</url>
+          <line>161</line>
+          <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

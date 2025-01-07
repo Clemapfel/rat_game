@@ -49,9 +49,9 @@ function rt.load_config(path, to_assign, template)
 
     local function is(value, type)
         if type == rt.SIGNED then
-            return meta.is_number(value) and (meta.is_inf(value) or meta.is_signed(value))
+            return meta.is_number(value)
         elseif type == rt.UNSIGNED then
-            return meta.is_number(value) and (meta.is_inf(value) or value >= 0)
+            return meta.is_number(value) and value >= 0
         elseif type == rt.FLOAT then
             return meta.is_number(value)
         elseif type == rt.POSITIVE_FLOAT then

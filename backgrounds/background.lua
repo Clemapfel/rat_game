@@ -25,8 +25,8 @@ end)
 
 --- @brief
 function rt.Background:set_implementation(implementation_type)
-    meta.assert_is_subtype(implementation_type, rt.BackgroundImplementation)
     self._implementation = implementation_type()
+    meta.assert_is_subtype(self._implementation, rt.BackgroundImplementation)
 
     if self._is_realized then
         self._implementation:realize()
