@@ -6,16 +6,14 @@ rt.settings.battle.status = {
 --- @class bt.StatusConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
 bt.StatusConfig = meta.new_type("StatusConfig", function(id)
+    meta.assert_string(id)
     local out = bt.StatusConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.status.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.StatusConfig, {
-            id = id,
-            _path = path,
-            _is_realized = false
-        })
-        out:realize()
-        meta.set_is_mutable(out, false)
+        local config = bt.StatusConfig.load_config(path)
+        config.id = id
+        config.see_also = {}
+        out = meta.new(bt.StatusConfig, config)
         bt.StatusConfig._atlas[id] = out
     end
     return out
@@ -52,170 +50,107 @@ end, {
     max_duration = POSITIVE_INFINITY,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_gained = function(self, afflicted)
-        return nil
-    end,
+    on_gained = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_lost = function(self, afflicted)
-        return nil
-    end,
+    on_lost = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_already_present = function(self, afflicted)
-        return nil
-    end,
+    on_already_present = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_turn_start = function(self, afflicted)
-        return nil
-    end,
+    on_turn_start = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_turn_end = function(self, afflicted)
-        return nil
-    end,
+    on_turn_end = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_battle_start = function(self, afflicted)
-        return nil
-    end,
+    on_battle_start = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_battle_end = function(self, afflicted)
-        return nil
-    end,
+    on_battle_end = nil,
 
     -- (StatusProxy, EntityProxy, Unsigned) -> nil
-    on_hp_gained = function(self, afflicted, value)
-        return nil
-    end,
+    on_hp_gained = nil,
 
     -- (StatusProxy, EntityProxy, Unsigned) -> nil
-    on_hp_lost = function(self, afflicted, hp_lost)
-        return nil
-    end,
+    on_hp_lost = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy, Unsigned) -> nil
-    on_healing_performed = function(self, afflicted, receiver, value)
-        return nil
-    end,
+    on_healing_performed = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy, Unsigned) -> nil
-    on_damage_dealt = function(self, afflicted, damage_taker, value)
-        return nil
-    end,
+    on_damage_dealt = nil,
 
     -- (StatusProxy, EntityProxy, StatusProxy) -> nil
-    on_status_gained = function(self, afflicted, gained_status)
-        return nil
-    end,
+    on_status_gained = nil,
 
     -- (StatusProxy, EntityProxy, StatusProxy) -> nil
-    on_status_lost = function(self, afflicted, lost_status)
-        return nil
-    end,
+    on_status_lost = nil,
 
     -- (StatusProxy, EntityProxy, GlobalStatusProxy) -> nil
-    on_global_status_gained = function(self, afflicted, gained_status)
-        return nil
-    end,
+    on_global_status_gained = nil,
 
     -- (StatusProxy, EntityProxy, GlobalStatusProxy) -> nil
-    on_global_status_lost = function(self, afflicted, lost_status)
-        return nil
-    end,
+    on_global_status_lost = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_knocked_out = function(self, afflicted)
-        return nil
-    end,
+    on_knocked_out = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_knocked_out_other = function(self, afflicted, knocked_out_entity)
-        return nil
-    end,
+    on_knocked_out_other = nil,
 
     -- (StatusProxy, EntityProxy) -> nil
-    on_helped_up = function(self, afflicted)
-        return nil
-    end,
+    on_helped_up = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_helped_up_other = function(self, afflicted, helping_up_entity)
-        return nil
-    end,
+    on_helped_up_other = nil,
 
     -- (StatusProxy, EntityProxy)
-    on_killed = function(self, afflicted)
-        return nil
-    end,
+    on_killed = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_killed_other = function(self, afflicted, killed_entity)
-        return nil
-    end,
+    on_killed_other = nil,
 
     -- (StatusProxy, EntityProxy)
-    on_revived = function(self, afflicted)
-        return nil
-    end,
+    on_revived = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_revived_other = function(self, afflicted, revived_entity)
-        return nil
-    end,
+    on_revived_other = nil,
 
     -- (StatusProxy, EntityProxy, EntityProxy) -> nil
-    on_swap = function(self, afflicted, entity_at_old_position)
-        return nil
-    end,
+    on_swap = nil,
 
     -- (StatusProxy, EntityProxy, MoveProxy, Table<EntityProxy>) -> nil
-    on_move_used = function(self, afflicted_user, move, targets)
-        return nil
-    end,
+    on_move_used = nil,
 
     -- (StatusProxy, EntityProxy, MoveProxy) -> nil
-    on_move_disabled = function(self, afflicted, move)
-        return nil
-    end,
+    on_move_disabled = nil,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
-    on_consumable_consumed = function(self, afflicted, consumable)
-        return nil
-    end,
+    on_consumable_consumed = nil,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
-    on_consumable_gained = function(self, afflicted, consumable)
-        return nil
-    end,
+    on_consumable_gained = nil,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
-    on_consumable_lost = function(self, afflicted, consumable)
-        return nil
-    end,
+    on_consumable_lost = nil,
 
     -- (StatusProxy, EntityProxy, ConsumableProxy) -> nil
-    on_consumable_disabled = function(self, afflicted, consumable)
-        return nil
-    end,
+    on_consumable_disabled = nil,
 
     -- (StatusProxy, EntityProxy)
-    on_entity_spawned = function(self, afflicted)
-    end,
+    on_entity_spawned = nil,
 
     -- (StatusProxy, EntityProxy, EquipProxy) -> nil
-    on_equip_disabled = function(self, afflicted, equip)
-        return nil
-    end
+    on_equip_disabled = nil
 })
+
+meta.make_immutable(bt.StatusConfig)
 bt.StatusConfig._atlas = {}
 
 --- @brief
-function bt.StatusConfig:realize()
-    if self._is_realized == true then return end
-
+function bt.StatusConfig.load_config(path)
     local functions = {
         "on_gained",
         "on_lost",
@@ -262,7 +197,6 @@ function bt.StatusConfig:realize()
     }
 
     for key in values(functions) do
-        self[key] = nil  -- set functions to nil if unassigned
         template[key] = rt.FUNCTION
     end
 
@@ -279,11 +213,7 @@ function bt.StatusConfig:realize()
         template[which .. "_factor"] = "Float"
     end
 
-    meta.set_is_mutable(self, true)
-    self.see_also = {}
-    rt.load_config(self._path, self, template)
-    self._is_realized = true
-    meta.set_is_mutable(self, false)
+    return rt.load_config(path, template)
 end
 
 --- @brief

@@ -32,13 +32,10 @@ bt.EntityConfig = meta.new_type("EntityConfig", function(id)
     local out = bt.EntityConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.entity.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.EntityConfig, {
-            id = id,
-            _path = path,
-            _is_realized = false
-        })
-        out:realize()
-        meta.set_is_mutable(out, false)
+        local config = bt.EntityConfig.load_config(path)
+        config.id = id
+        config.see_also = {}
+        out = meta.new(bt.EntityConfig, config)
         bt.EntityConfig._atlas[id] = out
     end
     return out
@@ -72,13 +69,11 @@ end, {
         "STRUGGLE"
     }
 })
+
 bt.EntityConfig._atlas = {}
 
 --- @brief
-function bt.EntityConfig:realize()
-    if self._is_realized == true then return end
-    meta.set_is_mutable(self, true)
-
+function bt.EntityConfig.load_config(path)
     local template = {
         name = rt.STRING,
 
@@ -107,8 +102,7 @@ function bt.EntityConfig:realize()
         flavor_text = rt.STRING
     }
 
-    rt.load_config(self._path, self, template)
-    meta.set_is_mutable(self, false)
+    return rt.load_config(path, template)
 end
 
 --- @brief
@@ -124,10 +118,8 @@ function bt.EntityConfig:update_id_from_multiplicity(n)
         id_suffix = id_suffix .. tostring(n)
     end
 
-    meta.set_is_mutable(self, true)
     self.id_suffix = id_suffix
     self.name_suffix = name_suffix
-    meta.set_is_mutable(self, false)
 end
 
 --- @brief

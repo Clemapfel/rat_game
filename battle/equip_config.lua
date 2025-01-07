@@ -5,16 +5,14 @@ rt.settings.battle.equip = {
 
 --- @class bt.EquipConfig
 bt.EquipConfig = meta.new_type("EquipConfig", function(id)
+    meta.assert_string(id)
     local out = bt.EquipConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.equip.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.EquipConfig, {
-            id = id,
-            _path = path,
-            _is_realized = false
-        })
-        out:realize()
-        meta.set_is_mutable(out, false)
+        local config = bt.EquipConfig.load_config(path)
+        config.id = id
+        config.see_also = {}
+        out = meta.new(bt.EquipConfig, config)
         bt.EquipConfig._atlas[id] = out
     end
     return out
@@ -42,9 +40,7 @@ end, {
 bt.EquipConfig._atlas = {}
 
 --- @brief
-function bt.EquipConfig:realize()
-    if self._is_realized == true then return end
-
+function bt.EquipConfig.load_config(path)
     local template = {
         id = rt.STRING,
         name = rt.STRING,
@@ -66,11 +62,7 @@ function bt.EquipConfig:realize()
         effect = rt.FUNCTION
     }
 
-    meta.set_is_mutable(self, true)
-    self.see_also = {}
-    rt.load_config(self._path, self, template)
-    self._is_realized = true
-    meta.set_is_mutable(self, false)
+    return rt.load_config(path, template)
 end
 
 --- @brief

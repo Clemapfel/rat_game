@@ -9,7 +9,7 @@ rt.settings.battle.priority_queue = {
 bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Updatable, function(scene)
     return meta.new(bt.PriorityQueue, {
         _order = {}, -- Table<Entity>,
-        _entity_id_to_item = {}, -- Table<String, cf. _new_element>
+        _entity_to_item = {}, -- Table<Entity, cf. _new_element>
         _render_order = {}, -- Table<Pair<Item, Motion>>
         _scale_factor = 1,
         _n_consumed = 0,
@@ -20,7 +20,9 @@ end)
 
 --- @brief [internal]
 function bt.PriorityQueue:_element_new(entity)
+
     local suffix = entity:get_name_suffix()
+
     local element = {
         entity = entity,
         motions = {},
@@ -156,14 +158,13 @@ end
 
 --- @brief
 function bt.PriorityQueue:reorder(new_order)
-    if new_order == nil then new_order = {} end
 
     local old_size = sizeof(self._order)
     local new_size = sizeof(new_order)
     if old_size == new_size then
         local is_same = true
         for i, _ in ipairs(new_order) do
-            if self._order[i] ~= new_order[i] then
+            if self._order[i]:get_id() ~= new_order[i]:get_id() then
                 is_same = false
                 break
             end
@@ -171,40 +172,40 @@ function bt.PriorityQueue:reorder(new_order)
         if is_same then return end
     end
 
+    assert(new_order ~= nil)
     self._order = new_order
     self._scale_elapsed = 1
     self._n_consumed = 0
     self._consumed_y_offset = 0
 
-
-    local to_remove_ids = {}
-    for entity_id in keys(self._entity_id_to_item) do
-        to_remove_ids[entity_id] = true
+    local to_remove = {}
+    for entity in keys(self._entity_to_item) do
+        to_remove[entity] = true
     end
 
-    local entity_id_to_multiplicity = {}
+    local entity_to_multiplicity = {}
+
     for entity in values(new_order) do
-        local entity_id = entity:get_id()
-        to_remove_ids[entity_id] = nil
-        local item = self._entity_id_to_item[entity_id]
+        to_remove[entity] = nil
+        local item = self._entity_to_item[entity]
         if item == nil then
             item = self:_element_new(entity)
-            self._entity_id_to_item[entity_id] = item
+            self._entity_to_item[entity] = item
         end
 
-        if entity_id_to_multiplicity[entity_id] == nil then
-            entity_id_to_multiplicity[entity_id] = 1
+        if entity_to_multiplicity[entity] == nil then
+            entity_to_multiplicity[entity] = 1
         else
-            entity_id_to_multiplicity[entity_id] = entity_id_to_multiplicity[entity_id] + 1
+            entity_to_multiplicity[entity] = entity_to_multiplicity[entity] + 1
         end
     end
 
-    for entity_id in keys(to_remove_ids) do
-        self._entity_id_to_item[entity_id] = nil
+    for entity in keys(to_remove) do
+        self._entity_to_item[entity] = nil
     end
 
-    for entity_id, multiplicity in pairs(entity_id_to_multiplicity) do
-        self:_element_set_multiplicity(self._entity_id_to_item[entity_id], multiplicity)
+    for entity, multiplicity in pairs(entity_to_multiplicity) do
+        self:_element_set_multiplicity(self._entity_to_item[entity], multiplicity)
     end
 
     self:reformat()
@@ -213,16 +214,16 @@ end
 --- @override
 function bt.PriorityQueue:size_allocate(x, y, width, height)
     local first_scale_width_delta, first_scale_height_delta = 0, 0
-    if self._order ~= nil and sizeof(self._order) >= 1 then
+    if self._order ~= nil and #self._order >= 1 then
         local first_scale_factor = rt.settings.battle.priority_queue.first_element_scale_factor
-        local first = self._entity_id_to_item[self._order[1]:get_id()]
+        local first = self._entity_to_item[self._order[1]]
         first_scale_width_delta = (first.width * first_scale_factor - first.width)
         first_scale_height_delta = (first.height * first_scale_factor - first.height)
     end
 
     local m = 2 * rt.settings.margin_unit
     local start_x = x + 0.5 * width
-    local entity_id_to_multiplicity_offset = {}
+    local entity_to_multiplicity_offset = {}
 
     self._render_order = {}
     self._consume_buffer = {}
@@ -231,24 +232,23 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
     local total_height = 0
     local n_items = 0
     for entity in values(self._order) do
-        local item = self._entity_id_to_item[entity:get_id()]
+        local item = self._entity_to_item[entity]
         total_height = total_height + item.height
         n_items = n_items + 1
     end
 
-
     local margin = clamp((height - total_height - first_scale_height_delta) / (n_items - 1), NEGATIVE_INFINITY, 0)
+
     local is_first = true
     for entity in values(self._order) do
-        local entity_id = entity:get_id()
-        local multiplicity_offset = entity_id_to_multiplicity_offset[entity_id]
+        local multiplicity_offset = entity_to_multiplicity_offset[entity]
         if multiplicity_offset == nil then
             multiplicity_offset = 0
         end
 
-        entity_id_to_multiplicity_offset[entity_id] = multiplicity_offset + 1
+        entity_to_multiplicity_offset[entity] = multiplicity_offset + 1
 
-        local item = self._entity_id_to_item[entity_id]
+        local item = self._entity_to_item[entity]
         local motion = item.motions[1 + multiplicity_offset]
         if is_first then
             motion:set_target_position(current_x, current_y)
@@ -265,7 +265,7 @@ end
 
 --- @override
 function bt.PriorityQueue:update(delta)
-    for item in values(self._entity_id_to_item) do
+    for item in values(self._entity_to_item) do
         for motion in values(item.motions) do
             motion:update(delta)
         end
@@ -281,15 +281,15 @@ function bt.PriorityQueue:update(delta)
         buffer.opacity_offset = buffer.opacity_offset - opacity_offset_speed * delta
 
         if buffer.y_offset_added == false and buffer.opacity <= 0 then
-            local item = self._entity_id_to_item[self._order[item_i]:get_id()]
+            local item = self._entity_to_item[self._order[item_i]]
             self._consumed_y_offset = self._consumed_y_offset - (1 - clamp(buffer.opacity, 0, 1))  * item.height
             buffer.y_offset_added = true
         end
         item_i = item_i + 1
     end
 
-    if sizeof(self._order) >= 1 then
-        local first = self._entity_id_to_item[self._order[1]:get_id()]
+    if #self._order >= 1 then
+        local first = self._entity_to_item[self._order[1]]
         if #first.motions > 1 then
             local x, y = first.motions[1]:get_position()
             self._scale_factor = 1 - (y - self._bounds.y) / self._bounds.height
@@ -340,7 +340,10 @@ end
 
 --- @override
 function bt.PriorityQueue:set_selection_state(entity, state)
-    local item = self._entity_id_to_item[entity:get_id()]
+    local item = self._entity_to_item[entity]
+    for self_entity, item in pairs(self._entity_to_item) do
+        dbg(self_entity:get_id(), entity:get_id(), self_entity:get_multiplicity(), entity:get_multiplicity())
+    end
     if item == nil then
         rt.warning("In bt.PriorityQueue:set_selection_state: entity `" .. entity:get_id() .. "` is not present in queue")
         return
@@ -352,7 +355,7 @@ end
 
 --- @override
 function bt.PriorityQueue:set_state(entity, state)
-    local item = self._entity_id_to_item[entity:get_id()]
+    local item = self._entity_to_item[entity]
     item.entity_state = state
     self:_element_update_state(item)
 end
@@ -364,7 +367,7 @@ end
 
 --- @brief
 function bt.PriorityQueue:skip()
-    for item in values(self._entity_id_to_item) do
+    for item in values(self._entity_to_item) do
         for motion in values(item.motions) do
             motion:skip()
         end

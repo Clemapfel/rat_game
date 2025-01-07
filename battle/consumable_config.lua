@@ -5,16 +5,14 @@ rt.settings.battle.consumable = {
 
 --- @class bt.ConsumableConfig
 bt.ConsumableConfig = meta.new_type("ConsumableConfig", function(id)
+    meta.assert_string(id)
     local out = bt.ConsumableConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.consumable.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.ConsumableConfig, {
-            id = id,
-            _path = path,
-            _is_realized = false
-        })
-        out:realize()
-        meta.set_is_mutable(out, false)
+        local config = bt.ConsumableConfig.load_config(path)
+        config.id = id
+        config.see_also = {}
+        out = meta.new(bt.ConsumableConfig, config)
         bt.ConsumableConfig._atlas[id] = out
     end
     return out
@@ -23,171 +21,108 @@ end, {
     restore_uses_after_battle = false,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_gained = function(self, holder)
-        return nil
-    end,
+    on_gained = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_lost = function(self, holder)
-        return nil
-    end,
+    on_lost = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_turn_start = function(self, holder)
-        return nil
-    end,
+    on_turn_start = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_turn_end = function(self, holder)
-        return nil
-    end,
+    on_turn_end = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_battle_start = function(self, holder)
-
-    end,
+    on_battle_start = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_battle_end = function(self, holder)
-        return nil
-    end,
+    on_battle_end = nil,
 
     -- (ConsumableProxy, EntityProxy, Unsigned) -> nil
-    on_hp_gained = function(self, holder, value)
-        return nil
-    end,
+    on_hp_gained = nil,
 
     -- (ConsumableProxy, EntityProxy, Unsigned) -> nil
-    on_hp_lost = function(self, holder, hp_lost)
-        return nil
-    end,
+    on_hp_lost = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy, Unsigned) -> nil
-    on_healing_performed = function(self, holder, receiver, value)
-        return nil
-    end,
+    on_healing_performed = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy, Unsigned) -> nil
-    on_damage_dealt = function(self, holder, damage_taker, value)
-        return nil
-    end,
+    on_damage_dealt = nil,
 
     -- (ConsumableProxy, EntityProxy, StatusProxy) -> nil
-    on_status_gained = function(self, holder, gained_status)
-        return nil
-    end,
+    on_status_gained = nil,
 
     -- (ConsumableProxy, EntityProxy, StatusProxy)
-    on_status_lost = function(self, holder, lost_status)
-        return nil
-    end,
+    on_status_lost = nil,
 
     -- (ConsumableProxy, EntityProxy, GlobalStatusProxy) -> nil
-    on_global_status_gained = function(self, holder, gained_status)
-        return nil
-    end,
+    on_global_status_gained = nil,
 
     -- (ConsumableProxy, EntityProxy, GlobalStatusProxy) -> nil
-    on_global_status_lost = function(self, holder, lost_status)
-        return nil
-    end,
+    on_global_status_lost = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_knocked_out = function(self, holder)
-        return nil
-    end,
+    on_knocked_out = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_knocked_out_other = function(self, holder, knocked_out_entity)
-        return nil
-    end,
+    on_knocked_out_other = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_helped_up = function(self, holder)
-        return nil
-    end,
+    on_helped_up = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_helped_up_other = function(self, holder, helped_up_entity)
-        return nil
-    end,
+    on_helped_up_other = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_killed = function(self, holder)
-        return nil
-    end,
+    on_killed = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_killed_other = function(self, holder, killed_entity)
-        return nil
-    end,
+    on_killed_other = nil,
 
     -- (ConsumableProxy, EntityProxy) -> nil
-    on_revived = function(self, holder)
-        return nil
-    end,
+    on_revived = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_revived_other = function(self, holder, revived_entity)
-        return nil
-    end,
+    on_revived_other = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy) -> nil
-    on_swap = function(self, holder, entity_at_old_position)
-        return nil
-    end,
+    on_swap = nil,
 
     -- (ConsumableProxy, EntityProxy, MoveProxy, Table<EntityProxy>)
-    on_move_used = function(self, holder, move, targets)
-        return nil
-    end,
+    on_move_used = nil,
 
     -- (ConsumableProxy, EntityProxy, MoveProxy) -> nil
-    on_move_disabled = function(self, holder, move)
-        return nil
-    end,
+    on_move_disabled = nil,
 
     -- (ConsumableProxy, EntityProxy, ConsumableProxy)
-    on_consumable_consumed = function(self, holder, other_consumable)
-        return nil
-    end,
+    on_consumable_consumed = nil,
 
     -- (ConsumableProxy, EntityProxy, ConsumableProxy)
-    on_consumable_gained = function(self, holder, other_consumable)
-        return nil
-    end,
+    on_consumable_gained = nil,
 
     -- (ConsumableProxy, EntityProxy, ConsumableProxy)
-    on_consumable_lost = function(self, holder, other_consumable)
-        return nil
-    end,
+    on_consumable_lost = nil,
 
     -- (ConsumableProxy, EntityProxy, ConsumableProxy)
-    on_consumable_disabled = function(self, holder, other_consumable)
-        return nil
-    end,
+    on_consumable_disabled = nil,
 
     -- (ConsumableProxy, EntityProxy, EntityProxy)
-    on_entity_spawned = function(self, holder, other_entity)
-        return nil
-    end,
+    on_entity_spawned = nil,
 
     -- (ConsumableProxy, EntityProxy, EquipProxy) -> nil
-    on_equip_disabled = function(self, holder, equip)
-        return nil
-    end,
+    on_equip_disabled = nil,
 
     description = rt.Translation.battle.consumable_default_description,
     flavor_text = rt.Translation.battle.consumable_default_flavor_text,
     sprite_id = "",
     sprite_index = 1
 })
+meta.make_immutable(bt.ConsumableConfig)
 bt.ConsumableConfig._atlas = {}
 
 --- @brief
-function bt.ConsumableConfig:realize()
-    if self._is_realized == true then return end
-
+function bt.ConsumableConfig.load_config(path)
     local functions = {
         "on_turn_start",
         "on_turn_end",
@@ -234,15 +169,10 @@ function bt.ConsumableConfig:realize()
     }
 
     for key in values(functions) do
-        self[key] = nil  -- set functions to nil if unassigned
         template[key] = rt.FUNCTION
     end
 
-    meta.set_is_mutable(self, true)
-    self.see_also = {}
-    rt.load_config(self._path, self, template)
-    self._is_realized = true
-    meta.set_is_mutable(self, false)
+    return rt.load_config(path, template)
 end
 
 --- @brief
@@ -274,4 +204,3 @@ end
 function bt.ConsumableConfig:get_flavor_text()
     return self.flavor_text
 end
-

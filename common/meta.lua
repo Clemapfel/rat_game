@@ -425,9 +425,10 @@ do
     end
 
     --- @brief
-    function meta.set_is_immutable(type, is_immutable)
+    function meta.make_immutable(type, is_immutable)
+        if is_immutable == nil then is_immutable = true end
         if not meta.typeof(type) == _type_typename then
-            _G.error("In meta.set_is_immutable: expected `Type`, got `" .. meta.typeof(type) .. "`")
+            _G.error("In meta.make_immutable: expected `Type`, got `" .. meta.typeof(type) .. "`")
             return
         end
         rawset(type, _type_is_mutable_index, is_immutable)
@@ -445,6 +446,14 @@ do
     --- @brief
     function meta.get_is_immutable(type)
         return rawget(type, _type_is_mutable_index)
+    end
+
+    meta.set_is_mutable = function(x, b)
+        if b then
+            rawget(x, _metatable_index).__newindex = nil
+        else
+            rawget(x, _metatable_index).__newindex = nil
+        end
     end
 
     --- @brief

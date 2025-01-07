@@ -22,7 +22,11 @@ where Type is one of the above
 
 --- @brief
 --- @param template Table<String, rt.ConfigTemplateType>
-function rt.load_config(path, to_assign, template)
+function rt.load_config(path, template, third)
+    meta.assert_string(path)
+    meta.assert_table(template)
+    meta.assert_nil(third)
+
     local load_success, chunk_or_error, love_error = pcall(love.filesystem.load, path)
     if not load_success then
         rt.error("In rt.load_config: error when parsing config at `" .. path .. "`: " .. chunk_or_error)
@@ -72,11 +76,12 @@ function rt.load_config(path, to_assign, template)
         end
     end
 
+    local out = {}
     for key, type in pairs(template) do
         if config[key] ~= nil then
-            to_assign[key] = config[key]
+            out[key] = config[key]
 
-            local value = to_assign[key]
+            local value = out[key]
             if meta.is_table(type) then
                 for t in values(type) do
                     if is(value, t) then
@@ -93,5 +98,5 @@ function rt.load_config(path, to_assign, template)
         end
     end
 
-    return to_assign
+    return out
 end

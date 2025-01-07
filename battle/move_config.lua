@@ -7,17 +7,17 @@ rt.settings.battle.move = {
 --- @class bt.MoveConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
 bt.MoveConfig = meta.new_type("Move", function(id)
+    meta.assert_string(id)
     local out = bt.MoveConfig._atlas[id]
     if out == nil then
         local path = rt.settings.battle.move.config_path .. "/" .. id .. ".lua"
-        out = meta.new(bt.MoveConfig, {
-            id = id,
-            name = "UNINITIALIZED MOVE @" .. path,
-            _path = path,
-            _is_realized = false
-        })
-        out:realize()
-        meta.set_is_mutable(out, false)
+        local config = bt.MoveConfig.load_config(path)
+        config.id = id
+        config.see_also = {}
+        out = meta.new(bt.MoveConfig, config)
+        if out.effect == nil then
+            rt.error("In bt.MoveConfig: config at `" .. path .. "` does not implement `effect`, value is left nil")
+        end
         bt.MoveConfig._atlas[id] = out
     end
     return out
@@ -42,17 +42,13 @@ end, {
     power = 0, -- factor
 
     --- (MoveProxy, EntityProxy, Table<EntityProxy>) -> nil
-    effect = function(move_proxy, user_proxy, target_proxies)
-        return nil
-    end,
+    effect = nil,
 })
+meta.make_immutable(bt.MoveConfig)
 bt.MoveConfig._atlas = {}
 
 --- @brief
-function bt.MoveConfig:realize()
-    if self._is_realized == true then return end
-    self.effect = nil
-
+function bt.MoveConfig.load_config(path)
     local template = {
         id = rt.STRING,
         name = rt.STRING,
@@ -72,15 +68,7 @@ function bt.MoveConfig:realize()
         effect = rt.FUNCTION
     }
 
-    meta.set_is_mutable(self, true)
-    self.see_also = {}
-    rt.load_config(self._path, self, template)
-    self._is_realized = true
-    meta.set_is_mutable(self, false)
-
-    if self.effect == nil then
-        rt.error("In bt.MoveConfig:realize: config at `" .. self._path .. "` does not implement `effect`, value is left nil")
-    end
+    return rt.load_config(path, template)
 end
 
 --- @brief

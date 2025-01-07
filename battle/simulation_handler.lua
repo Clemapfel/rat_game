@@ -77,6 +77,8 @@ do
         }
     end
 
+    local _entity_proxy_atlas = meta.make_weak({})
+
     --- @brief
     --- @param scene bt.BattleScene
     --- @param entity bt.Entity
@@ -84,10 +86,19 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.Entity)
 
+        local id = native:get_id()
+        if _entity_proxy_atlas[id] ~= nil then
+            return _entity_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.EntityProxy, scene, native)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _entity_proxy_atlas[id] = out
+        return out
     end
+
+    local _global_status_proxy_atlas = meta.make_weak({})
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -96,10 +107,19 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.GlobalStatusConfig)
 
+        local id = native:get_id()
+        if _global_status_proxy_atlas[id] ~= nil then
+            return _global_status_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.GlobalStatusProxy, scene, native)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _global_status_proxy_atlas[id] = out
+        return out
     end
+
+    local _status_proxy_atlas = meta.make_weak({})
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -108,14 +128,19 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.StatusConfig)
 
+        local id = native:get_id()
+        if _status_proxy_atlas[id] ~= nil then
+            return _status_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.StatusProxy, scene, native)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _status_proxy_atlas[id] = out
+        return out
     end
 
-    --- @brief
-    --- @param scene bt.BattleScene
-    --- @param status bt.StatusConfig
+    local _consumable_proxy_atlas = meta.make_weak({})
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -125,10 +150,19 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.ConsumableConfig)
 
+        local id = native:get_id()
+        if _consumable_proxy_atlas[id] ~= nil then
+            return _consumable_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.ConsumableProxy, scene)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _consumable_proxy_atlas[id] = out
+        return out
     end
+
+    local _equip_proxy_atlas = meta.make_weak({})
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -138,10 +172,19 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.EquipConfig)
 
+        local id = native:get_id()
+        if _equip_proxy_atlas[id] ~= nil then
+            return _equip_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.EquipProxy, scene)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _equip_proxy_atlas[id] = out
+        return out
     end
+
+    local _move_proxy_atlas = meta.make_weak({})
 
     --- @brief
     --- @param scene bt.BattleScene
@@ -151,9 +194,16 @@ do
         meta.assert_isa(scene, bt.BattleScene)
         meta.assert_isa(native, bt.MoveConfig)
 
+        local id = native:get_id()
+        if _move_proxy_atlas[id] ~= nil then
+            return _move_proxy_atlas[id]
+        end
+
         local metatable = _create_proxy_metatable(bt.MoveProxy, scene)
         metatable._native = native
-        return setmetatable({}, metatable)
+        local out = setmetatable({}, metatable)
+        _move_proxy_atlas[id] = out
+        return out
     end
 end
 
@@ -2222,7 +2272,7 @@ function bt.BattleScene:create_simulation_environment()
         _new_animation_node()
 
         local added_entities = {}
-        local entity_to_status_proxies = {}
+        local entity_id_to_status_proxies = {}
 
         local is_first_animation = true
 
@@ -2263,9 +2313,9 @@ function bt.BattleScene:create_simulation_environment()
                 _state:entity_add_equip(entity, i, _get_native(equip_proxy))
             end
 
-            entity_to_status_proxies[entity] = {}
+            entity_id_to_status_proxies[entity:get_id()] = {}
             for status_proxy in values(status_proxies) do
-                table.insert(entity_to_status_proxies[entity], status_proxy)
+                table.insert(entity_id_to_status_proxies[entity:get_id()], status_proxy)
             end
 
             local entity_proxy = bt.create_entity_proxy(_scene, entity)
@@ -2366,9 +2416,9 @@ function bt.BattleScene:create_simulation_environment()
         _new_animation_node()
 
         -- now add statuses
-        for entity, proxies in pairs(entity_to_status_proxies) do
+        for entity in values(added_entities) do
             local entity_proxy = bt.create_entity_proxy(_scene, entity)
-            for status_proxy in values(proxies) do
+            for status_proxy in values(entity_id_to_status_proxies[entity:get_id()]) do
                 bt.assert_is_status_proxy("spawn", status_proxy, 5)
                 env.add_status(entity_proxy, status_proxy, false)
             end
