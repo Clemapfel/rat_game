@@ -46,7 +46,6 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _game_over_screen_active = false,
 
         _is_first_size_allocate = true,
-
         _selection_graph = nil, -- rt.SelectionGraph?
     })
     return out
