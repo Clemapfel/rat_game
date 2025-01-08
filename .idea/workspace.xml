@@ -22,20 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added selection indicator">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/scroll_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/scroll_indicator.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -670,15 +661,7 @@
       <workItem from="1736026929737" duration="1195000" />
       <workItem from="1736102224811" duration="27995000" />
       <workItem from="1736208153761" duration="360000" />
-      <workItem from="1736265205191" duration="33107000" />
-    </task>
-    <task id="LOCAL-01348" summary="added after-line delay">
-      <option name="closed" value="true" />
-      <created>1734828621371</created>
-      <option name="number" value="01348" />
-      <option name="presentableId" value="LOCAL-01348" />
-      <option name="project" value="LOCAL" />
-      <updated>1734828621371</updated>
+      <workItem from="1736265205191" duration="38322000" />
     </task>
     <task id="LOCAL-01349" summary="stashing manual mode">
       <option name="closed" value="true" />
@@ -1064,7 +1047,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736291609379</updated>
     </task>
-    <option name="localTasksCounter" value="1397" />
+    <task id="LOCAL-01397" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736364073329</created>
+      <option name="number" value="01397" />
+      <option name="presentableId" value="LOCAL-01397" />
+      <option name="project" value="LOCAL" />
+      <updated>1736364073329</updated>
+    </task>
+    <option name="localTasksCounter" value="1398" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1139,11 +1130,11 @@
     <MESSAGE value="jfa working" />
     <MESSAGE value="text box reveal working" />
     <MESSAGE value="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="refactored meta" />
     <MESSAGE value="refactored entity comparison" />
     <MESSAGE value="added selection indicator" />
-    <option name="LAST_COMMIT_MESSAGE" value="added selection indicator" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

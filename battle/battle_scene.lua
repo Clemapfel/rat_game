@@ -445,10 +445,6 @@ function bt.BattleScene:draw()
     if self._selection_graph_frame_visible then
         self._selection_graph_frame:draw()
     end
-
-    if self._selection_graph ~= nil then
-        self._selection_graph:draw()
-    end
 end
 
 --- @brief
@@ -734,10 +730,12 @@ function bt.BattleScene:_create_inspect_selection_graph()
     local global_status_bar_nodes = self._global_status_bar:get_selection_nodes()
 
     local textbox_nodes = { rt.SelectionGraphNode(self._text_box:get_bounds()) }
-    textbox_nodes[1].object = rt.VerboseInfoObject.BATTLE_LOG
+    local textbox_node = textbox_nodes[1]
+    textbox_node.object = rt.VerboseInfoObject.BATTLE_LOG
 
     local quicksave_nodes = self._quicksave_indicator:get_selection_nodes()
-    quicksave_nodes[1].object = rt.VerboseInfoObject.QUICKSAVE
+    local quicksave_node = quicksave_nodes[1]
+    quicksave_node.object = rt.VerboseInfoObject.QUICKSAVE
 
     local enemy_sprite_nodes = {}
     local enemy_status_consumable_nodes = {}
@@ -763,178 +761,247 @@ function bt.BattleScene:_create_inspect_selection_graph()
 
             for i = 1, sizeof(bar_nodes) do
                 local node = bar_nodes[i]
-                node:set_left(bar_nodes[i - 1])
-                node:set_right(bar_nodes[i + 1])
-
-                if direction == true then
-                    node:set_up(sprite_node)
-                else
-                    node:set_down(sprite_node)
+                local bounds = node:get_bounds()
+                local center_x = bounds.x + 0.5 * bounds.width
+                local distance = math.abs(sprite_center_x - center_x)
+                if distance < min_distance then
+                    min_distance = distance
+                    closest_node = node
                 end
 
-                do
-                    local bounds = node:get_bounds()
-                    local center_x = bounds.x + 0.5 * bounds.width
-                    local distance = math.abs(sprite_center_x - center_x)
-                    if distance < min_distance then
-                        min_distance = distance
-                        closest_node = node
-                    end
-                end
                 table.insert(status_consumable_nodes, node)
-            end
-
-            if direction then
-                sprite_node:set_down(closest_node)
-            else
-                sprite_node:set_up(closest_node)
             end
 
             table.insert(sprite_nodes, sprite_node)
         end
     end
 
-    for sprite_nodes in range(
-        enemy_sprite_nodes,
-        enemy_status_consumable_nodes,
-        party_sprite_nodes,
-        party_status_consumable_nodes
+    -- linking
+    local n_party_status_nodes = sizeof(party_status_consumable_nodes)
+    local n_enemy_status_nodes = sizeof(enemy_status_consumable_nodes)
+    local n_enemy_sprite_nodes = sizeof(enemy_sprite_nodes)
+    local n_party_sprite_nodes = sizeof(party_sprite_nodes)
+    local n_global_status_nodes = sizeof(global_status_bar_nodes)
+    local n_priority_queue_nodes = sizeof(priority_queue_nodes)
+
+    for nodes_n in range(
+        {party_status_consumable_nodes, n_party_status_nodes},
+        {enemy_status_consumable_nodes, n_enemy_status_nodes},
+        {party_sprite_nodes, n_party_sprite_nodes},
+        {enemy_sprite_nodes, n_enemy_sprite_nodes},
+        {global_status_bar_nodes, n_global_status_nodes}
     ) do
-        table.sort(sprite_nodes, function(a, b)
+
+        local nodes, n = table.unpack(nodes_n)
+        table.sort(nodes, function(a, b)
             return a:get_bounds().x < b:get_bounds().x
         end)
-
-        for i = 1, sizeof(sprite_nodes) do
-            local node = sprite_nodes[i]
-            node:set_left(sprite_nodes[i - 1])
-            node:set_right(sprite_nodes[i + 1])
-        end
-    end
-
-    do
-        local nodes = priority_queue_nodes
-        local right_candidates = {
-            textbox_nodes[1],
-            enemy_sprite_nodes[1],
-            party_sprite_nodes[1],
-            enemy_status_consumable_nodes[1],
-            party_status_consumable_nodes[1]
-        }
-
-        for i = 1, sizeof(nodes) do
+        for i = 1, n do
             local node = nodes[i]
-            node:set_up(nodes[i - 1])
-            node:set_down(nodes[i + 1])
-
-            local closest_node = nil
-            local min_distance = POSITIVE_INFINITY
-            for other in values(right_candidates) do
-                local self_bounds = node:get_bounds()
-                local self_y = self_bounds.y + 0.5 * self_bounds.height
-
-                local other_bounds = other:get_bounds()
-                local other_y = other_bounds.y -- sic, not center
-
-                local distance = math.abs(self_y - other_y)
-                if distance < min_distance then
-                    min_distance = distance
-                    closest_node = other
-                end
-            end
-
-            node:set_right(closest_node)
-            closest_node:set_left(node)
+            node:set_left(nodes[i - 1])
+            node:set_right(nodes[i + 1])
         end
     end
 
-    do
-        local node = textbox_nodes[1]
-        local self_bounds = node:get_bounds()
-        local self_x = self_bounds.x + 0.5 * self_bounds.width
+    local _last_textbox_down_node = nil
+    local highest_y = POSITIVE_INFINITY
+    for node in values(enemy_sprite_nodes) do
+        node:set_up(textbox_node)
+        node:signal_connect("enter", function(self)
+            _last_textbox_down_node = self
+        end)
 
-        local min_distance = POSITIVE_INFINITY
-        local closest_node = nil
-        for other in values(enemy_sprite_nodes) do
-            other:set_up(textbox_nodes[1])
-
-            local other_bounds = other:get_bounds()
-            local other_x = other_bounds.x + 0.5 * other_bounds.width
-
-            local distance = math.abs(other_x - self_x)
-            if distance < min_distance then
-                min_distance = distance
-                closest_node = other
-            end
+        -- initialize as node closest to top
+        if node:get_bounds().y < highest_y then
+            _last_textbox_down_node = node
         end
-
-        node:set_down(closest_node)
     end
 
-    for i = 1, sizeof(global_status_bar_nodes) do
-        local node = global_status_bar_nodes[i]
-        node:set_left(global_status_bar_nodes[i - 1])
-        node:set_right(global_status_bar_nodes[i + 1])
-        node:set_down(quicksave_nodes[1])
+    textbox_node:set_down(function()
+        return _last_textbox_down_node
+    end)
+
+    textbox_node:set_right(global_status_bar_nodes[1])
+    global_status_bar_nodes[1]:set_left(textbox_node)
+
+    local _last_quicksave_up_node = global_status_bar_nodes[1]
+    for node in values(global_status_bar_nodes) do
+        node:set_down(quicksave_node)
+        node:signal_connect("enter", function(self)
+            _last_quicksave_up_node = self
+        end)
     end
-    quicksave_nodes[1]:set_up(global_status_bar_nodes[1])
 
-    do
-        local right_nodes = {
-            enemy_sprite_nodes[sizeof(enemy_sprite_nodes)],
-            enemy_status_consumable_nodes[sizeof(enemy_status_consumable_nodes)],
-            party_sprite_nodes[sizeof(party_sprite_nodes)],
-            party_status_consumable_nodes[sizeof(party_status_consumable_nodes)],
-            textbox_nodes[sizeof(textbox_nodes)]
-        }
+    quicksave_node:set_up(function()
+        return _last_quicksave_up_node
+    end)
 
-        local candidates = {
-            global_status_bar_nodes[1],
-            quicksave_nodes[1]
-        }
+    local _last_quicksave_left_node = party_sprite_nodes[n_party_sprite_nodes]
+    quicksave_node:set_left(function()
+        return _last_quicksave_left_node
+    end)
 
-        for node in values(right_nodes) do
-            local min_distance = POSITIVE_INFINITY
-            local closest_node = nil
+    party_sprite_nodes[n_party_sprite_nodes]:signal_connect("exit", function(self)
+        _last_quicksave_left_node = self
+    end)
+    party_sprite_nodes[n_party_sprite_nodes]:set_right(quicksave_node)
 
+    party_status_consumable_nodes[n_party_status_nodes]:signal_connect("exit", function(self)
+        _last_quicksave_left_node = self
+    end)
+    party_status_consumable_nodes[n_party_status_nodes]:set_right(quicksave_node)
+
+    local _sprite_to_last_status_node = {}
+    for status_nodes_sprite_nodes_down_or_up in range(
+        {enemy_status_consumable_nodes, enemy_sprite_nodes, true},
+        {party_status_consumable_nodes, party_sprite_nodes, false}
+    ) do
+        local status_nodes, sprite_nodes, down_or_up = table.unpack(status_nodes_sprite_nodes_down_or_up)
+        for node in values(status_nodes) do
             local self_bounds = node:get_bounds()
-            local self_y = self_bounds.y + 0.5 * self_bounds.height
-
-            for other in values(candidates) do
+            local self_x = self_bounds.x + 0.5 * self_bounds.width
+            local min_distance = POSITIVE_INFINITY
+            local closest_node = nil
+            for other in values(sprite_nodes) do
                 local other_bounds = other:get_bounds()
-                local other_y = other_bounds.y + 0.5 * other_bounds.height
-
-                local distance = math.abs(other_y - self_y)
+                local distance = math.abs(self_x - (other_bounds.x + 0.5 * other_bounds.width))
                 if distance < min_distance then
                     min_distance = distance
                     closest_node = other
                 end
             end
 
-            node:set_right(closest_node)
-            closest_node:set_left(node)
+            if down_or_up then
+                node:set_up(closest_node)
+            else
+                node:set_down(closest_node)
+            end
+
+            _sprite_to_last_status_node[closest_node] = node
+            node:signal_connect("enter", function(self)
+                _sprite_to_last_status_node[closest_node] = self
+            end)
+        end
+
+        for node in values(sprite_nodes) do
+            if down_or_up then
+                node:set_down(function(self)
+                    return _sprite_to_last_status_node[self]
+                end)
+            else
+                node:set_up(function(self)
+                    return _sprite_to_last_status_node[self]
+                end)
+            end
         end
     end
 
-    for node in values(party_status_consumable_nodes) do
-        local min_distance = POSITIVE_INFINITY
-        local closest_node = nil
+    table.sort(priority_queue_nodes, function(a, b)
+        return a:get_bounds().y < b:get_bounds().y
+    end)
+
+    local left_candidates = {
+        textbox_node,
+        enemy_sprite_nodes[1],
+        enemy_status_consumable_nodes[1],
+        party_sprite_nodes[1],
+        party_status_consumable_nodes[1]
+    }
+
+    local _last_priority_queue_node_left = priority_queue_nodes[1]
+    local _last_priority_queue_node_right
+    for i = 1, n_priority_queue_nodes do
+        local node = priority_queue_nodes[i]
+        node:set_up(priority_queue_nodes[i - 1])
+        node:set_down(priority_queue_nodes[i + 1])
+        node:signal_connect("enter", function(self)
+            _last_priority_queue_node_left = self
+        end)
 
         local self_bounds = node:get_bounds()
-        local self_x = self_bounds.x + 0.5 * self_bounds.width
-
-        for other in values(enemy_status_consumable_nodes) do
+        local self_y = self_bounds.y + 0.5 * self_bounds.height
+        local min_distance = POSITIVE_INFINITY
+        local closest_node = nil
+        for other in values(left_candidates) do
             local other_bounds = other:get_bounds()
-            local other_x = other_bounds.x + 0.5 * other_bounds.width
-
-            local distance = math.abs(other_x - self_x)
+            local distance = math.abs(self_y - (other_bounds.y + 0.5 * other_bounds.height))
             if distance < min_distance then
                 min_distance = distance
                 closest_node = other
             end
         end
 
-        node:set_up(closest_node)
-        closest_node:set_down(node)
+        -- TODO
+    end
+
+    for node in values(left_candidates) do
+        -- TODO
+    end
+
+    textbox_node:set_left(priority_queue_nodes[1])
+    priority_queue_nodes[1]:set_right(textbox_node)
+
+    local _last_party_status_node = nil
+    local _last_enemy_status_node = nil
+    for selfs_others in range(
+        {party_status_consumable_nodes, enemy_status_consumable_nodes, true},
+        {enemy_status_consumable_nodes, party_status_consumable_nodes, false}
+    ) do
+        local selfs, others, down_or_up = table.unpack(selfs_others)
+        for node in values(selfs) do
+            local self_bounds = node:get_bounds()
+            local self_x = self_bounds.x + 0.5 * self_bounds.width
+            local min_distance = POSITIVE_INFINITY
+            local closest_node = nil
+            for other in values(others) do
+                local other_bounds = other:get_bounds()
+                local distance = math.abs(self_x - (other_bounds.x + 0.5 * other_bounds.width))
+                if distance < min_distance then
+                    min_distance = distance
+                    closest_node = other
+                end
+            end
+
+            if down_or_up then
+                -- party nodes
+                node:set_up(function(self)
+                    local out = which(_last_enemy_status_node, closest_node)
+                    _last_party_status_node = self
+                    return out
+                end)
+
+                node:signal_connect("leave_left", function()
+                    _last_enemy_status_node = nil
+                end)
+
+                node:signal_connect("leave_right", function()
+                    _last_enemy_status_node = nil
+                end)
+
+                node:signal_connect("leave_down", function()
+                    _last_enemy_status_node = nil
+                end)
+            else
+                -- enemy nodes
+                node:set_down(function(self)
+                    local out = which(_last_party_status_node, closest_node)
+                    _last_enemy_status_node = self
+                    return out
+                end)
+
+                node:signal_connect("leave_left", function()
+                    _last_party_status_node = nil
+                end)
+
+                node:signal_connect("leave_right", function()
+                    _last_party_status_node = nil
+                end)
+
+                node:signal_connect("leave_up", function()
+                    _last_party_status_node = nil
+                end)
+            end
+        end
     end
 
     -- behavior

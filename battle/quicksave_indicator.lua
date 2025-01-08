@@ -21,6 +21,7 @@ bt.QuicksaveIndicator = meta.new_type("BattleQuicksaveIndicator", rt.Widget, fun
         _n_turns_elapsed = 0,
         _n_turns_label = nil, -- rt.Label
 
+        _padding = rt.settings.label.outline_offset_padding,
         _screenshot = nil, -- rt.RenderTexture
         _mesh = nil, -- love.Mesh
         _paths = {}, -- Table<rt.Path>
@@ -68,7 +69,7 @@ do
 
     --- @brief
     function bt.QuicksaveIndicator:_update_frame_snapshot()
-        local padding = rt.settings.label.outline_offset_padding
+        local padding = self._padding
 
         love.graphics.push()
         love.graphics.origin()
@@ -311,8 +312,8 @@ end
 --- @brief
 function bt.QuicksaveIndicator:get_selection_nodes()
     local bounds = self._frame:get_bounds()
-    bounds.x = bounds.x + self._frame_x
-    bounds.y = bounds.y + self._frame_y
+    bounds.x = bounds.x + self._frame_x + self._padding
+    bounds.y = bounds.y + self._frame_y + self._padding
 
     local node = rt.SelectionGraphNode(bounds)
     return {
