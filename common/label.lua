@@ -90,7 +90,9 @@ function rt.Label:_glyph_new(
     local font_native = font:get_native(style)
     local out = {
         text = text, -- necessary for beat weights
-        glyph = love.graphics.newTextBatch(font_native, text),
+        glyph = love.graphics.newTextBatch(font_native, text, {
+            sdf = true
+        }),
         font = font_native,
         is_mono = is_mono,
         is_underlined = is_underlined,
@@ -127,8 +129,6 @@ function rt.Label:_glyph_new(
 
     return out
 end
-
-
 
 --- @override
 function rt.Label:draw()
@@ -185,6 +185,8 @@ end
 
 --- @override
 function rt.Label:size_allocate(x, y, width, height)
+    x = math.floor(x)
+    y = math.floor(y)
     self:_apply_wrapping(width)
     self:_update_textures()
     self:_update_n_visible_characters()
@@ -724,8 +726,8 @@ do
                     last_r, last_g, last_b = nil, nil, nil
                 end
 
-                glyph.x = glyph_x
-                glyph.y = glyph_y
+                glyph.x = math.floor(glyph_x)
+                glyph.y = math.floor(glyph_y)
                 glyph.row_index = row_i
 
                 if glyph.is_outlined then
@@ -860,6 +862,8 @@ do
     function rt.Label:_update_textures()
         if self._n_glyphs == 0 or self._swap_texture == nil then return end
 
+        love.graphics.setBlendMode("alpha", "premultiplied")
+
         love.graphics.push()
         love.graphics.reset()
 
@@ -926,6 +930,8 @@ do
         self._swap_texture:unbind()
 
         love.graphics.pop()
+
+        love.graphics.setBlendMode("alpha")
     end
 
     --- @brief

@@ -102,3 +102,8 @@ function mn.ScrollIndicator._generate_outline(center_x, center_y, angle, width, 
         center_top_x, center_top_y,
     }
 end
+
+--- @brief
+function mn.ScrollIndicator:set_color(color)
+    self._body:set_color(color)
+end

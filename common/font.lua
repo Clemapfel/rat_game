@@ -69,12 +69,19 @@ rt.Font._bold = love.graphics.getFont()
 rt.Font._italic = love.graphics.getFont()
 rt.Font._bold_italic = love.graphics.getFont()
 
+local _new_font = function(path, size)
+    return love.graphics.newFont(path, size, {
+        sdf = true
+    })
+end
+
 --- @brief [internal] update held fonts
 function rt.Font:_update()
-    self._regular = love.graphics.newFont(self._regular_path, self._size)
-    self._bold = love.graphics.newFont(self._bold_path, self._size)
-    self._italic = love.graphics.newFont(self._italic_path, self._size)
-    self._bold_italic = love.graphics.newFont(self._bold_italic_path, self._size)
+    local config = {}
+    self._regular = _new_font(self._regular_path, self._size)
+    self._bold = _new_font(self._bold_path, self._size)
+    self._italic = _new_font(self._italic_path, self._size)
+    self._bold_italic = _new_font(self._bold_italic_path, self._size)
 
     self._regular:setFallbacks(splat(rt.settings.font.regular_fallbacks))
     self._bold:setFallbacks(splat(rt.settings.font.bold_fallbacks))
@@ -122,33 +129,33 @@ end
 --- @brief [internal] load default fonts and fallbacks
 function rt.load_default_fonts()
     -- fallback fonts to support more symbols
-    local noto_math = love.graphics.newFont("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf")
-    local gnu_unifont = love.graphics.newFont("assets/fonts/fallback.otf")
+    local noto_math = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf")
+    local gnu_unifont = _new_font("assets/fonts/fallback.otf")
 
     rt.settings.font.regular_fallbacks = {
-        love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Regular.ttf"),
-        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"),
+        _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf"),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"),
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.italic_fallbacks = {
-        love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Italic.ttf"),
-        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"), -- no italic in japanese
+        _new_font("assets/fonts/NotoSans/NotoSans-Italic.ttf"),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"), -- no italic in japanese
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.bold_fallbacks = {
-        love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Bold.ttf"),
-        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"),
+        _new_font("assets/fonts/NotoSans/NotoSans-Bold.ttf"),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"),
         noto_math,
         gnu_unifont
     }
 
     rt.settings.font.bold_italic_fallbacks = {
-        love.graphics.newFont("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf"),
-        love.graphics.newFont("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"), -- no italic in japanese
+        _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf"),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"), -- no italic in japanese
         noto_math,
         gnu_unifont
     }

@@ -106,17 +106,13 @@ do
         end
     end
 
-    local _meta_signal_disconnect_all = function(self, name)
-        local component = rawget(self, _instance_signal_component_index)[name]
-        if component == nil then
-            _G.error("In " .. _typeof(self) .. ".signal_connect: object has no signal with id `" .. name .. "`")
-            return
+    local _meta_signal_disconnect_all = function(self)
+        for component in values(rawget(self, _instance_signal_component_index)) do
+            component[_signal_component_handler_id_to_callback_index] = {}
+            component[_signal_component_callbacks_in_order_index] = setmetatable({}, {
+                __mode = "kv"
+            })
         end
-
-        component[_signal_component_handler_id_to_callback_index] = {}
-        component[_signal_component_callbacks_in_order_index] = setmetatable({}, {
-            __mode = "kv"
-        })
     end
 
     local _meta_signal_set_is_blocked = function(self, name, is_blocked)

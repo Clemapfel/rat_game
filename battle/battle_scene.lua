@@ -447,7 +447,7 @@ function bt.BattleScene:draw()
     end
 
     if self._selection_graph ~= nil then
-        --self._selection_graph:draw()
+        self._selection_graph:draw()
     end
 end
 
@@ -993,7 +993,6 @@ function bt.BattleScene:_create_inspect_selection_graph()
 
     local on_small_node_enter = function()
         scene._selection_graph_frame_visible = true
-        dbg(true)
     end
 
     local on_small_node_exit = function()
@@ -1043,6 +1042,10 @@ end
 function bt.BattleScene:_update_selection_graph_arrows(node)
     local bounds = node:get_bounds()
     local m = rt.settings.margin_unit
+
+    local thickness = self._selection_graph_frame:get_thickness() * 2
+    self._selection_graph_frame:fit_into(bounds.x, bounds.y , bounds.width, bounds.height)
+
     local outline_thickness = 1
     local r = m
     local offset = r * math.cos(2 * math.pi / 3 / 2) + self._selection_graph_frame:get_thickness() + 4 * outline_thickness
@@ -1098,9 +1101,6 @@ function bt.BattleScene:_update_selection_graph_arrows(node)
             1 * math.pi
         )
     end
-
-    local thickness = self._selection_graph_frame:get_thickness()
-    self._selection_graph_frame:fit_into(bounds.x - thickness, bounds.y - thickness, bounds.width + 2 * thickness, bounds.height + 2 * thickness)
 end
 
 --- @brief

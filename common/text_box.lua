@@ -272,6 +272,8 @@ function rt.TextBox:update(delta)
         self._text_scroll_overlap_entry_offset = n
     end
 
+    local n_updated = 0
+
     local all_entries_done = true
     do -- scroll characters
         local letters_per_second = rt.settings.text_box.letters_per_second
@@ -281,6 +283,7 @@ function rt.TextBox:update(delta)
         for i = self._first_visible_entry, self._n_entries do
             local entry = self._entries[i]
             entry.label:update(delta)
+            n_updated = n_updated + 1
             entry.elapsed = entry.elapsed + delta
 
             local is_done, new_n_lines_visible = entry.label:update_n_visible_characters_from_elapsed(entry.elapsed, letters_per_second)
@@ -370,7 +373,6 @@ function rt.TextBox:draw()
     love.graphics.translate(x, y - self._current_text_y_offset)
 
     local y_offset = 0
-    local n_drawn = 0
     for i = self._first_visible_entry, self._n_entries do
         local entry = self._entries[i]
 

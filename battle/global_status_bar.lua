@@ -162,9 +162,12 @@ function bt.GlobalStatusBar:get_selection_nodes()
     local frame_bounds = self._frame:get_bounds()
     for global_status, sprite in pairs(self._global_status_to_sprite) do
         local bounds = self._ordered_box:get_widget_bounds(sprite)
-        bounds.x = bounds.x + offset_x
-        bounds.y = frame_bounds.y
-        bounds.height = frame_bounds.height
+        local padding = rt.settings.frame.thickness * 2
+        bounds.x = bounds.x + offset_x - padding
+        bounds.y = bounds.y - padding
+        bounds.width = bounds.width + 2 * padding
+        bounds.height = bounds.height + 2 * padding
+        --bounds.height = frame_bounds.height
         local node = rt.SelectionGraphNode(bounds)
         node.object = global_status
         table.insert(nodes, node)

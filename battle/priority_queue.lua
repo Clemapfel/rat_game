@@ -374,18 +374,27 @@ end
 --- @brief
 function bt.PriorityQueue:get_selection_nodes()
     local nodes = {}
-    local n = 0
-    for item_motion in values(self._render_order) do
-        local item, motion = table.unpack(item_motion)
+    local is_first = true
+    local n = sizeof(self._render_order)
+    for i = 1, n do
+        local item, motion = table.unpack(self._render_order[i])
 
         local bounds = item.frame:get_bounds()
         local x, y = motion:get_target_position()
-        bounds.x = bounds.x + x - 0.5 * bounds.width
-        bounds.y = bounds.y + y
-        local to_add = rt.SelectionGraphNode(bounds)
+        local thickness = item.frame:get_thickness()
+        bounds.x = bounds.x + x - 0.5 * bounds.width + 0.5 * item.padding - thickness
+        bounds.y = bounds.y + y + item.padding
 
+        if i == n then
+            local factor = rt.settings.battle.priority_queue.first_element_scale_factor
+            local before_w = bounds.width
+            bounds.width = bounds.width * factor
+            bounds.height = bounds.height * factor
+            bounds.x = bounds.x - (bounds.width - before_w) + 2 * thickness
+        end
+
+        local to_add = rt.SelectionGraphNode(bounds)
         table.insert(nodes, 1, to_add)
-        n = n + 1
     end
 
     for i = 1, sizeof(nodes) do

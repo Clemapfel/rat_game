@@ -74,7 +74,6 @@ do
         love.graphics.origin()
         love.graphics.translate(padding, padding)
         self._frame_snapshot:bind()
-        love.graphics.clear(1, 0, 1, 1)
         self._base:draw()
         self._frame_outline:draw()
         self._frame:draw()

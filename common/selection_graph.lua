@@ -63,7 +63,7 @@ end
 
 --- @brief
 function rt.SelectionGraphNode:get_bounds()
-    return self._aabb
+    return rt.aabb_copy(self._aabb)
 end
 
 --- @brief

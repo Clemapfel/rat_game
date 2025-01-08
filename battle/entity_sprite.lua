@@ -343,8 +343,11 @@ function bt.EntitySprite:get_status_consumable_selection_nodes()
     for slot_i, sprite in pairs(self._consumable_slot_to_sprite) do
         local consumable = self._consumable_slot_to_consumable[slot_i]
         local bounds = self._status_consumable_bar:get_widget_bounds(sprite)
-        bounds.x = bounds.x
-        bounds.y = bounds.y
+        local padding = rt.settings.frame.thickness * 2
+        bounds.x = bounds.x - padding
+        bounds.y = bounds.y - padding
+        bounds.width = bounds.width + 2 * padding
+        bounds.height = bounds.height + 2 * padding
         local node = rt.SelectionGraphNode(bounds)
         node.object = self._consumable_slot_to_consumable[slot_i]
         table.insert(nodes, node)

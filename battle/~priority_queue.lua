@@ -342,7 +342,6 @@ end
 function bt.PriorityQueue:set_selection_state(entity, state)
     local item = self._entity_to_item[entity]
     for self_entity, item in pairs(self._entity_to_item) do
-        dbg(self_entity:get_id(), entity:get_id(), self_entity:get_multiplicity(), entity:get_multiplicity())
     end
     if item == nil then
         rt.warning("In bt.PriorityQueue:set_selection_state: entity `" .. entity:get_id() .. "` is not present in queue")
