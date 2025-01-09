@@ -12,7 +12,7 @@ rt.RenderTexture = meta.new_type("RenderTexture", rt.Texture, function(width, he
             format = format,
             computewrite = true
         }),
-        _before = {}, -- love.Canvas
+        _before = nil, -- love.Canvas
     })
     out:set_scale_mode(rt.TextureScaleMode.NEAREST)
     out:set_wrap_mode(rt.TextureWrapMode.CLAMP)
