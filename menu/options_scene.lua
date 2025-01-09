@@ -33,13 +33,13 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
 
     -- nil items set during :realize
 
-    local labels = rt.Translation.options_scene
-    fields._heading_label = rt.Label(labels.heading)
+    local translation = rt.Translation.options_scene
+    fields._heading_label = rt.Label(translation.heading)
 
-    fields._vsync_label_text = labels.vsync
-    fields._vsync_on_label = labels.vsync_on
-    fields._vsync_off_label = labels.vsync_off
-    fields._vsync_adaptive_label = labels.vsync_adaptive
+    fields._vsync_label_text = translation.vsync
+    fields._vsync_on_label = translation.vsync_on
+    fields._vsync_off_label = translation.vsync_off
+    fields._vsync_adaptive_label = translation.vsync_adaptive
     fields._vsync_label = nil
     fields._vsync_option_button = nil
     fields._vsync_item = nil
@@ -55,19 +55,19 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         fields._vsync_label_to_vsync_mode[value] = key
     end
 
-    fields._fullscreen_label_text = labels.fullscreen
-    fields._fullscreen_true_label = labels.fullscreen_on
-    fields._fullscreen_false_label = labels.fullscreen_off
+    fields._fullscreen_label_text = translation.fullscreen
+    fields._fullscreen_true_label = translation.fullscreen_on
+    fields._fullscreen_false_label = translation.fullscreen_off
     fields._fullscreen_label = nil
     fields._fullscreen_option_button = nil
     fields._fullscreen_item = nil
 
-    fields._msaa_label_text = labels.msaa
-    fields._msaa_off_label = labels.msaa_off
-    fields._msaa_good_label = labels.msaa_good
-    fields._msaa_better_label = labels.msaa_better
-    fields._msaa_best_label = labels.msaa_best
-    fields._msaa_max_label = labels.msaa_max
+    fields._msaa_label_text = translation.msaa
+    fields._msaa_off_label = translation.msaa_off
+    fields._msaa_good_label = translation.msaa_good
+    fields._msaa_better_label = translation.msaa_better
+    fields._msaa_best_label = translation.msaa_best
+    fields._msaa_max_label = translation.msaa_max
     fields._msaa_label = nil
     fields._msaa_option_button = nil
     fields._msaa_item = nil
@@ -85,19 +85,19 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         fields._msaa_label_to_msaa_quality[value] = key
     end
 
-    fields._resolution_label_text = labels.resolution
-    fields._resolution_1280_720_label = labels.resolution_1280_720
-    fields._resolution_1366_768_label = labels.resolution_1366_768
-    fields._resolution_1600_900_label = labels.resolution_1600_900
-    fields._resolution_1920_1080_label = labels.resolution_1920_1080
-    fields._resolution_2560_1440_label = labels.resolution_2560_1440
-    fields._resolution_1280_800_label = labels.resolution_1280_800
-    fields._resolution_1440_900_label = labels.resolution_1440_900
-    fields._resolution_1680_1050_label = labels.resolution_1680_1050
-    fields._resolution_1920_1200_label = labels.resolution_1920_1200
-    fields._resolution_2560_1600_label = labels.resolution_2560_1600
-    fields._resolution_2560_1080_label = labels.resolution_2560_1080
-    fields._resolution_native_label = labels.resolution_native
+    fields._resolution_label_text = translation.resolution
+    fields._resolution_1280_720_label = translation.resolution_1280_720
+    fields._resolution_1366_768_label = translation.resolution_1366_768
+    fields._resolution_1600_900_label = translation.resolution_1600_900
+    fields._resolution_1920_1080_label = translation.resolution_1920_1080
+    fields._resolution_2560_1440_label = translation.resolution_2560_1440
+    fields._resolution_1280_800_label = translation.resolution_1280_800
+    fields._resolution_1440_900_label = translation.resolution_1440_900
+    fields._resolution_1680_1050_label = translation.resolution_1680_1050
+    fields._resolution_1920_1200_label = translation.resolution_1920_1200
+    fields._resolution_2560_1600_label = translation.resolution_2560_1600
+    fields._resolution_2560_1080_label = translation.resolution_2560_1080
+    fields._resolution_native_label = translation.resolution_native
 
     fields._resolution_label = nil
     fields._resolution_option_button = nil
@@ -151,41 +151,32 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         }
     }
 
-    fields._gamma_text = labels.gamma
-    fields._gamma_label = nil
-    fields._gamma_scale = nil
-    fields._gamma_item = nil
-
-    fields._sfx_level_text = labels.sfx_level
+    fields._sfx_level_text = translation.sfx_level
     fields._sfx_level_label = nil
     fields._sfx_level_scale = nil
     fields._sfx_level_item = nil
 
-    fields._music_level_text = labels.music_level
+    fields._music_level_text = translation.music_level
     fields._music_level_label = nil
     fields._music_level_scale = nil
     fields._music_level_item = nil
 
-    fields._vfx_motion_text = labels.vfx_motion
-    fields._vfx_motion_label = nil
-    fields._vfx_motion_scale = nil
-    fields._vfx_motion_item = nil
+    fields._text_speed_text = translation.text_speed
+    fields._text_speed_label = nil
+    fields._text_speed_scale = nil
+    fields._text_speed_item = nil
 
-    fields._vfx_contrast_text = labels.vfx_contrast
+    fields._vfx_contrast_text = translation.vfx_contrast
     fields._vfx_contrast_label = nil
     fields._vfx_contrast_scale = nil
     fields._vfx_contrast_item = nil
 
-    fields._deadzone_text = labels.deadzone
+    fields._deadzone_text = translation.deadzone
     fields._deadzone_label = nil
     fields._deadzone_scale = nil
     fields._deadzone_item = nil
 
     fields._level_layout = {
-        [fields._gamma_text] = {
-            range = {0.3, 2.2, 100},
-            default = 1.0
-        },
 
         [fields._sfx_level_text] = {
             range = {0, 1, 100},
@@ -197,9 +188,9 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
             default = 50
         },
 
-        [fields._vfx_motion_text] = {
-            range = {0, 1, 100},
-            default = 3
+        [fields._text_speed_text] = {
+            range = {0.1, 2, 100},
+            default = 1
         },
 
         [fields._vfx_contrast_text] = {
@@ -213,7 +204,7 @@ mn.OptionsScene = meta.new_type("MenuOptionsScene", rt.Scene, function(state)
         }
     }
 
-    fields._keymap_text = labels.keymap
+    fields._keymap_text = translation.keymap
     fields._keymap_label = nil
     fields._keymap_arrow = nil
     fields._keymap_item = nil
@@ -331,10 +322,6 @@ function mn.OptionsScene:realize()
         table.insert(scene._items, item)
     end
 
-    create_scale_and_label("gamma", self._gamma_text, function(_, fraction)
-        scene._state:set_gamma_level(fraction)
-    end)
-
     create_scale_and_label("sfx_level", self._sfx_level_text, function(_, fraction)
         scene._state:set_sfx_level(fraction)
     end)
@@ -343,8 +330,8 @@ function mn.OptionsScene:realize()
         scene._state:set_music_level(fraction)
     end)
 
-    create_scale_and_label("vfx_motion", self._vfx_motion_text, function(_, fraction)
-        scene._state:set_motion_intensity(fraction)
+    create_scale_and_label("text_speed", self._text_speed_text, function(_, fraction)
+        scene._state:set_text_speed(fraction)
     end)
 
     create_scale_and_label("vfx_contrast", self._vfx_contrast_text, function(_, fraction)
@@ -454,10 +441,9 @@ function mn.OptionsScene:create_from_state(state)
         scale:signal_set_is_blocked("value_changed", false)
     end
 
-    set_scale(self._gamma_scale, self._state:get_gamma_level())
     set_scale(self._sfx_level_scale, self._state:get_sfx_level())
     set_scale(self._music_level_scale, self._state:get_music_level())
-    set_scale(self._vfx_motion_scale, self._state:get_vfx_motion_level())
+    set_scale(self._text_speed_scale, self._state:get_text_speed())
     set_scale(self._vfx_contrast_scale, self._state:get_vfx_contrast_level())
     set_scale(self._deadzone_scale, self._state:get_deadzone())
 end
@@ -573,12 +559,11 @@ function mn.OptionsScene:_regenerate_selection_nodes()
     for item_verbose_info_object in range(
         {self._vsync_item, rt.VerboseInfoObject.VSYNC},
         {self._fullscreen_item, rt.VerboseInfoObject.FULLSCREEN},
-        {self._gamma_item, {rt.VerboseInfoObject.GAMMA, rt.VerboseInfoObject.GAMMA_WIDGET}},
         {self._msaa_item, {rt.VerboseInfoObject.MSAA, rt.VerboseInfoObject.MSAA_WIDGET}},
         {self._resolution_item, rt.VerboseInfoObject.RESOLUTION},
         {self._sfx_level_item, rt.VerboseInfoObject.SOUND_EFFECTS},
         {self._music_level_item, rt.VerboseInfoObject.MUSIC},
-        {self._vfx_motion_item, {rt.VerboseInfoObject.MOTION_EFFECTS, rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET}},
+        {self._text_speed_item, {rt.VerboseInfoObject.TEXT_SPEED}},
         {self._vfx_contrast_item, {rt.VerboseInfoObject.VISUAL_EFFECTS, rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET}},
         {self._deadzone_item, {rt.VerboseInfoObject.DEADZONE}},
         {self._keymap_item, rt.VerboseInfoObject.KEYMAP}

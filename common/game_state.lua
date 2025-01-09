@@ -43,9 +43,9 @@ rt.GameState = meta.new_type("GameState", function()
         resolution_y = 720,
         sfx_level = 1,
         music_level = 1,
-        vfx_motion_level = 1,
         vfx_contrast_level = 1,
         deadzone = 0.15,
+        text_speed = 1,
         show_diagnostics = true,
         keybinding = {}, -- Table<rt.InputButton, Table<Union<rt.GamepadButton, rt.KeyboardKey>>>
 
@@ -215,7 +215,7 @@ function rt.GameState:_update_window_mode()
     -- window does not shrink unless updateMode is called twice
 
     rt.settings.contrast = self._state.vfx_contrast_level
-    rt.settings.motion_intensity = self._state.vfx_motion_level
+    rt.settings.text_speed = self._state.text_speed
 
     self:resize(window_res_x, window_res_y)
 end
@@ -657,19 +657,16 @@ function rt.GameState:get_music_level()
 end
 
 --- @brief
-function rt.GameState:set_motion_intensity(fraction)
+function rt.GameState:set_text_speed(fraction)
     meta.assert_number(fraction)
-    if fraction < 0 or fraction > 1 then
-        rt.error("In rt.GameState:set_motion_intensity: level `" .. fraction .. "` is outside [0, 1]")
-        fraction = clamp(fraction, 0, 1)
-    end
-    self._state.vfx_motion_level = fraction
-    rt.settings.motion_intensity = fraction
+    fraction = clamp(fraction, 0.01, 1)
+    self._state.text_speed = fraction
+    rt.settings.text_speed = fraction
 end
 
 --- @brief
-function rt.GameState:get_vfx_motion_level()
-    return self._state.vfx_motion_level
+function rt.GameState:get_text_speed()
+    return self._state.text_speed
 end
 
 --- @brief

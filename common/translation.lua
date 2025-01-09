@@ -178,8 +178,11 @@ rt.Translation = rt.initialize_translation({
             vsync_title = "Vertical Synchronization",
             vsync_description = "Synchronizes game refresh rate with that of the screen, preventing screen tearing. When 'adaptive', dynamically turns of vsync depending on the frame rate. When `off`, frame rate is no longer capped by the monitor refresh rate.",
 
-            gamma_title = "Brightness (Gamma)",
-            gamma_description = "Changes brightness of the screen",
+            vfx_title = "Background Intensity",
+            vfx_description = "Changes brightness of animated backgrounds",
+
+            text_speed_title = "Text Scrolling Speed",
+            text_speed_description = "Modifies text scroll speed in battle and during dialog",
 
             msaa_title = "Multi-sample Anti Aliasing (MSAA)",
             msaa_description = "Reduces artifacting along lines and sharp edges, but decreases performance",
@@ -195,9 +198,6 @@ rt.Translation = rt.initialize_translation({
 
             music_title = "Music Audio Level",
             music_description = "Loudness of music",
-
-            motion_effects_title = "Screen Shake",
-            motion_effects_description = "Intensity of screen shake and other motion-based animations",
 
             visual_effects_title = "Background Intensity",
             visual_effects_description = "Intensity of background TODO",
@@ -257,9 +257,10 @@ rt.Translation = rt.initialize_translation({
         sfx_level = "Sound Effects",
         music_level = "Music",
         vfx_motion = "Motion Effects",
-        vfx_contrast = "Visual Effects",
+        vfx_contrast = "Backgrounds",
         deadzone = "Deadzone",
         keymap = "Controls",
+        text_speed = "Text Speed",
 
         control_indicator_a = "Change Value",
         control_indicator_b = "Exit",

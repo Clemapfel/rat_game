@@ -1370,9 +1370,6 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
     elseif which == rt.VerboseInfoObject.GAMMA_WIDGET then
         self:create_as_gamma_widget()
         return
-    elseif which == rt.VerboseInfoObject.MOTION_EFFECTS_WIDGET then
-        self:create_as_motion_effects_widget()
-        return
     elseif which == rt.VerboseInfoObject.VISUAL_EFFECTS_WIDGET then
         self:create_as_visual_effects_widget()
         return
@@ -1399,13 +1396,12 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
 
         [rt.VerboseInfoObject.OPTIONS] = format_title(translation.options_title),
         [rt.VerboseInfoObject.VSYNC] = format_title(translation.vsync_title),
-        [rt.VerboseInfoObject.GAMMA] = format_title(translation.gamma_title),
+        [rt.VerboseInfoObject.TEXT_SPEED] = format_title(translation.text_speed_title),
         [rt.VerboseInfoObject.FULLSCREEN] = format_title(translation.fullscreen_title),
         [rt.VerboseInfoObject.RESOLUTION] = format_title(translation.resolution_title),
         [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title(translation.sound_effects_title),
         [rt.VerboseInfoObject.MUSIC] = format_title(translation.music_title),
 
-        [rt.VerboseInfoObject.MOTION_EFFECTS] = format_title(translation.motion_effects_title),
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title(translation.visual_effects_title),
         [rt.VerboseInfoObject.MSAA] = format_title(translation.msaa_title),
         [rt.VerboseInfoObject.DEADZONE] = format_title(translation.deadzone_title),
@@ -1428,13 +1424,12 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
 
         [rt.VerboseInfoObject.VSYNC] = translation.vsync_description,
         [rt.VerboseInfoObject.MSAA] = translation.msaa_description,
-        [rt.VerboseInfoObject.GAMMA] = translation.gamma_description,
+        [rt.VerboseInfoObject.TEXT_SPEED] = translation.text_speed_description,
         [rt.VerboseInfoObject.FULLSCREEN] = translation.fullscreen_description,
         [rt.VerboseInfoObject.RESOLUTION] = translation.resolution_description,
         [rt.VerboseInfoObject.SOUND_EFFECTS] = translation.sound_effects_description,
         [rt.VerboseInfoObject.MUSIC] = translation.music_description,
 
-        [rt.VerboseInfoObject.MOTION_EFFECTS] = translation.motion_effects_description,
         [rt.VerboseInfoObject.VISUAL_EFFECTS] = translation.visual_effects_description,
 
         [rt.VerboseInfoObject.DEADZONE] = translation.deadzone_description,
@@ -1533,44 +1528,6 @@ function mn.VerboseInfoPanel.Item:create_as_visual_effects_widget()
         self.frame:realize()
 
         self.widget = rt.Background(rt.Background.CONTRAST_TEST)
-        self.widget:realize()
-
-        self.content = {
-            self.widget
-        }
-    end
-
-    self.size_allocate = function(self, x, y, width, height)
-        local m, xm, ym = self._get_margin()
-        ym = 2 * ym
-        local w = 0.75 * (width - 2 * xm)
-        height = w + 2 * ym
-        self.widget:fit_into(
-            x + 0.5 * width - 0.5 * w,
-            y + 0.5 * height - 0.5 * w,
-            w,
-            w
-        )
-
-        self.frame:fit_into(x, y, width, height)
-        self.divider:resize(x, y + height, x + width, y + height)
-        self.final_height = height
-    end
-
-    self.update = function(self, delta)
-        self.widget:update(delta)
-    end
-end
-
-function mn.VerboseInfoPanel.Item:create_as_motion_effects_widget()
-    self.object = nil
-    self._is_realized = false
-
-    self.realize = function()
-        self._is_realized = true
-        self.frame:realize()
-
-        self.widget = mn.ShakeIntensityWidget()
         self.widget:realize()
 
         self.content = {

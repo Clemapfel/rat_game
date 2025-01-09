@@ -32,7 +32,9 @@ rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
     DEADZONE = "deadzone",
     DEADZONE_WIDGET = "deadzone_widget",
     QUICKSAVE = "quicksave",
-    BATTLE_LOG = "battle_log"
+    BATTLE_LOG = "battle_log",
+    TEXT_SPEED = "text_speed",
+    TEXT_SPEED_WIDGET = "text_speed_widget",
 })
 
 --- @class mn.VerboseInfoPanel

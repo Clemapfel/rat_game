@@ -569,4 +569,5 @@ end
 --- @brief
 function rt.TextBox:set_selection_state(state)
     self._frame:set_selection_state(state)
+    self._frame:set_base_color(rt.Palette.BACKGROUND)
 end
