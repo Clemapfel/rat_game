@@ -8,12 +8,12 @@ local reset_memory_mapping_shader, update_cell_hash_shader
 local sort_particles_shader
 local step_shader
 local render_particle_shader, render_spatial_hash_shader
-local compute_sdf_shader, render_sdf_shader
+local init_sdf_shader, compute_sdf_shader, render_sdf_shader
 
 local particle_mesh
 local particle_mesh_n_outer_vertices = 16
 
-local n_particles = 10
+local n_particles = 10000
 local particle_radius = 5
 local particle_mass = 1
 
@@ -27,7 +27,7 @@ local left_wall_aabb, right_wall_aabb, top_wall_aabb, bottom_wall_aabb
 
 love.load = function()
     love.window.setMode(window_w, window_h, {
-        vsync = -1,
+        vsync = 0,
         msaa = 0
     })
 
@@ -68,7 +68,14 @@ love.load = function()
         N_PARTICLES = n_particles
     })
 
-    compute_sdf_shader = rt.ComputeShader("blood_compute_sdf.glsl")
+    init_sdf_shader = rt.ComputeShader("blood_compute_sdf.glsl", {
+        MODE = 0
+    })
+
+    compute_sdf_shader = rt.ComputeShader("blood_compute_sdf.glsl", {
+        MODE = 1
+    })
+
     render_sdf_shader = rt.Shader("blood_render_sdf.glsl")
 
     particle_buffer_a = rt.GraphicsBuffer(render_particle_shader:get_buffer_format("particle_buffer"), n_particles)
@@ -216,17 +223,15 @@ love.update = function(delta)
     love.graphics.circle("fill",0.5 * window_w, 0.5 * window_h, 0.25 * math.min(window_w, window_h))
     wall_texture:unbind()
 
-    compute_sdf_shader:send("mode", 0)
-    compute_sdf_shader:send("init_texture", wall_texture._native)
-    compute_sdf_shader:send("input_texture", sdf_texture_a._native)
-    compute_sdf_shader:send("output_texture", sdf_texture_b._native)
-    compute_sdf_shader:dispatch(window_w, window_h)
+    init_sdf_shader:send("init_texture", wall_texture._native)
+    init_sdf_shader:send("input_texture", sdf_texture_a._native)
+    init_sdf_shader:send("output_texture", sdf_texture_b._native)
+    init_sdf_shader:dispatch(window_w / 8, window_h / 8)
+    sdf_texture = sdf_texture_a
 
-
-    compute_sdf_shader:send("mode", 1)
-    local jump = 0.5 * math.max(window_w, window_h)
+    local jump = 0.5 * math.min(window_w, window_h)
     local jump_a_or_b = true
-    while jump > 0.5 do
+    while jump > 1 do
         if jump_a_or_b then
             compute_sdf_shader:send("input_texture", sdf_texture_a._native)
             compute_sdf_shader:send("output_texture", sdf_texture_b._native)
@@ -238,7 +243,7 @@ love.update = function(delta)
         end
 
         compute_sdf_shader:send("jump_distance", jump)
-        compute_sdf_shader:dispatch(window_w, window_h)
+        compute_sdf_shader:dispatch(window_w / 8, window_h / 8)
 
         jump_a_or_b = not jump_a_or_b
         jump = jump / 2
@@ -320,12 +325,13 @@ love.draw = function(which)
     particle_mesh:draw_instanced(n_particles)
     render_particle_shader:unbind()
 
-    love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
-
     -- draw sdf
     love.graphics.setColor(1, 1, 1, 1)
     render_sdf_shader:bind()
     sdf_texture:draw()
     render_sdf_shader:unbind()
+
+    -- show fps
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.printf(n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 end
