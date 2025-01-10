@@ -11,6 +11,9 @@ bt.PriorityQueue = meta.new_type("PriorityQueue", rt.Widget, rt.Updatable, funct
         _order = {}, -- Table<Entity>,
         _entity_id_to_item = {}, -- Table<String, cf. _new_element>
         _render_order = {}, -- Table<Pair<Item, Motion>>
+        _selected_item_is = {},
+        _unselected_item_is = {},
+
         _scale_factor = 1,
         _n_consumed = 0,
         _consume_buffer = {},
@@ -236,7 +239,6 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         n_items = n_items + 1
     end
 
-
     local margin = clamp((height - total_height - first_scale_height_delta) / (n_items - 1), NEGATIVE_INFINITY, 0)
     local is_first = true
     for entity in values(self._order) do
@@ -261,6 +263,8 @@ function bt.PriorityQueue:size_allocate(x, y, width, height)
         table.insert(self._consume_buffer, {opacity_offset = 0, opacity = 1, y_offset_added = false})
         is_first = false
     end
+
+    self:_update_selection_render_order()
 end
 
 --- @override
@@ -303,17 +307,22 @@ function bt.PriorityQueue:draw()
     local target_scale = rt.settings.battle.priority_queue.first_element_scale_factor
     local first_scale = clamp(target_scale * self._scale_factor, 1, target_scale)
 
-    for i, item_motion in ipairs(self._render_order) do
-        local item, motion = table.unpack(item_motion)
-        local x, y = motion:get_position()
+    for which in range( -- draw selected on top of unselected
+        self._unselected_item_is,
+        self._selected_item_is
+    ) do
+        for i in values(which) do
+            local item, motion = table.unpack(self._render_order[i])
+            local x, y = motion:get_position()
 
-        local scale = 1
-        if i == #self._render_order then
-            scale = first_scale
+            local scale = 1
+            if i == #self._render_order then
+                scale = first_scale
+            end
+
+            local consume_item = self._consume_buffer[i]
+            self:_element_draw(item, x, y, scale, consume_item.opacity, consume_item.opacity_offset)
         end
-
-        local consume_item = self._consume_buffer[i]
-        self:_element_draw(item, x, y, scale, consume_item.opacity, consume_item.opacity_offset)
     end
 end
 
@@ -338,6 +347,22 @@ function bt.PriorityQueue:_element_update_state(element)
     element.r, element.g, element.b, element.a = r, g, b, a
 end
 
+--- @brief
+function bt.PriorityQueue:_update_selection_render_order()
+    self._selected_item_is = {}
+    self._unselected_item_is = {}
+    local i = 1
+    for item_motion in values(self._render_order) do
+        local item, motion = table.unpack(item_motion)
+        if item.selection_state == rt.SelectionState.ACTIVE then
+            table.insert(self._selected_item_is, i)
+        else
+            table.insert(self._unselected_item_is, i)
+        end
+        i = i + 1
+    end
+end
+
 --- @override
 function bt.PriorityQueue:set_selection_state(entity, state)
     local item = self._entity_id_to_item[entity:get_id()]
@@ -346,8 +371,11 @@ function bt.PriorityQueue:set_selection_state(entity, state)
         return
     end
 
-    item.selection_state = state
-    self:_element_update_state(item)
+    if item.selection_state ~= state then
+        item.selection_state = state
+        self:_element_update_state(item)
+        self:_update_selection_render_order()
+    end
 end
 
 --- @override

@@ -2,7 +2,8 @@
 
 const float h = 0.5;
 
-// https://www.desmos.com/calculator/8r5cfy9fiz
+// https://www.desmos.com/calculator/kdvvtte3vh
+
 float spiky_kernel(float x) {
     if (abs(x) > h) return 0;
     return (h - x) * (h - x) * (h - x) / (h * h * h * h / 4);
