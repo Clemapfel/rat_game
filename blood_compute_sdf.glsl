@@ -2,19 +2,19 @@
 #define MODE_JUMP 1
 
 #ifndef MODE
-    #define MODE MODE_INITIALIZE
+    #error "In blood_compute_sdf.glsl: MODE is undefined, it should be 0 or 1"
 #endif
 
 #if MODE == MODE_INITIALIZE
     layout(r8) uniform readonly image2D init_texture; // x: is wall
-    layout(rgba32f) uniform writeonly image2D input_texture; // xy: nearest wall pixel coords, z: distance
+    layout(rgba32f) uniform writeonly image2D input_texture;  // xy: nearest wall pixel coords, z: distance
     layout(rgba32f) uniform writeonly image2D output_texture;
 #elif MODE == MODE_JUMP
     layout(rgba32f) uniform readonly image2D input_texture;
     layout(rgba32f) uniform writeonly image2D output_texture;
 #endif
 
-uniform int jump_distance; // The current jump distance
+uniform int jump_distance; // k / 2, k / 2 / 2, ..., 1, where k = max(size(input_texture))
 
 const float infinity = 1 / 0.f;
 const float threshold = 0.0;
@@ -57,11 +57,12 @@ void computemain() {
         vec4 best = self;
         for (int i = 0; i < 8; ++i) {
             ivec2 neighbor_position = position + directions[i] * jump_distance;
-            if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
-                continue;
+
+            //if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
+                //continue;
 
             vec4 neighbor = imageLoad(input_texture, neighbor_position);
-            if (neighbor.x < 0 || neighbor.y < 0)
+            if (neighbor.x < 0 || neighbor.y < 0) // is uninitialized
                 continue;
 
             float dist = distance(vec2(position), vec2(neighbor.xy));

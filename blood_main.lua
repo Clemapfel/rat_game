@@ -1,7 +1,9 @@
 require "include"
 
 local particle_buffer_a, particle_buffer_b, cell_memory_mapping_buffer
-local sdf_texture_a, sdf_texture_b, sdf_texture, wall_texture
+local sdf_texture_a, sdf_texture_b, sdf_texture -- xy: nearest wall coords (abs), z: distance
+local wall_texture -- x: is wall
+local density_texture -- x: density
 local a_or_b = true
 
 local reset_memory_mapping_shader, update_cell_hash_shader
@@ -10,11 +12,13 @@ local step_shader
 local render_particle_shader, render_spatial_hash_shader
 local init_sdf_shader, compute_sdf_shader, render_sdf_shader
 
-local particle_mesh
+local density_kernel_texture, init_density_kernel_shader, render_density_kernel_shader, render_density_texture_shader
+local particle_mesh, density_kernel_mesh
 local particle_mesh_n_outer_vertices = 16
 
-local n_particles = 10000
+local n_particles = 3000
 local particle_radius = 5
+local particle_density_influence_multiplier = 4
 local particle_mass = 1
 
 local n_particles_per_thread = 1
@@ -27,7 +31,7 @@ local left_wall_aabb, right_wall_aabb, top_wall_aabb, bottom_wall_aabb
 
 love.load = function()
     love.window.setMode(window_w, window_h, {
-        vsync = 0,
+        vsync = rt.VSyncMode.ON,
         msaa = 0
     })
 
@@ -57,6 +61,8 @@ love.load = function()
 
     step_shader = rt.ComputeShader("blood_step.glsl")
     render_particle_shader = rt.Shader("blood_render_particles.glsl")
+    render_density_kernel_shader = rt.Shader("blood_render_density_kernel.glsl")
+    render_density_texture_shader = rt.Shader("blood_render_density_texture.glsl")
     render_spatial_hash_shader = rt.Shader("blood_render_spatial_hash.glsl")
     reset_memory_mapping_shader = rt.ComputeShader("blood_reset_memory_mapping.glsl")
     update_cell_hash_shader = rt.ComputeShader("blood_update_cell_hash.glsl", {
@@ -86,7 +92,22 @@ love.load = function()
     sdf_texture_b = rt.RenderTexture(window_w, window_h, 0, rt.TextureFormat.RGBA32F, true)
     wall_texture = rt.RenderTexture(window_w, window_h, 0, rt.TextureFormat.R8, true)
 
+    density_texture = rt.RenderTexture(window_w, window_h, 0, rt.TextureFormat.R32F, true)
     cell_memory_mapping_buffer = rt.GraphicsBuffer(render_spatial_hash_shader:get_buffer_format("cell_memory_mapping_buffer"), n_rows * n_columns)
+
+    -- init density kernel texture
+    density_kernel_texture = rt.RenderTexture(
+        2 * particle_radius * particle_density_influence_multiplier,
+        2 * particle_radius * particle_density_influence_multiplier,
+        0, rt.TextureFormat.R32F, false
+    )
+    init_density_kernel_shader = rt.Shader("blood_init_density_kernel.glsl")
+    density_kernel_texture:bind()
+    init_density_kernel_shader:bind()
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.rectangle("fill", 0, 0, density_kernel_texture:get_width(), density_kernel_texture:get_height())
+    init_density_kernel_shader:unbind()
+    density_kernel_texture:unbind()
 
     -- render
     do
@@ -116,6 +137,10 @@ love.load = function()
         })
         particle_mesh._native:setVertexMap(vertex_map)
     end
+
+    local density_w = density_kernel_texture:get_width()
+    density_kernel_mesh = rt.VertexRectangle(-density_w, -density_w, 2 * density_w, 2 * density_w)
+    density_kernel_mesh:set_texture(density_kernel_texture)
 
     render_particle_shader:send("particle_buffer", particle_buffer_a._native)
     render_particle_shader:send("n_particles", n_particles)
@@ -152,8 +177,9 @@ love.load = function()
             end
         end
 
-        local min_x, max_x = left_x + particle_radius, right_x - particle_radius
-        local min_y, max_y = top_y + particle_radius, bottom_y - particle_radius
+        local constrain = 0.33
+        local min_x, max_x = left_x + particle_radius + constrain * window_w, right_x - particle_radius - constrain * window_w
+        local min_y, max_y = top_y + particle_radius + constrain * window_h, bottom_y - particle_radius - constrain * window_h
         local max_velocity = 50
         for i = 1, n_particles do
             local x = rt.random.number(min_x, max_x)
@@ -165,7 +191,7 @@ love.load = function()
 
             for to_insert in range(
                 x, y,   -- position
-                vx, vy,   -- velocity
+                0, 0,   -- velocity
                 cell_xy_to_cell_hash(cell_x, cell_y)
             ) do
                 table.insert(particle_data, to_insert)
@@ -200,6 +226,7 @@ love.load = function()
     sort_particles_shader:send("particle_buffer_a", particle_buffer_a._native)
     sort_particles_shader:send("particle_buffer_b", particle_buffer_b._native)
 
+    step_shader:send("density_texture", density_texture._native)
     step_shader:send("particle_buffer", particle_buffer_a._native)
     step_shader:send("cell_memory_mapping_buffer", cell_memory_mapping_buffer._native)
     step_shader:send("n_particles", n_particles)
@@ -209,7 +236,10 @@ love.load = function()
 end
 
 love.update = function(delta)
+    if love.keyboard.isDown("space") == false then return end
+
     -- update SDF
+
     wall_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
     for aabb in range(
@@ -229,6 +259,7 @@ love.update = function(delta)
     init_sdf_shader:dispatch(window_w / 8, window_h / 8)
     sdf_texture = sdf_texture_a
 
+    --[[
     local jump = 0.5 * math.min(window_w, window_h)
     local jump_a_or_b = true
     while jump > 1 do
@@ -248,8 +279,9 @@ love.update = function(delta)
         jump_a_or_b = not jump_a_or_b
         jump = jump / 2
     end
+    ]]--
 
-    -- update particles
+    -- update spatial hash
     if a_or_b then
         reset_memory_mapping_shader:send("particle_buffer", particle_buffer_a._native)
         update_cell_hash_shader:send("particle_buffer", particle_buffer_a._native)
@@ -264,9 +296,30 @@ love.update = function(delta)
     
     reset_memory_mapping_shader:dispatch(n_rows, n_columns)
     update_cell_hash_shader:dispatch(1, 1)
-    
     sort_particles_shader:dispatch(1, 1)
 
+    -- update density
+    love.graphics.push()
+    density_texture:bind()
+    love.graphics.clear(0, 0, 0, 0)
+    love.graphics.origin()
+    love.graphics.setBlendMode("add")
+    render_density_kernel_shader:bind()
+    if a_or_b then
+        render_density_kernel_shader:send("particle_buffer", particle_buffer_b._native)
+    else
+        render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
+    end
+    render_density_kernel_shader:send("wall_texture", wall_texture._native)
+    render_density_kernel_shader:send("sdf_texture", sdf_texture._native)
+    density_kernel_mesh:draw_instanced(n_particles)
+    render_density_kernel_shader:unbind()
+
+    density_texture:unbind()
+    love.graphics.setBlendMode("alpha")
+    love.graphics.pop()
+
+    -- step simulation
     if a_or_b then
         step_shader:send("particle_buffer", particle_buffer_b._native)
     else
@@ -298,9 +351,17 @@ love.draw = function(which)
         love.graphics.rectangle("fill", rt.aabb_unpack(aabb))
     end
 
+    -- draw sdf
+    --[[
+    love.graphics.setColor(1, 1, 1, 1)
+    render_sdf_shader:bind()
+    sdf_texture:draw()
+    render_sdf_shader:unbind()
+    ]]--
+
     -- draw spatial hash
     render_spatial_hash_shader:bind()
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+    --love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
     render_spatial_hash_shader:unbind()
 
     -- draw grid
@@ -321,15 +382,23 @@ love.draw = function(which)
     end
 
     -- draw particles
+    if a_or_b then
+        render_density_kernel_shader:send("particle_buffer", particle_buffer_b._native)
+        render_particle_shader:send("particle_buffer", particle_buffer_b._native)
+    else
+        render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
+        render_particle_shader:send("particle_buffer", particle_buffer_a._native)
+    end
+
     render_particle_shader:bind()
     particle_mesh:draw_instanced(n_particles)
     render_particle_shader:unbind()
 
-    -- draw sdf
-    love.graphics.setColor(1, 1, 1, 1)
-    render_sdf_shader:bind()
-    sdf_texture:draw()
-    render_sdf_shader:unbind()
+    love.graphics.setBlendMode("lighten", "premultiplied")
+    render_density_texture_shader:bind()
+    density_texture:draw()
+    render_density_texture_shader:unbind()
+    love.graphics.setBlendMode("alpha")
 
     -- show fps
     love.graphics.setColor(1, 1, 1, 1)
