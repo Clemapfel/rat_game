@@ -44,15 +44,16 @@ void computemain() {
     for (uint particle_i = particle_start_i; particle_i < particle_end_i; ++particle_i) {
         Particle particle = particles[particle_i];
 
-        ivec2 texelCoord = ivec2(particle.position);
-        float density_00 = imageLoad(density_texture, texelCoord + ivec2(-1, -1)).r;
-        float density_01 = imageLoad(density_texture, texelCoord + ivec2( 0, -1)).r;
-        float density_02 = imageLoad(density_texture, texelCoord + ivec2( 1, -1)).r;
-        float density_10 = imageLoad(density_texture, texelCoord + ivec2(-1,  0)).r;
-        float density_12 = imageLoad(density_texture, texelCoord + ivec2( 1,  0)).r;
-        float density_20 = imageLoad(density_texture, texelCoord + ivec2(-1,  1)).r;
-        float density_21 = imageLoad(density_texture, texelCoord + ivec2( 0,  1)).r;
-        float density_22 = imageLoad(density_texture, texelCoord + ivec2( 1,  1)).r;
+        // calculate density gradient
+        ivec2 position = ivec2(particle.position);
+        float density_00 = imageLoad(density_texture, position + ivec2(-1, -1)).r;
+        float density_01 = imageLoad(density_texture, position + ivec2( 0, -1)).r;
+        float density_02 = imageLoad(density_texture, position + ivec2( 1, -1)).r;
+        float density_10 = imageLoad(density_texture, position + ivec2(-1,  0)).r;
+        float density_12 = imageLoad(density_texture, position + ivec2( 1,  0)).r;
+        float density_20 = imageLoad(density_texture, position + ivec2(-1,  1)).r;
+        float density_21 = imageLoad(density_texture, position + ivec2( 0,  1)).r;
+        float density_22 = imageLoad(density_texture, position + ivec2( 1,  1)).r;
 
         float sobel_x = (density_02 + 2.0 * density_12 + density_22) - (density_00 + 2.0 * density_10 + density_20);
         float sobel_y = (density_20 + 2.0 * density_21 + density_22) - (density_00 + 2.0 * density_01 + density_02);

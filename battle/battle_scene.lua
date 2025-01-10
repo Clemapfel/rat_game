@@ -938,8 +938,8 @@ function bt.BattleScene:_create_inspect_selection_graph()
         -- TODO
     end
 
-    textbox_node:set_left(priority_queue_nodes[1])
-    priority_queue_nodes[1]:set_right(textbox_node)
+    --textbox_node:set_left(priority_queue_nodes[1])
+    --priority_queue_nodes[1]:set_right(textbox_node)
 
     local _last_party_status_node = nil
     local _last_enemy_status_node = nil
