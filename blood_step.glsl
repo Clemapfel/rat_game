@@ -22,9 +22,33 @@ layout(std430) buffer cell_memory_mapping_buffer {
     CellMemoryMapping cell_memory_mapping[];
 }; // size: n_columns * n_rows
 
-layout(r32f) uniform readonly image2D density_texture;
-
+uniform uint n_rows;
+uniform uint n_columns;
 uniform uint n_particles;
+uniform vec2 screen_size;
+
+float cell_width = screen_size.x / n_columns;
+float cell_height = screen_size.y / n_rows;
+
+uint cell_xy_to_linear_index(uint cell_x, uint cell_y) {
+    return cell_y * n_columns + cell_x;
+}
+
+uint cell_xy_to_cell_hash(uint cell_x, uint cell_y) {
+    return cell_x << 16u | cell_y << 0u;
+}
+
+ivec2 cell_hash_to_cell_xy(uint cell_hash) {
+    uint cell_x = cell_hash >> 16u;
+    uint cell_y = cell_hash & ((1u << 16u) - 1u);
+    return ivec2(int(cell_x), int(cell_y));
+}
+
+uvec2 position_to_cell_xy(vec2 position) {
+    return uvec2(position.x / cell_width, position.y / cell_height);
+}
+
+layout(r32f) uniform readonly image2D density_texture;
 uniform float particle_radius;
 uniform vec2 x_bounds; // left wall x, right wall x
 uniform vec2 y_bounds; // top wall y, bottom wall y
@@ -43,6 +67,9 @@ void computemain() {
 
     for (uint particle_i = particle_start_i; particle_i < particle_end_i; ++particle_i) {
         Particle particle = particles[particle_i];
+
+        uvec2 cell_xy = position_to_cell_xy(particle.position);
+        for (uint cell_x_offset = -1; cell_x_off)
 
         // calculate density gradient
         ivec2 position = ivec2(particle.position);

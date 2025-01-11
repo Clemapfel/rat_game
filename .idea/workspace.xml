@@ -22,8 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="rendered selected items on top">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -160,7 +162,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -659,15 +661,7 @@
       <workItem from="1736102224811" duration="27995000" />
       <workItem from="1736208153761" duration="360000" />
       <workItem from="1736265205191" duration="40253000" />
-      <workItem from="1736451038683" duration="19802000" />
-    </task>
-    <task id="LOCAL-01355" summary="stashing init compute">
-      <option name="closed" value="true" />
-      <created>1735074127525</created>
-      <option name="number" value="01355" />
-      <option name="presentableId" value="LOCAL-01355" />
-      <option name="project" value="LOCAL" />
-      <updated>1735074127525</updated>
+      <workItem from="1736451038683" duration="20972000" />
     </task>
     <task id="LOCAL-01356" summary="initialization done">
       <option name="closed" value="true" />
@@ -1053,7 +1047,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736539339440</updated>
     </task>
-    <option name="localTasksCounter" value="1404" />
+    <task id="LOCAL-01404" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736539864011</created>
+      <option name="number" value="01404" />
+      <option name="presentableId" value="LOCAL-01404" />
+      <option name="project" value="LOCAL" />
+      <updated>1736539864011</updated>
+    </task>
+    <option name="localTasksCounter" value="1405" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1125,14 +1127,14 @@
     <MESSAGE value="refactored meta" />
     <MESSAGE value="refactored entity comparison" />
     <MESSAGE value="added selection indicator" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="fixed selection graph navigation" />
     <MESSAGE value="added sdf step" />
     <MESSAGE value="removed unnecessary options" />
     <MESSAGE value="added sdf" />
     <MESSAGE value="pressure gradient working" />
     <MESSAGE value="rendered selected items on top" />
-    <option name="LAST_COMMIT_MESSAGE" value="rendered selected items on top" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
