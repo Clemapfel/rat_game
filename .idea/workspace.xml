@@ -23,9 +23,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/global_status_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/global_status_bar.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +168,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -662,6 +668,7 @@
       <workItem from="1736208153761" duration="360000" />
       <workItem from="1736265205191" duration="40253000" />
       <workItem from="1736451038683" duration="20972000" />
+      <workItem from="1736553950474" duration="15043000" />
     </task>
     <task id="LOCAL-01356" summary="initialization done">
       <option name="closed" value="true" />
@@ -1169,11 +1176,6 @@
           <url>file://$PROJECT_DIR$/common/scrollbar.lua</url>
           <line>47</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/serialize.lua</url>
-          <line>107</line>
-          <option name="timeStamp" value="49" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
           <url>file://$PROJECT_DIR$/common/translation.lua</url>

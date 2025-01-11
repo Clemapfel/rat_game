@@ -26,6 +26,14 @@ uniform uint n_rows;
 uniform uint n_columns;
 uniform uint n_particles;
 uniform vec2 screen_size;
+uniform float pressure_multiplier = 10;
+uniform vec2 gravity = vec2(0, 0.0);
+
+layout(r32f) uniform readonly image2D density_texture;
+uniform float particle_radius;
+uniform vec2 x_bounds; // left wall x, right wall x
+uniform vec2 y_bounds; // top wall y, bottom wall y
+uniform float delta;
 
 float cell_width = screen_size.x / n_columns;
 float cell_height = screen_size.y / n_rows;
@@ -48,12 +56,6 @@ uvec2 position_to_cell_xy(vec2 position) {
     return uvec2(position.x / cell_width, position.y / cell_height);
 }
 
-layout(r32f) uniform readonly image2D density_texture;
-uniform float particle_radius;
-uniform vec2 x_bounds; // left wall x, right wall x
-uniform vec2 y_bounds; // top wall y, bottom wall y
-uniform float delta;
-
 layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // dispatch with m, n were m * n <= n_particles
 void computemain() {
     uint n_threads = gl_WorkGroupSize.x * gl_WorkGroupSize.y * gl_WorkGroupSize.z;
@@ -65,14 +67,11 @@ void computemain() {
     uint particle_start_i = thread_i * n_particles_per_thread;
     uint particle_end_i = min(particle_start_i + n_particles_per_thread, n_particles);
 
-    for (uint particle_i = particle_start_i; particle_i < particle_end_i; ++particle_i) {
-        Particle particle = particles[particle_i];
-
-        uvec2 cell_xy = position_to_cell_xy(particle.position);
-        for (uint cell_x_offset = -1; cell_x_off)
+    for (uint self_i = particle_start_i; self_i < particle_end_i; ++self_i) {
+        Particle self = particles[self_i];
 
         // calculate density gradient
-        ivec2 position = ivec2(particle.position);
+        ivec2 position = ivec2(self.position);
         float density_00 = imageLoad(density_texture, position + ivec2(-1, -1)).r;
         float density_01 = imageLoad(density_texture, position + ivec2( 0, -1)).r;
         float density_02 = imageLoad(density_texture, position + ivec2( 1, -1)).r;
@@ -86,7 +85,31 @@ void computemain() {
         float sobel_y = (density_20 + 2.0 * density_21 + density_22) - (density_00 + 2.0 * density_01 + density_02);
 
         vec2 gradient = vec2(sobel_x, sobel_y);
-        particle.velocity = -1 * gradient * delta * 10;
+
+        self.velocity += -1 * normalize(gradient) * pressure_multiplier;
+
+        self.velocity += gravity;
+
+        uvec2 center_cell_xy = position_to_cell_xy(self.position);
+        for (uint cell_x_offset = -1; cell_x_offset <= 1; ++cell_x_offset) {
+            for (uint cell_y_offset = -1; cell_y_offset <= 1; ++cell_y_offset) {
+                if (cell_x_offset == 0 && cell_y_offset == 0)
+                continue;
+
+                uvec2 neighbor_cell_xy = center_cell_xy + uvec2(cell_x_offset, cell_y_offset);
+                CellMemoryMapping mapping = cell_memory_mapping[cell_xy_to_linear_index(neighbor_cell_xy.x, neighbor_cell_xy.y)];
+
+                for (uint other_i = mapping.start_index; other_i < mapping.end_index; ++other_i) {
+                    Particle other = particles[other_i];
+
+                    vec2 direction = other.position - self.position;
+                    float distance = length(direction);
+
+                }
+            }
+        }
+
+        self.position += self.velocity * delta;
 
         // Handle boundary conditions
         float min_x = x_bounds.x + particle_radius;
@@ -94,15 +117,14 @@ void computemain() {
         float min_y = y_bounds.x + particle_radius;
         float max_y = y_bounds.y - particle_radius;
 
-        if (particle.position.x < min_x || particle.position.x > max_x) {
-            particle.velocity.x *= -1;
+        if (self.position.x < min_x || self.position.x > max_x) {
+            self.velocity.x *= -1;
         }
 
-        if (particle.position.y < min_y || particle.position.y > max_y) {
-            particle.velocity.y *= -1;
+        if (self.position.y < min_y || self.position.y > max_y) {
+            self.velocity.y *= -1;
         }
 
-        particle.position += particle.velocity * delta;
-        particles[particle_i] = particle;
+        particles[self_i] = self;
     }
 }

@@ -5,8 +5,28 @@ rt.settings.battle.battle_scene = {
 }
 
 bt.BattleSceneState = meta.new_enum("BattleSceneState", {
-    INSPECT = "inspect"
+    INSPECT = "inspect",
+    MOVE_SELECTION = "move_selection"
 })
+
+--- @class bt.MoveSelection
+bt.MoveSelection = function(user, move, targets, _)
+    meta.assert_isa(user, bt.Entity)
+    meta.assert_isa(move, bt.MoveConfig)
+    meta.assert_nil(_)
+
+    local out = {
+        user = user,
+        move = move,
+        targets = targets
+    }
+
+    for target in values(out.targets) do
+        meta.assert_isa(target, bt.Entity)
+    end
+
+    return out
+end
 
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
@@ -14,6 +34,7 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _state = state,
         _scene_state = nil,
         _env = nil,
+        _ai = bt.EnemyAI(state),
 
         _background = rt.Background(),
         _verbose_info = mn.VerboseInfoPanel(state),
@@ -65,10 +86,24 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _selection_grpah_arrow_left_visible = false,
 
         _selection_graph_frame = rt.Frame(),
-        _selection_graph_frame_visible = false
+        _selection_graph_frame_visible = false,
+
+        _move_selection_order = {}, -- Table<Entities>
+        _move_selection_aabb = rt.AABB(0, 0, 1, 1),
+        _entity_id_to_move_selection = {}, -- Table<EntityID, MoveSelection>
+        _entity_id_to_slots = {}, -- Table<EntityID, {moves = mn.Slots, intrinics = mn.Slots, selection_graph = rt.SelectionGraph}>
+        _move_selection_control_indicator = nil,
     })
     return out
 end)
+
+function bt.BattleScene:_new_move_selection(user, move, targets)
+    return {
+        user = user,
+        move = move,
+        targets = targets
+    }
+end
 
 --- @override
 function bt.BattleScene:realize()
@@ -108,6 +143,15 @@ function bt.BattleScene:realize()
         self:_handle_button_released(which)
     end)
 
+    self._move_selection_control_indicator = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.control_indicator_select_move},
+        {rt.ControlIndicatorButton.A, rt.Translation.battle_scene.control_indicator_confirm_move},
+        {rt.ControlIndicatorButton.L, rt.Translation.battle_scene.control_indicator_previous_entity},
+        {rt.ControlIndicatorButton.R, rt.Translation.battle_scene.control_indicator_next_entity},
+        {rt.ControlIndicatorButton.Y, rt.Translation.battle_scene.control_indicator_inspect}
+    })
+    self._move_selection_control_indicator:realize()
+
     self:create_from_state(self._state)
 end
 
@@ -124,7 +168,6 @@ end
 
 --- @override
 function bt.BattleScene:create_from_state()
-
     self._animation_queue:clear()
     self._text_box:clear()
     self._global_status_bar:clear()
@@ -237,23 +280,29 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     local m = rt.settings.margin_unit
     local outer_margin = rt.settings.menu.inventory_scene.outer_margin
 
-
     local text_box_w = (4 / 3 * self._bounds.height) - 2 * outer_margin - 2 * tile_size
     self._text_box:fit_into(
         x + 0.5 * width - 0.5 * text_box_w, y + outer_margin,
         text_box_w, tile_size
     )
 
-    local status_bar_x = x + 0.5 * width + 0.5 * text_box_w
-    self._global_status_bar:fit_into(
-        status_bar_x, y + outer_margin,
-        x + width - status_bar_x, tile_size
-    )
-
     local queue_w = (width - 4 / 3 * height) / 2 - 2 * outer_margin
     self._priority_queue:fit_into(
         x + outer_margin, y + outer_margin, queue_w,
         height - 2 * outer_margin
+    )
+
+    local control_w, control_h = self._move_selection_control_indicator:measure()
+    self._move_selection_control_indicator:fit_into(
+        x + outer_margin + queue_w + outer_margin,
+        y + outer_margin,
+        control_w, control_h
+    )
+
+    local status_bar_x = x + 0.5 * width + 0.5 * text_box_w
+    self._global_status_bar:fit_into(
+        status_bar_x, y + outer_margin,
+        x + width - status_bar_x, control_h
     )
 
     self._quicksave_indicator:fit_into(
@@ -270,8 +319,14 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     )
     self._verbose_info_width = verbose_info_w
 
-    self:reformat_enemy_sprites()
+    local enemy_bounds = self:reformat_enemy_sprites()
     self:reformat_party_sprites()
+
+    self._move_selection_aabb = rt.AABB(
+        x + outer_margin + queue_w + outer_margin,
+        y + outer_margin + control_h + m,
+        0, 0
+    )
 
     if self._is_first_size_allocate then
         self:skip()
@@ -321,6 +376,9 @@ function bt.BattleScene:reformat_enemy_sprites()
     end
     self._enemy_sprites_motion = {}
 
+    local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
+    local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+
     self._enemy_sprites_render_order = {}
     local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
     local current_x = self._bounds.x + 0.5 * self._bounds.width - 0.5 * (total_w + (n_enemies + 1) * sprite_m)
@@ -338,11 +396,18 @@ function bt.BattleScene:reformat_enemy_sprites()
         end
         sprite:fit_into(new_x, new_y, sprite_w, sprite_h)
 
+        min_x = math.min(min_x, new_x)
+        min_y = math.min(min_y, new_y)
+        max_x = math.max(max_x, new_x + sprite_w)
+        max_y = math.max(max_y, new_y + sprite_h)
+
         self._enemy_sprites_motion[sprite] = motion
         table.insert(self._enemy_sprites_render_order, sprite)
 
         current_x = current_x + sprite_w + sprite_m
     end
+
+    return rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y)
 end
 
 --- @brief
@@ -366,6 +431,9 @@ function bt.BattleScene:reformat_party_sprites()
     end
     self._party_sprites_motion = {}
 
+    local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
+    local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+
     local speed = rt.settings.battle.battle_scene.enemy_sprite_speed
     for sprite in values(self._party_sprites) do
         if sprite ~= nil then
@@ -379,9 +447,16 @@ function bt.BattleScene:reformat_party_sprites()
             sprite:fit_into(sprite_x, sprite_y, sprite_w, sprite_h)
             self._party_sprites_motion[sprite] = motion
 
+            min_x = math.min(min_x, sprite_x)
+            min_y = math.min(min_y, sprite_y)
+            max_x = math.max(max_x, sprite_x + sprite_w)
+            max_y = math.max(max_y, sprite_y + sprite_h)
+
             sprite_x = sprite_x + sprite_w + m
         end
     end
+
+    return rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y)
 end
 
 --- @override
@@ -419,6 +494,23 @@ function bt.BattleScene:draw()
 
     self._animation_queue:draw()
     self._text_box:draw()
+
+    if self._move_selection_active then
+        self._move_selection_control_indicator:draw()
+        local current = self._move_selection_order[self._move_selection_i]
+        local element = self._entity_id_to_slots[current:get_id()]
+        if element ~= nil then
+            if element.moves ~= nil then
+                element.moves:draw()
+            end
+
+            if element.intrinsics ~= nil then
+                element.intrinsics:draw()
+            end
+        end
+
+        element.selection_graph:draw()
+    end
 
     self._verbose_info:draw()
 
@@ -1106,6 +1198,201 @@ function bt.BattleScene:_create_inspect_selection_graph()
 end
 
 --- @brief
+function bt.BattleScene:_create_move_slot_selection_graph(entity)
+    local current = self._entity_id_to_slots[entity:get_id()]
+    local n_move_slots, move_slots = self._state:entity_list_move_slots(entity)
+    local intrinsic_slots = self._state:entity_list_intrinsic_moves(entity)
+
+    local moves, intrinsics
+
+    -- split into rows of 4
+    local move_slot_layout = {}
+    table.insert(move_slot_layout, {})
+    for i = 1, n_move_slots do
+        table.insert(move_slot_layout[#move_slot_layout], mn.SlotType.MOVE)
+        if i % 4 == 0 and i ~= n_move_slots then
+            table.insert(move_slot_layout, {})
+        end
+    end
+    moves = mn.Slots(move_slot_layout)
+
+    if sizeof(intrinsic_slots) > 0 then
+        local intrinsic_layout = {}
+        for _ in values(intrinsic_slots) do
+            table.insert(intrinsic_layout, mn.SlotType.INTRINSIC)
+        end
+        intrinsics = mn.Slots({ intrinsic_layout})
+    end
+
+    for widget in range(moves, intrinsics) do
+        widget:realize()
+    end
+
+    local move_x, move_y = self._move_selection_aabb.x, self._move_selection_aabb.y
+    local move_w, move_h = moves:measure()
+
+    if intrinsics ~= nil then
+        move_w = math.max(move_w, select(1, intrinsics:measure()))
+    end
+
+    moves:fit_into(move_x, move_y, move_w, move_h)
+    if intrinsics ~= nil then
+        intrinsics:fit_into(move_x, move_y + move_h + rt.settings.margin_unit, move_w, select(2, intrinsics:measure()))
+    end
+
+    current = {
+        moves = moves,
+        intrinsics = intrinsics,
+        selection_graph = rt.SelectionGraph()
+    }
+    self._entity_id_to_slots[entity:get_id()] = current
+
+    for slot_i = 1, n_move_slots do
+        local move = move_slots[slot_i]
+        if move ~= nil then
+            local n_left = move:get_max_n_uses() - self._state:entity_get_move_n_used(entity, slot_i)
+            current.moves:set_object(slot_i, move, ternary(n_left == POSITIVE_INFINITY, "", n_left))
+        else
+            current.moves:set_object(slot_i, nil)
+        end
+    end
+
+    if current.intrinsics ~= nil then
+        local slot_i = 1
+        for intrinsic in values(intrinsic_slots) do
+            current.intrinsics:set_object(slot_i, intrinsic, rt.Translation.infinity)
+            slot_i = slot_i + 1
+        end
+    end
+
+    -- create selection graph
+    local move_nodes = current.moves:get_selection_nodes()
+    local intrinsic_nodes = {}
+    if current.intrinsics ~= nil then
+        intrinsic_nodes = current.intrinsics:get_selection_nodes()
+
+        local bottom_nodes = {}
+        do
+            local max_y = NEGATIVE_INFINITY
+            for node in values(move_nodes) do
+                max_y = math.max(node:get_bounds().y, max_y)
+            end
+            for node in values(move_nodes) do
+                if node:get_bounds().y == max_y then table.insert(bottom_nodes, node) end
+            end
+        end
+
+        local last_intrinsic_node = nil
+        local last_bottom_node = nil
+
+        for self in values(bottom_nodes) do
+            local self_x = self:get_bounds().x + 0.5 * self:get_bounds().width
+            local min_distance, closest_node = POSITIVE_INFINITY, nil
+            for other in values(intrinsic_nodes) do
+                local other_bounds = other:get_bounds()
+                local distance = math.abs(other_bounds.x + 0.5 * other_bounds.width - self_x)
+                if distance < min_distance then
+                    min_distance = distance
+                    closest_node = other
+                end
+            end
+
+            self:set_down(function(self)
+                if last_intrinsic_node == nil then
+                    return closest_node
+                else
+                    return last_intrinsic_node
+                end
+            end)
+
+            self:signal_connect("leave_down", function(self)
+                last_bottom_node = self
+            end)
+
+            self:signal_connect("exit", function(self)
+                last_intrinsic_node = nil
+            end)
+        end
+
+        for self in values(intrinsic_nodes) do
+            local self_x = self:get_bounds().x + 0.5 * self:get_bounds().width
+            local min_distance, closest_node = POSITIVE_INFINITY, nil
+            for other in values(bottom_nodes) do
+                local other_bounds = other:get_bounds()
+                local distance = math.abs(other_bounds.x + 0.5 * other_bounds.width - self_x)
+                if distance < min_distance then
+                    min_distance = distance
+                    closest_node = other
+                end
+            end
+
+            self:set_up(function(self)
+                if last_bottom_node == nil then
+                    return closest_node
+                else
+                    return last_bottom_node
+                end
+            end)
+
+            self:signal_connect("leave_up", function(self)
+                last_intrinsic_node = self
+            end)
+
+            self:signal_connect("exit", function(self)
+                last_bottom_node = nil
+            end)
+        end
+    end
+
+    local scene, user = self, entity
+    local slot_i = 1
+    for node in values(move_nodes) do
+        node.slot_i = slot_i
+        slot_i = slot_i + 1
+
+        node:signal_connect("enter", function(self)
+            current.moves:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
+
+            local move = move_slots[self.slot_i]
+            local valid_targets = scene._state:entity_get_valid_targets_for_move(user, move)
+            for entity in values(valid_targets) do
+                scene:_set_entity_selection_state(entity, rt.SelectionState.ACTIVE)
+            end
+        end)
+
+        node:signal_connect("exit", function(self)
+            current.moves:set_slot_selection_state(self.slot_i, rt.SelectionState.INACTIVE)
+
+            local move = move_slots[self.slot_i]
+            local valid_targets = scene._state:entity_get_valid_targets_for_move(user, move)
+            for entity in values(valid_targets) do
+                scene:_set_entity_selection_state(entity, rt.SelectionState.INACTIVE)
+            end
+        end)
+    end
+
+    slot_i = 1
+    for node in values(intrinsic_nodes) do
+        node.slot_i = slot_i
+        slot_i = slot_i + 1
+
+        node:signal_connect("enter", function(self)
+            current.intrinsics:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
+        end)
+
+        node:signal_connect("exit", function(self)
+            current.intrinsics:set_slot_selection_state(self.slot_i, rt.SelectionState.INACTIVE)
+        end)
+    end
+
+    for nodes in range(move_nodes, intrinsic_nodes) do
+        for node in values(nodes) do
+            current.selection_graph:add(node)
+        end
+    end
+end
+
+--- @brief
 function bt.BattleScene:_update_selection_graph_arrows(node)
     local bounds = node:get_bounds()
     local m = rt.settings.margin_unit
@@ -1192,13 +1479,53 @@ function bt.BattleScene:_set_entity_selection_state(entity, state)
 end
 
 --- @brief
-function bt.BattleScene:_set_mode(state)
+function bt.BattleScene:_start_move_selection()
+    -- collect viable entities
+    local entities = self._state:list_entities()
+    local party = {}
+    local enemies = {}
+
+    self._entity_id_to_move_selection = {}
+    for entity in values(entities) do
+        if not (self._state:entity_get_is_stunned(entity) or self._state:entity_get_state(entity) ~= bt.EntityState.ALIVE) then
+            if self._state:entity_get_is_enemy(entity) then
+                table.insert(enemies, entity)
+            else
+                table.insert(party, entity)
+            end
+            self._entity_id_to_move_selection[entity:get_id()] = nil
+        end
+    end
+
+    for choice in values(self._ai:make_move_selection(enemies)) do
+        self._entity_id_to_move_selection[choice.user:get_id()] = choice
+    end
+
+
+    self._move_selection_active = true
+    self._move_selection_order = party
+    self._move_selection_i = 1
+    self:_update_move_selection()
+end
+
+--- @brief
+function bt.BattleScene:_update_move_selection()
+    local current = self._move_selection_order[self._move_selection_i]
+    self:_create_move_slot_selection_graph(current)
+end
+
+--- @brief
+function bt.BattleScene:set_scene_state(state)
     if state == bt.BattleSceneState.INSPECT then
         self:_create_inspect_selection_graph()
         self._text_box:set_reveal_indicator_visible(true)
+    elseif state == bt.BattleSceneState.MOVE_SELECTION then
+        self:_start_move_selection()
     else
         rt.error("In bt.BattleScene:_set_mode: unhandled state `" .. tostring(state) .. "`")
     end
+
+    self._scene_state = state
 end
 
 --- @brief
@@ -1234,7 +1561,9 @@ function bt.BattleScene:_handle_button_pressed(which)
         self._env.start_battle("DEBUG_BATTLE")
         self._env.quicksave()
         self:skip_all()
-        self:_set_mode(bt.BattleSceneState.INSPECT)
+        --self:set_scene_state(bt.BattleSceneState.INSPECT)
+        self:set_scene_state(bt.BattleSceneState.MOVE_SELECTION)
+
         --self._text_box:set_show_history_mode_active(true)
 
         --[[
@@ -1274,7 +1603,15 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif which == rt.InputButton.LEFT then
     end
 
-    if self._selection_graph ~= nil then
-        self._selection_graph:handle_button(which)
+    if self._scene_state == bt.BattleSceneState.INSPECT then
+        if self._selection_graph ~= nil then
+            self._selection_graph:handle_button(which)
+        end
+    elseif self._scene_state == bt.BattleSceneState.MOVE_SELECTION then
+        local current = self._move_selection_order[self._move_selection_i]
+        local element = self._entity_id_to_slots[current:get_id()]
+        if element.selection_graph ~= nil then
+            element.selection_graph:handle_button(which)
+        end
     end
 end

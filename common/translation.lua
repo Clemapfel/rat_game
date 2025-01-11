@@ -460,5 +460,14 @@ rt.Translation = rt.initialize_translation({
                 return entity .. " used " .. move
             end
         }
+    },
+
+    battle_scene = {
+        control_indicator_select_move = "Select Move",
+        control_indicator_confirm_move = "Confirm",
+        control_indicator_previous_entity = "Go Back",
+        control_indicator_next_entity = "Go Next",
+        control_indicator_inspect = "Inspect"
+
     }
 })

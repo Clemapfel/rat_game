@@ -11,6 +11,7 @@
         index    -- Unsigned
         priority -- Signed
         is_obfuscated -- Boolean
+        ai_level -- bt.AILevel
 
         storage = {}, -- Table<String, Any>
         
@@ -84,6 +85,7 @@ function rt.GameState:create_entity(config)
         id = "",
         state = bt.EntityState.ALIVE,
         is_obfuscated = config:get_is_enemy(),
+        ai_level = config:get_ai_level(),
         moves = {},
         equips = {},
         consumables = {},
@@ -976,6 +978,45 @@ function rt.GameState:entity_preview_equip(entity, slot_i, new_equip)
 end
 
 --- @brief
+function rt.GameState:entity_get_valid_targets_for_move(user, move)
+    meta.assert_isa(user, bt.Entity)
+
+    if move == nil then return {} end
+    meta.assert_isa(move, bt.MoveConfig)
+
+    local is_party = self:entity_get_is_enemy(user) == false
+    local can_target_self = move:get_can_target_self()
+    local can_target_enemies = (move:get_can_target_enemies() and is_party) or (move:get_can_target_allies() and not is_party)
+    local can_target_party = (move:get_can_target_allies() and is_party) or (move:get_can_target_enemies() and not is_party)
+
+    if move:get_can_target_multiple() then
+        local targets = {}
+        for entity in values(self:list_entities()) do
+            if entity == user and can_target_self then
+                table.insert(targets, entity)
+            elseif self:entity_get_is_enemy(entity) == true and can_target_enemies then
+                table.insert(targets, entity)
+            elseif self:entity_get_is_enemy(entity) == false and can_target_party then
+                table.insert(targets, entity)
+            end
+        end
+        return {targets}
+    else
+        local targets = {}
+        for entity in values(self:list_entities()) do
+            if entity == user and can_target_self then
+                table.insert(targets, {entity})
+            elseif self:entity_get_is_enemy(entity) == true and can_target_enemies then
+                table.insert(targets, {entity})
+            elseif self:entity_get_is_enemy(entity) == false and can_target_party then
+                table.insert(targets, {entity})
+            end
+        end
+        return targets
+    end
+end
+
+--- @brief
 function rt.GameState:add_shared_object(object)
     if meta.isa(object, bt.MoveConfig) then
         self:add_shared_move(object)
@@ -1044,6 +1085,32 @@ function rt.GameState:entity_sort_inventory(entity)
     end
 
     return moves, equips, consumables
+end
+
+--- @brief
+function rt.GameState:entity_get_ai_level(entity)
+    meta.assert_isa(entity, bt.Entity)
+
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_ai_level: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    return entry.ai_level
+end
+
+--- @brief
+function rt.GameState:entity_set_ai_level(entity, level)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_enum(level, bt.AILevel)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_get_ai_level: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    entry.ai_level = level
 end
 
 --- @brief

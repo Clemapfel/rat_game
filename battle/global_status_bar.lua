@@ -54,9 +54,9 @@ function bt.GlobalStatusBar:add_global_status(status, n_turns_left)
         self._max_item_h = sprite_h
         local x, y, w, h = rt.aabb_unpack(self._bounds)
         local screen_w = love.graphics.getWidth()
-        local box_h = sprite_h + 2 * m + 2 * self._frame_thickness
-        self._frame:fit_into(0, y + 0.5 * h - 0.5 * box_h, screen_w, box_h)
-        self._ordered_box:fit_into(0 + m, y + 0.5 * h - 0.5 * sprite_h, screen_w, sprite_h)
+        local box_h = h--sprite_h + 2 * m + 2 * self._frame_thickness
+        self._frame:fit_into(0, y, screen_w, box_h)
+        self._ordered_box:fit_into(0 + m, y + 0.5 * box_h - 0.5 * sprite_h, screen_w, sprite_h)
         self._motion:set_value(screen_w + m)
         self:_update_frame_position()
     end

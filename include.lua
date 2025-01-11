@@ -253,7 +253,7 @@ require "battle.quicksave_indicator"
 require "battle.game_over_screen"
 
 require "battle.battle_animation"
-
+require "battle.enemy_ai"
 require "battle.battle_scene"
 require "battle.simulation_handler"
 

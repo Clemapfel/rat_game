@@ -18,8 +18,9 @@ local particle_mesh_n_outer_vertices = 16
 
 local n_particles = 3000
 local particle_radius = 5
-local particle_density_influence_multiplier = 4
+local particle_density_influence_multiplier = 2
 local particle_mass = 1
+local pressure_multiplier = 10;
 
 local n_particles_per_thread = 1
 local window_w, window_h = 800, 600
@@ -177,7 +178,7 @@ love.load = function()
             end
         end
 
-        local constrain = 0.33
+        local constrain = 0.0
         local min_x, max_x = left_x + particle_radius + constrain * window_w, right_x - particle_radius - constrain * window_w
         local min_y, max_y = top_y + particle_radius + constrain * window_h, bottom_y - particle_radius - constrain * window_h
         local max_velocity = 50
@@ -226,6 +227,10 @@ love.load = function()
     sort_particles_shader:send("particle_buffer_a", particle_buffer_a._native)
     sort_particles_shader:send("particle_buffer_b", particle_buffer_b._native)
 
+    step_shader:send("n_rows", n_rows)
+    step_shader:send("n_columns", n_columns)
+    step_shader:send("screen_size", {window_w, window_h})
+    --step_shader:send("pressure_multiplier", pressure_multiplier)
     step_shader:send("density_texture", density_texture._native)
     step_shader:send("particle_buffer", particle_buffer_a._native)
     step_shader:send("cell_memory_mapping_buffer", cell_memory_mapping_buffer._native)
