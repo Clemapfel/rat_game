@@ -22,21 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing move highlighting">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before move slots into realize">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/health_bar.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/health_bar.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/frame.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/older/~common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/older/~common/meta.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -674,15 +662,7 @@
       <workItem from="1736265205191" duration="40253000" />
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
-      <workItem from="1736701404307" duration="2338000" />
-    </task>
-    <task id="LOCAL-01357" summary="init complete">
-      <option name="closed" value="true" />
-      <created>1735077224445</created>
-      <option name="number" value="01357" />
-      <option name="presentableId" value="LOCAL-01357" />
-      <option name="project" value="LOCAL" />
-      <updated>1735077224445</updated>
+      <workItem from="1736701404307" duration="8177000" />
     </task>
     <task id="LOCAL-01358" summary="stashing">
       <option name="closed" value="true" />
@@ -1068,7 +1048,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736627910094</updated>
     </task>
-    <option name="localTasksCounter" value="1406" />
+    <task id="LOCAL-01406" summary="stashing before move slots into realize">
+      <option name="closed" value="true" />
+      <created>1736707357826</created>
+      <option name="number" value="01406" />
+      <option name="presentableId" value="LOCAL-01406" />
+      <option name="project" value="LOCAL" />
+      <updated>1736707357826</updated>
+    </task>
+    <option name="localTasksCounter" value="1407" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1122,7 +1110,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="optimized threadgroup usage, added sort step" />
     <MESSAGE value="stashing selection graph, TODO: quicksave and textbox verbose info, add status to entity item" />
     <MESSAGE value="stashing before branching verbose info entity info for battle and non-battle" />
     <MESSAGE value="label now has global outline color" />
@@ -1147,7 +1134,8 @@
     <MESSAGE value="rendered selected items on top" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing move highlighting" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing move highlighting" />
+    <MESSAGE value="stashing before move slots into realize" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before move slots into realize" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
