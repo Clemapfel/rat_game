@@ -758,7 +758,7 @@ do
 
                     if glyph.is_strikethrough then
                         if last_glyph_was_strikethrough and color_matches then
-                            glyph.strikethrough_ax = last_glyph_underline_bx
+                            glyph.strikethrough_ax = last_glyph_strikethrough_bx
                         else
                             glyph.strikethrough_ax = glyph.x + _padding
                         end
