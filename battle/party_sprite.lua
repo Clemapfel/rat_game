@@ -139,6 +139,15 @@ function bt.PartySprite:set_selection_state(state)
     self._selection_state = state
     self._frame:set_selection_state(state)
     self._gradient_visible = state ~= rt.SelectionState.ACTIVE
+    local opacity = ternary(state == rt.SelectionState.UNSELECTED, 0.5, 1)
+    for widget in range(
+        self._status_consumable_bar,
+        self._health_bar,
+        self._speed_value,
+        self._name
+    ) do
+        widget:set_opacity(opacity)
+    end
 end
 
 --- @override

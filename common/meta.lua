@@ -555,7 +555,6 @@ function meta.make_auto_extend(x, recursive)
     local metatable = getmetatable(x)
     if metatable == nil then
         metatable = {}
-        setmetatable(x, metatable)
     end
 
     metatable.__index = function(self, key)
@@ -563,10 +562,13 @@ function meta.make_auto_extend(x, recursive)
         self[key] = out
 
         if recursive then
-            meta.make_auto_extend(out, recursive)
+            return meta.make_auto_extend(out, recursive)
+        else
+            return out
         end
-        return out
     end
+
+    return setmetatable(x, metatable)
 end
 
 --- @brief

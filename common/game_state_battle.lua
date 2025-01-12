@@ -11,6 +11,7 @@
         index    -- Unsigned
         priority -- Signed
         is_obfuscated -- Boolean
+
         ai_level -- bt.AILevel
 
         storage = {}, -- Table<String, Any>
@@ -984,36 +985,25 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
     if move == nil then return {} end
     meta.assert_isa(move, bt.MoveConfig)
 
-    local is_party = self:entity_get_is_enemy(user) == false
+    local is_enemy = self:entity_get_is_enemy(user)
     local can_target_self = move:get_can_target_self()
-    local can_target_enemies = (move:get_can_target_enemies() and is_party) or (move:get_can_target_allies() and not is_party)
-    local can_target_party = (move:get_can_target_allies() and is_party) or (move:get_can_target_enemies() and not is_party)
+    local can_target_enemies = move:get_can_target_enemies()
+    local can_target_allies = move:get_can_target_allies()
+    local target_override = can_target_self == false and can_target_enemies == false and can_target_allies == false
 
-    if move:get_can_target_multiple() then
-        local targets = {}
-        for entity in values(self:list_entities()) do
-            if entity == user and can_target_self then
-                table.insert(targets, entity)
-            elseif self:entity_get_is_enemy(entity) == true and can_target_enemies then
-                table.insert(targets, entity)
-            elseif self:entity_get_is_enemy(entity) == false and can_target_party then
-                table.insert(targets, entity)
-            end
+    local out = {}
+    for entry in values(self._state.entities) do
+        local config = bt.EntityConfig(entry.id)
+        if target_override or
+            ((entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity()) and can_target_self) or
+            (config:get_is_enemy() == is_enemy and can_target_allies) or
+            (config:get_is_enemy() ~= is_enemy and can_target_enemies)
+        then
+            table.insert(out, bt.Entity(config, entry.multiplicity))
         end
-        return {targets}
-    else
-        local targets = {}
-        for entity in values(self:list_entities()) do
-            if entity == user and can_target_self then
-                table.insert(targets, {entity})
-            elseif self:entity_get_is_enemy(entity) == true and can_target_enemies then
-                table.insert(targets, {entity})
-            elseif self:entity_get_is_enemy(entity) == false and can_target_party then
-                table.insert(targets, {entity})
-            end
-        end
-        return targets
     end
+
+    return out
 end
 
 --- @brief

@@ -172,10 +172,17 @@ end
 --- @brief
 function bt.HealthBar:set_opacity(alpha)
     self._opacity = alpha
-    self._shape:set_opacity(alpha)
-    self._shape_outline:set_opacity(alpha)
-    self._backdrop:set_opacity(alpha)
-    self._backdrop_outline:set_opacity(alpha)
+    for which in range(
+        self._shape,
+        self._shape_outline,
+        self._backdrop,
+        self._backdrop_outline,
+        self._label_left,
+        self._label_center,
+        self._label_right
+    ) do
+        which:set_opacity(alpha)
+    end
 end
 
 --- @brief

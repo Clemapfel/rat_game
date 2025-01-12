@@ -312,6 +312,24 @@ function mn.VerboseInfoPanel.Item:create_from_equip(equip)
     return self
 end
 
+local _move_targets_to_label = meta.make_auto_extend({}, true)
+_move_targets_to_label[false][false][false][false] = rt.Translation.verbose_info.move_single_target_no_self_no_ally_no_enemy
+_move_targets_to_label[false][false][false][true ] = rt.Translation.verbose_info.move_single_target_no_self_no_ally_yes_enemy
+_move_targets_to_label[false][false][true ][false] = rt.Translation.verbose_info.move_single_target_no_self_yes_ally_yes_enemy
+_move_targets_to_label[false][false][true ][true ] = rt.Translation.verbose_info.move_single_target_no_self_yes_ally_yes_enemy
+_move_targets_to_label[false][true ][false][false] = rt.Translation.verbose_info.move_single_target_yes_self_no_ally_no_enemy
+_move_targets_to_label[false][true ][false][true ] = rt.Translation.verbose_info.move_single_target_yes_self_no_ally_yes_enemy
+_move_targets_to_label[false][true ][true ][false] = rt.Translation.verbose_info.move_single_target_yes_self_yes_ally_no_enemy
+_move_targets_to_label[false][true ][true ][true ] = rt.Translation.verbose_info.move_single_target_yes_self_yes_ally_yes_enemy
+_move_targets_to_label[true ][false][false][false] = rt.Translation.verbose_info.move_multi_target_no_self_no_ally_no_enemy
+_move_targets_to_label[true ][false][false][true ] = rt.Translation.verbose_info.move_multi_target_no_self_no_ally_yes_enemy
+_move_targets_to_label[true ][false][true ][false] = rt.Translation.verbose_info.move_multi_target_no_self_yes_ally_no_enemy
+_move_targets_to_label[true ][false][true ][true ] = rt.Translation.verbose_info.move_multi_target_no_self_yes_ally_yes_enemy
+_move_targets_to_label[true ][true ][false][false] = rt.Translation.verbose_info.move_multi_target_yes_self_no_ally_no_enemy
+_move_targets_to_label[true ][true ][false][true ] = rt.Translation.verbose_info.move_multi_target_yes_self_no_ally_yes_enemy
+_move_targets_to_label[true ][true ][true ][false] = rt.Translation.verbose_info.move_multi_target_yes_self_yes_ally_no_enemy
+_move_targets_to_label[true ][true ][true ][true ] = rt.Translation.verbose_info.move_multi_target_yes_self_yes_ally_yes_enemy
+
 --- @brief move
 function mn.VerboseInfoPanel.Item:create_from_move(move)
     self.object = move
@@ -369,6 +387,10 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         priority_str = priority_str .. prio
         self.priority_value_label = self._number(priority_str)
 
+        local target_label = _move_targets_to_label[move.can_target_multiple][move.can_target_self][move.can_target_ally][move.can_target_enemy]
+        self.target_label_left = self._prefix("<u>" .. rt.Translation.verbose_info.move_targets_prefix_label .. "</u> <color=GRAY>:</color> ")
+        self.target_label_right = self._description(target_label)
+
         self.content = {
             self.title_label,
             self.sprite,
@@ -387,7 +409,10 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
 
             self.priority_prefix_label,
             self.priority_colon_label,
-            self.priority_value_label
+            self.priority_value_label,
+
+            self.target_label_left,
+            self.target_label_right
         }
     end
 
@@ -408,7 +433,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         current_y = current_y + title_max_h
 
         do
-            local value_w, value_h = self.power_value_label:measure() -- TODO: why does this measure wrongly?
+            local value_w, value_h = self.power_prefix_label:measure()
             local colon_w, colon_h = self.power_colon_label:measure()
             self.power_prefix_label:fit_into(current_x, current_y)
             self.power_colon_label:fit_into(current_x + value_w + m, current_y)
@@ -439,6 +464,11 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
 
         self.description_label:fit_into(current_x, current_y, w)
         current_y = current_y + select(2, self.description_label:measure()) + 2 * m
+
+        self.target_label_left:fit_into(current_x, current_y, w)
+        local target_left_w = select(1, self.target_label_left:measure())
+        self.target_label_right:fit_into(current_x + target_left_w, current_y, w - target_left_w)
+        current_y = current_y + select(2, self.target_label_right:measure()) + 2 * m
 
         if self.spacer ~= nil then
             self.spacer:fit_into(current_x, current_y, w, 0)

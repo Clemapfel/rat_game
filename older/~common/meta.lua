@@ -609,6 +609,8 @@ function meta.make_auto_extend(x, recursive)
         end
         return out
     end
+
+    return x
 end
 
 --- @brief Add abstract method that needs to be overloaded or an assertion is raised

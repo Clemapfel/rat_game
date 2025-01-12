@@ -330,11 +330,12 @@ end
 function bt.PriorityQueue:_element_update_state(element)
     element.frame:set_selection_state(element.selection_state)
     element.frame:set_base_color(rt.Palette.BACKGROUND)
-    self:_element_snapshot(element)
 
     local r, g, b, a = 1, 1, 1, 1
     if element.selection_state == rt.SelectionState.UNSELECTED then
         a = 0.75
+    else
+        a = 1
     end
 
     if element.entity_state == bt.EntityState.DEAD then
@@ -345,6 +346,7 @@ function bt.PriorityQueue:_element_update_state(element)
     end
 
     element.r, element.g, element.b, element.a = r, g, b, a
+    self:_element_snapshot(element)
 end
 
 --- @brief

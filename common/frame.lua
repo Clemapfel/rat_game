@@ -200,9 +200,11 @@ function rt.Frame:set_selection_state(selection_state)
     if self._selection_state == rt.SelectionState.INACTIVE then
         self._stencil_color = rt.Palette.BACKGROUND
         self._frame_color = self._color
+        self._opacity = 1
     elseif self._selection_state == rt.SelectionState.ACTIVE then
         self._frame_color = rt.Palette.SELECTION
         self._stencil_color = rt.settings.frame.selected_base_color
+        self._opacity = 1
     elseif self._selection_state == rt.SelectionState.UNSELECTED then
         self._stencil_color = rt.Palette.BACKGROUND
         self._frame_color = self._color

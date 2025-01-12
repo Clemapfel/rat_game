@@ -34,8 +34,37 @@ end
 
 --- @brief [internal]
 --- @return Table<Table<bt.Entity>>
-function bt.EnemyAI:_get_valid_targets(user, move)
-    return self._state:entity_get_valid_targets_for_move(user, move)
+function bt.EnemyAI:_get_valid_targets(user, moveg)
+    local is_party = self._state:entity_get_is_enemy(user) == false
+    local can_target_self = move:get_can_target_self()
+    local can_target_enemies = (move:get_can_target_enemies() and is_party) or (move:get_can_target_allies() and not is_party)
+    local can_target_party = (move:get_can_target_allies() and is_party) or (move:get_can_target_enemies() and not is_party)
+
+    if move:get_can_target_multiple() then
+        local targets = {}
+        for entity in values(state:list_entities()) do
+            if entity == user and can_target_self then
+                table.insert(targets, entity)
+            elseif entity:get_is_enemy() == true and can_target_enemies then
+                table.insert(targets, entity)
+            elseif entity:get_is_enemy() == false and can_target_party then
+                table.insert(targets, entity)
+            end
+        end
+        return {targets}
+    else
+        local targets = {}
+        for entity in values(state:list_entities()) do
+            if entity == user and can_target_self then
+                table.insert(targets, {entity})
+            elseif entity:get_is_enemy() == true and can_target_enemies then
+                table.insert(targets, {entity})
+            elseif entity:get_is_enemy() == false and can_target_party then
+                table.insert(targets, {entity})
+            end
+        end
+        return targets
+    end
 end
 
 function bt.EnemyAI:_get_valid_moves(entity)

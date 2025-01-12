@@ -113,3 +113,17 @@ function bt.EnemySprite:measure()
     h = h + select(2, self._health_bar:measure()) + select(2, self._status_consumable_bar:measure())
     return w, h
 end
+
+--- @override
+function bt.EnemySprite:set_selection_state(state)
+    self._selection_state = state
+    local opacity = ternary(state == rt.SelectionState.UNSELECTED, 0.5, 1)
+    for widget in range(
+        self._status_consumable_bar,
+        self._health_bar,
+        self._speed_value,
+        self._id_offset_label
+    ) do
+        widget:set_opacity(opacity)
+    end
+end

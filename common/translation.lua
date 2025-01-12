@@ -115,10 +115,10 @@ rt.Translation = rt.initialize_translation({
         defense_label = "DEF",
         speed_label = "SPD",
 
-        move_n_uses = "Uses",
+        move_n_uses = "# Uses",
         move_priority = "Priority",
         move_power = "Power",
-        move_0_power = "\u{2501}", -- horizontal bar
+        move_0_power = "   \u{2501}", -- horizontal bar
 
         status_max_duration = "Max Duration",
         global_status_max_duration = "Max Duration",
@@ -146,6 +146,24 @@ rt.Translation = rt.initialize_translation({
         entity_state_alive = "ALIVE",
         entity_state_dead = "DEAD",
         entity_state_knocked_out = "KO",
+
+        move_targets_prefix_label = "Targets",
+        move_single_target_no_self_no_ally_no_enemy = "Field",
+        move_single_target_no_self_no_ally_yes_enemy = "Enemy",
+        move_single_target_no_self_yes_ally_yes_enemy = "Other Ally",
+        move_single_target_no_self_yes_ally_yes_enemy = "Other Ally or Enemy",
+        move_single_target_yes_self_no_ally_no_enemy = "User",
+        move_single_target_yes_self_no_ally_yes_enemy = "User or Enemy",
+        move_single_target_yes_self_yes_ally_no_enemy = "Ally",
+        move_single_target_yes_self_yes_ally_yes_enemy = "Ally or Enemy",
+        move_multi_target_no_self_no_ally_no_enemy = "Field",
+        move_multi_target_no_self_no_ally_yes_enemy = "All Enemies",
+        move_multi_target_no_self_yes_ally_no_enemy = "All Other Allies",
+        move_multi_target_no_self_yes_ally_yes_enemy = "Everyone except User",
+        move_multi_target_yes_self_no_ally_no_enemy = "User",
+        move_multi_target_yes_self_no_ally_yes_enemy = "User and All Enemies",
+        move_multi_target_yes_self_yes_ally_no_enemy = "All Allies",
+        move_multi_target_yes_self_yes_ally_yes_enemy = "Everyone",
 
         objects = {
             hp_title = "Health (<color=HP>HP</color>)",
