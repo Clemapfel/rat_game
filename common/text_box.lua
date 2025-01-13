@@ -103,7 +103,7 @@ function rt.TextBox:size_allocate(x, y, width, height)
     self._frame:fit_into(0, 0, width, frame_h)
     self._position_path = rt.Path(
         x, y,
-        x, 0 - frame_h - m
+        x, 0 - frame_h - 2 * m - 2 * self._frame:get_thickness()
     )
 
     do

@@ -1,5 +1,5 @@
 return {
-    name = "MC",
+    name = "Smitty Werbenjagermanjensen",
     flavor_text = "MC flavor text",
 
     sprite_id = "",

@@ -7,7 +7,10 @@ bt.PartySprite = meta.new_type("PartySprite", bt.EntitySprite, function(entity)
         _frame = rt.Frame(),
         _gradient = rt.VertexRectangle(0, 0, 1, 1),
         _gradient_visible = true,
-        _final_bounds = rt.AABB(0, 0, 1, 1)
+        _final_bounds = rt.AABB(0, 0, 1, 1),
+
+        _move_choice_sprite = nil, -- rt.Sprite
+        _move_choice_sprite_aabb = rt.AABB(0, 0, 1, 1)
     })
 end)
 
@@ -38,7 +41,7 @@ function bt.PartySprite:size_allocate(x, y, width, height)
     local bar_h = rt.settings.battle.entity_sprite.bar_height
 
     local label_w, label_h = self._name:measure()
-    self._name:fit_into(x + xm, current_y - label_h, width - 2 * xm)
+    self._name:fit_into(x + xm, current_y - label_h, POSITIVE_INFINITY) -- always one line
     local speed_value_w, speed_value_h = self._speed_value:measure()
     self._speed_value:fit_into(x + width - xm, current_y - label_h - speed_value_h + 0.5 * speed_value_h + 0.5 * label_h)
     current_y = current_y - label_h - 0.5 * ym
@@ -158,4 +161,11 @@ end
 --- @override
 function bt.PartySprite:get_position()
     return self._final_bounds.x, self._final_bounds.y
+end
+
+--- @override
+function bt.PartySprite:get_sprite_selection_node()
+    local out = rt.SelectionGraphNode(self._frame:get_bounds())
+    out.object = self._entity
+    return out
 end

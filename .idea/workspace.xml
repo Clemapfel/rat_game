@@ -22,9 +22,14 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before move slots into realize">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed strikethrough alignment bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/MC.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -662,23 +667,8 @@
       <workItem from="1736265205191" duration="40253000" />
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
-      <workItem from="1736701404307" duration="8177000" />
-    </task>
-    <task id="LOCAL-01358" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1735172402439</created>
-      <option name="number" value="01358" />
-      <option name="presentableId" value="LOCAL-01358" />
-      <option name="project" value="LOCAL" />
-      <updated>1735172402439</updated>
-    </task>
-    <task id="LOCAL-01359" summary="stashing before removing offset texture">
-      <option name="closed" value="true" />
-      <created>1735173945377</created>
-      <option name="number" value="01359" />
-      <option name="presentableId" value="LOCAL-01359" />
-      <option name="project" value="LOCAL" />
-      <updated>1735173945377</updated>
+      <workItem from="1736701404307" duration="10560000" />
+      <workItem from="1736783820700" duration="6609000" />
     </task>
     <task id="LOCAL-01360" summary="stashing maybe">
       <option name="closed" value="true" />
@@ -1056,7 +1046,23 @@
       <option name="project" value="LOCAL" />
       <updated>1736707357826</updated>
     </task>
-    <option name="localTasksCounter" value="1407" />
+    <task id="LOCAL-01407" summary="added move selection UI">
+      <option name="closed" value="true" />
+      <created>1736713222762</created>
+      <option name="number" value="01407" />
+      <option name="presentableId" value="LOCAL-01407" />
+      <option name="project" value="LOCAL" />
+      <updated>1736713222762</updated>
+    </task>
+    <task id="LOCAL-01408" summary="fixed strikethrough alignment bug">
+      <option name="closed" value="true" />
+      <created>1736713539116</created>
+      <option name="number" value="01408" />
+      <option name="presentableId" value="LOCAL-01408" />
+      <option name="project" value="LOCAL" />
+      <updated>1736713539116</updated>
+    </task>
+    <option name="localTasksCounter" value="1409" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1110,8 +1116,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing selection graph, TODO: quicksave and textbox verbose info, add status to entity item" />
-    <MESSAGE value="stashing before branching verbose info entity info for battle and non-battle" />
     <MESSAGE value="label now has global outline color" />
     <MESSAGE value="fixed mono space width" />
     <MESSAGE value="implemented in-battle entity verbose info" />
@@ -1135,7 +1139,9 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing move highlighting" />
     <MESSAGE value="stashing before move slots into realize" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before move slots into realize" />
+    <MESSAGE value="added move selection UI" />
+    <MESSAGE value="fixed strikethrough alignment bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed strikethrough alignment bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

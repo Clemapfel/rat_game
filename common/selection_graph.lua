@@ -178,6 +178,7 @@ function rt.SelectionGraph:add(...)
             self._nodes[node] = true
             if self._n_nodes == 0 then
                 self._current_node = node
+                self._current_node:signal_emit("enter")
             end
             self._n_nodes = self._n_nodes + 1
         end
