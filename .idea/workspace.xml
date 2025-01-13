@@ -22,14 +22,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed strikethrough alignment bug">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scene transitions">
+      <change afterPath="$PROJECT_DIR$/battle/move_selection.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/entities/MC.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/entities/MC.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_graph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/selection_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -668,15 +673,7 @@
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
       <workItem from="1736701404307" duration="10560000" />
-      <workItem from="1736783820700" duration="6609000" />
-    </task>
-    <task id="LOCAL-01360" summary="stashing maybe">
-      <option name="closed" value="true" />
-      <created>1735246979440</created>
-      <option name="number" value="01360" />
-      <option name="presentableId" value="LOCAL-01360" />
-      <option name="project" value="LOCAL" />
-      <updated>1735246979440</updated>
+      <workItem from="1736783820700" duration="13507000" />
     </task>
     <task id="LOCAL-01361" summary="spread working">
       <option name="closed" value="true" />
@@ -1062,7 +1059,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736713539116</updated>
     </task>
-    <option name="localTasksCounter" value="1409" />
+    <task id="LOCAL-01409" summary="added scene transitions">
+      <option name="closed" value="true" />
+      <created>1736790676504</created>
+      <option name="number" value="01409" />
+      <option name="presentableId" value="LOCAL-01409" />
+      <option name="project" value="LOCAL" />
+      <updated>1736790676505</updated>
+    </task>
+    <option name="localTasksCounter" value="1410" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1116,7 +1121,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="label now has global outline color" />
     <MESSAGE value="fixed mono space width" />
     <MESSAGE value="implemented in-battle entity verbose info" />
     <MESSAGE value="linked underline and strikethrough between words" />
@@ -1141,7 +1145,8 @@
     <MESSAGE value="stashing before move slots into realize" />
     <MESSAGE value="added move selection UI" />
     <MESSAGE value="fixed strikethrough alignment bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed strikethrough alignment bug" />
+    <MESSAGE value="added scene transitions" />
+    <option name="LAST_COMMIT_MESSAGE" value="added scene transitions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

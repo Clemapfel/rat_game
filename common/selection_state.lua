@@ -1,5 +1,5 @@
 rt.settings.selection_state = {
-    unselected_opacity = 0.3,
+    unselected_opacity = 0.6,
 }
 
 --- @class rt.SelectionState

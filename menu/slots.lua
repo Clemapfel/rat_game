@@ -26,6 +26,7 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _selected_slots = {},
 
         _frame = rt.Frame(),
+        _selection_state = rt.SelectionState.INACTIVE,
         _snapshot = rt.RenderTexture(),
         _snapshot_x = 0,
         _snapshot_y = 0,
@@ -287,7 +288,13 @@ end
 --- @override
 function mn.Slots:draw()
     if not self:get_is_allocated() then return end
-    self._snapshot:draw(self._snapshot_x, self._snapshot_y)
+    self._snapshot:draw(self._snapshot_x, self._snapshot_y, 1, 1, 1,
+        ternary(
+            self._selection_state == rt.SelectionState.UNSELECTED,
+            rt.settings.selection_state.unselected_opacity,
+            1
+        )
+    )
 
     love.graphics.translate(self._slot_x, self._slot_y)
     for item in keys(self._selected_slots) do
@@ -369,7 +376,7 @@ end
 --- @brief
 function mn.Slots:set_slot_selection_state(slot_i, selection_state)
     local item = self._slot_i_to_item[slot_i]
-    local unselected_opacity = 0.5
+    local unselected_opacity = 0.0
     if selection_state == rt.SelectionState.ACTIVE then
         for shape in range(item.base, item.base_inlay, item.frame) do
             shape:set_opacity(1)
@@ -390,8 +397,7 @@ end
 
 --- @brief
 function mn.Slots:set_selection_state(state)
-    self._frame:set_selection_state(state)
-    self:_update_snapshot()
+    self._selection_state = state
 end
 
 --- @brief

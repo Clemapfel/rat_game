@@ -30,6 +30,8 @@ function bt.EnemyAI:make_move_selection(enemies)
             targets
         ))
     end
+
+    return choices
 end
 
 --- @brief [internal]

@@ -9,8 +9,8 @@ bt.PartySprite = meta.new_type("PartySprite", bt.EntitySprite, function(entity)
         _gradient_visible = true,
         _final_bounds = rt.AABB(0, 0, 1, 1),
 
-        _move_choice_sprite = nil, -- rt.Sprite
-        _move_choice_sprite_aabb = rt.AABB(0, 0, 1, 1)
+        _move_selection = nil, -- rt.Sprite
+        _move_selection_aabb = rt.AABB(0, 0, 1, 1)
     })
 end)
 
@@ -72,8 +72,15 @@ function bt.PartySprite:size_allocate(x, y, width, height)
         sprite_h
     )
 
+
     self._snapshot_position_x = frame_aabb.x + 0.5 * frame_aabb.width - 0.5 * sprite_w - 0.25 * frame_aabb.width
     self._snapshot_position_y = frame_aabb.y - (1 - sprite_overlap) * sprite_h
+
+    self._move_selection_aabb = rt.AABB(
+        self._snapshot_position_x + 0.5 * sprite_w,
+        self._snapshot_position_y - 0.25 * sprite_h,
+        sprite_w, sprite_w
+    )
 
     local current_w, current_h = self._snapshot:get_size()
     if current_w ~= sprite_w or current_h ~= sprite_h then
@@ -125,7 +132,8 @@ function bt.PartySprite:draw()
             self._health_bar,
             self._speed_value,
             self._status_consumable_bar,
-            self._name:draw()
+            self._name,
+            self._move_selection -- may be nil
         ) do
             widget:draw()
         end
@@ -168,4 +176,23 @@ function bt.PartySprite:get_sprite_selection_node()
     local out = rt.SelectionGraphNode(self._frame:get_bounds())
     out.object = self._entity
     return out
+end
+
+--- @brief
+function bt.PartySprite:set_move_selection(move)
+    if move == nil then
+        self._move_selection = nil
+        return
+    end
+
+    self._move_selection = rt.Sprite(move:get_sprite_id())
+    local sprite_w, sprite_h = self._move_selection:get_resolution()
+    self._move_selection:set_minimum_size(sprite_w, sprite_h)
+    self._move_selection:realize()
+    local bounds = self._move_selection_aabb
+    self._move_selection:fit_into(
+        bounds.x + 0.5 * bounds.width - 0.5 * sprite_w,
+        bounds.y + 0.5 * bounds.height - 0.5 * sprite_h,
+        sprite_w, sprite_h
+    )
 end

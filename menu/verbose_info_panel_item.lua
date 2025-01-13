@@ -340,7 +340,9 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         self.frame:realize()
 
         self.title_label = self._title(move:get_name())
-        self.description_label = self._description(move:get_description())
+        self.description_label = self._description(
+            "<u>" .. rt.Translation.verbose_info.move_description .. "</u>" .. move:get_description()
+        )
         self.sprite = self._sprite(move)
 
         local flavor_text = move:get_flavor_text()
@@ -388,7 +390,7 @@ function mn.VerboseInfoPanel.Item:create_from_move(move)
         self.priority_value_label = self._number(priority_str)
 
         local target_label = _move_targets_to_label[move.can_target_multiple][move.can_target_self][move.can_target_ally][move.can_target_enemy]
-        self.target_label_left = self._prefix("<u>" .. rt.Translation.verbose_info.move_targets_prefix_label .. "</u> <color=GRAY>:</color> ")
+        self.target_label_left = self._prefix(rt.Translation.verbose_info.move_targets_prefix_label .. " <color=GRAY>:</color> ")
         self.target_label_right = self._description(target_label)
 
         self.content = {

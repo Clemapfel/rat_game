@@ -119,6 +119,7 @@ rt.Translation = rt.initialize_translation({
         move_priority = "Priority",
         move_power = "Power",
         move_0_power = "   \u{2501}", -- horizontal bar
+        move_description = "Effect: ",
 
         status_max_duration = "Max Duration",
         global_status_max_duration = "Max Duration",
@@ -481,11 +482,15 @@ rt.Translation = rt.initialize_translation({
     },
 
     battle_scene = {
-        control_indicator_select_move = "Select Move",
-        control_indicator_confirm_move = "Confirm",
-        control_indicator_previous_entity = "Go Back",
-        control_indicator_next_entity = "Go Next",
-        control_indicator_inspect = "Inspect"
+        move_selection_control_indicator_move = "Select Move",
+        move_selection_control_indicator_confirm = "Confirm",
+        move_selection_control_indicator_unconfirm = "Undo",
+        move_selection_control_indicator_previous_entity = "Previous",
+        move_selection_control_indicator_next_entity = "Next",
+        move_selection_control_indicator_inspect = "Inspect",
+
+        inspect_control_indicator_move = "Select",
+        inspect_control_indicator_go_back = "Return",
 
     }
 })

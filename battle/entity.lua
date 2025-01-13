@@ -20,13 +20,12 @@ function bt.Entity:_get_suffixes()
     local n = self._multiplicity
     local id_suffix = ""
     local name_suffix = ""
-    if n > 1 then
-        name_suffix = "" .. utf8.char(n + 0x03B1 - 1) -- lowercase greek letters
+    name_suffix = "" .. utf8.char(n + 0x03B1 - 1) -- lowercase greek letters
 
-        id_suffix = ""
-        if n < 10 then id_suffix = id_suffix .. "0" end
-        id_suffix = id_suffix .. tostring(n)
-    end
+    id_suffix = ""
+    if n < 10 then id_suffix = id_suffix .. "0" end
+    id_suffix = id_suffix .. tostring(n)
+
     return id_suffix, name_suffix
 end
 
@@ -45,7 +44,7 @@ end
 --- @brief
 function bt.Entity:get_id()
     local id_suffix, _ = self:_get_suffixes()
-    if utf8.size(id_suffix) > 0 then
+    if self._multiplicity > 1 then
         return self._config.id .. "_" .. id_suffix
     else
         return self._config.id
@@ -55,7 +54,7 @@ end
 --- @brief
 function bt.Entity:get_name()
     local _, name_suffix = self:_get_suffixes()
-    if utf8.size(name_suffix) > 0 then
+    if self._multiplicity > 1 then
         return self._config.name .. " " .. name_suffix
     else
         return self._config.name

@@ -29,6 +29,7 @@ function bt.PriorityQueue:_element_new(entity)
         motions = {},
         multiplicity = 0,
         sprite = rt.Sprite(entity:get_config():get_portrait_sprite_id()),
+        move_selection = nil, -- rt.Sprite
         frame = rt.Frame(),
         gradient = rt.VertexRectangle(0, 0, 1, 1),
         id_offset_label = nil,
@@ -44,14 +45,17 @@ function bt.PriorityQueue:_element_new(entity)
         a = 1
     }
 
-    if suffix ~= nil then
-        element.id_offset_label = rt.Label("<b><o>" .. suffix .. "</o></b>")--, rt.settings.font.default_large)
+    if entity:get_multiplicity() > 1 then
+        element.id_offset_label = rt.Label("<b><o>" .. suffix .. "</o></b>")
     end
 
     element.frame:set_thickness(rt.settings.frame.thickness + 1)
     element.frame:realize()
     element.sprite:realize()
-    element.id_offset_label:realize()
+
+    if element.id_offset_label ~= nil then
+        element.id_offset_label:realize()
+    end
 
     local top_color = rt.RGBA(1, 1, 1, 1)
     local bottom_color = rt.RGBA(0.4, 0.4, 0.4, 1)
@@ -77,8 +81,10 @@ function bt.PriorityQueue:_element_new(entity)
         0, frame_h
     )
 
-    local label_w, label_h = element.id_offset_label:measure()
-    element.id_offset_label:fit_into(0.5 * sprite_w - 0.5 * label_w, 1 * sprite_h - 0.5 * label_h)
+    if element.id_offset_label ~= nil then
+        local label_w, label_h = element.id_offset_label:measure()
+        element.id_offset_label:fit_into(0, 0.9 * sprite_h)
+    end
 
     local thickness = element.frame:get_thickness()
     element.width = sprite_w + 2 * thickness
@@ -111,6 +117,25 @@ function bt.PriorityQueue:_element_set_multiplicity(element, n)
 end
 
 --- @brief [internal]
+function bt.PriorityQueue:_element_set_move_selection(element, move)
+    if move == nil then
+        element.move_selection = nil
+        return
+    end
+
+    element.move_selection = rt.Sprite(move:get_sprite_id())
+    element.move_selection:realize()
+    local bounds = element.frame:get_bounds()
+    local sprite_w, sprite_h = element.move_selection:get_resolution()
+    element.move_selection:set_minimum_size(sprite_w, sprite_h)
+    element.move_selection:fit_into(
+        1.0 * bounds.width - 0.25 * sprite_w,
+        0.5 * bounds.height - 0.25 * sprite_h,
+        sprite_w, sprite_h
+    )
+end
+
+--- @brief [internal]
 function bt.PriorityQueue:_element_draw(element, x, y, scale, opacity, opacity_offset)
     love.graphics.push()
     love.graphics.setColor(element.r, element.g, element.b, math.min(element.a, opacity))
@@ -120,14 +145,17 @@ function bt.PriorityQueue:_element_draw(element, x, y, scale, opacity, opacity_o
     love.graphics.scale(scale, scale)
     love.graphics.translate(-(x + 0.5 * element.width * scale), -y)
     love.graphics.draw(element.snapshot._native, x, y)
-    love.graphics.pop()
 
+    love.graphics.translate(x, y)
     if element.id_offset_label ~= nil then
-        love.graphics.push()
-        love.graphics.translate(x, y)
         element.id_offset_label:draw()
-        love.graphics.pop()
     end
+
+    if element.move_selection ~= nil then
+        element.move_selection:draw()
+    end
+
+    love.graphics.pop()
 end
 
 --- @brief [internal]
@@ -432,4 +460,12 @@ function bt.PriorityQueue:get_selection_nodes()
     end
 
     return nodes
+end
+
+--- @brief
+function bt.PriorityQueue:set_move_selection(entity, move)
+    local element = self._entity_id_to_item[entity:get_id()]
+    if element ~= nil then
+        self:_element_set_move_selection(element, move)
+    end
 end

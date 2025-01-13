@@ -6,27 +6,10 @@ rt.settings.battle.battle_scene = {
 
 bt.BattleSceneState = meta.new_enum("BattleSceneState", {
     INSPECT = "inspect",
-    MOVE_SELECTION = "move_selection"
+    MOVE_SELECTION = "move_selection",
+    TARGET_SELECTION = "target_selection",
+    SIMULATION = "simulation"
 })
-
---- @class bt.MoveSelection
-bt.MoveSelection = function(user, move, targets, _)
-    meta.assert_isa(user, bt.Entity)
-    meta.assert_isa(move, bt.MoveConfig)
-    meta.assert_nil(_)
-
-    local out = {
-        user = user,
-        move = move,
-        targets = targets
-    }
-
-    for target in values(out.targets) do
-        meta.assert_isa(target, bt.Entity)
-    end
-
-    return out
-end
 
 --- @class bt.BattleScene
 bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
@@ -133,8 +116,8 @@ function bt.BattleScene:realize()
     self._inspect_selection_frame:set_corner_radius(32 / 4)
 
     self._inspect_control_indicator = rt.ControlIndicator({
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "Select"},
-        {rt.ControlIndicatorButton.B, "Return"}
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.inspect_control_indicator_move},
+        {rt.ControlIndicatorButton.B, rt.Translation.battle_scene.inspect_control_indicator_go_back}
     })
     self._inspect_control_indicator:realize()
 
@@ -293,6 +276,7 @@ function bt.BattleScene:_create_move_selection_slots(entity)
         node.slot_i = i
         node.entity = entity
         node.slots = current.moves
+        node.n_slots = n_move_slots
         node.get_move = function(self)
             return scene._state:entity_get_move(self.entity, self.slot_i)
         end
@@ -307,6 +291,7 @@ function bt.BattleScene:_create_move_selection_slots(entity)
             node.slot_i = i
             node.entity = entity
             node.slots = current.intrinsics
+            node.n_slots = n_intrinsic_slots
             node.get_move = function(self)
                 return scene._state:entity_list_intrinsic_moves(self.entity)[self.slot_i]
             end
@@ -413,9 +398,26 @@ function bt.BattleScene:_create_move_selection_slots(entity)
             end)
 
             node:signal_connect(rt.InputButton.A, function(self)
-                scene:_set_move_choice(self.entity, self:get_move())
-                scene:set_scene_state(bt.BattleSceneState.TARGET_SELECTION)
-                -- TODO: start simulation
+                -- lock in move choice
+                local move = self:get_move()
+                if move ~= nil then
+                    scene:_set_move_selection(self.entity, move)
+                end
+
+                local element = scene._entity_id_to_slots[self.entity:get_id()]
+                element.moves:set_selection_state(rt.SelectionState.UNSELECTED)
+                element.intrinsics:set_selection_state(rt.SelectionState.UNSELECTED)
+                scene:_update_move_selection_control_indicator()
+            end)
+
+            node:signal_connect(rt.InputButton.B, function(self)
+                -- undo move choice
+                scene:_set_move_selection(self.entity, nil)
+
+                local element = scene._entity_id_to_slots[self.entity:get_id()]
+                element.moves:set_selection_state(rt.SelectionState.INACTIVE)
+                element.intrinsics:set_selection_state(rt.SelectionState.INACTIVE)
+                scene:_update_move_selection_control_indicator()
             end)
 
             current.selection_graph:add(node)
@@ -1548,11 +1550,21 @@ function bt.BattleScene:_start_move_selection()
         end
     end
 
+    -- pick enemy moves
     for choice in values(self._ai:make_move_selection(enemies)) do
         self._entity_id_to_move_selection[choice.user:get_id()] = choice
+        self._priority_queue:set_move_selection(choice.user, choice.move)
     end
 
     self._move_selection_order = party
+
+    for entity in values(party) do
+        self._entity_id_to_move_selection[entity:get_id()] = bt.MoveSelection(
+            entity,
+            nil,
+            {}
+        )
+    end
 
     -- update slot base
     for entity in values(party) do
@@ -1624,46 +1636,7 @@ function bt.BattleScene:_set_move_selection_i(i)
         move_bounds.height + rt.settings.margin_unit + intrinsic_bounds.height
     )
 
-    local left_prefix, left_postfix = "", ""
-    local right_prefix, right_postfix = "", ""
-    local selection_bounds = self:get_sprite(current_entity)._frame:get_bounds()
-    local r = rt.settings.margin_unit
-    local offset = r * math.cos(2 * math.pi / 3 / 2) + self:get_sprite(current_entity)._frame:get_thickness() + 4 * 1
-
-    if self._move_selection_i <= 1 then
-        left_prefix = "<s><color=GRAY>"
-        left_postfix = "</color></s>"
-
-        self._move_selection_jump_left_arrow_visible = false
-    else
-        self._move_selection_jump_left_arrow_visible = true
-        self._move_selection_jump_left_arrow, self._move_selection_jump_left_arrow_outline = self:_generate_selection_arrow(
-            selection_bounds.x - offset,
-            selection_bounds.y + 0.5 * selection_bounds.height,
-            -math.pi
-        )
-    end
-
-    if self._move_selection_i >= sizeof(self._move_selection_order) then
-        right_prefix = "<s><color=GRAY>"
-        right_postfix = "</s></color>"
-        self._move_selection_jump_right_arrow_visible = false
-    else
-        self._move_selection_jump_right_arrow_visible = true
-        self._move_selection_jump_right_arrow, self._move_selection_jump_right_arrow_outline = self:_generate_selection_arrow(
-            selection_bounds.x + selection_bounds.width + offset,
-            selection_bounds.y + 0.5 * selection_bounds.height,
-            0
-        )
-    end
-
-    self._move_selection_control_indicator:create_from({
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.control_indicator_select_move},
-        {rt.ControlIndicatorButton.A, rt.Translation.battle_scene.control_indicator_confirm_move},
-        {rt.ControlIndicatorButton.L, left_prefix .. rt.Translation.battle_scene.control_indicator_previous_entity .. left_postfix},
-        {rt.ControlIndicatorButton.R, right_prefix .. rt.Translation.battle_scene.control_indicator_next_entity .. right_postfix},
-        {rt.ControlIndicatorButton.Y, rt.Translation.battle_scene.control_indicator_inspect}
-    })
+    self:_update_move_selection_control_indicator()
 
     for sprite in values(self._enemy_sprites) do
         sprite:set_selection_state(rt.SelectionState.UNSELECTED)
@@ -1672,24 +1645,67 @@ function bt.BattleScene:_set_move_selection_i(i)
     for entity in values(self._state:list_party()) do
         local sprite = self:get_sprite(entity)
         if sprite ~= nil then
-            sprite:set_selection_state(ternary(entity == current_entity, rt.SelectionState.ACTIVE, rt.SelectionState.UNSELECTED))
+            sprite:set_selection_state(ternary(entity == current_entity, rt.SelectionState.ACTIVE, rt.SelectionState.INACTIVE))
         end
     end
 
     if current.selection_graph:get_current_node() == nil then -- cursor memory
         current.selection_graph:set_current_node(current.move_nodes[1])
     end
+    current.selection_graph:get_current_node():signal_emit("enter")
 end
 
 --- @brief
-function bt.BattleScene:_set_move_choice(entity, move, targets)
-    local sprite = self:get_sprite(entity)
-    if sprite == nil then
-        rt.error("In bt.BattleScene:_set_move_choice: no sprite for entity `" .. entity:get_id() .. "`")
-        return
-    end
+function bt.BattleScene:_update_move_selection_control_indicator()
+    local current_entity = self._move_selection_order[self._move_selection_i]
+    local selection = self._entity_id_to_move_selection[current_entity:get_id()]
 
-    sprite:set_move_choice(move)
+    local disable_prefix, disable_postfix = "<s><color=GRAY>", "</s></color>"
+
+    local can_jump_left = self._move_selection_i > 1
+    local can_jump_right = self._move_selection_i < sizeof(self._move_selection_order)
+    local can_lock = selection.move == nil
+    local can_move = can_lock
+
+    local move_label = rt.Translation.battle_scene.move_selection_control_indicator_move
+    if not can_move then move_label = disable_prefix .. move_label .. disable_postfix end
+
+    local jump_left_label = rt.Translation.battle_scene.move_selection_control_indicator_previous_entity
+    if not can_jump_left then jump_left_label = disable_prefix .. jump_left_label .. disable_postfix end
+
+    local jump_right_label = rt.Translation.battle_scene.move_selection_control_indicator_next_entity
+    if not can_jump_right then jump_right_label = disable_prefix .. jump_right_label .. disable_postfix end
+
+    local lock_label = rt.Translation.battle_scene.move_selection_control_indicator_confirm
+    if not can_lock then lock_label = disable_prefix .. lock_label .. disable_postfix end
+
+    local unlock_label = rt.Translation.battle_scene.move_selection_control_indicator_unconfirm
+    if can_lock then unlock_label = disable_prefix .. unlock_label .. disable_postfix end
+
+    local inspect_label = rt.Translation.battle_scene.move_selection_control_indicator_inspect
+
+    self._move_selection_control_indicator:create_from({
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, move_label},
+        ternary(can_lock,
+            { rt.ControlIndicatorButton.A, lock_label },
+            { rt.ControlIndicatorButton.B, unlock_label }
+        ),
+        {rt.ControlIndicatorButton.L, jump_left_label},
+        {rt.ControlIndicatorButton.R, jump_right_label},
+        {rt.ControlIndicatorButton.Y, inspect_label}
+    })
+end
+
+--- @brief
+function bt.BattleScene:_set_move_selection(entity, move)
+    local slots = self._entity_id_to_slots[entity:get_id()]
+    self._entity_id_to_move_selection[entity:get_id()].move = move
+    self._priority_queue:set_move_selection(entity, move)
+
+    local sprite = self:get_sprite(entity)
+    if sprite ~= nil then
+        sprite:set_move_selection(move)
+    end
 end
 
 --- @brief
@@ -1736,6 +1752,10 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
+    if which == rt.InputButton.X then
+        self._priority_queue:reorder(rt.random.shuffle(self._state:list_entities()))
+    end
+
     if self._scene_state == bt.BattleSceneState.INSPECT then
         if which == rt.InputButton.B then
             self:set_scene_state(bt.BattleSceneState.MOVE_SELECTION)
@@ -1778,9 +1798,12 @@ function bt.BattleScene:_handle_button_pressed(which)
             end
         else
             local current = self._move_selection_order[self._move_selection_i]
+            local selection = self._entity_id_to_move_selection[current:get_id()]
             local element = self._entity_id_to_slots[current:get_id()]
             if element ~= nil and element.selection_graph ~= nil then
-                element.selection_graph:handle_button(which)
+                if not (selection.move ~= nil and which ~= rt.InputButton.B) then -- lock movement after selection
+                    element.selection_graph:handle_button(which)
+                end
             end
         end
     end
