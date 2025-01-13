@@ -22,19 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added scene transitions">
-      <change afterPath="$PROJECT_DIR$/battle/move_selection.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added move selection indicators">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/entity.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/priority_queue.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/priority_queue.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/selection_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/selection_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/serialize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/serialize.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -673,15 +666,7 @@
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
       <workItem from="1736701404307" duration="10560000" />
-      <workItem from="1736783820700" duration="13507000" />
-    </task>
-    <task id="LOCAL-01361" summary="spread working">
-      <option name="closed" value="true" />
-      <created>1735248257908</created>
-      <option name="number" value="01361" />
-      <option name="presentableId" value="LOCAL-01361" />
-      <option name="project" value="LOCAL" />
-      <updated>1735248257908</updated>
+      <workItem from="1736783820700" duration="14987000" />
     </task>
     <task id="LOCAL-01362" summary="stashing">
       <option name="closed" value="true" />
@@ -1067,7 +1052,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736790676505</updated>
     </task>
-    <option name="localTasksCounter" value="1410" />
+    <task id="LOCAL-01410" summary="added move selection indicators">
+      <option name="closed" value="true" />
+      <created>1736797463469</created>
+      <option name="number" value="01410" />
+      <option name="presentableId" value="LOCAL-01410" />
+      <option name="project" value="LOCAL" />
+      <updated>1736797463469</updated>
+    </task>
+    <option name="localTasksCounter" value="1411" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1121,7 +1114,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed mono space width" />
     <MESSAGE value="implemented in-battle entity verbose info" />
     <MESSAGE value="linked underline and strikethrough between words" />
     <MESSAGE value="verbose info now correctly displays battle entity info" />
@@ -1146,7 +1138,8 @@
     <MESSAGE value="added move selection UI" />
     <MESSAGE value="fixed strikethrough alignment bug" />
     <MESSAGE value="added scene transitions" />
-    <option name="LAST_COMMIT_MESSAGE" value="added scene transitions" />
+    <MESSAGE value="added move selection indicators" />
+    <option name="LAST_COMMIT_MESSAGE" value="added move selection indicators" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1181,11 +1174,6 @@
           <url>file://$PROJECT_DIR$/common/scrollbar.lua</url>
           <line>47</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/common/translation.lua</url>
-          <line>11</line>
-          <option name="timeStamp" value="50" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

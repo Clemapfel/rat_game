@@ -138,11 +138,7 @@ function bt.BattleScene:realize()
     end)
 
     self._move_selection_control_indicator = rt.ControlIndicator({
-        {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.control_indicator_select_move},
-        {rt.ControlIndicatorButton.A, rt.Translation.battle_scene.control_indicator_confirm_move},
-        {rt.ControlIndicatorButton.L, rt.Translation.battle_scene.control_indicator_previous_entity},
-        {rt.ControlIndicatorButton.R, rt.Translation.battle_scene.control_indicator_next_entity},
-        {rt.ControlIndicatorButton.Y, rt.Translation.battle_scene.control_indicator_inspect}
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, "UNINITIALIZED"}
     })
     self._move_selection_control_indicator:realize()
     self:create_from_state(self._state)
@@ -1557,7 +1553,6 @@ function bt.BattleScene:_start_move_selection()
     end
 
     self._move_selection_order = party
-
     for entity in values(party) do
         self._entity_id_to_move_selection[entity:get_id()] = bt.MoveSelection(
             entity,

@@ -48,6 +48,7 @@ do
     end
 
     local _concat = function(self, other)
+        return ""--[[
         local self_native = getmetatable(self)._native
         local other_native = getmetatable(other)
         if other_native ~= nil then
@@ -57,6 +58,7 @@ do
             end
         end
         return bt.format_name(self_native) .. other
+        ]]--
     end
 
     local _tostring = function(self)
@@ -331,7 +333,6 @@ function bt.BattleScene:create_simulation_environment()
         "range",
         "tostring",
         "print",
-        "println",
         "dbg",
         "sizeof",
         "clamp",
@@ -348,6 +349,10 @@ function bt.BattleScene:create_simulation_environment()
     ) do
         assert(_G[common] ~= nil)
         env[common] = _G[common]
+    end
+
+    env["println"] = function(...)
+        --println(...)
     end
 
     -- blacklist
@@ -3026,7 +3031,7 @@ function bt.BattleScene:create_simulation_environment()
             end
 
             -- TODO
-            table.insert(statuses, bt.create_status_proxy(_scene, bt.StatusConfig("DEBUG_STATUS")))
+            --table.insert(statuses, bt.create_status_proxy(_scene, bt.StatusConfig("DEBUG_STATUS")))
             -- TODO
 
             table.insert(to_spawn, {

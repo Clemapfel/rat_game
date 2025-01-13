@@ -1,4 +1,4 @@
-_serialize_get_indent = function(n_indent_tabs)
+local _serialize_get_indent = function(n_indent_tabs)
     local tabspace = "    "
     local buffer = {""}
 
@@ -9,13 +9,13 @@ _serialize_get_indent = function(n_indent_tabs)
     return table.concat(buffer)
 end
 
-_serialize_insert = function(buffer, ...)
+local _serialize_insert = function(buffer, ...)
     for i, value in pairs({...}) do
         table.insert(buffer, value)
     end
 end
 
-_serialize_inner = function(buffer, object, n_indent_tabs, seen, comment_out)
+local function _serialize_inner(buffer, object, n_indent_tabs, seen, comment_out)
     if type(object) == "number" then
         _serialize_insert(buffer, object)
     elseif type(object) == "string" then
