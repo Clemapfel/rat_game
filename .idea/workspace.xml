@@ -22,12 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added move selection indicators">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="disabled debug output">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/battles/DEBUG_BATTLE.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/serialize.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/serialize.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -666,15 +665,7 @@
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
       <workItem from="1736701404307" duration="10560000" />
-      <workItem from="1736783820700" duration="14987000" />
-    </task>
-    <task id="LOCAL-01362" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1735259218736</created>
-      <option name="number" value="01362" />
-      <option name="presentableId" value="LOCAL-01362" />
-      <option name="project" value="LOCAL" />
-      <updated>1735259218736</updated>
+      <workItem from="1736783820700" duration="15629000" />
     </task>
     <task id="LOCAL-01363" summary="added global status bar">
       <option name="closed" value="true" />
@@ -1060,7 +1051,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736797463469</updated>
     </task>
-    <option name="localTasksCounter" value="1411" />
+    <task id="LOCAL-01411" summary="disabled debug output">
+      <option name="closed" value="true" />
+      <created>1736798895823</created>
+      <option name="number" value="01411" />
+      <option name="presentableId" value="LOCAL-01411" />
+      <option name="project" value="LOCAL" />
+      <updated>1736798895823</updated>
+    </task>
+    <option name="localTasksCounter" value="1412" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1098,10 +1097,10 @@
             <State>
               <option name="FILTERS">
                 <map>
-                  <entry key="text">
+                  <entry key="branch">
                     <value>
                       <list>
-                        <option value="hex" />
+                        <option value="main" />
                       </list>
                     </value>
                   </entry>
@@ -1114,7 +1113,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="implemented in-battle entity verbose info" />
     <MESSAGE value="linked underline and strikethrough between words" />
     <MESSAGE value="verbose info now correctly displays battle entity info" />
     <MESSAGE value="changed color to HP purple" />
@@ -1139,7 +1137,8 @@
     <MESSAGE value="fixed strikethrough alignment bug" />
     <MESSAGE value="added scene transitions" />
     <MESSAGE value="added move selection indicators" />
-    <option name="LAST_COMMIT_MESSAGE" value="added move selection indicators" />
+    <MESSAGE value="disabled debug output" />
+    <option name="LAST_COMMIT_MESSAGE" value="disabled debug output" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

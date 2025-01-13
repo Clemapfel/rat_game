@@ -2,7 +2,7 @@ return {
     background_id = "CONFUSION",
     global_statuses = {
         "DEBUG_GLOBAL_STATUS",
-        --"RAIN"
+        "RAIN"
     },
     enemies = {
         [1] = {

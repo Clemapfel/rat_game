@@ -48,7 +48,6 @@ do
     end
 
     local _concat = function(self, other)
-        return ""--[[
         local self_native = getmetatable(self)._native
         local other_native = getmetatable(other)
         if other_native ~= nil then
@@ -58,7 +57,6 @@ do
             end
         end
         return bt.format_name(self_native) .. other
-        ]]--
     end
 
     local _tostring = function(self)
@@ -333,6 +331,7 @@ function bt.BattleScene:create_simulation_environment()
         "range",
         "tostring",
         "print",
+        "println",
         "dbg",
         "sizeof",
         "clamp",
@@ -351,9 +350,19 @@ function bt.BattleScene:create_simulation_environment()
         env[common] = _G[common]
     end
 
+    local enable_console_output = true
     env["println"] = function(...)
-        --println(...)
+        if enable_console_output then println(...) end
     end
+
+    env["print"] = function(...)
+        if enable_console_output then print(...) end
+    end
+
+    env["dbg"] = function(...)
+        if enable_console_output then dbg(...) end
+    end
+
 
     -- blacklist
     for no in range(

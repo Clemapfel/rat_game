@@ -210,13 +210,14 @@ function bt.BattleScene:_reformat_move_selection_slots(entity)
     local move_w, move_h = element.moves:measure()
     local intrinsic_w, intrinsic_h = element.intrinsics:measure()
     local w = math.max(move_w, intrinsic_w)
+    local bounds = self._bounds
     element.moves:fit_into(
-        self._move_selection_aabb.x,
+        bounds.x + 0.5 * bounds.width - w,
         self._move_selection_aabb.y,
         w, move_h
     )
     element.intrinsics:fit_into(
-        self._move_selection_aabb.x,
+        bounds.x + 0.5 * bounds.width - w,
         self._move_selection_aabb.y + move_h + rt.settings.margin_unit,
         w, intrinsic_h
     )
@@ -525,7 +526,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     local control_w, control_h = self._move_selection_control_indicator:measure()
     self._move_selection_control_indicator:fit_into(
-        x + outer_margin + queue_w + outer_margin,
+        x + 0.5 * width - 0.5 * control_w,
         y + outer_margin,
         control_w, control_h
     )
@@ -1689,6 +1690,14 @@ function bt.BattleScene:_update_move_selection_control_indicator()
         {rt.ControlIndicatorButton.R, jump_right_label},
         {rt.ControlIndicatorButton.Y, inspect_label}
     })
+
+    local bounds = self._bounds
+    local control_w, control_h = self._move_selection_control_indicator:measure()
+    self._move_selection_control_indicator:fit_into(
+        bounds.x + 0.5 * bounds.width - 0.5 * control_w,
+        bounds.y + 2 * rt.settings.margin_unit,
+        control_w, control_h
+    )
 end
 
 --- @brief
