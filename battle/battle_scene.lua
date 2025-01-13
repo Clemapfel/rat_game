@@ -1713,6 +1713,15 @@ function bt.BattleScene:_set_move_selection(entity, move)
 end
 
 --- @brief
+function bt.BattleScene:_start_target_selection()
+    local current = self._move_selection_order[self._move_selection_i]
+    local move = self._entity_id_to_move_selection[current:get_id()]
+    if move == nil then
+        rt.error("In bt.BattleScene:_start_target_selection: trying to select target, but no move is active")
+    end
+end
+
+--- @brief
 function bt.BattleScene:set_scene_state(state)
     if self._scene_state == state then return end
 
@@ -1741,6 +1750,8 @@ function bt.BattleScene:set_scene_state(state)
         self._inspect_selection_graph:set_current_node(self._inspect_selection_graph_default_node) -- no cursor memory
     elseif state == bt.BattleSceneState.MOVE_SELECTION then
         self:_start_move_selection()
+    elseif state == bt.battleSceneState.TARGET_SELECTION then
+        self:_start_target_selection()
     else
         rt.error("In bt.BattleScene:_set_mode: unhandled state `" .. tostring(state) .. "`")
     end

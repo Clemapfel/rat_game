@@ -26,6 +26,12 @@ shared uint i_to_masked[N_PARTICLES]; // cache masked values
 shared uint masked_to_last_i[256];  // used to limit search range in scatter step
 shared uint masked_to_first_i[256];
 
+/*
+layout(std430) buffer is_sorted_buffer {
+    uint is_sorted[];
+};
+*/
+
 #define n_threads 256
 
 layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in; // dispatch with 1, 1
@@ -111,4 +117,19 @@ void computemain()
 
         barrier();
     }
+
+    /*
+    if (is_sequential_worker) {
+        bool sorted = true;
+        for (uint i = 0; i < N_PARTICLES - 1; ++i) {
+            Particle a = particles_a[i];
+            Particle b = particles_a[i+1];
+            if (a.cell_hash > b.cell_hash) {
+                sorted = false;
+                break;
+            }
+        }
+        is_sorted[0] = sorted ? uint(-1) : 0u;
+    }
+    */
 }

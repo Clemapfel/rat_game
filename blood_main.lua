@@ -4,9 +4,10 @@ local particle_buffer_a, particle_buffer_b, cell_memory_mapping_buffer
 local sdf_texture_a, sdf_texture_b, sdf_texture -- xy: nearest wall coords (abs), z: distance
 local wall_texture -- x: is wall
 local density_texture -- x: density
+local is_sorted_buffer
 local a_or_b = true
 
-local reset_memory_mapping_shader, update_cell_hash_shader
+local reset_memory_mapping_shader, update_cell_hash_shader, build_memory_mapping_shader
 local sort_particles_shader
 local step_shader
 local render_particle_shader, render_spatial_hash_shader
@@ -16,9 +17,9 @@ local density_kernel_texture, init_density_kernel_shader, render_density_kernel_
 local particle_mesh, density_kernel_mesh
 local particle_mesh_n_outer_vertices = 16
 
-local n_particles = 3000
+local n_particles = 100
 local particle_radius = 5
-local particle_density_influence_multiplier = 2
+local particle_density_influence_multiplier = 1
 local particle_mass = 1
 local pressure_multiplier = 10;
 
@@ -66,6 +67,7 @@ love.load = function()
     render_density_texture_shader = rt.Shader("blood_render_density_texture.glsl")
     render_spatial_hash_shader = rt.Shader("blood_render_spatial_hash.glsl")
     reset_memory_mapping_shader = rt.ComputeShader("blood_reset_memory_mapping.glsl")
+    build_memory_mapping_shader = rt.ComputeShader("blood_build_memory_mapping.glsl")
     update_cell_hash_shader = rt.ComputeShader("blood_update_cell_hash.glsl", {
         LOCAL_SIZE_X = 32,
         LOCAL_SIZE_Y = 32
@@ -224,6 +226,15 @@ love.load = function()
     update_cell_hash_shader:send("cell_width", cell_width)
     update_cell_hash_shader:send("cell_height", cell_height)
 
+    build_memory_mapping_shader:send("n_particles", n_particles)
+    build_memory_mapping_shader:send("screen_size", {window_w, window_h})
+    build_memory_mapping_shader:send("n_columns", n_columns)
+    build_memory_mapping_shader:send("n_rows", n_rows)
+    build_memory_mapping_shader:send("particle_buffer", particle_buffer_a._native)
+    build_memory_mapping_shader:send("cell_memory_mapping_buffer", cell_memory_mapping_buffer._native)
+    build_memory_mapping_shader:send("cell_width", cell_width)
+    build_memory_mapping_shader:send("cell_height", cell_height)
+
     sort_particles_shader:send("particle_buffer_a", particle_buffer_a._native)
     sort_particles_shader:send("particle_buffer_b", particle_buffer_b._native)
 
@@ -238,103 +249,118 @@ love.load = function()
     step_shader:send("particle_radius", particle_radius)
     step_shader:send("x_bounds", x_bounds)
     step_shader:send("y_bounds", y_bounds)
+
+    --is_sorted_buffer = rt.GraphicsBuffer(sort_particles_shader:get_buffer_format("is_sorted_buffer"), 1)
+    --sort_particles_shader:send("is_sorted_buffer", is_sorted_buffer._native)
 end
 
+local elapsed = 0
 love.update = function(delta)
     if love.keyboard.isDown("space") == false then return end
 
-    -- update SDF
+    elapsed = elapsed + delta
+    local fixed_dt = 1 / 120
+    while (elapsed > fixed_dt) do
+        elapsed = elapsed - fixed_dt
 
-    wall_texture:bind()
-    love.graphics.clear(0, 0, 0, 0)
-    for aabb in range(
-        left_wall_aabb,
-        right_wall_aabb,
-        top_wall_aabb,
-        bottom_wall_aabb
-    ) do
-        love.graphics.rectangle("fill", rt.aabb_unpack(aabb))
-    end
-    love.graphics.circle("fill",0.5 * window_w, 0.5 * window_h, 0.25 * math.min(window_w, window_h))
-    wall_texture:unbind()
 
-    init_sdf_shader:send("init_texture", wall_texture._native)
-    init_sdf_shader:send("input_texture", sdf_texture_a._native)
-    init_sdf_shader:send("output_texture", sdf_texture_b._native)
-    init_sdf_shader:dispatch(window_w / 8, window_h / 8)
-    sdf_texture = sdf_texture_a
+        -- update SDF
 
-    --[[
-    local jump = 0.5 * math.min(window_w, window_h)
-    local jump_a_or_b = true
-    while jump > 1 do
-        if jump_a_or_b then
-            compute_sdf_shader:send("input_texture", sdf_texture_a._native)
-            compute_sdf_shader:send("output_texture", sdf_texture_b._native)
-            sdf_texture = sdf_texture_b
-        else
-            compute_sdf_shader:send("input_texture", sdf_texture_b._native)
-            compute_sdf_shader:send("output_texture", sdf_texture_a._native)
-            sdf_texture = sdf_texture_a
+        wall_texture:bind()
+        love.graphics.clear(0, 0, 0, 0)
+        for aabb in range(
+            left_wall_aabb,
+            right_wall_aabb,
+            top_wall_aabb,
+            bottom_wall_aabb
+        ) do
+            love.graphics.rectangle("fill", rt.aabb_unpack(aabb))
+        end
+        love.graphics.circle("fill",0.5 * window_w, 0.5 * window_h, 0.25 * math.min(window_w, window_h))
+        wall_texture:unbind()
+
+        init_sdf_shader:send("init_texture", wall_texture._native)
+        init_sdf_shader:send("input_texture", sdf_texture_a._native)
+        init_sdf_shader:send("output_texture", sdf_texture_b._native)
+        init_sdf_shader:dispatch(window_w / 8, window_h / 8)
+        sdf_texture = sdf_texture_a
+
+        local jump = 0.5 * math.min(window_w, window_h)
+        local jump_a_or_b = true
+        while jump > 1 do
+            if jump_a_or_b then
+                compute_sdf_shader:send("input_texture", sdf_texture_a._native)
+                compute_sdf_shader:send("output_texture", sdf_texture_b._native)
+                sdf_texture = sdf_texture_b
+            else
+                compute_sdf_shader:send("input_texture", sdf_texture_b._native)
+                compute_sdf_shader:send("output_texture", sdf_texture_a._native)
+                sdf_texture = sdf_texture_a
+            end
+
+            compute_sdf_shader:send("jump_distance", jump)
+            compute_sdf_shader:dispatch(window_w / 8, window_h / 8)
+
+            jump_a_or_b = not jump_a_or_b
+            jump = jump / 2
         end
 
-        compute_sdf_shader:send("jump_distance", jump)
-        compute_sdf_shader:dispatch(window_w / 8, window_h / 8)
+        step_shader:send("sdf_texture", sdf_texture._native)
 
-        jump_a_or_b = not jump_a_or_b
-        jump = jump / 2
+        -- update spatial hash
+        if a_or_b then
+            reset_memory_mapping_shader:send("particle_buffer", particle_buffer_a._native)
+            update_cell_hash_shader:send("particle_buffer", particle_buffer_a._native)
+            sort_particles_shader:send("particle_buffer_a", particle_buffer_a._native)
+            sort_particles_shader:send("particle_buffer_b", particle_buffer_b._native)
+            build_memory_mapping_shader:send("particle_buffer", particle_buffer_b._native)
+        else
+            reset_memory_mapping_shader:send("particle_buffer", particle_buffer_b._native)
+            update_cell_hash_shader:send("particle_buffer", particle_buffer_b._native)
+            sort_particles_shader:send("particle_buffer_a", particle_buffer_b._native)
+            sort_particles_shader:send("particle_buffer_b", particle_buffer_a._native)
+            build_memory_mapping_shader:send("particle_buffer", particle_buffer_a._native)
+        end
+
+        reset_memory_mapping_shader:dispatch(n_rows, n_columns)
+        --update_cell_hash_shader:dispatch(particle_dispatch_size, particle_dispatch_size)
+        sort_particles_shader:dispatch(1, 1)
+        build_memory_mapping_shader:dispatch(1, 1)
+
+        -- update density
+        love.graphics.push()
+        density_texture:bind()
+        love.graphics.clear(0, 0, 0, 0)
+        love.graphics.origin()
+        love.graphics.setBlendMode("add")
+        render_density_kernel_shader:bind()
+        if a_or_b then
+            render_density_kernel_shader:send("particle_buffer", particle_buffer_b._native)
+        else
+            render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
+        end
+        render_density_kernel_shader:send("delta", fixed_dt)
+        render_density_kernel_shader:send("wall_texture", wall_texture._native)
+        render_density_kernel_shader:send("sdf_texture", sdf_texture._native)
+        density_kernel_mesh:draw_instanced(n_particles)
+        render_density_kernel_shader:unbind()
+
+        density_texture:unbind()
+        love.graphics.setBlendMode("alpha")
+        love.graphics.pop()
+
+        -- step simulation
+        if a_or_b then
+            step_shader:send("particle_buffer", particle_buffer_b._native)
+        else
+            step_shader:send("particle_buffer", particle_buffer_a._native)
+        end
+
+        step_shader:send("delta", fixed_dt)
+        step_shader:dispatch(particle_dispatch_size, particle_dispatch_size)
+
+        a_or_b = not a_or_b
     end
-    ]]--
-
-    -- update spatial hash
-    if a_or_b then
-        reset_memory_mapping_shader:send("particle_buffer", particle_buffer_a._native)
-        update_cell_hash_shader:send("particle_buffer", particle_buffer_a._native)
-        sort_particles_shader:send("particle_buffer_a", particle_buffer_a._native)
-        sort_particles_shader:send("particle_buffer_b", particle_buffer_b._native)
-    else
-        reset_memory_mapping_shader:send("particle_buffer", particle_buffer_b._native)
-        update_cell_hash_shader:send("particle_buffer", particle_buffer_b._native)
-        sort_particles_shader:send("particle_buffer_a", particle_buffer_b._native)
-        sort_particles_shader:send("particle_buffer_b", particle_buffer_a._native)
-    end
-    
-    reset_memory_mapping_shader:dispatch(n_rows, n_columns)
-    update_cell_hash_shader:dispatch(1, 1)
-    sort_particles_shader:dispatch(1, 1)
-
-    -- update density
-    love.graphics.push()
-    density_texture:bind()
-    love.graphics.clear(0, 0, 0, 0)
-    love.graphics.origin()
-    love.graphics.setBlendMode("add")
-    render_density_kernel_shader:bind()
-    if a_or_b then
-        render_density_kernel_shader:send("particle_buffer", particle_buffer_b._native)
-    else
-        render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
-    end
-    render_density_kernel_shader:send("wall_texture", wall_texture._native)
-    render_density_kernel_shader:send("sdf_texture", sdf_texture._native)
-    density_kernel_mesh:draw_instanced(n_particles)
-    render_density_kernel_shader:unbind()
-
-    density_texture:unbind()
-    love.graphics.setBlendMode("alpha")
-    love.graphics.pop()
-
-    -- step simulation
-    if a_or_b then
-        step_shader:send("particle_buffer", particle_buffer_b._native)
-    else
-        step_shader:send("particle_buffer", particle_buffer_a._native)
-    end
-
-    step_shader:send("delta", delta)
-    step_shader:dispatch(particle_dispatch_size, particle_dispatch_size)
-
-    a_or_b = not a_or_b
 end
 
 love.keypressed = function(which)
@@ -366,7 +392,7 @@ love.draw = function(which)
 
     -- draw spatial hash
     render_spatial_hash_shader:bind()
-    --love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
     render_spatial_hash_shader:unbind()
 
     -- draw grid
@@ -388,8 +414,8 @@ love.draw = function(which)
 
     -- draw particles
     if a_or_b then
-        render_density_kernel_shader:send("particle_buffer", particle_buffer_b._native)
-        render_particle_shader:send("particle_buffer", particle_buffer_b._native)
+        render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
+        render_particle_shader:send("particle_buffer", particle_buffer_a._native)
     else
         render_density_kernel_shader:send("particle_buffer", particle_buffer_a._native)
         render_particle_shader:send("particle_buffer", particle_buffer_a._native)

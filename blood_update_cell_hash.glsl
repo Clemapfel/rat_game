@@ -8,7 +8,7 @@ struct Particle {
     uint cell_hash;
 };
 
-layout(std430) readonly buffer particle_buffer {
+layout(std430) buffer particle_buffer {
     Particle particles[];
 }; // size: n_particles
 
@@ -80,6 +80,8 @@ void computemain() {
         Particle particle = particles[particle_i];
         ivec2 center_xy = position_to_cell_xy(particle.position);
         vec2 particle_xy = particle.position;
+
+        particles[particle_i].cell_hash = cell_xy_to_cell_hash(center_xy);
 
         // center cell always occupied
         atomicAdd(cell_memory_mapping[cell_xy_to_cell_i(center_xy)].n_particles, 1u);

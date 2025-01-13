@@ -26,10 +26,12 @@ uniform uint n_rows;
 uniform uint n_columns;
 uniform uint n_particles;
 uniform vec2 screen_size;
-uniform float pressure_multiplier = 10;
-uniform vec2 gravity = vec2(0, 0.0);
+uniform float pressure_multiplier = 1;
+uniform vec2 gravity = vec2(0, 1.0);
 
 layout(r32f) uniform readonly image2D density_texture;
+layout(rgba32f) uniform readonly image2D sdf_texture;
+
 uniform float particle_radius;
 uniform vec2 x_bounds; // left wall x, right wall x
 uniform vec2 y_bounds; // top wall y, bottom wall y
@@ -72,6 +74,7 @@ void computemain() {
 
         // calculate density gradient
         ivec2 position = ivec2(self.position);
+        float self_density = imageLoad(density_texture, position).r;
         float density_00 = imageLoad(density_texture, position + ivec2(-1, -1)).r;
         float density_01 = imageLoad(density_texture, position + ivec2( 0, -1)).r;
         float density_02 = imageLoad(density_texture, position + ivec2( 1, -1)).r;
@@ -86,30 +89,44 @@ void computemain() {
 
         vec2 gradient = vec2(sobel_x, sobel_y);
 
-        self.velocity += -1 * normalize(gradient) * pressure_multiplier;
-
-        self.velocity += gravity;
+        //self.velocity += -1 * gradient * pressure_multiplier;
+        //self.velocity += gravity;
 
         uvec2 center_cell_xy = position_to_cell_xy(self.position);
         for (uint cell_x_offset = -1; cell_x_offset <= 1; ++cell_x_offset) {
             for (uint cell_y_offset = -1; cell_y_offset <= 1; ++cell_y_offset) {
                 if (cell_x_offset == 0 && cell_y_offset == 0)
-                continue;
+                    continue;
 
                 uvec2 neighbor_cell_xy = center_cell_xy + uvec2(cell_x_offset, cell_y_offset);
                 CellMemoryMapping mapping = cell_memory_mapping[cell_xy_to_linear_index(neighbor_cell_xy.x, neighbor_cell_xy.y)];
 
                 for (uint other_i = mapping.start_index; other_i < mapping.end_index; ++other_i) {
+                    if (other_i == self_i) continue;
                     Particle other = particles[other_i];
 
                     vec2 direction = other.position - self.position;
                     float distance = length(direction);
 
+                    vec2 other_position = other.position;
+                    float other_density = imageLoad(density_texture, ivec2(other_position)).r;
+
+                    self.velocity += normalize(position - other_position) * mix(self_density, other_density, 0.5) * pressure_multiplier * delta;
                 }
             }
         }
 
-        self.position += self.velocity * delta;
+        float sdf_00 = imageLoad(sdf_texture, position + ivec2(-1, -1)).z;
+        float sdf_01 = imageLoad(sdf_texture, position + ivec2( 0, -1)).z;
+        float sdf_02 = imageLoad(sdf_texture, position + ivec2( 1, -1)).z;
+        float sdf_10 = imageLoad(sdf_texture, position + ivec2(-1,  0)).z;
+        float sdf_12 = imageLoad(sdf_texture, position + ivec2( 1,  0)).z;
+        float sdf_20 = imageLoad(sdf_texture, position + ivec2(-1,  1)).z;
+        float sdf_21 = imageLoad(sdf_texture, position + ivec2( 0,  1)).z;
+        float sdf_22 = imageLoad(sdf_texture, position + ivec2( 1,  1)).z;
+
+        float sdf_x = (sdf_02 + 2.0 * sdf_12 + sdf_22) - (sdf_00 + 2.0 * sdf_10 + sdf_20);
+        float sdf_y = (sdf_20 + 2.0 * sdf_21 + sdf_22) - (sdf_00 + 2.0 * sdf_01 + sdf_02);
 
         // Handle boundary conditions
         float min_x = x_bounds.x + particle_radius;
@@ -124,6 +141,10 @@ void computemain() {
         if (self.position.y < min_y || self.position.y > max_y) {
             self.velocity.y *= -1;
         }
+
+        self.position += self.velocity * delta;
+        self.position.x = clamp(self.position.x, min_x, max_x);
+        self.position.y = clamp(self.position.y, min_y, max_y);
 
         particles[self_i] = self;
     }

@@ -363,7 +363,7 @@ do
             end,
 
             __index = function(self, key)
-                local out = fields[key] -- non-chached metatable for additional speed here
+                local out = fields[key] -- non-cached metatable for additional speed here
                 if out == nil then
                     rt.warning("In " .. name .. ".__index: key `" .. key .. "` is not part of enum")
                 end

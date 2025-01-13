@@ -6,7 +6,7 @@ rt.settings.battle.move = {
 
 --- @class bt.MoveConfig
 --- @brief cached instancing, moves with the same ID will always return the same instance
-bt.MoveConfig = meta.new_type("Move", function(id)
+bt.MoveConfig = meta.new_type("MoveConfig", function(id)
     meta.assert_string(id)
     local out = bt.MoveConfig._atlas[id]
     if out == nil then

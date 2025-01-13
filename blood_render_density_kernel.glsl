@@ -11,6 +11,7 @@ layout(std430) readonly buffer particle_buffer {
 }; // size: n_particles
 
 uniform uint n_particles;
+uniform float delta;
 uniform sampler2D wall_texture;
 uniform sampler2D sdf_texture;
 
@@ -20,7 +21,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
     int instance_id = love_InstanceID;
     Particle particle = particles[instance_id];
-    vertex_position.xy += particle.position;
+    vertex_position.xy += particle.position + particle.velocity * delta;
     return transform_projection * vertex_position;
 }
 
