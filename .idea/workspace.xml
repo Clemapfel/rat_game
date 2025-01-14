@@ -22,17 +22,16 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed text box output">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/moves/BOMB.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/BOMB.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/move_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/move_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_build_memory_mapping.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_build_memory_mapping.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_render_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_render_density_kernel.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_update_cell_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_update_cell_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/enemy_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/party_sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/party_sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,7 +168,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -269,9 +268,9 @@
     <list>
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
-      <item itemvalue="Lua Application.main_sort" />
       <item itemvalue="Lua Application.main_blood" />
       <item itemvalue="Lua Application.main_smoke" />
+      <item itemvalue="Lua Application.main_sort" />
       <item itemvalue="Lua Application.meta.lua" />
       <item itemvalue="Makefile Target.Makefile" />
     </list>
@@ -671,15 +670,11 @@
       <workItem from="1736451038683" duration="20972000" />
       <workItem from="1736553950474" duration="21886000" />
       <workItem from="1736701404307" duration="10560000" />
-      <workItem from="1736783820700" duration="24244000" />
-    </task>
-    <task id="LOCAL-01364" summary="reset working correclty now">
-      <option name="closed" value="true" />
-      <created>1735334905157</created>
-      <option name="number" value="01364" />
-      <option name="presentableId" value="LOCAL-01364" />
-      <option name="project" value="LOCAL" />
-      <updated>1735334905157</updated>
+      <workItem from="1736783820700" duration="24532000" />
+      <workItem from="1736865943702" duration="963000" />
+      <workItem from="1736867008051" duration="142000" />
+      <workItem from="1736867304102" duration="109000" />
+      <workItem from="1736868766647" duration="11682000" />
     </task>
     <task id="LOCAL-01365" summary="added skipping individual messages">
       <option name="closed" value="true" />
@@ -1065,7 +1060,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736799510666</updated>
     </task>
-    <option name="localTasksCounter" value="1413" />
+    <task id="LOCAL-01413" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736812720567</created>
+      <option name="number" value="01413" />
+      <option name="presentableId" value="LOCAL-01413" />
+      <option name="project" value="LOCAL" />
+      <updated>1736812720567</updated>
+    </task>
+    <option name="localTasksCounter" value="1414" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1135,7 +1138,6 @@
     <MESSAGE value="added sdf" />
     <MESSAGE value="pressure gradient working" />
     <MESSAGE value="rendered selected items on top" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing move highlighting" />
     <MESSAGE value="stashing before move slots into realize" />
     <MESSAGE value="added move selection UI" />
@@ -1144,7 +1146,8 @@
     <MESSAGE value="added move selection indicators" />
     <MESSAGE value="disabled debug output" />
     <MESSAGE value="fixed text box output" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed text box output" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

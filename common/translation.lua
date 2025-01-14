@@ -492,5 +492,8 @@ rt.Translation = rt.initialize_translation({
         inspect_control_indicator_move = "Select",
         inspect_control_indicator_go_back = "Return",
 
+        target_selection_control_indicator_move = "Select",
+        target_selection_control_indicator_go_back = "Back",
+        target_selection_control_indicator_confirm = "Confirm"
     }
 })

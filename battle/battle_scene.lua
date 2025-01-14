@@ -51,36 +51,39 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
 
         _is_first_size_allocate = true,
         
+        -- selection ui
+        _selection_arrow_up = nil,
+        _selection_arrow_up_outline = nil,
+        _selection_arrow_up_visible = false,
+
+        _selection_arrow_right = nil,
+        _selection_arrow_right_outline = nil,
+        _selection_arrow_right_visible = false,
+
+        _selection_arrow_down = nil,
+        _selection_arrow_down_outline = nil,
+        _selection_arrow_down_visible = false,
+
+        _selection_arrow_left = nil,
+        _selection_arrow_left_outline = nil,
+        _selection_arrow_left_visible = false,
+
+        _selection_frame = rt.Frame(),
+        _selection_frame_visible = false,
+        _inspect_control_indicator = nil,
+        
         -- inspect
         _inspect_selection_graph = nil, -- rt.SelectionGraph
         _inspect_selection_graph_default_node = nil, -- rt.SelectionGraphNode
-
-        _inspect_selection_arrow_up = nil,
-        _inspect_selection_arrow_up_outline = nil,
-        _inspect_selection_arrow_up_visible = false,
-
-        _inspect_selection_arrow_right = nil,
-        _inspect_selection_arrow_right_outline = nil,
-        _inspect_selection_arrow_right_visible = false,
-
-        _inspect_selection_arrow_down = nil,
-        _inspect_selection_arrow_down_outline = nil,
-        _inspect_selection_arrow_down_visible = false,
-
-        _inspect_selection_arrow_left = nil,
-        _inspect_selection_arrow_left_outline = nil,
-        _inspect_selection_arrow_left_visible = false,
-
-        _inspect_selection_frame = rt.Frame(),
-        _inspect_selection_frame_visible = false,
-        _inspect_control_indicator = nil,
+        _inspect_selection_graph_needs_update = true,
 
         -- move selection
         _move_selection_order = {}, -- Table<Entities>
+        _move_selection_i = 0,
         _move_selection_aabb = rt.AABB(0, 0, 1, 1),
         _entity_id_to_move_selection = {}, -- Table<EntityID, MoveSelection>
         _entity_id_to_slots = {}, -- Table<EntityID, {cf. _create_move_selection_slots}>
-        _move_selection_control_indicator = nil,
+        _move_selection_control_indicator = nil, -- rt.ControlIndicator
         
         _move_selection_jump_right_arrow_visible = false,
         _move_selection_jump_right_arrow = nil,
@@ -89,6 +92,10 @@ bt.BattleScene = meta.new_type("BattleScene", rt.Scene, function(state)
         _move_selection_jump_left_arrow_visible = false,
         _move_selection_jump_left_arrow = nil,
         _move_selection_jump_left_arrow_outline = nil,
+
+        -- target selection
+        _target_selection_graph = nil, -- rt.SelectionGraph
+        _target_selection_control_indicator = nil, -- rt.ControlIndicator
     })
     return out
 end)
@@ -110,16 +117,23 @@ function bt.BattleScene:realize()
     end
 
     self._verbose_info:set_frame_visible(false)
-    self._inspect_selection_frame:realize()
-    self._inspect_selection_frame:set_selection_state(rt.SelectionState.ACTIVE)
-    self._inspect_selection_frame:set_base_color(rt.RGBA(0, 0, 0, 0))
-    self._inspect_selection_frame:set_corner_radius(32 / 4)
+    self._selection_frame:realize()
+    self._selection_frame:set_selection_state(rt.SelectionState.ACTIVE)
+    self._selection_frame:set_base_color(rt.RGBA(0, 0, 0, 0))
+    self._selection_frame:set_corner_radius(32 / 4)
 
     self._inspect_control_indicator = rt.ControlIndicator({
         {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.inspect_control_indicator_move},
         {rt.ControlIndicatorButton.B, rt.Translation.battle_scene.inspect_control_indicator_go_back}
     })
     self._inspect_control_indicator:realize()
+
+    self._target_selection_control_indicator = rt.ControlIndicator({
+        {rt.ControlIndicatorButton.ALL_DIRECTIONS, rt.Translation.battle_scene.target_selection_control_indicator_move},
+        {rt.ControlIndicatorButton.A, rt.Translation.battle_scene.target_selection_control_indicator_go_back},
+        {rt.ControlIndicatorButton.B, rt.Translation.battle_scene.target_selection_control_indicator_confirm},
+    })
+    self._target_selection_control_indicator:realize()
 
     for sprite in values(self._enemy_sprites) do
         sprite:realize()
@@ -368,7 +382,14 @@ function bt.BattleScene:_create_move_selection_slots(entity)
     end
 
     local _update_priority_queue_selection = function(entity, move)
-        local entities = self._state:entity_get_valid_targets_for_move(entity, move)
+        local targets = self._state:entity_get_valid_targets_for_move(entity, move)
+        local entities = {}
+        for t in values(targets) do
+            for e in values(t) do
+                table.insert(entities, e)
+            end
+        end
+
         local as_set = {};
         for e in values(entities) do as_set[e:get_id()] = true end
 
@@ -395,26 +416,14 @@ function bt.BattleScene:_create_move_selection_slots(entity)
             end)
 
             node:signal_connect(rt.InputButton.A, function(self)
-                -- lock in move choice
                 local move = self:get_move()
                 if move ~= nil then
                     scene:_set_move_selection(self.entity, move)
                 end
-
-                local element = scene._entity_id_to_slots[self.entity:get_id()]
-                element.moves:set_selection_state(rt.SelectionState.UNSELECTED)
-                element.intrinsics:set_selection_state(rt.SelectionState.UNSELECTED)
-                scene:_update_move_selection_control_indicator()
             end)
 
             node:signal_connect(rt.InputButton.B, function(self)
-                -- undo move choice
                 scene:_set_move_selection(self.entity, nil)
-
-                local element = scene._entity_id_to_slots[self.entity:get_id()]
-                element.moves:set_selection_state(rt.SelectionState.INACTIVE)
-                element.intrinsics:set_selection_state(rt.SelectionState.INACTIVE)
-                scene:_update_move_selection_control_indicator()
             end)
 
             current.selection_graph:add(node)
@@ -519,9 +528,16 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     local inspect_control_w, inspect_control_h = self._inspect_control_indicator:measure()
     self._inspect_control_indicator:fit_into(
-        x + outer_margin + queue_w + outer_margin,
+        x + 0.5 * width - 0.5 * inspect_control_w,
         text_box_y,
         inspect_control_w, inspect_control_h
+    )
+
+    local target_selection_control_w, target_selection_control_h = self._target_selection_control_indicator:measure()
+    self._target_selection_control_indicator:fit_into(
+        x + 0.5 * width - 0.5 * target_selection_control_w,
+        text_box_y,
+        target_selection_control_w, target_selection_control_h
     )
 
     local control_w, control_h = self._move_selection_control_indicator:measure()
@@ -570,6 +586,7 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         self._env.quicksave()
         self:skip_all()
         self:set_scene_state(bt.BattleSceneState.MOVE_SELECTION)
+        self:_start_move_selection()
         -- TODO
         self._is_first_size_allocate = false
     end
@@ -738,9 +755,10 @@ function bt.BattleScene:draw()
 
     if self._scene_state == bt.BattleSceneState.INSPECT and self._text_box:get_reveal_indicator_visible() then
         self._inspect_control_indicator:draw()
-    end
-
-    if self._scene_state == bt.BattleSceneState.MOVE_SELECTION then
+    elseif self._scene_state == bt.BattleSceneState.TARGET_SELECTION then
+        self._target_selection_selection_graph:draw()
+        self._target_selection_control_indicator:draw()
+    elseif self._scene_state == bt.BattleSceneState.MOVE_SELECTION then
         self._move_selection_control_indicator:draw()
         local current = self._move_selection_order[self._move_selection_i]
         local element = self._entity_id_to_slots[current:get_id()]
@@ -755,28 +773,28 @@ function bt.BattleScene:draw()
 
     self._verbose_info:draw()
 
-    if self._inspect_selection_arrow_up_visible then
-        self._inspect_selection_arrow_up:draw()
-        self._inspect_selection_arrow_up_outline:draw()
+    if self._selection_arrow_up_visible then
+        self._selection_arrow_up:draw()
+        self._selection_arrow_up_outline:draw()
     end
 
-    if self._inspect_selection_arrow_right_visible then
-        self._inspect_selection_arrow_right:draw()
-        self._inspect_selection_arrow_right_outline:draw()
+    if self._selection_arrow_right_visible then
+        self._selection_arrow_right:draw()
+        self._selection_arrow_right_outline:draw()
     end
 
-    if self._inspect_selection_arrow_down_visible then
-        self._inspect_selection_arrow_down:draw()
-        self._inspect_selection_arrow_down_outline:draw()
+    if self._selection_arrow_down_visible then
+        self._selection_arrow_down:draw()
+        self._selection_arrow_down_outline:draw()
     end
 
-    if self._inspect_selection_arrow_left_visible then
-        self._inspect_selection_arrow_left:draw()
-        self._inspect_selection_arrow_left_outline:draw()
+    if self._selection_arrow_left_visible then
+        self._selection_arrow_left:draw()
+        self._selection_arrow_left_outline:draw()
     end
 
-    if self._inspect_selection_frame_visible then
-        self._inspect_selection_frame:draw()
+    if self._selection_frame_visible then
+        self._selection_frame:draw()
     end
 
     if self._move_selection_jump_left_arrow_visible then
@@ -1067,8 +1085,9 @@ end
 
 --- @brief
 function bt.BattleScene:_create_inspect_selection_graph()
-    local graph = rt.SelectionGraph()
+    if not self._inspect_selection_graph_needs_update then return end
 
+    local graph = rt.SelectionGraph()
     local priority_queue_nodes = self._priority_queue:get_selection_nodes()
     local global_status_bar_nodes = self._global_status_bar:get_selection_nodes()
 
@@ -1393,11 +1412,11 @@ function bt.BattleScene:_create_inspect_selection_graph()
     end
 
     local on_small_node_enter = function()
-        scene._inspect_selection_frame_visible = true
+        scene._selection_frame_visible = true
     end
 
     local on_small_node_exit = function()
-        scene._inspect_selection_frame_visible = false
+        scene._selection_frame_visible = false
     end
 
     for nodes in range(
@@ -1414,7 +1433,7 @@ function bt.BattleScene:_create_inspect_selection_graph()
     do
         local on_enter_show_verbose_info = function(self)
             scene:_verbose_info_show_next_to(self.object, self:get_bounds())
-            scene:_update_inspect_selection_arrows(self)
+            scene:_update_selection_arrows(self)
         end
 
         for nodes in range(
@@ -1438,6 +1457,7 @@ function bt.BattleScene:_create_inspect_selection_graph()
 
     self._inspect_selection_graph = graph
     self._inspect_selection_graph_default_node = enemy_sprite_nodes[1]
+    self._inspect_selection_graph_needs_update = false
 end
 
 --- @brief
@@ -1459,47 +1479,47 @@ function bt.BattleScene:_generate_selection_arrow(center_x, center_y, angle)
 end
 
 --- @brief
-function bt.BattleScene:_update_inspect_selection_arrows(node)
+function bt.BattleScene:_update_selection_arrows(node)
     local bounds = node:get_bounds()
     local m = rt.settings.margin_unit
 
-    local thickness = self._inspect_selection_frame:get_thickness() * 2
-    self._inspect_selection_frame:fit_into(bounds.x, bounds.y , bounds.width, bounds.height)
+    local thickness = self._selection_frame:get_thickness() * 2
+    self._selection_frame:fit_into(bounds.x, bounds.y , bounds.width, bounds.height)
 
     local outline_thickness = 1
     local r = m
-    local offset = r * math.cos(2 * math.pi / 3 / 2) + self._inspect_selection_frame:get_thickness() + 4 * outline_thickness
+    local offset = r * math.cos(2 * math.pi / 3 / 2) + self._selection_frame:get_thickness() + 4 * outline_thickness
     
-    self._inspect_selection_arrow_up_visible = node:get_up() ~= nil
-    if self._inspect_selection_arrow_up_visible then
-        self._inspect_selection_arrow_up, self._inspect_selection_arrow_up_outline = self:_generate_selection_arrow(
+    self._selection_arrow_up_visible = node:get_up() ~= nil
+    if self._selection_arrow_up_visible then
+        self._selection_arrow_up, self._selection_arrow_up_outline = self:_generate_selection_arrow(
             bounds.x + 0.5 * bounds.width,
             bounds.y - offset,
             -0.5 * math.pi
         )
     end
 
-    self._inspect_selection_arrow_right_visible = node:get_right() ~= nil
-    if self._inspect_selection_arrow_right_visible then
-        self._inspect_selection_arrow_right, self._inspect_selection_arrow_right_outline = self:_generate_selection_arrow(
+    self._selection_arrow_right_visible = node:get_right() ~= nil
+    if self._selection_arrow_right_visible then
+        self._selection_arrow_right, self._selection_arrow_right_outline = self:_generate_selection_arrow(
             bounds.x + bounds.width + offset,
             bounds.y + 0.5 * bounds.height,
             0
         )
     end
 
-    self._inspect_selection_arrow_down_visible = node:get_down() ~= nil
-    if self._inspect_selection_arrow_down_visible then
-        self._inspect_selection_arrow_down, self._inspect_selection_arrow_down_outline = self:_generate_selection_arrow(
+    self._selection_arrow_down_visible = node:get_down() ~= nil
+    if self._selection_arrow_down_visible then
+        self._selection_arrow_down, self._selection_arrow_down_outline = self:_generate_selection_arrow(
             bounds.x + 0.5 * bounds.width,
             bounds.y + bounds.height + offset,
             0.5 * math.pi
         )
     end
 
-    self._inspect_selection_arrow_left_visible = node:get_left() ~= nil
-    if self._inspect_selection_arrow_left_visible then
-        self._inspect_selection_arrow_left, self._inspect_selection_arrow_left_outline = self:_generate_selection_arrow(
+    self._selection_arrow_left_visible = node:get_left() ~= nil
+    if self._selection_arrow_left_visible then
+        self._selection_arrow_left, self._selection_arrow_left_outline = self:_generate_selection_arrow(
             bounds.x - offset,
             bounds.y + 0.5 * bounds.height,
             1 * math.pi
@@ -1617,7 +1637,7 @@ end
 --- @brief
 function bt.BattleScene:_set_move_selection_i(i)
     self._move_selection_i = i
-    local current_entity =self._move_selection_order[self._move_selection_i]
+    local current_entity = self._move_selection_order[self._move_selection_i]
     local current = self._entity_id_to_slots[current_entity:get_id()]
     if current == nil then
         current = self:_create_move_selection_slots(current_entity)
@@ -1710,15 +1730,174 @@ function bt.BattleScene:_set_move_selection(entity, move)
     if sprite ~= nil then
         sprite:set_move_selection(move)
     end
+
+    if move ~= nil then
+        local entity = self._move_selection_order[self._move_selection_i]
+        local element = self._entity_id_to_slots[entity:get_id()]
+        element.moves:set_selection_state(rt.SelectionState.UNSELECTED)
+        element.intrinsics:set_selection_state(rt.SelectionState.UNSELECTED)
+        self:_update_move_selection_control_indicator()
+        self:set_scene_state(bt.BattleSceneState.TARGET_SELECTION)
+    else
+        local entity = self._move_selection_order[self._move_selection_i]
+        local element = self._entity_id_to_slots[entity:get_id()]
+        element.moves:set_selection_state(rt.SelectionState.INACTIVE)
+        element.intrinsics:set_selection_state(rt.SelectionState.INACTIVE)
+        self:_update_move_selection_control_indicator()
+    end
 end
 
 --- @brief
-function bt.BattleScene:_start_target_selection()
-    local current = self._move_selection_order[self._move_selection_i]
-    local move = self._entity_id_to_move_selection[current:get_id()]
-    if move == nil then
-        rt.error("In bt.BattleScene:_start_target_selection: trying to select target, but no move is active")
+function bt.BattleScene:_create_target_selection_graph()
+    local user = self._move_selection_order[self._move_selection_i]
+    local move = self._entity_id_to_move_selection[user:get_id()].move
+    if move == nil then self:set_scene_state(bt.BattleSceneState.MOVE_SELECTION) end
+
+    local scene = self
+    local targets = self._state:entity_get_valid_targets_for_move(user, move)
+    local nodes, default_node = {}, nil
+    self._target_selection_selection_graph = rt.SelectionGraph()
+    if move:get_can_target_multiple() then
+        local min_x, max_x, min_y, max_y = POSITIVE_INFINITY, POSITIVE_INFINITY, NEGATIVE_INFINITY, NEGATIVE_INFINITY
+        local entities = {}
+        for entity in values(targets[1]) do
+            table.insert(entities, entity)
+            local sprite = self:get_sprite(entity)
+            if sprite == nil then
+                rt.error("In bt.BattleScene:_start_target_selection: no sprite for entity `" .. entity:get_id() .. "`")
+            else
+                local bounds = sprite:get_sprite_selection_node():get_bounds()
+                min_x = math.min(min_x, bounds.x)
+                max_x = math.max(max_x, bounds.x + bounds.width)
+                min_y = math.min(min_y, bounds.y)
+                max_y = math.max(max_y, bounds.y + bounds.height)
+            end
+        end
+        local node = rt.SelectionGraphNode(rt.AABB(min_x, min_y, max_x - min_x, max_y - min_y))
+        node.objects = entities
+        table.insert(nodes, node)
+        default_node = node
+    else
+        local enemy_sprite_nodes = {}
+        local party_sprite_nodes = {}
+
+        for target in values(targets) do
+            local entity = target[1]
+            local node = self:get_sprite(entity):get_sprite_selection_node()
+            node.objects = {entity}
+
+            if self._state:entity_get_is_enemy(entity) then
+                table.insert(enemy_sprite_nodes, node)
+            else
+                table.insert(party_sprite_nodes, node)
+            end
+        end
+
+        for which in range(enemy_sprite_nodes, party_sprite_nodes) do
+            table.sort(which, function(a, b)
+                return a:get_bounds().x < b:get_bounds().x
+            end)
+
+            for i = 1, sizeof(which) do
+                which[i]:set_left(which[i - 1])
+                which[i]:set_right(which[i + 1])
+                table.insert(nodes, which[i])
+            end
+        end
+
+        local _last_enemy_sprite_node = nil
+        local _last_party_sprite_node = nil
+
+        for direction_up in range(true, false) do
+            local a, b
+            if direction_up then
+                a = enemy_sprite_nodes
+                b = party_sprite_nodes
+            else
+                a = party_sprite_nodes
+                b = enemy_sprite_nodes
+            end
+
+            for node in values(a) do
+                local self_x = node:get_bounds().x + 0.5 * node:get_bounds().width
+                local min_distance, closest_node = POSITIVE_INFINITY, nil
+                for other in values(b) do
+                    local other_bounds = other:get_bounds()
+                    local distance = math.abs(other_bounds.x - self_x)
+                    if distance < min_distance then
+                        min_distance = distance
+                        closest_node = other
+                    end
+                end
+
+                if direction_up then
+                    node:set_down(function()
+                        return which(_last_party_sprite_node, closest_node)
+                    end)
+                else
+                    node:set_up(function()
+                        return which(_last_enemy_sprite_node, closest_node)
+                    end)
+                end
+            end
+        end
+
+        for enemy_node in values(enemy_sprite_nodes) do
+            enemy_node:signal_connect("leave_left", function()
+            end)
+
+            enemy_node:signal_connect("leave_right", function()
+            end)
+
+            enemy_node:signal_connect("leave_up", function(self)
+                _last_enemy_sprite_node = self
+                dbg("called")
+            end)
+        end
+
+        for party_node in values(party_sprite_nodes) do
+            party_node:signal_connect("leave_left", function()
+            end)
+
+            party_node:signal_connect("leave_right", function()
+            end)
+
+            party_node:signal_connect("leave_down", function(self)
+                _last_party_sprite_node = self
+            end)
+        end
+
+        default_node = enemy_sprite_nodes[1]
     end
+
+    for node in values(nodes) do
+        node:signal_connect("enter", function(self)
+            for entity in values(self.objects) do
+                local sprite = scene:get_sprite(entity)
+                sprite:set_selection_state(rt.SelectionState.ACTIVE)
+                sprite:set_is_blinking(true)
+            end
+
+            scene:_update_selection_arrows(self)
+        end)
+
+        node:signal_connect("exit", function(self)
+            for entity in values(self.objects) do
+                local sprite = scene:get_sprite(entity)
+                sprite:set_selection_state(rt.SelectionState.INACTIVE)
+                sprite:set_is_blinking(false)
+            end
+        end)
+
+        node:signal_connect(rt.InputButton.A, function(self)
+
+        end)
+
+        self._target_selection_selection_graph:add(node)
+    end
+
+    assert(default_node ~= nil)
+    self._target_selection_selection_graph:set_current_node(default_node)
 end
 
 --- @brief
@@ -1737,10 +1916,10 @@ function bt.BattleScene:set_scene_state(state)
     self._verbose_info:show(nil)
 
     self._text_box:set_reveal_indicator_visible(false)
-    self._inspect_selection_arrow_up_visible = false
-    self._inspect_selection_arrow_right_visible = false
-    self._inspect_selection_arrow_down_visible = false
-    self._inspect_selection_arrow_left_visible = false
+    self._selection_arrow_up_visible = false
+    self._selection_arrow_right_visible = false
+    self._selection_arrow_down_visible = false
+    self._selection_arrow_left_visible = false
     self._move_selection_jump_right_arrow_visible = false
     self._move_selection_jump_left_arrow_visible = false
 
@@ -1749,9 +1928,13 @@ function bt.BattleScene:set_scene_state(state)
         self._text_box:set_reveal_indicator_visible(true)
         self._inspect_selection_graph:set_current_node(self._inspect_selection_graph_default_node) -- no cursor memory
     elseif state == bt.BattleSceneState.MOVE_SELECTION then
-        self:_start_move_selection()
-    elseif state == bt.battleSceneState.TARGET_SELECTION then
-        self:_start_target_selection()
+        if sizeof(self._move_selection_order) == 0 then
+            self:_start_move_selection()
+        else
+            self:_set_move_selection_i(self._move_selection_i)
+        end
+    elseif state == bt.BattleSceneState.TARGET_SELECTION then
+        self:_create_target_selection_graph()
     else
         rt.error("In bt.BattleScene:_set_mode: unhandled state `" .. tostring(state) .. "`")
     end
@@ -1820,6 +2003,13 @@ function bt.BattleScene:_handle_button_pressed(which)
                     element.selection_graph:handle_button(which)
                 end
             end
+        end
+    elseif self._scene_state == bt.BattleSceneState.TARGET_SELECTION then
+        if which == rt.InputButton.B then
+            self:_set_move_selection(self._move_selection_order[self._move_selection_i], nil)
+            self:set_scene_state(bt.BattleSceneState.MOVE_SELECTION)
+        else
+            self._target_selection_selection_graph:handle_button(which)
         end
     end
 end

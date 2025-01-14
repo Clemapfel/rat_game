@@ -13,6 +13,7 @@
         is_obfuscated -- Boolean
 
         ai_level -- bt.AILevel
+        is_enemy -- Boolean
 
         storage = {}, -- Table<String, Any>
         
@@ -87,6 +88,7 @@ function rt.GameState:create_entity(config)
         state = bt.EntityState.ALIVE,
         is_obfuscated = config:get_is_enemy(),
         ai_level = config:get_ai_level(),
+        is_enemy = config:get_is_enemy(),
         moves = {},
         equips = {},
         consumables = {},
@@ -310,7 +312,7 @@ function rt.GameState:entity_get_is_enemy(entity)
         rt.error("In rt.GameState:entity_get_is_enemy: entity `" .. entity:get_id() .. "` is not part of state")
         return
     end
-    return bt.EntityConfig(entry.id):get_is_enemy()
+    return entry.is_enemy
 end
 
 --- @brief
@@ -1005,6 +1007,56 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
 
     return out
 end
+
+--- @brief
+function rt.GameState:entity_get_valid_targets_for_move(user, move)
+    meta.assert_isa(user, bt.Entity)
+    if move == nil then return {} end
+    meta.assert_isa(move, bt.MoveConfig)
+
+    if move:get_can_target_self() == false and move:get_can_target_allies() == false and move:get_can_target_enemies() == false then
+        return {} -- field
+    end
+
+    local can_target_self = move:get_can_target_self()
+    local can_target_party, can_target_enemies
+
+    if self:entity_get_is_enemy(user) == true then
+        can_target_party = move:get_can_target_enemies()
+        can_target_enemies = move:get_can_target_allies()
+    else
+        can_target_party = move:get_can_target_allies()
+        can_target_enemies = move:get_can_target_enemies()
+    end
+
+    if move:get_can_target_multiple() then
+        local targets = {}
+        for entry in values(self._state.entities) do
+
+            if entry.state ~= bt.EntityState.DEAD and
+                (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity() and can_target_self) or
+                (entry.is_enemy == true and can_target_enemies) or
+                (entry.is_enemy == false and can_target_party)
+            then
+                table.insert(targets, bt.Entity(bt.EntityConfig(entry.id), entry.multiplicity))
+            end
+        end
+        return {targets}
+    else
+        local out = {}
+        for entry in values(self._state.entities) do
+            if entry.state ~= bt.EntityState.DEAD and
+                (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity() and can_target_self) or
+                (entry.is_enemy == true and can_target_enemies) or
+                (entry.is_enemy == false and can_target_party)
+            then
+                table.insert(out, {bt.Entity(bt.EntityConfig(entry.id), entry.multiplicity)})
+            end
+        end
+        return out
+    end
+end
+
 
 --- @brief
 function rt.GameState:add_shared_object(object)

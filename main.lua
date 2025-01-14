@@ -1,4 +1,5 @@
 require "include"
+
 profiler_active = false
 
 STATE = rt.GameState()

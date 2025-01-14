@@ -84,6 +84,7 @@ end
 function bt.EnemySprite:draw()
     if self._snapshot_visible then
         self:draw_snapshot()
+        self:_draw_super()
     end
 
     if self._ui_visible then

@@ -8,9 +8,9 @@ return {
     is_intrinsic = false,
 
     can_target_multiple = true,
-    can_target_self = false,
-    can_target_enemy = false,
-    can_target_ally = false,
+    can_target_self = true,
+    can_target_enemy = true,
+    can_target_ally = true,
 
     sprite_id = "moves",
     sprite_index = "BOMB",

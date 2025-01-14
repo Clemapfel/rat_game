@@ -34,6 +34,11 @@ bt.EntitySprite = meta.new_abstract_type("EntitySprite", rt.Widget, {
     _status_to_sprite = {}, -- Table<bt.StatusConfig, rt.Sprite>
     _consumable_slot_to_sprite = {}, -- Table<rt.Sprite>
     _consumable_slot_to_consumable = {}, -- Table<bt.Consumable>
+
+    _blink_animation = rt.TimedAnimation(10, 0, 0.3, rt.InterpolationFunctions.SINE_WAVE),
+    _is_blinking = false,
+    _blink_color = rt.Palette.WHITE,
+    _blink_opacity = 0,
 })
 
 --- @brief
@@ -67,6 +72,8 @@ function bt.EntitySprite:_realize_super(sprite_id)
     self._status_consumable_selection_frame:set_selection_state(rt.SelectionState.ACTIVE)
     self._status_consumable_selection_frame:set_base_color(rt.RGBA(0, 0, 0, 0))
 
+    self._blink_animation:set_should_loop(true)
+
     if not self._sprite:has_animation(bt.EntitySpriteState.IDLE) then
         rt.warning("In bt.EntitySprite._initialize_super: sprite `" .. sprite_id .. "` does not have animation with id \"idle\"")
     end
@@ -87,10 +94,45 @@ function bt.EntitySprite:_update_super(delta)
         self._stunned_animation:update(delta)
     end
 
+    if self._is_blinking then
+        self._blink_animation:update(delta)
+        self._blink_opacity = self._blink_animation:get_value()
+    end
+
     self._snapshot:bind()
     love.graphics.clear()
     self._sprite:draw()
+
+    if self._is_blinking then
+        local strength = self._blink_opacity
+        love.graphics.setColor(
+            strength * self._blink_color.r,
+            strength * self._blink_color.g,
+            strength * self._blink_color.b,
+            1
+        )
+
+        love.graphics.setBlendState(
+            rt.BlendOperation.ADD,  -- rgb
+            rt.BlendOperation.ADD,  -- alpha
+            rt.BlendFactor.ONE,  -- source rgb
+            rt.BlendFactor.ZERO, -- source alpha
+            rt.BlendFactor.ONE, -- dest rgb
+            rt.BlendFactor.ONE  -- dest alpha
+        )
+        local sprite_bounds = self._sprite:get_bounds()
+        love.graphics.rectangle("fill", 0, 0, sprite_bounds.width, sprite_bounds.height)
+        rt.graphics.set_blend_mode()
+    end
+
     self._snapshot:unbind()
+end
+
+--- @brief
+function bt.EntitySprite:_draw_super()
+    if self._is_stunned then
+        self._stunned_animation:draw()
+    end
 end
 
 --- @brief
@@ -366,4 +408,25 @@ function bt.EntitySprite:get_selection_nodes()
     local nodes = self:get_status_consumable_selection_nodes()
     table.insert(nodes, 1, self:get_sprite_selection_node())
     return nodes
+end
+
+--- @brief
+function bt.EntitySprite:set_is_blinking(b)
+    if b ~= self._is_blinking then self._blink_animation:reset() end
+    self._is_blinking = b
+end
+
+--- @brief
+function bt.EntitySprite:get_is_blinking()
+    return self._is_blinking
+end
+
+--- @brief
+function bt.EntitySprite:set_blink_color(color)
+    self._blink_color = color
+end
+
+--- @brief
+function bt.EntitySprite:get_blink_color()
+    return self._blink_color
 end
