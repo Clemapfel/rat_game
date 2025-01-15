@@ -36,6 +36,8 @@ end
 --- @param max Number
 --- @return Number
 function rt.random.number(min, max)
+    if min == nil then min = 0 end
+    if max == nil then max = 1 end
     local lower, upper = math.min(min, max), math.max(min, max)
     return lower + rt.rand() * (upper - lower)
 end

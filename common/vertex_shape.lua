@@ -74,7 +74,7 @@ do
         y_radius = which(y_radius, x_radius)
         n_outer_vertices = which(n_outer_vertices, 8)
         local data = {
-            {center_x, center_y, 0, 0, 1, 1, 1, 1},
+            {center_x, center_y, 0.5, 0.5, 1, 1, 1, 1},
         }
 
         local step = 2 * math.pi / n_outer_vertices
@@ -82,7 +82,8 @@ do
             table.insert(data, {
                 center_x + math.cos(angle) * x_radius,
                 center_y + math.sin(angle) * y_radius,
-                0, 0,
+                0.5 + math.cos(angle) * 0.5,
+                0.5 + math.sin(angle) * 0.5,
                 1, 1, 1, 1
             })
         end

@@ -28,8 +28,9 @@ float alt_kernel_peak() {
 }
 
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position) {
-    float value = alt_kernel(distance(texture_coords, vec2(0.5))) / alt_kernel_peak(); // aspect ratio is 1:1
-    return vec4(value);
+    //float value = alt_kernel(distance(texture_coords, vec2(0.5)) * 2) / alt_kernel_peak(); // aspect ratio is 1:1
+    float value = 1 - distance(texture_coords, vec2(0.5)) * 2;
+    return vec4(1, 1, 1, value);
 }
 
 #endif

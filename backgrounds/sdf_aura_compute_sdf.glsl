@@ -6,7 +6,7 @@
 #endif
 
 #if MODE == MODE_INITIALIZE
-layout(r8) uniform readonly image2D wall_texture; // x: is wall
+layout(rgba32f) uniform readonly image2D wall_texture; // x: is wall
 layout(rgba32f) uniform writeonly image2D input_texture;  // xy: nearest wall pixel coords, z: distance
 layout(rgba32f) uniform writeonly image2D output_texture;
 #elif MODE == MODE_JUMP
@@ -17,7 +17,7 @@ layout(rgba32f) uniform writeonly image2D output_texture;
 uniform int jump_distance; // k / 2, k / 2 / 2, ..., 1, where k = max(size(input_texture))
 
 const float infinity = 1 / 0.f;
-const float threshold = 0.0;
+uniform float threshold = 0.0;
 
 const ivec2 directions[8] = ivec2[](
     ivec2(0, -1),

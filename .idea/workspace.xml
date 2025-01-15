@@ -22,14 +22,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored battle scene">
-      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_wall.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf aura shader">
+      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_init_particle_texture.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_particles.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/random.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -675,15 +680,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="1367000" />
-    </task>
-    <task id="LOCAL-01369" summary="9-direction flux working">
-      <option name="closed" value="true" />
-      <created>1735439885124</created>
-      <option name="number" value="01369" />
-      <option name="presentableId" value="LOCAL-01369" />
-      <option name="project" value="LOCAL" />
-      <updated>1735439885124</updated>
+      <workItem from="1736975567452" duration="8925000" />
     </task>
     <task id="LOCAL-01370" summary="refactored textbox done">
       <option name="closed" value="true" />
@@ -1069,7 +1066,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736968226676</updated>
     </task>
-    <option name="localTasksCounter" value="1418" />
+    <task id="LOCAL-01418" summary="added sdf aura shader">
+      <option name="closed" value="true" />
+      <created>1736976944610</created>
+      <option name="number" value="01418" />
+      <option name="presentableId" value="LOCAL-01418" />
+      <option name="project" value="LOCAL" />
+      <updated>1736976944610</updated>
+    </task>
+    <option name="localTasksCounter" value="1419" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1123,7 +1128,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before float" />
     <MESSAGE value="jfa working" />
     <MESSAGE value="text box reveal working" />
     <MESSAGE value="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked" />
@@ -1148,7 +1152,8 @@
     <MESSAGE value="deprecated blood" />
     <MESSAGE value="stashing before refactoring battle scene" />
     <MESSAGE value="refactored battle scene" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored battle scene" />
+    <MESSAGE value="added sdf aura shader" />
+    <option name="LAST_COMMIT_MESSAGE" value="added sdf aura shader" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
