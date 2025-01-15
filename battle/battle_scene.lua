@@ -756,7 +756,6 @@ function bt.BattleScene:draw()
     if self._scene_state == bt.BattleSceneState.INSPECT and self._text_box:get_reveal_indicator_visible() then
         self._inspect_control_indicator:draw()
     elseif self._scene_state == bt.BattleSceneState.TARGET_SELECTION then
-        self._target_selection_selection_graph:draw()
         self._target_selection_control_indicator:draw()
     elseif self._scene_state == bt.BattleSceneState.MOVE_SELECTION then
         self._move_selection_control_indicator:draw()
@@ -1635,6 +1634,38 @@ function bt.BattleScene:_start_move_selection()
 end
 
 --- @brief
+function bt.BattleScene:_next_move_selection()
+    local current = self._move_selection_i
+    local n_entities = sizeof(self._move_selection_order)
+
+    -- find next unselected after current
+    for i = current, n_entities do
+        local next_entity = self._move_selection_order[i]
+        if self._entity_id_to_move_selection[next_entity:get_id()].move == nil then
+            self:_set_move_selection_i(i)
+            return
+        end
+    end
+
+    -- if none found, check for previous unset ones
+    for i = current, 1, -1 do
+        local next_entity = self._move_selection_order[i]
+        if self._entity_id_to_move_selection[next_entity:get_id()].move == nil then
+            self:_set_move_selection_i(i)
+            return
+        end
+    end
+
+    -- if all are set, goto sim
+    for i = 1, n_entities do
+        local selection = self._entity_id_to_move_selection[self._move_selection_order[i]:get_id()]
+        assert(selection.move ~= nil and #selection.targets ~= 0)
+    end
+s
+    self:_start_simulation()
+end
+
+--- @brief
 function bt.BattleScene:_set_move_selection_i(i)
     self._move_selection_i = i
     local current_entity = self._move_selection_order[self._move_selection_i]
@@ -1844,25 +1875,28 @@ function bt.BattleScene:_create_target_selection_graph()
 
         for enemy_node in values(enemy_sprite_nodes) do
             enemy_node:signal_connect("leave_left", function()
+                _last_party_sprite_node = nil
             end)
 
             enemy_node:signal_connect("leave_right", function()
+                _last_party_sprite_node = nil
             end)
 
-            enemy_node:signal_connect("leave_up", function(self)
+            enemy_node:signal_connect("leave_down", function(self)
                 _last_enemy_sprite_node = self
-                dbg("called")
             end)
         end
 
         for party_node in values(party_sprite_nodes) do
             party_node:signal_connect("leave_left", function()
+                _last_enemy_sprite_node = nil
             end)
 
             party_node:signal_connect("leave_right", function()
+                _last_enemy_sprite_node = nil
             end)
 
-            party_node:signal_connect("leave_down", function(self)
+            party_node:signal_connect("leave_up", function(self)
                 _last_party_sprite_node = self
             end)
         end
@@ -1890,7 +1924,13 @@ function bt.BattleScene:_create_target_selection_graph()
         end)
 
         node:signal_connect(rt.InputButton.A, function(self)
-
+            -- confirm target selection, go to next move choice
+            local current_entity = scene._move_selection_order[scene._move_selection_i]
+            scene._entity_id_to_move_selection[current_entity:get_id()].targets = self.objects
+                
+            scene:_set_move_selection_i(scene._move_selection_i + 1)
+            scene:set_scene_state(bt.BattleSceneState.MOVE_SELECTION)
+            -- TODO: if lasts, open confirm, then sim
         end)
 
         self._target_selection_selection_graph:add(node)
