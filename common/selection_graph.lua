@@ -50,7 +50,11 @@ meta.add_signals(rt.SelectionGraphNode,
     "leave_up",
     "leave_down",
     "leave_left",
-    "leave_right"
+    "leave_right",
+    "enter_up",
+    "enter_down",
+    "enter_left",
+    "enter_right"
 )
 
 --- @brief
@@ -137,11 +141,18 @@ do
         [rt.InputButton.LEFT] = "_left"
     }
 
-    local _button_to_directional_signal = {
+    local _button_to_leave_directional_signal = {
         [rt.InputButton.UP] = "leave_up",
         [rt.InputButton.RIGHT] = "leave_right",
         [rt.InputButton.DOWN] = "leave_down",
         [rt.InputButton.LEFT] = "leave_left"
+    }
+
+    local _button_to_enter_directional_signal = {
+        [rt.InputButton.UP] = "enter_down",
+        [rt.InputButton.RIGHT] = "enter_left",
+        [rt.InputButton.DOWN] = "enter_up",
+        [rt.InputButton.LEFT] = "enter_right"
     }
 
     --- @brief
@@ -160,10 +171,11 @@ do
                         rt.error("In rt.SelectionGraph:handle_button: node #" .. meta.hash(current) .. " returns object of type `" .. meta.typeof(next) .. "` on `" .. button .. "` instead of rt.SelectionGraphNode")
                         return
                     end
-                    current:signal_emit(_button_to_directional_signal[button])
+                    current:signal_emit(_button_to_leave_directional_signal[button])
                     current:signal_emit("exit")
                     self._current_node = next
                     next:signal_emit("enter")
+                    next:signal_emit(_button_to_enter_directional_signal[button])
                 end
             end
         end

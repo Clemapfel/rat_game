@@ -35,7 +35,7 @@ bt.EntitySprite = meta.new_abstract_type("EntitySprite", rt.Widget, {
     _consumable_slot_to_sprite = {}, -- Table<rt.Sprite>
     _consumable_slot_to_consumable = {}, -- Table<bt.Consumable>
 
-    _blink_animation = rt.TimedAnimation(10, 0, 0.3, rt.InterpolationFunctions.SINE_WAVE),
+    _blink_animation = rt.TimedAnimation(4, 0, 0.3, rt.InterpolationFunctions.SINE_WAVE),
     _is_blinking = false,
     _blink_color = rt.Palette.WHITE,
     _blink_opacity = 0,
@@ -412,7 +412,9 @@ end
 
 --- @brief
 function bt.EntitySprite:set_is_blinking(b)
-    if b ~= self._is_blinking then self._blink_animation:reset() end
+    if b ~= self._is_blinking then
+        self._blink_animation:reset()
+    end
     self._is_blinking = b
 end
 
