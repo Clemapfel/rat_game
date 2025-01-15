@@ -477,6 +477,10 @@ rt.Translation = rt.initialize_translation({
 
             move_used_f = function(entity, move)
                 return entity .. " used " .. move
+            end,
+
+            turn_start_f = function(turn_i)
+                return "Turn " .. turn_i .. " start"
             end
         }
     },
@@ -492,8 +496,9 @@ rt.Translation = rt.initialize_translation({
         inspect_control_indicator_move = "Select",
         inspect_control_indicator_go_back = "Return",
 
-        target_selection_control_indicator_move = "Select",
+        target_selection_control_indicator_move = "Select Target(s)",
         target_selection_control_indicator_go_back = "Back",
-        target_selection_control_indicator_confirm = "Confirm"
+        target_selection_control_indicator_confirm = "Confirm",
+        target_selection_control_indicator_inspect = "Inspect"
     }
 })

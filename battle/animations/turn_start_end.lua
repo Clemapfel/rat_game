@@ -12,7 +12,7 @@ end
 
 --- @class bt.Animation.TURN_START_END
 bt.Animation.TURN_START_END = meta.new_type("TURN_START_END", rt.Animation, function(scene, start_or_end, message)
-    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(scene, bt.BattleScene)
     meta.assert_boolean(start_or_end)
 
     local settings = rt.settings.battle.animations.turn_start
@@ -249,9 +249,7 @@ function bt.Animation.TURN_START_END:update(delta)
     end
 
     self._is_visible = false
-    self._screenshot:bind()
-    self._scene:draw()
-    self._screenshot:unbind()
+    self._scene:create_quicksave_screenshot(self._screenshot)
     self._is_visible = true
 
     self._label:update(delta)

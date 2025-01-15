@@ -2754,7 +2754,10 @@ function bt.BattleScene:create_simulation_environment()
 
     env.start_turn = function()
         _new_animation_node()
-        local animation = bt.Animation.TURN_START(_scene)
+        local animation = bt.Animation.TURN_START(
+            _scene,
+            rt.Translation.battle.message.turn_start_f(_state:get_turn_i())
+        )
         _queue_animation(animation)
 
         local callback_id = "on_turn_start"
@@ -2772,8 +2775,15 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy)
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxies)
         end
+
+        _new_animation_node()
+        animation = bt.Animation.DUMMY()
+        animation:signal_connect("finish", function()
+            _scene:start_move_selection()
+        end)
+        _queue_animation(animation)
     end
 
     env.end_turn = function()

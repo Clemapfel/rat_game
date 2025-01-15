@@ -25,6 +25,7 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _position_current_value = _HIDDEN,
         _position_target_value = _HIDDEN,
         _position_target_override_value = nil,
+        _should_emit_signal_hidden = false,
 
         _current_text_y_offset = 0,
         _target_text_y_offset = 0,
@@ -68,6 +69,8 @@ rt.TextBox = meta.new_type("TextBox", rt.Widget, rt.Updatable, function()
         _reveal_indicator_max_y_offset = 0
     })
 end)
+
+meta.add_signal(rt.TextBox, "hidden")
 
 --- @brief
 function rt.TextBox:_update_target_frame_h()
@@ -234,7 +237,13 @@ function rt.TextBox:update(delta)
         local distance = math.abs(current - target) * 2
         if current < target then
             current = current + delta * scrolling_speed
-            if current >= target then current = target end
+            if current >= target then
+                current = target
+                if self._should_emit_signal_hidden then
+                    self._should_emit_signal_hidden = true
+                    self:signal_emit("hidden")
+                end
+            end
         elseif current > target then
             current = current - delta * scrolling_speed
             if current <= target then current = target end
@@ -323,6 +332,7 @@ function rt.TextBox:update(delta)
         self._all_entries_done_delay = self._all_entries_done_delay + delta
         if self._all_entries_done_delay > rt.settings.text_box.all_entries_done_delay then
             self._position_target_value = _HIDDEN
+            self._should_emit_signal_hidden = true
             self._first_visible_entry = self._n_entries + 1
             self._scrollbar:set_page_index(self._first_visible_entry)
             self._n_lines = 0
@@ -430,6 +440,7 @@ function rt.TextBox:skip()
     self._first_visible_entry = self._n_entries + 1
     self._scrollbar:set_page_index(self._first_visible_entry)
     self._position_target_value = _HIDDEN
+    self._should_emit_signal_hidden = true
     -- self._position_current_value = self._position_target_value
 
     self._n_lines = 0

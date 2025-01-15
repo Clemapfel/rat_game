@@ -393,7 +393,7 @@ function bt.PriorityQueue:_update_selection_render_order()
     end
 end
 
---- @override
+--- @brief
 function bt.PriorityQueue:set_selection_state(entity, state)
     local item = self._entity_id_to_item[entity:get_id()]
     if item == nil then
@@ -406,6 +406,15 @@ function bt.PriorityQueue:set_selection_state(entity, state)
         self:_element_update_state(item)
         self:_update_selection_render_order()
     end
+end
+
+--- @brief
+function bt.PriorityQueue:reset_selection_state(state)
+    for item in values(self._entity_id_to_item) do
+        item.selection_state = state
+        self:_element_update_state(item)
+    end
+    self:_update_selection_render_order()
 end
 
 --- @override

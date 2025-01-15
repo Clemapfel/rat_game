@@ -938,7 +938,6 @@ end
 --- @brief
 function rt.GameState:entity_list_intrinsic_moves(entity)
     meta.assert_isa(entity, bt.Entity)
-
     local entry = self:_get_entity_entry(entity)
     if entry == nil then
         rt.error("In rt.GameState:entity_list_intrinsic_moves: entity `" .. entity:get_id() .. "` is not part of state")
@@ -951,6 +950,22 @@ function rt.GameState:entity_list_intrinsic_moves(entity)
     end
 
     return out
+end
+
+--- @brief
+function rt.GameState:entity_get_n_intrinsic_moves(entity)
+    meta.assert_isa(entity, bt.Entity)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState:entity_list_intrinsic_moves: entity `" .. entity:get_id() .. "` is not part of state")
+        return {}
+    end
+
+    local n = 0
+    for _ in values(entry.intrinsic_moves) do
+        n = n + 1
+    end
+    return n
 end
 
 --- @brief
