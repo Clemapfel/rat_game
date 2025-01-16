@@ -17,7 +17,7 @@ layout(rgba32f) uniform writeonly image2D output_texture;
 uniform int jump_distance; // k / 2, k / 2 / 2, ..., 1, where k = max(size(input_texture))
 
 const float infinity = 1 / 0.f;
-uniform float threshold = 0.0;
+uniform float threshold;
 
 const ivec2 directions[8] = ivec2[](
     ivec2(0, -1),
@@ -40,7 +40,7 @@ void computemain() {
 
     #if MODE == MODE_INITIALIZE
     vec4 pixel = imageLoad(wall_texture, position);
-    if (pixel.r > threshold) {
+    if (pixel.a > threshold) {
         vec4 wall = vec4(position.x, position.y, -1, -1);
         imageStore(input_texture, position, wall);
         imageStore(output_texture, position, wall);

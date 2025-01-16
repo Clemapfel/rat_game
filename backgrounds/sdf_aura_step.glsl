@@ -35,22 +35,34 @@ void computemain() {
         float min_y = bounds.y + radius;
         float max_y = bounds.y + bounds.w - radius;
 
-        particle.position += particle.velocity * delta;
+        const float gravity_multiplier = 0.0;
+        const float reflection_multiplier = 1.0;
+        const float velocity_decay = 0.02; // per second
+        const float spin_force = 0.02;
+
+        const vec2 center_of_gravity = vec2(0.5) * bounds.zw;
+        vec2 to_center = particle.position - center_of_gravity;
+
+        particle.velocity += normalize(to_center) * gravity_multiplier;
+        vec2 perpendicular = vec2(-to_center.y, to_center.x);
+        particle.velocity += normalize(perpendicular) * spin_force * length(to_center) / min(bounds.z, bounds.w);
+
+        particle.position += (particle.velocity + -1 * velocity_decay * particle.velocity) * delta;
 
         if (particle.position.x < min_x) {
             particle.position.x = min_x;
-            particle.velocity.x = -particle.velocity.x;
+            particle.velocity.x = -reflection_multiplier * particle.velocity.x;
         } else if (particle.position.x > max_x) {
             particle.position.x = max_x;
-            particle.velocity.x = -particle.velocity.x;
+            particle.velocity.x = -reflection_multiplier * particle.velocity.x;
         }
 
         if (particle.position.y < min_y) {
             particle.position.y = min_y;
-            particle.velocity.y = -particle.velocity.y;
+            particle.velocity.y = -reflection_multiplier * particle.velocity.y;
         } else if (particle.position.y > max_y) {
             particle.position.y = max_y;
-            particle.velocity.y = -particle.velocity.y;
+            particle.velocity.y = -reflection_multiplier * particle.velocity.y;
         }
 
         particle.radius += particle.radius_velocity * delta;
