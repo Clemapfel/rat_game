@@ -46,16 +46,25 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
+}
+
 uniform float threshold;
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 screen_coords) {
     vec4 pixel = texture(image, texture_coords);
     const float eps = 0.09;
-    float threshold_override = 0.8;
+    float threshold_override = 0.7;
     float value = smoothstep(threshold_override - eps, threshold_override + eps, pixel.a);
     vec3 as_hsv = rgb_to_hsv(pixel.rgb);
+    as_hsv.y = 0;
+    as_hsv.z = as_hsv.x;
+    as_hsv.z = project(as_hsv.z, 0.5, 1);
 
-    return vec4(lch_to_rgb(vec3(0.8, as_hsv.y * 1.5, as_hsv.x)), value);
+    //return vec4(value);
+    return vec4(hsv_to_rgb(as_hsv), value);
 }
 
 #endif

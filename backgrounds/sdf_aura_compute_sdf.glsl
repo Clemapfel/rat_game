@@ -7,7 +7,7 @@
 
 #if MODE == MODE_INITIALIZE
 layout(rgba32f) uniform readonly image2D wall_texture; // x: is wall
-layout(rgba32f) uniform writeonly image2D input_texture;  // xy: nearest wall pixel coords, z: distance
+layout(rgba32f) uniform writeonly image2D input_texture;  // xy: nearest wall pixel coords, z: distance, w: sign of distance
 layout(rgba32f) uniform writeonly image2D output_texture;
 #elif MODE == MODE_JUMP
 layout(rgba32f) uniform readonly image2D input_texture;
@@ -39,37 +39,54 @@ void computemain() {
     return;
 
     #if MODE == MODE_INITIALIZE
-    vec4 pixel = imageLoad(wall_texture, position);
-    if (pixel.a > threshold) {
-        vec4 wall = vec4(position.x, position.y, -1, -1);
-        imageStore(input_texture, position, wall);
-        imageStore(output_texture, position, wall);
-    }
-    else {
-        vec4 non_wall = vec4(-1, -1, infinity, 0);
-        imageStore(input_texture, position, non_wall);
-    }
+        vec4 pixel = imageLoad(wall_texture, position);
+        bool is_wall = false;
+        if (pixel.a > threshold) {
+            is_wall = true;
+
+            uint n_others = 0;
+            for (uint i = 0; i < 8; ++i) {
+                vec4 other = imageLoad(wall_texture, position + directions[i]);
+                if (other.a > threshold)
+                    n_others += 1;
+                else
+                    break;
+            }
+
+            if (n_others >= 8) {
+                vec4 inner_wall = vec4(-1, -1, infinity, -1);
+                imageStore(input_texture, position, inner_wall);
+            }
+            else {
+                vec4 wall = vec4(position.x, position.y, -1, 0);
+                imageStore(input_texture, position, wall);
+                imageStore(output_texture, position, wall);
+            }
+        } else {
+            vec4 non_wall = vec4(-1, -1, infinity, 1);
+            imageStore(input_texture, position, non_wall);
+        }
     #elif MODE == MODE_JUMP
-    vec4 self = imageLoad(input_texture, position);
-    if (self.z < 0) // is wall
-    return;
+        vec4 self = imageLoad(input_texture, position);
+        if (self.z < 0) // is wall
+            return;
 
-    vec4 best = self;
-    for (int i = 0; i < 8; ++i) {
-        ivec2 neighbor_position = position + directions[i] * jump_distance;
+        vec4 best = self;
+        for (int i = 0; i < 8; ++i) {
+            ivec2 neighbor_position = position + directions[i] * jump_distance;
 
-        //if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
-        //continue;
+            if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
+                continue;
 
-        vec4 neighbor = imageLoad(input_texture, neighbor_position);
-        if (neighbor.x < 0 || neighbor.y < 0) // is uninitialized
-        continue;
+            vec4 neighbor = imageLoad(input_texture, neighbor_position);
+            if (neighbor.x < 0 || neighbor.y < 0) // is uninitialized
+                continue;
 
-        float dist = distance(vec2(position), vec2(neighbor.xy));
-        if (dist < best.z)
-        best = vec4(neighbor.xy, dist, 0);
-    }
+            float dist = distance(vec2(position), vec2(neighbor.xy));
+            if (dist < best.z)
+                best = vec4(neighbor.xy, dist, self.w);
+        }
 
-    imageStore(output_texture, position, best);
+        imageStore(output_texture, position, best);
     #endif
 }

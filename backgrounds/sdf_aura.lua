@@ -1,6 +1,6 @@
 rt.Background.SDF_AURA = meta.new_type("SDF_AURA", rt.BackgroundImplementation, function()
     return meta.new(rt.Background.SDF_AURA, {
-        _metaballs_texture = nil, -- rt.RenderTexture
+        _wall_texture = nil, -- rt.RenderTexture
         
         _left_wall_aabb = nil,
         _right_wall_aabb = nil,
@@ -13,9 +13,9 @@ rt.Background.SDF_AURA = meta.new_type("SDF_AURA", rt.BackgroundImplementation, 
 
         _is_realized = false,
         _particles = {},
-        _particle_density = 0.15, -- particles_per_pixel
-        _particle_min_radius = 30,
-        _particle_max_radius = 50,
+        _particle_density = 0.3, -- particles_per_pixel
+        _particle_min_radius = 5,
+        _particle_max_radius = 15,
         _particle_max_velocity = 10,
 
         _sdf_texture_a = nil, -- rt.RenderTexture
@@ -25,7 +25,7 @@ rt.Background.SDF_AURA = meta.new_type("SDF_AURA", rt.BackgroundImplementation, 
         _init_sdf_shader = rt.ComputeShader("backgrounds/sdf_aura_compute_sdf.glsl", { MODE = 0 }),
         _compute_sdf_shader = rt.ComputeShader("backgrounds/sdf_aura_compute_sdf.glsl", { MODE = 1 }),
         _render_sdf_shader = rt.Shader("backgrounds/sdf_aura_render_sdf.glsl"),
-        _render_wall_shader = rt.Shader("backgrounds/sdf_aura_render_wall.glsl"),
+        _render_metaballs_shader = rt.Shader("backgrounds/sdf_aura_render_metaballs.glsl"),
         _render_particle_shader = rt.Shader("backgrounds/sdf_aura_render_particles.glsl"),
         _init_particle_texture_shader = rt.Shader("backgrounds/sdf_aura_init_particle_texture.glsl"),
         _metaballs_threshold = 0.9;
@@ -46,21 +46,22 @@ function rt.Background.SDF_AURA:realize()
             self._init_sdf_shader = rt.ComputeShader("backgrounds/sdf_aura_compute_sdf.glsl", { MODE = 0 })
             self._compute_sdf_shader = rt.ComputeShader("backgrounds/sdf_aura_compute_sdf.glsl", { MODE = 1 })
             self._render_sdf_shader = rt.Shader("backgrounds/sdf_aura_render_sdf.glsl")
-            self._render_wall_shader = rt.Shader("backgrounds/sdf_aura_render_wall.glsl")
+            self._render_metaballs_shader = rt.Shader("backgrounds/sdf_aura_render_metaballs.glsl")
             self._render_particle_shader = rt.Shader("backgrounds/sdf_aura_render_particles.glsl")
             self._init_particle_texture_shader = rt.Shader("backgrounds/sdf_aura_init_particle_texture.glsl")
             self._step_shader = rt.ComputeShader("backgrounds/sdf_aura_step.glsl")
 
             self:size_allocate(rt.aabb_unpack(self._bounds))
+            self._is_realized = false
+            self:update(0)
         end
     end)
 end
 
 --- @override
 function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
-    self._n_particles = width * height * self._particle_density / (2 * math.pi * mix(self._particle_min_radius, self._particle_max_radius, 0.5))
-
-    self._init_particle_texture_shader:send("other", rt.Texture("assets/sprites/why.png")._native)
+    self._n_particles = math.ceil(width * height * self._particle_density / (2 * math.pi * mix(self._particle_min_radius, self._particle_max_radius, 0.5)))
+    dbg(self._n_particles)
 
     local texture_w = 500
     self._particle_mesh_texture = rt.RenderTexture(texture_w, texture_w)
@@ -88,10 +89,10 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
         table.insert(self._particles, {
             math.min(math.max(px, min_x), max_x),
             math.min(math.max(py, min_y), max_y),
-            vx * rt.random.number(0.1, 1) * self._particle_max_velocity,
-            vy * rt.random.number(0.1, 1) * self._particle_max_velocity,
+            1, --vx * rt.random.number(0.1, 1) * self._particle_max_velocity,
+            1, --vy * rt.random.number(0.1, 1) * self._particle_max_velocity,
             radius,
-            rt.random.number(-1, 1),
+            rt.random.number(-1, 1) * (1 / self._particle_max_radius),
             as_rgba.r,
             as_rgba.g,
             as_rgba.b
@@ -118,11 +119,11 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
 
     self._render_particle_shader:send("particle_buffer", self._particle_buffer._native)
 
-    self._render_wall_shader:send("threshold", self._metaballs_threshold)
+    self._render_metaballs_shader:send("threshold", self._metaballs_threshold)
     self._compute_sdf_shader:send("threshold", self._jump_flood_threshold)
 
-    self._metaballs_texture = rt.RenderTexture(width, height, 8, rt.TextureFormat.RGBA32F, true)
     self._wall_texture = rt.RenderTexture(width, height, 8, rt.TextureFormat.RGBA32F, true)
+    self._metaballs_texture = rt.RenderTexture(width, height, 8, rt.TextureFormat.RGBA32F, true)
 
     local wall_fraction = 0.01
     local normalization_factor = width / height
@@ -140,45 +141,24 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
 
     self._sdf_texture_a = rt.RenderTexture(width, height, 0, rt.TextureFormat.RGBA32F, true)
     self._sdf_texture_b = rt.RenderTexture(width, height, 0, rt.TextureFormat.RGBA32F, true)
-    self:update(0)
-end
+    self._step_shader:send("sdf_texture", self._sdf_texture_a._native)
 
---- @override
-function rt.Background.SDF_AURA:update(delta)
-    if not love.keyboard.isDown("space") then return end
-    self._is_realized = true
+    local font = rt.Font(0.4 * self._bounds.height, "assets/fonts/NotoSansJP/NotoSansJP-Black.ttf")
+    local ascent = font._regular:getAscent()
+    local descent = font._regular:getDescent()
 
-    self._elapsed = self._elapsed + delta
-    self._step_shader:send("delta", delta)
-    self._render_sdf_shader:send("elapsed", self._elapsed)
-
-    local dispatch_n = math.ceil(math.sqrt(self._n_particles)) / 8
-    self._step_shader:dispatch(dispatch_n, dispatch_n)
-
-    self._metaballs_texture:bind()
-    love.graphics.clear(0, 0, 0, 0)
-    love.graphics.setBlendState(
-        rt.BlendOperation.ADD,  -- rgb
-        rt.BlendOperation.ADD,  -- alpha
-        rt.BlendFactor.SOURCE_ALPHA,  -- source rgb
-        rt.BlendFactor.ONE, -- source alpha
-        rt.BlendFactor.ONE_MINUS_SOURCE_ALPHA, -- dest rgb
-        rt.BlendFactor.ONE  -- dest alpha
-    )
-    self._render_particle_shader:bind()
-    self._particle_mesh:draw_instanced(self._n_particles)
-    self._render_particle_shader:unbind()
-    love.graphics.setBlendMode("alpha")
-    self._metaballs_texture:unbind()
+    local content = "LÖVE"--"死"
+    self._label = rt.Label(content, font)
+    self._label:realize()
+    local label_w, label_h = self._label:measure()
+    label_h = font._regular:getHeight(content)
+    self._label:fit_into(self._bounds.x + 0.5 * self._bounds.width - 0.5 * label_w, self._bounds.y + 0.5 * self._bounds.height - 0.5 * label_h)
+    --  - 0.5 * (label_h - ascent)
 
     self._wall_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
-    self._render_wall_shader:bind()
-    self._metaballs_texture:draw(0, 0)
-    self._render_wall_shader:unbind()
+    self._label:draw()
     self._wall_texture:unbind()
-
-    local width, height = self._bounds.width, self._bounds.height
 
     -- jump flood fill
     self._init_sdf_shader:send("wall_texture", self._wall_texture._native)
@@ -205,20 +185,59 @@ function rt.Background.SDF_AURA:update(delta)
         jump_a_or_b = not jump_a_or_b
         jump = jump / 2
     end
+    self._compute_sdf_shader:dispatch(width / 8, height / 8)
+    self._step_shader:send("sdf_texture", self._sdf_texture._native)
+
+    self:update(0)
+end
+
+--- @override
+function rt.Background.SDF_AURA:update(delta)
+    if self._is_realized then
+        if not love.keyboard.isDown("space") then return end
+    else
+        self._is_realized = true
+    end
+
+    self._elapsed = self._elapsed + delta
+    self._step_shader:send("delta", delta)
+    self._step_shader:send("elapsed", self._elapsed)
+    self._render_sdf_shader:send("elapsed", self._elapsed)
+
+    local dispatch_n = math.ceil(math.sqrt(self._n_particles)) / 8
+    self._step_shader:dispatch(dispatch_n, dispatch_n)
+
+    self._metaballs_texture:bind()
+    love.graphics.clear(0, 0, 0, 0)
+    love.graphics.setBlendState(
+        rt.BlendOperation.ADD,  -- rgb
+        rt.BlendOperation.ADD,  -- alpha
+        rt.BlendFactor.SOURCE_ALPHA,  -- source rgb
+        rt.BlendFactor.ONE, -- source alpha
+        rt.BlendFactor.ONE_MINUS_SOURCE_ALPHA, -- dest rgb
+        rt.BlendFactor.ONE  -- dest alpha
+    )
+    self._render_particle_shader:bind()
+    self._particle_mesh:draw_instanced(self._n_particles)
+    self._render_particle_shader:unbind()
+    love.graphics.setBlendMode("alpha")
+    self._metaballs_texture:unbind()
 end
 
 --- @override
 function rt.Background.SDF_AURA:draw()
     if not self._is_realized then return end
 
-    love.graphics.setColor(rt.color_unpack(rt.Palette.WHITE))
+    love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
     love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
 
     self._render_sdf_shader:bind()
-    self._sdf_texture:draw()
+    --self._sdf_texture:draw()
     self._render_sdf_shader:unbind()
 
-    self._wall_texture:draw()
+    self._render_metaballs_shader:bind()
+    self._metaballs_texture:draw()
+    self._render_metaballs_shader:unbind()
 
     love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
     for aabb in range(
@@ -229,4 +248,7 @@ function rt.Background.SDF_AURA:draw()
     ) do
         love.graphics.rectangle("fill", rt.aabb_unpack(aabb))
     end
+
+    love.graphics.setColor(1, 1, 1, 1)
+    --self._label:draw()
 end

@@ -25,10 +25,14 @@
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_init_particle_texture.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_init_particle_texture.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_metaballs.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -674,15 +678,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="12322000" />
-    </task>
-    <task id="LOCAL-01372" summary="textbox done">
-      <option name="closed" value="true" />
-      <created>1735506222912</created>
-      <option name="number" value="01372" />
-      <option name="presentableId" value="LOCAL-01372" />
-      <option name="project" value="LOCAL" />
-      <updated>1735506222912</updated>
+      <workItem from="1736975567452" duration="19724000" />
     </task>
     <task id="LOCAL-01373" summary="stashing selection node linking">
       <option name="closed" value="true" />
@@ -1068,7 +1064,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736986707290</updated>
     </task>
-    <option name="localTasksCounter" value="1421" />
+    <task id="LOCAL-01421" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736988147404</created>
+      <option name="number" value="01421" />
+      <option name="presentableId" value="LOCAL-01421" />
+      <option name="project" value="LOCAL" />
+      <updated>1736988147404</updated>
+    </task>
+    <option name="localTasksCounter" value="1422" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

@@ -131,8 +131,10 @@ function rt.Label:_glyph_new(
 end
 
 --- @override
-function rt.Label:draw()
+function rt.Label:draw(x, y)
     if self._n_glyphs == 0 or self._is_visible ~= true then return end
+    if x == nil then x = 0 end
+    if y == nil then y = 0 end
 
     local render_order = self._glyphs_only
     love.graphics.setColor(1, 1, 1, 1)
@@ -152,16 +154,16 @@ function rt.Label:draw()
 
     if self._use_outline and self._outline_texture ~= nil then
         self._outline_texture:draw(
-            justify_offset + self._outline_texture_offset_x,
-            self._outline_texture_offset_y,
+            justify_offset + self._outline_texture_offset_x + x,
+            self._outline_texture_offset_y + y,
             1, 1, 1, self._opacity
         )
     end
 
     if self._swap_texture ~= nil then
         self._swap_texture:draw(
-            justify_offset + self._outline_texture_offset_x,
-            self._outline_texture_offset_y,
+            justify_offset + self._outline_texture_offset_x + x,
+            self._outline_texture_offset_y + y,
             1, 1, 1, self._opacity
         )
     end

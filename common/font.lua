@@ -136,28 +136,28 @@ function rt.load_default_fonts()
         _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf"),
         _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"),
         noto_math,
-        gnu_unifont
+        --gnu_unifont
     }
 
     rt.settings.font.italic_fallbacks = {
         _new_font("assets/fonts/NotoSans/NotoSans-Italic.ttf"),
         _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"), -- no italic in japanese
         noto_math,
-        gnu_unifont
+        --gnu_unifont
     }
 
     rt.settings.font.bold_fallbacks = {
         _new_font("assets/fonts/NotoSans/NotoSans-Bold.ttf"),
         _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"),
         noto_math,
-        gnu_unifont
+        --gnu_unifont
     }
 
     rt.settings.font.bold_italic_fallbacks = {
         _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf"),
         _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"), -- no italic in japanese
         noto_math,
-        gnu_unifont
+        --gnu_unifont
     }
 
     rt.settings.font.default = rt.Font(rt.settings.font.default_size,

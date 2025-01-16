@@ -45,8 +45,7 @@ vec4 effect(vec4 color, Image sdf_texture, vec2 texture_coords, vec2 screen_coor
     vec4 pixel = texture(sdf_texture, texture_coords);
     vec2 size = textureSize(sdf_texture, 0);
     float dist = pixel.z / (max(size.x, size.y) / 2);
-    dist = gaussian(dist, 4); //2 + 8 * sine_wave(elapsed, 0.5));
-    return vec4(vec3(1 - dist), dist);
+    return vec4(vec3(dist), 1);
 }
 
 #endif

@@ -27,13 +27,10 @@ float alt_kernel_peak() {
     return exp(h) / sinh(h);
 }
 
-uniform sampler2D other;
-
 vec4 effect(vec4 vertex_color, Image _, vec2 texture_coords, vec2 vertex_position) {
     //float value = alt_kernel(distance(texture_coords, vec2(0.5)) * 2) / alt_kernel_peak(); // aspect ratio is 1:1
     float value = 1 - distance(texture_coords, vec2(0.5)) * 2;
-    vec4 other = texture(other, texture_coords);
-    return vec4(vec3(1) * max(max(other.x, other.y), other.z), value);
+    return vec4(vec3(1), value);
 }
 
 #endif
