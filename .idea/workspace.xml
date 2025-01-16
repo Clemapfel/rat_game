@@ -25,8 +25,9 @@
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_compute_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_init_particle_texture.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_init_particle_texture.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_render_wall.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backgrounds/sdf_aura_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/sdf_aura_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -673,15 +674,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="10941000" />
-    </task>
-    <task id="LOCAL-01371" summary="history mode working">
-      <option name="closed" value="true" />
-      <created>1735504378531</created>
-      <option name="number" value="01371" />
-      <option name="presentableId" value="LOCAL-01371" />
-      <option name="project" value="LOCAL" />
-      <updated>1735504378531</updated>
+      <workItem from="1736975567452" duration="12322000" />
     </task>
     <task id="LOCAL-01372" summary="textbox done">
       <option name="closed" value="true" />
@@ -1067,7 +1060,15 @@
       <option name="project" value="LOCAL" />
       <updated>1736984729502</updated>
     </task>
-    <option name="localTasksCounter" value="1420" />
+    <task id="LOCAL-01420" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1736986707290</created>
+      <option name="number" value="01420" />
+      <option name="presentableId" value="LOCAL-01420" />
+      <option name="project" value="LOCAL" />
+      <updated>1736986707290</updated>
+    </task>
+    <option name="localTasksCounter" value="1421" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

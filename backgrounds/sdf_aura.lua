@@ -60,6 +60,8 @@ end
 function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
     self._n_particles = width * height * self._particle_density / (2 * math.pi * mix(self._particle_min_radius, self._particle_max_radius, 0.5))
 
+    self._init_particle_texture_shader:send("other", rt.Texture("assets/sprites/why.png")._native)
+
     local texture_w = 500
     self._particle_mesh_texture = rt.RenderTexture(texture_w, texture_w)
     self._particle_mesh_texture:bind()
@@ -86,8 +88,8 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
         table.insert(self._particles, {
             math.min(math.max(px, min_x), max_x),
             math.min(math.max(py, min_y), max_y),
-            vx * rt.random.number(0, self._particle_max_velocity),
-            vy * rt.random.number(0, self._particle_max_velocity),
+            vx * rt.random.number(0.1, 1) * self._particle_max_velocity,
+            vy * rt.random.number(0.1, 1) * self._particle_max_velocity,
             radius,
             rt.random.number(-1, 1),
             as_rgba.r,
@@ -213,10 +215,10 @@ function rt.Background.SDF_AURA:draw()
     love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
 
     self._render_sdf_shader:bind()
-    --self._sdf_texture:draw()
+    self._sdf_texture:draw()
     self._render_sdf_shader:unbind()
 
-    self._metaballs_texture:draw()
+    self._wall_texture:draw()
 
     love.graphics.setColor(rt.color_unpack(rt.Palette.BLACK))
     for aabb in range(
