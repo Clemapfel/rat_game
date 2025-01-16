@@ -52,6 +52,7 @@ float project(float lower, float upper, float value)
 }
 
 uniform float threshold;
+uniform float opacity;
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 screen_coords) {
     vec4 pixel = texture(image, texture_coords);
@@ -59,12 +60,14 @@ vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 screen_coords) {
     float threshold_override = 0.7;
     float value = smoothstep(threshold_override - eps, threshold_override + eps, pixel.a);
     vec3 as_hsv = rgb_to_hsv(pixel.rgb);
-    as_hsv.y = 0;
+    as_hsv.y = 1;
     as_hsv.z = as_hsv.x;
     as_hsv.z = project(as_hsv.z, 0.5, 1);
 
+    as_hsv.z = 1;
+
     //return vec4(value);
-    return vec4(hsv_to_rgb(as_hsv), value);
+    return vec4(hsv_to_rgb(as_hsv), value * opacity);
 }
 
 #endif

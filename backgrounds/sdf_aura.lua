@@ -13,9 +13,9 @@ rt.Background.SDF_AURA = meta.new_type("SDF_AURA", rt.BackgroundImplementation, 
 
         _is_realized = false,
         _particles = {},
-        _particle_density = 0.3, -- particles_per_pixel
-        _particle_min_radius = 5,
-        _particle_max_radius = 15,
+        _particle_density = 0.4, -- particles_per_pixel
+        _particle_min_radius = 3,
+        _particle_max_radius = 4,
         _particle_max_velocity = 10,
 
         _sdf_texture_a = nil, -- rt.RenderTexture
@@ -35,6 +35,9 @@ rt.Background.SDF_AURA = meta.new_type("SDF_AURA", rt.BackgroundImplementation, 
         _particle_mesh = nil, -- rt.VertexShape
         _particle_mesh_texture = nil, -- rt.RenderTexture
         _particle_buffer = nil, -- rt.GraphicsBuffer
+
+        _opacity_animation = rt.TimedAnimation(1, 0, 1, rt.InterpolationFunctions.GAUSSIAN_HIGHPASS),
+        _opacity = 0
     })
 end)
 
@@ -53,6 +56,9 @@ function rt.Background.SDF_AURA:realize()
 
             self:size_allocate(rt.aabb_unpack(self._bounds))
             self._is_realized = false
+            self._opacity = 0
+            self._opacity_animation:reset()
+            self._elapsed = 0
             self:update(0)
         end
     end)
@@ -80,15 +86,16 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
     -- init particles
     self._particles = {}
     for i = 1, self._n_particles do
-        local px, py = rt.random.number() * width, rt.random.number() * height
         local vx, vy = rt.random.number(-1, 1), rt.random.number(-1, 1)
         local radius = rt.random.number(self._particle_min_radius, self._particle_max_radius)
         local as_rgba = rt.lcha_to_rgba(rt.LCHA(0.8, 1, rt.random.number(0, 1)))
         local min_x, max_x = x + padding + radius, x + width - radius - padding
         local min_y, max_y = y + padding + radius, y + height - radius - padding
+
+        local px, py = math.min(math.max(rt.random.number() * width, min_x), max_x), math.min(math.max(rt.random.number() * height, min_y), max_y)
+
         table.insert(self._particles, {
-            math.min(math.max(px, min_x), max_x),
-            math.min(math.max(py, min_y), max_y),
+            px, py,
             1, --vx * rt.random.number(0.1, 1) * self._particle_max_velocity,
             1, --vy * rt.random.number(0.1, 1) * self._particle_max_velocity,
             radius,
@@ -143,17 +150,16 @@ function rt.Background.SDF_AURA:size_allocate(x, y, width, height)
     self._sdf_texture_b = rt.RenderTexture(width, height, 0, rt.TextureFormat.RGBA32F, true)
     self._step_shader:send("sdf_texture", self._sdf_texture_a._native)
 
-    local font = rt.Font(0.4 * self._bounds.height, "assets/fonts/NotoSansJP/NotoSansJP-Black.ttf")
+    local font = rt.Font(0.2 * self._bounds.height, "assets/fonts/NotoSansJP/NotoSansJP-Black.ttf")
     local ascent = font._regular:getAscent()
     local descent = font._regular:getDescent()
 
-    local content = "LÖVE"--"死"
+    local content = "you lost\nthe game"
     self._label = rt.Label(content, font)
     self._label:realize()
     local label_w, label_h = self._label:measure()
     label_h = font._regular:getHeight(content)
-    self._label:fit_into(self._bounds.x + 0.5 * self._bounds.width - 0.5 * label_w, self._bounds.y + 0.5 * self._bounds.height - 0.5 * label_h)
-    --  - 0.5 * (label_h - ascent)
+    self._label:fit_into(self._bounds.x + 0.5 * self._bounds.width - 0.5 * label_w, self._bounds.y + 0.5 * self._bounds.height - 1 * label_h)
 
     self._wall_texture:bind()
     love.graphics.clear(0, 0, 0, 0)
@@ -198,6 +204,10 @@ function rt.Background.SDF_AURA:update(delta)
     else
         self._is_realized = true
     end
+
+    self._opacity_animation:update(delta)
+    self._opacity = self._opacity_animation:get_value()
+    self._render_metaballs_shader:send("opacity", self._opacity)
 
     self._elapsed = self._elapsed + delta
     self._step_shader:send("delta", delta)
