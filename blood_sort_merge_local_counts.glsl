@@ -20,17 +20,11 @@ layout(r32ui) uniform readonly uimage2D local_counts_texture;
 uniform uint n_rows;
 uniform uint n_columns;
 
-#ifndef LOCAL_SIZE_X
-    #define LOCAL_SIZE_X 16
-#endif
-
-#ifndef LOCAL_SIZE_Y
-    #define LOCAL_SIZE_Y 16
-#endif
-
-layout (local_size_x = LOCAL_SIZE_X, local_size_y = LOCAL_SIZE_Y, local_size_z = 1) in; // dispatch with sqrt(n_rows, n_columns)
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // dispatch with sqrt(n_rows, n_columns)
 void computemain()
 {
+
+
     uint n_counts = n_columns * n_rows;
     uvec3 thread_ns = gl_NumWorkGroups * gl_WorkGroupSize;
     uint n_threads = thread_ns.x * thread_ns.y * thread_ns.z;
@@ -46,12 +40,6 @@ void computemain()
     uint end_i = min(start_i + n_per_thread, n_counts);
 
     uint n_texture_rows = imageSize(local_counts_texture).y;
-
-    // reset global counts and prefix sum buffers
-    for (uint i = start_i; i < end_i; ++i)
-        global_counts[i] = 0u;
-
-    barrier();
 
     // sum local counts and write to buffer
     for (uint i = start_i; i < end_i; ++i) {

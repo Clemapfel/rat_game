@@ -1,7 +1,6 @@
 #pragma language glsl4
 
 struct CellMemoryMapping {
-    uint n_particles;
     uint start_index; // start particle i
     uint end_index;   // end particle i
 };
@@ -36,7 +35,7 @@ vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 frag_position) {
     ivec2 cell_xy = position_to_cell_xy(frag_position);
     uint cell_i = cell_xy_to_cell_i(cell_xy);
     CellMemoryMapping mapping = cell_memory_mapping[cell_i];
-    return vec4(1, 0, 1, mapping.n_particles / 3.0);
+    return vec4(1, 0, 1, (mapping.end_index - mapping.start_index) / 3.0);
 }
 
 #endif

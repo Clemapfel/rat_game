@@ -21,7 +21,7 @@ rt.settings.fluid_simulation = {
 
 local SCREEN_W, SCREEN_H = 1600 / 1.5, 900 / 1.5
 local N_PARTICLES = 10000
-local VSYNC = 0
+local VSYNC = 1
 
 --- @class rt.FluidSimulation
 rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h, n_particles)
@@ -53,9 +53,7 @@ function rt.FluidSimulation:realize()
         usage = "static"
     }
 
-    self._update_particle_cell_id_shader = rt.ComputeShader("blood_update_particle_cell_id.glsl", {
-        LOCAL_SIZE = local_size
-    })
+    self._update_particle_cell_id_shader = rt.ComputeShader("blood_update_particle_cell_id.glsl")
 
     -- init particle buffer
 
@@ -113,10 +111,7 @@ function rt.FluidSimulation:realize()
     end
 
     self._update_particle_cell_id = function(self)
-        self._update_particle_cell_id_shader:dispatch(
-            math.ceil(self._particle_dispatch_size / local_size),
-            math.ceil(self._particle_dispatch_size / local_size)
-        )
+        self._update_particle_cell_id_shader:dispatch(1, 1)
     end
 
     -- split particle range in n groups, for each group, accumulate local counts
@@ -132,9 +127,7 @@ function rt.FluidSimulation:realize()
         }
     )
 
-    self._sort_accumulate_local_counts_shader = rt.ComputeShader("blood_sort_accumulate_local_counts.glsl", {
-        LOCAL_SIZE = 256
-    })
+    self._sort_accumulate_local_counts_shader = rt.ComputeShader("blood_sort_accumulate_local_counts.glsl")
 
     for name_value in range(
         {"particle_buffer", self._particle_buffer_a},
@@ -155,10 +148,7 @@ function rt.FluidSimulation:realize()
 
     -- merge local counts
 
-    self._sort_merge_local_counts_shader = rt.ComputeShader("blood_sort_merge_local_counts.glsl", {
-        LOCAL_SIZE_X = 16,
-        LOCAL_SIZE_Y = 16
-    })
+    self._sort_merge_local_counts_shader = rt.ComputeShader("blood_sort_merge_local_counts.glsl")
 
     self._cell_occupations_buffer = love.graphics.newBuffer(
         self._sort_merge_local_counts_shader:get_buffer_format("cell_occupations_buffer"),
@@ -184,13 +174,12 @@ function rt.FluidSimulation:realize()
 
     local merge_local_counts_dispatch_size = math.ceil(math.sqrt(self._n_rows * self._n_columns))
     self._sort_merge_local_counts = function(self)
-        self._sort_merge_local_counts_shader:dispatch(merge_local_counts_dispatch_size, merge_local_counts_dispatch_size)
+        self._sort_merge_local_counts_shader:dispatch(1, 1)
     end
 
     -- compute prefix sum
 
     self._sort_compute_prefix_sum_shader = rt.ComputeShader("blood_sort_compute_prefix_sum.glsl", {
-        LOCAL_SIZE = 256,
     })
 
     for name_value in range(
@@ -208,8 +197,6 @@ function rt.FluidSimulation:realize()
     -- scatter particles
 
     self._sort_scatter_particles_shader = rt.ComputeShader("blood_sort_scatter_particles.glsl", {
-        LOCAL_SIZE_X = 32,
-        LOCAL_SIZE_Y = 32
     })
 
     self._is_sorted_buffer = love.graphics.newBuffer({
@@ -234,14 +221,12 @@ function rt.FluidSimulation:realize()
 
     self._verify_is_sorted = function(self)
         local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
+        dbg("is_sorted", data:getUInt32(0))
     end
 
     -- step
 
-    self._step_simulation_shader = rt.ComputeShader("blood_step_simulation.glsl", {
-        LOCAL_SIZE_X = local_size,
-        LOCAL_SIZE_Y = local_size
-    })
+    self._step_simulation_shader = rt.ComputeShader("blood_step_simulation.glsl")
 
     for name_value in range(
         {"particle_buffer_in", self._particle_buffer_b},
@@ -255,7 +240,7 @@ function rt.FluidSimulation:realize()
 
     self._step_simulation = function(self, delta)
         self._step_simulation_shader:send("delta", delta)
-        self._step_simulation_shader:dispatch(self._particle_dispatch_size / local_size, self._particle_dispatch_size / local_size)
+        self._step_simulation_shader:dispatch(1, 1)
     end
 
     -- draw spatial hash
@@ -299,19 +284,50 @@ function rt.FluidSimulation:realize()
         self._particle_mesh:draw_instanced(self._n_particles)
         self._debug_draw_particles_shader:unbind()
     end
+
+    -- debug
+
+    self._debug_run_shader = rt.ComputeShader("blood_debug_run.glsl")
+
+    for name_value in range(
+        {"particle_buffer_in", self._particle_buffer_a},
+        {"particle_buffer_out", self._particle_buffer_b},
+        {"cell_occupations_buffer", self._cell_occupations_buffer},
+        {"global_counts_buffer", self._sort_global_counts_buffer},
+        {"n_particles", self._n_particles},
+        {"particle_radius", self._particle_radius},
+        {"bounds", {0, 0, love.graphics.getDimensions()}},
+        {"n_rows", self._n_rows},
+        {"n_columns", self._n_columns},
+        {"cell_width", self._cell_width},
+        {"cell_height", self._cell_height},
+        {"is_sorted_buffer", self._is_sorted_buffer}
+    ) do
+        self._debug_run_shader:send(table.unpack(name_value))
+    end
+
+    self._run_debug = function(self, delta)
+        self._debug_run_shader:send("delta", delta)
+        self._debug_run_shader:dispatch(1, 1)
+    end
 end
 
 --- @override
 function rt.FluidSimulation:update(delta)
+    --[[
     self:_update_particle_cell_id()
+
     self:_sort_accumulate_local_counts()
     self:_sort_merge_local_counts()
     self:_sort_compute_prefix_sum()
     self:_sort_scatter_particles()
-
     self:_verify_is_sorted()
 
     self:_step_simulation(delta)
+    ]]--
+
+    self:_run_debug(delta)
+    self:_verify_is_sorted()
 end
 
 --- @override
@@ -332,7 +348,7 @@ end
 
 allow_update = true
 love.update = function(delta)
-    if allow_update or true then --love.keyboard.isDown("space") then
+    if allow_update or love.keyboard.isDown("space") then
         sim:update(delta)
         allow_update = false
     end

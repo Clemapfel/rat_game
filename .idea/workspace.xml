@@ -22,18 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sdf aura done">
-      <change afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored blood">
+      <change afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step_simulation.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step_simulation.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/blood_render_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_render_spatial_hash.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -679,15 +678,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="39269000" />
-    </task>
-    <task id="LOCAL-01375" summary="stashing before redo">
-      <option name="closed" value="true" />
-      <created>1735591373089</created>
-      <option name="number" value="01375" />
-      <option name="presentableId" value="LOCAL-01375" />
-      <option name="project" value="LOCAL" />
-      <updated>1735591373089</updated>
+      <workItem from="1736975567452" duration="44703000" />
     </task>
     <task id="LOCAL-01376" summary="stashing">
       <option name="closed" value="true" />
@@ -1073,7 +1064,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737067049012</updated>
     </task>
-    <option name="localTasksCounter" value="1424" />
+    <task id="LOCAL-01424" summary="refactored blood">
+      <option name="closed" value="true" />
+      <created>1737150637974</created>
+      <option name="number" value="01424" />
+      <option name="presentableId" value="LOCAL-01424" />
+      <option name="project" value="LOCAL" />
+      <updated>1737150637974</updated>
+    </task>
+    <option name="localTasksCounter" value="1425" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1127,7 +1126,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="text box reveal working" />
     <MESSAGE value="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked" />
     <MESSAGE value="refactored meta" />
     <MESSAGE value="refactored entity comparison" />
@@ -1152,7 +1150,8 @@
     <MESSAGE value="added sdf aura shader" />
     <MESSAGE value="stashing" />
     <MESSAGE value="sdf aura done" />
-    <option name="LAST_COMMIT_MESSAGE" value="sdf aura done" />
+    <MESSAGE value="refactored blood" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored blood" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

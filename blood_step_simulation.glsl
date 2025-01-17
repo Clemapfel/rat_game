@@ -21,18 +21,10 @@ uniform float delta;
 uniform float particle_radius;
 uniform vec4 bounds;
 
-#ifndef LOCAL_SIZE_X
-    #define LOCAL_SIZE_X 32
-#endif
-
-#ifndef LOCAL_SIZE_Y
-    #define LOCAL_SIZE_Y 32
-#endif
-
-layout (local_size_x = LOCAL_SIZE_X, local_size_y = LOCAL_SIZE_Y, local_size_z = 1) in; // dispatch with sqrt(n_particles) / LOCAL_SIZE_X, sqrt(n_particles) / LOCAL_SIZE_Y
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in; // dispatch with sqrt(n_particles) / LOCAL_SIZE_X, sqrt(n_particles) / LOCAL_SIZE_Y
 void computemain()
 {
-    uint thread_i = gl_LocalInvocationID.y * gl_WorkGroupSize.x + gl_LocalInvocationID.x;
+    uint thread_i = gl_GlobalInvocationID.x;
     uint n_particles_per_thread = uint(ceil(n_particles / float(gl_WorkGroupSize.x * gl_WorkGroupSize.y)));
     uint particle_start_i = thread_i * n_particles_per_thread;
     uint particle_end_i = min(particle_start_i + n_particles_per_thread, n_particles);
@@ -44,6 +36,7 @@ void computemain()
     float max_y = bounds.y + bounds.w - radius;
 
     for (uint particle_i = particle_start_i; particle_i < particle_end_i; particle_i++) {
+
         Particle particle = particles_in[particle_i];
         particle.position += particle.velocity * delta;
 
