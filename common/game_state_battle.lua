@@ -159,6 +159,19 @@ function rt.GameState:_get_entity_entry(entity)
 end
 
 --- @brief
+--- @return Table<bt.Entity>
+function rt.GameState:get_entity_from_id(id)
+    meta.assert_string(id)
+    local out = {}
+    for entry in values(self._state.entities) do
+        if entry.id == id then
+            table.insert(out, bt.Entity(bt.EntityConfig(id), entry.multiplicity))
+        end
+    end
+    return out
+end
+
+--- @brief
 function rt.GameState:remove_entity(entity)
     meta.assert_isa(entity, bt.Entity)
 

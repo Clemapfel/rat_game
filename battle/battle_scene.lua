@@ -305,16 +305,13 @@ function bt.BattleScene:size_allocate(x, y, width, height)
 
     if self._is_first_size_allocate then
         -- TODO
-        --[[
         self._env.start_battle("DEBUG_BATTLE")
         self._env.quicksave()
-        self._env:start_turn()
-        -- TODO
+        self._env.start_turn()
+        self._env.knock_out(self._env.get_entity_from_id("MC"))
 
         self:skip_all()
-        ]]--
         self._is_first_size_allocate = false
-        self:set_background(rt.Background.SDF_AURA)
     end
 end
 

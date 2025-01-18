@@ -23,23 +23,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/blood_copy.hlsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_density_kernel_init.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_01.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_01_error.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_folder/shader_include_02.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_folder/shader_include_02_error.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_main.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_main.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/shader_include_main_error.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/ally_knocked_out.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/ally_knocked_out.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/entity_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/entity_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_step_simulation.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/blood_render_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_render_density_kernel.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -118,6 +121,7 @@
     "Lua Application.main_physics_blood.executor": "Run",
     "Lua Application.main_rope.executor": "Run",
     "Lua Application.main_rope_windows.executor": "Run",
+    "Lua Application.main_shader_include.executor": "Run",
     "Lua Application.main_signal.executor": "Run",
     "Lua Application.main_smoke.executor": "Run",
     "Lua Application.main_sort.executor": "Run",
@@ -176,7 +180,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main_shader_include">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -198,6 +202,17 @@
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="blood_main.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_shader_include" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="shader_include_main.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -277,6 +292,7 @@
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_blood" />
+      <item itemvalue="Lua Application.main_shader_include" />
       <item itemvalue="Lua Application.main_smoke" />
       <item itemvalue="Lua Application.main_sort" />
       <item itemvalue="Lua Application.meta.lua" />
@@ -685,15 +701,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="49868000" />
-    </task>
-    <task id="LOCAL-01377" summary="optimized radix sort to be parallell in all passes">
-      <option name="closed" value="true" />
-      <created>1735604773975</created>
-      <option name="number" value="01377" />
-      <option name="presentableId" value="LOCAL-01377" />
-      <option name="project" value="LOCAL" />
-      <updated>1735604773975</updated>
+      <workItem from="1736975567452" duration="62181000" />
     </task>
     <task id="LOCAL-01378" summary="moved old mains">
       <option name="closed" value="true" />
@@ -1079,7 +1087,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737157370465</updated>
     </task>
-    <option name="localTasksCounter" value="1426" />
+    <task id="LOCAL-01426" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1737162555601</created>
+      <option name="number" value="01426" />
+      <option name="presentableId" value="LOCAL-01426" />
+      <option name="project" value="LOCAL" />
+      <updated>1737162555601</updated>
+    </task>
+    <option name="localTasksCounter" value="1427" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

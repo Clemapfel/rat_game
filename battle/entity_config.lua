@@ -62,6 +62,12 @@ end, {
     portrait_sprite_id = nil,
     portrait_sprite_index = nil,
 
+    knocked_out_sprite_id = nil,
+    knocked_out_sprite_index = nil,
+
+    killed_sprite_id = nil,
+    killed_sprite_index = nil,
+
     description = rt.Translation.battle.entity_default_description,
     flavor_text = rt.Translation.battle.entity_default_flavor_text,
 
@@ -93,6 +99,12 @@ function bt.EntityConfig.load_config(path)
 
         portrait_sprite_id = rt.STRING,
         portrait_sprite_index = {rt.UNSIGNED, rt.STRING},
+
+        knocked_out_sprite_id = rt.STRING,
+        knocked_out_sprite_index = {rt.UNSIGNED, rt.STRING},
+
+        killed_sprite_id = rt.STRING,
+        killed_sprite_index = {rt.UNSIGNED, rt.STRING},
 
         n_move_slots = rt.INTEGER,
         n_equip_slots = rt.INTEGER,
@@ -175,6 +187,16 @@ end
 --- @brief
 function bt.EntityConfig:get_portrait_sprite_id()
     return self.portrait_sprite_id, self.portrait_sprite_index
+end
+
+--- @brief
+function bt.EntityConfig:get_knocked_out_sprite_id()
+    return self.knocked_out_sprite_id, self.knocked_out_sprite_index
+end
+
+--- @brief
+function bt.EntityConfig:get_killed_sprite_id()
+    return self.killed_sprite_id, self.killed_sprite_index
 end
 
 --- @brief

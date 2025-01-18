@@ -1701,6 +1701,17 @@ function bt.BattleScene:create_simulation_environment()
         return out
     end
 
+    --- @return Tuple<bt.EntityProxy>
+    function env.get_entity_from_id(id)
+        bt.assert_args("get_entity_from_id", id, bt.String)
+        local entities = _state:get_entity_from_id(id)
+        local out = {}
+        for entity in values(entities) do
+            table.insert(out, bt.create_entity_proxy(_scene, entity))
+        end
+        return table.unpack(out)
+    end
+
     function env.list_enemies()
         local out = {}
         for entity in values(_state:list_entities_in_order()) do

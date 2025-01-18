@@ -1,7 +1,10 @@
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
+    <inspection_tool class="ArrayIndexZero" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="DuplicateClassDeclaration" enabled="false" level="ERROR" enabled_by_default="false" />
     <inspection_tool class="GlobalNameCanbeLocal" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="UnresolvedClass" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="UnresolvedSymbolInEmmyDoc" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>

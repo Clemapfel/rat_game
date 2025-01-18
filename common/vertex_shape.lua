@@ -198,6 +198,7 @@ end
 
 --- @brief
 function rt.VertexShape:set_texture(texture)
+    meta.assert_isa(texture, rt.Texture)
     self._native:setTexture(texture._native)
 end
 

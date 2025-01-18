@@ -21,6 +21,8 @@ layout(std430) buffer cell_occupations_buffer { // TODO: make write only
     CellOccupation cell_occupations[];
 };
 
+layout(rgba32f) uniform readonly image2D density_texture; // x: density, zw: directional derivatives
+
 uniform uint n_particles;
 uniform uint n_rows;
 uniform uint n_columns;

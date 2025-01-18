@@ -16,11 +16,12 @@ require "include"
 
 rt.settings.fluid_simulation = {
     particle_radius = 5,
-    local_size = 8
+    local_size = 8,
+    density_radius = 2, -- factor
 }
 
 local SCREEN_W, SCREEN_H = 1600 / 1.5, 900 / 1.5
-local N_PARTICLES = 10000
+local N_PARTICLES = 1000
 local VSYNC = 1
 
 --- @class rt.FluidSimulation
@@ -134,13 +135,14 @@ function rt.FluidSimulation:realize()
     love.graphics.setShader(nil)
     love.graphics.setCanvas(nil)
 
+    local factor = rt.settings.fluid_simulation.density_radius
     self._density_kernel_mesh = rt.VertexRectangle(
-        -self._particle_radius,
-        -self._particle_radius,
-        2 * self._particle_radius,
-        2 * self._particle_radius
+        -1 * factor * self._particle_radius,
+        -1 * factor * self._particle_radius,
+        2 * factor * self._particle_radius,
+        2 * factor * self._particle_radius
     )
-    self._density_kernel_mesh:set_texture(self._density_kernel_texture)
+    self._density_kernel_mesh._native:setTexture(self._density_kernel_texture)
 
     -- density
 
@@ -151,7 +153,6 @@ function rt.FluidSimulation:realize()
 
     self._density_kernel_draw_shader = rt.Shader("blood_density_kernel_draw.glsl")
     self._density_kernel_draw_shader:send("particle_buffer", self._particle_buffer_a)
-    self._density_kernel_draw_shader:send("density_texture", self._density_texture)
 
     self._density_compute_derivative_shader = rt.ComputeShader("blood_density_compute_derivative.glsl")
     self._density_compute_derivative_shader:send("density_texture", self._density_texture)
@@ -168,7 +169,7 @@ function rt.FluidSimulation:realize()
         love.graphics.setCanvas()
         love.graphics.setBlendMode("alpha")
 
-        self._density_compute_derivative_shader:dispatch( self._density_texture_w, self._density_texture_h)
+        self._density_compute_derivative_shader:dispatch(self._density_texture_w, self._density_texture_h)
     end
 
     self._debug_draw_density_shader = rt.Shader("blood_debug_draw_density.glsl")
@@ -219,6 +220,7 @@ function rt.FluidSimulation:realize()
         {"particle_buffer_b", self._particle_buffer_b},
         {"cell_occupations_buffer", self._cell_occupations_buffer},
         {"global_counts_buffer", self._sort_global_counts_buffer},
+        {"density_texture", self._density_texture},
         {"n_particles", self._n_particles},
         {"particle_radius", self._particle_radius},
         {"bounds", {0, 0, love.graphics.getDimensions()}},
@@ -255,7 +257,6 @@ function rt.FluidSimulation:draw()
     self._debug_draw_density_shader:bind()
     love.graphics.draw(self._density_texture)
     self._debug_draw_density_shader:unbind()
-
 end
 
 local sim = nil
