@@ -6,6 +6,7 @@ struct Particle {
     uint cell_id;
 };
 
+
 layout(std430) readonly buffer particle_buffer {
     Particle particles[];
 }; // size: n_particles

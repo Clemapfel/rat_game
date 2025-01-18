@@ -53,25 +53,25 @@ function rt.FluidSimulation:realize()
         usage = "static"
     }
 
-    self._update_particle_cell_id_shader = rt.ComputeShader("blood_update_particle_cell_id.glsl")
+    self._debug_run_shader = rt.ComputeShader("blood_debug_run.glsl")
 
-    -- init particle buffer
+    -- buffers
 
     self._particle_buffer_a = love.graphics.newBuffer(
-        self._update_particle_cell_id_shader:get_buffer_format("particle_buffer"),
+        self._debug_run_shader:get_buffer_format("particle_buffer_a"),
         self._n_particles,
         buffer_usage
     )
 
     self._particle_buffer_b = love.graphics.newBuffer(
-        self._update_particle_cell_id_shader:get_buffer_format("particle_buffer"),
+        self._debug_run_shader:get_buffer_format("particle_buffer_b"),
         self._n_particles,
         buffer_usage
     )
 
     self._initialize_particle_buffer = function(self)
         local particles = {}
-        local x, y, width, height = 0, 0, love.graphics.getDimensions()
+        local x, y, width, height = 0, 0, self._area_w, self._area_h
         local radius = self._particle_radius
         local padding = 10
         local max_velocity = 10
@@ -88,7 +88,9 @@ function rt.FluidSimulation:realize()
             table.insert(particles, {
                 px, py, -- position
                 vx, vy, -- velocity
-                cell_i  -- cell_id
+                cell_i,  -- cell_id,
+                0,
+                0
             })
         end
 
@@ -97,151 +99,79 @@ function rt.FluidSimulation:realize()
     end
     self:_initialize_particle_buffer()
 
-    -- for each particle, update cell id
-
-    for name_value in range(
-        {"particle_buffer", self._particle_buffer_a},
-        {"n_particles", self._n_particles},
-        {"n_rows", self._n_rows},
-        {"n_columns", self._n_columns},
-        {"cell_width", self._cell_width},
-        {"cell_height", self._cell_height}
-    ) do
-        self._update_particle_cell_id_shader:send(table.unpack(name_value))
-    end
-
-    self._update_particle_cell_id = function(self)
-        self._update_particle_cell_id_shader:dispatch(1, 1)
-    end
-
-    -- split particle range in n groups, for each group, accumulate local counts
-
-    local n_thread_groups = 16
-    local n_per_thread_group = math.ceil(self._n_particles / n_thread_groups)
-    local n_different_cell_ids = self._n_rows * self._n_columns
-
-    self._sort_local_counts_texture = love.graphics.newCanvas(
-        n_different_cell_ids, n_thread_groups, {
-            format = rt.TextureFormat.R32UI,
-            computewrite = true
-        }
-    )
-
-    self._sort_accumulate_local_counts_shader = rt.ComputeShader("blood_sort_accumulate_local_counts.glsl")
-
-    for name_value in range(
-        {"particle_buffer", self._particle_buffer_a},
-        {"local_counts_texture", self._sort_local_counts_texture},
-        {"n_particles", self._n_particles}
-    ) do
-        self._sort_accumulate_local_counts_shader:send(table.unpack(name_value))
-    end
-
-    self._sort_accumulate_local_counts = function(self)
-        -- reset texture to 0 with draw
-        love.graphics.setCanvas(self._sort_local_counts_texture)
-        love.graphics.clear(0, 0, 0, 0)
-        love.graphics.setCanvas(nil)
-
-        self._sort_accumulate_local_counts_shader:dispatch(n_thread_groups, 1)
-    end
-
-    -- merge local counts
-
-    self._sort_merge_local_counts_shader = rt.ComputeShader("blood_sort_merge_local_counts.glsl")
-
     self._cell_occupations_buffer = love.graphics.newBuffer(
-        self._sort_merge_local_counts_shader:get_buffer_format("cell_occupations_buffer"),
+        self._debug_run_shader:get_buffer_format("cell_occupations_buffer"),
         self._n_rows * self._n_columns,
         buffer_usage
     )
 
     self._sort_global_counts_buffer = love.graphics.newBuffer(
-        self._sort_merge_local_counts_shader:get_buffer_format("global_counts_buffer"),
-        n_different_cell_ids,
+        self._debug_run_shader:get_buffer_format("global_counts_buffer"),
+        self._n_rows * self._n_columns,
         buffer_usage
     )
-
-    for name_value in range(
-        {"global_counts_buffer", self._sort_global_counts_buffer},
-        {"cell_occupations_buffer", self._cell_occupations_buffer},
-        {"n_rows", self._n_rows},
-        {"n_columns", self._n_columns},
-        {"local_counts_texture", self._sort_local_counts_texture}
-    ) do
-        self._sort_merge_local_counts_shader:send(table.unpack(name_value))
-    end
-
-    local merge_local_counts_dispatch_size = math.ceil(math.sqrt(self._n_rows * self._n_columns))
-    self._sort_merge_local_counts = function(self)
-        self._sort_merge_local_counts_shader:dispatch(1, 1)
-    end
-
-    -- compute prefix sum
-
-    self._sort_compute_prefix_sum_shader = rt.ComputeShader("blood_sort_compute_prefix_sum.glsl", {
-    })
-
-    for name_value in range(
-        {"global_counts_buffer", self._sort_global_counts_buffer},
-        {"n_rows", self._n_rows},
-        {"n_columns", self._n_columns}
-    ) do
-        self._sort_compute_prefix_sum_shader:send(table.unpack(name_value))
-    end
-
-    self._sort_compute_prefix_sum = function(self)
-        self._sort_compute_prefix_sum_shader:dispatch(1, 1)
-    end
-
-    -- scatter particles
-
-    self._sort_scatter_particles_shader = rt.ComputeShader("blood_sort_scatter_particles.glsl", {
-    })
 
     self._is_sorted_buffer = love.graphics.newBuffer({
         {name = "is_sorted", format = "uint32"}
     }, 1, buffer_usage)
 
-    for name_value in range(
-        {"global_counts_buffer", self._sort_global_counts_buffer},
-        {"particle_buffer_in", self._particle_buffer_a},
-        {"particle_buffer_out", self._particle_buffer_b},
-        {"n_rows", self._n_rows},
-        {"n_columns", self._n_columns},
-        {"n_particles", self._n_particles},
-        {"is_sorted_buffer", self._is_sorted_buffer}
-    ) do
-        self._sort_scatter_particles_shader:send(table.unpack(name_value))
+    -- density kernel
+
+    local density_kernel_resolution = 50
+    self._density_kernel_texture = love.graphics.newCanvas(density_kernel_resolution, density_kernel_resolution, {
+        format = rt.TextureFormat.R32F,
+        computewrite = true
+    }) -- r: density
+
+    self._density_kernel_init_shader = rt.Shader("blood_density_kernel_init.glsl")
+
+    love.graphics.setCanvas(self._density_kernel_texture)
+    love.graphics.setShader(self._density_kernel_init_shader._native)
+    love.graphics.push()
+    love.graphics.origin()
+    love.graphics.rectangle("fill", 0, 0, density_kernel_resolution, density_kernel_resolution)
+    love.graphics.pop()
+    love.graphics.setShader(nil)
+    love.graphics.setCanvas(nil)
+
+    self._density_kernel_mesh = rt.VertexRectangle(
+        -self._particle_radius,
+        -self._particle_radius,
+        2 * self._particle_radius,
+        2 * self._particle_radius
+    )
+    self._density_kernel_mesh:set_texture(self._density_kernel_texture)
+
+    -- density
+
+    self._density_texture = love.graphics.newCanvas(self._area_w, self._area_h, {
+        format = rt.TextureFormat.RGBA32F,
+        computewrite = true
+    }) -- r: density, gb: directional derivative
+
+    self._density_kernel_draw_shader = rt.Shader("blood_density_kernel_draw.glsl")
+    self._density_kernel_draw_shader:send("particle_buffer", self._particle_buffer_a)
+    self._density_kernel_draw_shader:send("density_texture", self._density_texture)
+
+    self._density_compute_derivative_shader = rt.ComputeShader("blood_density_compute_derivative.glsl")
+    self._density_compute_derivative_shader:send("density_texture", self._density_texture)
+    self._density_texture_w = self._area_w
+    self._density_texture_h = self._area_h
+
+    self._update_density_texture = function(self)
+        love.graphics.setBlendMode("add")
+        love.graphics.setCanvas(self._density_texture)
+        love.graphics.clear(0, 0, 0, 1)
+        love.graphics.setShader(self._density_kernel_draw_shader._native)
+        self._density_kernel_mesh:draw_instanced(self._n_particles)
+        love.graphics.setShader()
+        love.graphics.setCanvas()
+        love.graphics.setBlendMode("alpha")
+
+        self._density_compute_derivative_shader:dispatch( self._density_texture_w, self._density_texture_h)
     end
 
-    self._sort_scatter_particles = function(self)
-        self._sort_scatter_particles_shader:dispatch(1, 1)
-    end
-
-    self._verify_is_sorted = function(self)
-        local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
-        dbg("is_sorted", data:getUInt32(0))
-    end
-
-    -- step
-
-    self._step_simulation_shader = rt.ComputeShader("blood_step_simulation.glsl")
-
-    for name_value in range(
-        {"particle_buffer_in", self._particle_buffer_b},
-        {"particle_buffer_out", self._particle_buffer_a},
-        {"n_particles", self._n_particles},
-        {"particle_radius", self._particle_radius},
-        {"bounds", {0, 0, love.graphics.getDimensions()}}
-    ) do
-        self._step_simulation_shader:send(table.unpack(name_value))
-    end
-
-    self._step_simulation = function(self, delta)
-        self._step_simulation_shader:send("delta", delta)
-        self._step_simulation_shader:dispatch(1, 1)
-    end
+    self._debug_draw_density_shader = rt.Shader("blood_debug_draw_density.glsl")
 
     -- draw spatial hash
 
@@ -250,7 +180,6 @@ function rt.FluidSimulation:realize()
     for name_value in range(
         {"cell_occupation_buffer", self._cell_occupations_buffer},
         {"n_rows", self._n_rows},
-        --{"n_columns", self._n_columns},
         {"cell_width", self._cell_width},
         {"cell_height", self._cell_height}
     ) do
@@ -271,8 +200,6 @@ function rt.FluidSimulation:realize()
     for name_value in range(
         {"particle_buffer", self._particle_buffer_a},
         {"n_particles", self._n_particles},
-        --{"n_columns", self._n_columns},
-        --{"n_rows", self._n_columns},
         {"particle_radius", self._particle_radius}
     ) do
         self._debug_draw_particles_shader:send(table.unpack(name_value))
@@ -287,11 +214,9 @@ function rt.FluidSimulation:realize()
 
     -- debug
 
-    self._debug_run_shader = rt.ComputeShader("blood_debug_run.glsl")
-
     for name_value in range(
-        {"particle_buffer_in", self._particle_buffer_a},
-        {"particle_buffer_out", self._particle_buffer_b},
+        {"particle_buffer_a", self._particle_buffer_a},
+        {"particle_buffer_b", self._particle_buffer_b},
         {"cell_occupations_buffer", self._cell_occupations_buffer},
         {"global_counts_buffer", self._sort_global_counts_buffer},
         {"n_particles", self._n_particles},
@@ -314,26 +239,23 @@ end
 
 --- @override
 function rt.FluidSimulation:update(delta)
-    --[[
-    self:_update_particle_cell_id()
-
-    self:_sort_accumulate_local_counts()
-    self:_sort_merge_local_counts()
-    self:_sort_compute_prefix_sum()
-    self:_sort_scatter_particles()
-    self:_verify_is_sorted()
-
-    self:_step_simulation(delta)
-    ]]--
 
     self:_run_debug(delta)
-    self:_verify_is_sorted()
+    self:_update_density_texture()
+
+    local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
+    dbg("is_sorted", data:getUInt32(0))
 end
 
 --- @override
 function rt.FluidSimulation:draw()
     self:_debug_draw_spatial_hash()
     self:_debug_draw_particles()
+
+    self._debug_draw_density_shader:bind()
+    love.graphics.draw(self._density_texture)
+    self._debug_draw_density_shader:unbind()
+
 end
 
 local sim = nil

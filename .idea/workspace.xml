@@ -22,17 +22,24 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored blood">
-      <change afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/blood_copy.hlsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/blood_density_kernel_init.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_step_simulation.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step_simulation.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/blood_render_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_render_spatial_hash.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_accumulate_local_counts.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_compute_prefix_sum.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_merge_local_counts.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_sort_scatter_particles.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_step_simulation.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_update_particle_cell_id.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/blood_render_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_render_density_kernel.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -678,15 +685,7 @@
       <workItem from="1736868766647" duration="14492000" />
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
-      <workItem from="1736975567452" duration="44703000" />
-    </task>
-    <task id="LOCAL-01376" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1735592612105</created>
-      <option name="number" value="01376" />
-      <option name="presentableId" value="LOCAL-01376" />
-      <option name="project" value="LOCAL" />
-      <updated>1735592612105</updated>
+      <workItem from="1736975567452" duration="49868000" />
     </task>
     <task id="LOCAL-01377" summary="optimized radix sort to be parallell in all passes">
       <option name="closed" value="true" />
@@ -1072,7 +1071,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737150637974</updated>
     </task>
-    <option name="localTasksCounter" value="1425" />
+    <task id="LOCAL-01425" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1737157370465</created>
+      <option name="number" value="01425" />
+      <option name="presentableId" value="LOCAL-01425" />
+      <option name="project" value="LOCAL" />
+      <updated>1737157370465</updated>
+    </task>
+    <option name="localTasksCounter" value="1426" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1148,10 +1155,10 @@
     <MESSAGE value="stashing before refactoring battle scene" />
     <MESSAGE value="refactored battle scene" />
     <MESSAGE value="added sdf aura shader" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="sdf aura done" />
     <MESSAGE value="refactored blood" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored blood" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

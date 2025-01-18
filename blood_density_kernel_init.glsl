@@ -27,8 +27,8 @@ float alt_kernel_peak() {
     return exp(h) / sinh(h);
 }
 
-vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position) {
-    float value = alt_kernel(distance(texture_coords, vec2(0.5))); // aspect ratio is 1:1
+vec4 effect(vec4 vertex_color, Image texture, vec2, vec2 vertex_position) {
+    float value = alt_kernel(distance(vertex_position / love_ScreenSize.xy, vec2(0.5))) / alt_kernel_peak(); // aspect ratio is 1:1
     return vec4(value);
 }
 

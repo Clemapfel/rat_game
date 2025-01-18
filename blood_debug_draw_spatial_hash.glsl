@@ -1,9 +1,8 @@
 #pragma language glsl4
 
 struct CellOccupation {
-    uint start_index; // start particle i
-    uint end_index;   // end particle i
-    uint n_particles;
+    uint start_i;
+    uint end_i;
 };
 
 layout(std430) readonly buffer cell_occupation_buffer {
@@ -25,7 +24,7 @@ uint position_to_cell_linear_index(vec2 position) {
 
 vec4 effect(vec4, Image, vec2, vec2 frag_position) {
     CellOccupation occupation = cell_occupations[position_to_cell_linear_index(frag_position)];
-    return vec4(1, 0, 1, float(occupation.n_particles) / 3.0);
+    return vec4(1, 0, 1, float(occupation.end_i - occupation.start_i) / 3.0);
 }
 
 #endif
