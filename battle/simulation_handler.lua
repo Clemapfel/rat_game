@@ -479,7 +479,7 @@ function bt.BattleScene:create_simulation_environment()
 
     local _current_move_user_stack = {} -- Table<Union<Nil, EntityProxy>>
     local _push_current_move_user = function(entity_proxy)
-        if entity_proxy ~= nil then bt.assert_is_entity_proxy(entity_proxy) end
+        if entity_proxy ~= nil then bt.assert_is_entity_proxy("_push_current_move_user", entity_proxy, 1) end
         table.insert(_current_move_user_stack, 1, entity_proxy)
     end
 
@@ -858,7 +858,8 @@ function bt.BattleScene:create_simulation_environment()
         "is_intrinsic",
         "can_target_multiple",
         "can_target_self",
-        "can_target_ally"
+        "can_target_ally",
+        "can_target_enemy"
     ) do
         local name = "get_move_" .. which
         --- @brief get_move_priority, get_move_is_intrinsict, get_move_can_target_multiple, get_move_can_target_ally
@@ -1859,7 +1860,7 @@ function bt.BattleScene:create_simulation_environment()
             local sprite = _scene:get_sprite(entity)
             sprite:set_hp(0)
 
-            for status_proxy in values(env.list_statuses(entity)) do
+            for status_proxy in values(env.list_statuses(entity_proxy)) do
                 sprite:remove_status(_get_native(status_proxy))
             end
 
@@ -1871,7 +1872,6 @@ function bt.BattleScene:create_simulation_environment()
         end)
 
         _queue_animation(animation)
-
         _new_animation_node()
 
         for status_proxy in values(env.list_statuses(entity_proxy)) do
@@ -2707,26 +2707,25 @@ function bt.BattleScene:create_simulation_environment()
         local target_proxies = {...}
 
         -- assert valid targets
-        if select("#", ...) > 1 and not env.get_can_target_multiple(move_proxy) then
+        if select("#", ...) > 1 and not env.get_move_can_target_multiple(move_proxy) then
             bt.error_function("In use_move: move `" .. env.get_id(move_proxy) .. "` used by `" .. env.get_id(user_proxy) .. "` targets multiple, even though `can_target_multiple` is false")
             return
         end
 
         for target in values(target_proxies) do
             bt.assert_args("use_move", target, bt.EntityProxy)
-            table.insert(target_proxies, target)
 
-            if env.get_is_enemy(target) ~= env.get_is_enemy(user_proxy) and not env.get_can_target_enemies(move_proxy) then
+            if env.get_is_enemy(target) ~= env.get_is_enemy(user_proxy) and not env.get_move_can_target_enemy(move_proxy) then
                 bt.error_function("In use_move: move `" .. env.get_id(move_proxy) .. "` used by `" .. env.get_id(user_proxy) .. "` targets enemy, even though `can_target_enemy` is false")
                 return
             end
 
-            if env.get_is_enemy(target) == env.get_is_enemy(user_proxy) and not env.get_can_target_allies(move_proxy)then
+            if env.get_is_enemy(target) == env.get_is_enemy(user_proxy) and not env.get_move_can_target_ally(move_proxy)then
                 bt.error_function("In use_move: move `" .. env.get_id(move_proxy) .. "` used by `" .. env.get_id(user_proxy) .. "` targets ally, even though `can_target_ally` is false")
                 return
             end
 
-            if target == user_proxy and not env.get_can_target_self(move_proxy) then
+            if target == user_proxy and not env.get_move_can_target_self(move_proxy) then
                 bt.error_function("In use_move: move `" .. env.get_id(move_proxy) .. "` used by `" .. env.get_id(user_proxy) .. "` targets self, even though `can_target_self` is false")
                 return
             end
@@ -2770,6 +2769,7 @@ function bt.BattleScene:create_simulation_environment()
             rt.Translation.battle.message.turn_start_f(_state:get_turn_i())
         )
         _queue_animation(animation)
+        _new_animation_node()
 
         local callback_id = "on_turn_start"
         local entity_proxies = env.list_entities()
@@ -2788,13 +2788,6 @@ function bt.BattleScene:create_simulation_environment()
         for global_status_proxy in values(env.list_global_statuses()) do
             _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxies)
         end
-
-        _new_animation_node()
-        animation = bt.Animation.DUMMY()
-        animation:signal_connect("finish", function()
-            _scene:start_move_selection()
-        end)
-        _queue_animation(animation)
     end
 
     env.end_turn = function()
@@ -2854,7 +2847,6 @@ function bt.BattleScene:create_simulation_environment()
                         status,
                         max - current
                     })
-
                 end
             end
         end
@@ -2889,12 +2881,14 @@ function bt.BattleScene:create_simulation_environment()
             end
 
             for entity, t in pairs(entity_to_status_n_left) do
-                local sprite = _scene:get_sprite(entity)
-                sprite:set_global_status_n_turns_left(t[1], t[2])
+                for to_remove in values(t) do
+                    local sprite = _scene:get_sprite(entity)
+                    sprite:set_status_n_turns_left(to_remove[1], to_remove[2])
+                end
             end
 
             for global_status, n_left in pairs(global_status_n_left) do
-                _scene:set_global_status_n_turns_left(n_left)
+                _scene:set_global_status_n_turns_left(global_status, n_left)
             end
 
             _scene:set_priority_order(_state:list_entities_in_order())
@@ -2918,7 +2912,7 @@ function bt.BattleScene:create_simulation_environment()
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy)
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, entity_proxies)
         end
 
         -- expire statuses

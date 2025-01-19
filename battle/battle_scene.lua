@@ -306,11 +306,10 @@ function bt.BattleScene:size_allocate(x, y, width, height)
     if self._is_first_size_allocate then
         -- TODO
         self._env.start_battle("DEBUG_BATTLE")
-        self._env.quicksave()
-        self._env.start_turn()
+        --self._env.quicksave()
         self._env.knock_out(self._env.get_entity_from_id("MC"))
-
         self:skip_all()
+        self:start_move_selection()
         self._is_first_size_allocate = false
     end
 end
@@ -705,6 +704,12 @@ end
 --- @brief
 function bt.BattleScene:set_priority_order(entities)
     self._priority_queue:reorder(entities)
+    for entity in values(entities) do
+        local state = self._state:entity_get_state(entity)
+        if state ~= bt.EntityState.ALIVE then
+            self._priority_queue:set_state(entity, state)
+        end
+    end
 end
 
 --- @brief
@@ -754,7 +759,6 @@ function bt.BattleScene:skip()
         self._priority_queue,
         self._global_status_bar,
         self._animation_queue,
-        self._game_over_screen,
         self._text_box
     ) do
         to_skip:skip()
@@ -815,6 +819,7 @@ function bt.BattleScene:set_scene_state(next)
     elseif current == bt.SceneState.TARGET_SELECTION then
         self._target_selection_selection_graph:get_current_node():signal_emit("exit")
     elseif current == bt.SceneState.SIMULATION then
+        self:skip_all()
     end
 
     -- reset ui
@@ -1042,7 +1047,16 @@ function bt.BattleScene:_create_move_selection_slots(entity)
 
     local on_enter = function(self)
         self.slots:set_slot_selection_state(self.slot_i, rt.SelectionState.ACTIVE)
-        scene._verbose_info:show(self:get_move())
+
+        local state_info = nil
+        if scene._state:entity_get_state(self.entity) == bt.EntityState.KNOCKED_OUT then
+            state_info = rt.VerboseInfoObject.MOVE_SELECTION_KNOCKED_OUT
+        elseif scene._state:entity_get_is_stunned(self.entity) == true then
+            state_info = rt.VerboseInfoObject.MOVE_SELECTION_STUNNED
+        end
+
+        scene._verbose_info:show(self:get_move(), state_info)
+
         _update_priority_queue_selection(self.entity, self:get_move())
     end
 
@@ -1726,6 +1740,8 @@ function bt.BattleScene:_update_move_selection(entity, move)
     self._entity_id_to_move_selection[entity:get_id()].move = move
     self._priority_queue:set_move_selection(entity, move)
 
+    if self._state:entity_get_is_enemy(entity) == true then return end
+
     local sprite = self:get_sprite(entity)
     if sprite ~= nil then
         sprite:set_move_selection(move)
@@ -1863,6 +1879,19 @@ function bt.BattleScene:start_move_selection()
                 slot_i = slot_i + 1
             end
         end
+
+        local palette = mn.SlotPalette.DEFAULT
+        if self._state:entity_get_state(entity) == bt.EntityState.KNOCKED_OUT then
+            palette = mn.SlotPalette.KNOCKED_OUT
+        elseif self._state:entity_get_is_stunned(entity) == true then
+            palette = mn.SlotPalette.STUNNED
+        end
+
+        current.moves:set_palette(palette)
+        current.intrinsics:set_palette(palette)
+
+        current.moves:set_selection_state(rt.SelectionState.INACTIVE)
+        current.intrinsics:set_selection_state(rt.SelectionState.INACTIVE)
     end
 
     self:_set_move_selection_i(1)
@@ -1904,6 +1933,35 @@ function bt.BattleScene:_next_move_selection()
 end
 
 --- @brief
+function bt.BattleScene:_start_simulation()
+    self:set_scene_state(bt.SceneState.SIMULATION)
+    self._env.start_turn()
+
+    local order = self._state:list_entities_in_order()
+    for entity in values(order) do
+        local selection = self._entity_id_to_move_selection[entity:get_id()]
+        assert(selection ~= nil)
+        local user_proxy = bt.create_entity_proxy(self, selection.user)
+        local move_proxy = bt.create_move_proxy(self, selection.move)
+        local target_proxies = {}
+        for target in values(selection.targets) do
+            table.insert(target_proxies, bt.create_entity_proxy(self, target))
+        end
+
+        self._env.use_move(user_proxy, move_proxy, table.unpack(target_proxies))
+    end
+    self._env.end_turn()
+
+    -- queue end of turn after sim is done
+    local dummy = bt.Animation.DUMMY(self)
+    dummy:signal_connect("finish", function()
+        dummy:signal_set_is_blocked("finish", true) -- prevent loop on skip during state transition
+        self:start_move_selection()
+    end)
+    self._animation_queue:push(dummy)
+end
+
+--- @brief
 function bt.BattleScene:_handle_button_released(which)
     self._text_box_scroll_delay_elapsed = 0
     self._text_box_scroll_tick_elapsed = 0
@@ -1936,7 +1994,15 @@ function bt.BattleScene:_handle_button_pressed(which)
         self._inspect_selection_graph:handle_button(which)
 
     elseif state == bt.SceneState.MOVE_SELECTION then
-        if which == rt.InputButton.Y then
+        if which == rt.InputButton.B then
+            local i = self._move_selection_i
+            if i > 1 then
+                -- undo last move selection
+                self:_set_move_selection_i(i - 1)
+                local current_entity = self._move_selection_order[self._move_selection_i]
+                self:_update_move_selection(current_entity, nil)
+            end
+        elseif which == rt.InputButton.Y then
             self:set_scene_state(bt.SceneState.INSPECT)
         elseif which == rt.InputButton.L then
             local i = self._move_selection_i

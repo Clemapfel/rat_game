@@ -150,13 +150,13 @@ end
 
 --- @brief
 function bt.EntitySprite:set_sprite_state(state)
-    meta.assert_enum(state, bt.EntitySpriteState)
+    meta.assert_enum_value(state, bt.EntitySpriteState)
 
     if self._sprite:has_animation(state) then
         self._sprite:set_animation(state)
     else
         rt.warning("In bt.EntitySprite.set_sprite_state: sprite `" .. self._sprite:get_id() .. "` does not have animation with id \"idle\"")
-        self._sprite:set_animation(bt.EntitySpriteState.IDLE)
+        --self._sprite:set_animation(bt.EntitySpriteState.IDLE)
     end
 end
 

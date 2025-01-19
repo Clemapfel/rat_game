@@ -456,7 +456,7 @@ function string.concat(delimiter, ...)
     local out = ""
     local n = select("#", ...)
     for i = 1, n do
-        out = out .. select(i, ...)
+        out = out .. tostring(select(i, ...))
         if i < n then
             out = out .. delimiter
         end

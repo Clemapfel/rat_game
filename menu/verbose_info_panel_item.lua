@@ -1391,6 +1391,9 @@ function mn.VerboseInfoPanel.Item:create_from_quicksave(enum)
     return self
 end
 
+local _titles = nil
+local _descriptions = nil
+
 --- @brief party info
 function mn.VerboseInfoPanel.Item:create_from_enum(which)
     self.object = nil
@@ -1415,69 +1418,79 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
     end
 
     local translation = rt.Translation.verbose_info.objects
-    local titles = {
-        [rt.VerboseInfoObject.HP] = format_title(translation.hp_title),
-        [rt.VerboseInfoObject.ATTACK] = format_title(translation.attack_title),
-        [rt.VerboseInfoObject.DEFENSE] = format_title(translation.defense_title),
-        [rt.VerboseInfoObject.SPEED] = format_title(translation.speed_title),
+    if _titles == nil then
+        _titles = {
+            [rt.VerboseInfoObject.HP] = format_title(translation.hp_title),
+            [rt.VerboseInfoObject.ATTACK] = format_title(translation.attack_title),
+            [rt.VerboseInfoObject.DEFENSE] = format_title(translation.defense_title),
+            [rt.VerboseInfoObject.SPEED] = format_title(translation.speed_title),
 
-        [rt.VerboseInfoObject.CONSUMABLE] = format_title(translation.consumables_title),
-        [rt.VerboseInfoObject.EQUIP] = format_title(translation.equips_title),
-        [rt.VerboseInfoObject.MOVE] = format_title(translation.moves_title),
-        [rt.VerboseInfoObject.TEMPLATE] = format_title(translation.templates_title),
+            [rt.VerboseInfoObject.CONSUMABLE] = format_title(translation.consumables_title),
+            [rt.VerboseInfoObject.EQUIP] = format_title(translation.equips_title),
+            [rt.VerboseInfoObject.MOVE] = format_title(translation.moves_title),
+            [rt.VerboseInfoObject.TEMPLATE] = format_title(translation.templates_title),
 
-        [rt.VerboseInfoObject.OPTIONS] = format_title(translation.options_title),
-        [rt.VerboseInfoObject.VSYNC] = format_title(translation.vsync_title),
-        [rt.VerboseInfoObject.TEXT_SPEED] = format_title(translation.text_speed_title),
-        [rt.VerboseInfoObject.FULLSCREEN] = format_title(translation.fullscreen_title),
-        [rt.VerboseInfoObject.RESOLUTION] = format_title(translation.resolution_title),
-        [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title(translation.sound_effects_title),
-        [rt.VerboseInfoObject.MUSIC] = format_title(translation.music_title),
+            [rt.VerboseInfoObject.OPTIONS] = format_title(translation.options_title),
+            [rt.VerboseInfoObject.VSYNC] = format_title(translation.vsync_title),
+            [rt.VerboseInfoObject.TEXT_SPEED] = format_title(translation.text_speed_title),
+            [rt.VerboseInfoObject.FULLSCREEN] = format_title(translation.fullscreen_title),
+            [rt.VerboseInfoObject.RESOLUTION] = format_title(translation.resolution_title),
+            [rt.VerboseInfoObject.SOUND_EFFECTS] = format_title(translation.sound_effects_title),
+            [rt.VerboseInfoObject.MUSIC] = format_title(translation.music_title),
 
-        [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title(translation.visual_effects_title),
-        [rt.VerboseInfoObject.MSAA] = format_title(translation.msaa_title),
-        [rt.VerboseInfoObject.DEADZONE] = format_title(translation.deadzone_title),
-        [rt.VerboseInfoObject.KEYMAP] = format_title(translation.keymap_title),
-        [rt.VerboseInfoObject.BATTLE_LOG] = format_title(translation.battle_log_title)
-    }
+            [rt.VerboseInfoObject.VISUAL_EFFECTS] = format_title(translation.visual_effects_title),
+            [rt.VerboseInfoObject.MSAA] = format_title(translation.msaa_title),
+            [rt.VerboseInfoObject.DEADZONE] = format_title(translation.deadzone_title),
+            [rt.VerboseInfoObject.KEYMAP] = format_title(translation.keymap_title),
+            [rt.VerboseInfoObject.BATTLE_LOG] = format_title(translation.battle_log_title),
 
-    local descriptions = {
-        [rt.VerboseInfoObject.HP] = translation.hp_description,
-        [rt.VerboseInfoObject.ATTACK] = translation.attack_description,
-        [rt.VerboseInfoObject.DEFENSE] = translation.defense_description,
-        [rt.VerboseInfoObject.SPEED] = translation.speed_description,
+            [rt.VerboseInfoObject.MOVE_SELECTION_KNOCKED_OUT] = format_title(translation.move_selection_knocked_out_title),
+            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = format_title(translation.move_selection_stunned_title)
+        }
+    end
 
-        [rt.VerboseInfoObject.CONSUMABLE] = translation.consumables_description,
-        [rt.VerboseInfoObject.EQUIP] = translation.equips_description,
-        [rt.VerboseInfoObject.MOVE] = translation.moves_description,
-        [rt.VerboseInfoObject.TEMPLATE] = translation.templates_description,
+    if _descriptions == nil then
+        _descriptions = {
+            [rt.VerboseInfoObject.HP] = translation.hp_description,
+            [rt.VerboseInfoObject.ATTACK] = translation.attack_description,
+            [rt.VerboseInfoObject.DEFENSE] = translation.defense_description,
+            [rt.VerboseInfoObject.SPEED] = translation.speed_description,
 
-        [rt.VerboseInfoObject.OPTIONS] = translation.options_description,
+            [rt.VerboseInfoObject.CONSUMABLE] = translation.consumables_description,
+            [rt.VerboseInfoObject.EQUIP] = translation.equips_description,
+            [rt.VerboseInfoObject.MOVE] = translation.moves_description,
+            [rt.VerboseInfoObject.TEMPLATE] = translation.templates_description,
 
-        [rt.VerboseInfoObject.VSYNC] = translation.vsync_description,
-        [rt.VerboseInfoObject.MSAA] = translation.msaa_description,
-        [rt.VerboseInfoObject.TEXT_SPEED] = translation.text_speed_description,
-        [rt.VerboseInfoObject.FULLSCREEN] = translation.fullscreen_description,
-        [rt.VerboseInfoObject.RESOLUTION] = translation.resolution_description,
-        [rt.VerboseInfoObject.SOUND_EFFECTS] = translation.sound_effects_description,
-        [rt.VerboseInfoObject.MUSIC] = translation.music_description,
+            [rt.VerboseInfoObject.OPTIONS] = translation.options_description,
 
-        [rt.VerboseInfoObject.VISUAL_EFFECTS] = translation.visual_effects_description,
+            [rt.VerboseInfoObject.VSYNC] = translation.vsync_description,
+            [rt.VerboseInfoObject.MSAA] = translation.msaa_description,
+            [rt.VerboseInfoObject.TEXT_SPEED] = translation.text_speed_description,
+            [rt.VerboseInfoObject.FULLSCREEN] = translation.fullscreen_description,
+            [rt.VerboseInfoObject.RESOLUTION] = translation.resolution_description,
+            [rt.VerboseInfoObject.SOUND_EFFECTS] = translation.sound_effects_description,
+            [rt.VerboseInfoObject.MUSIC] = translation.music_description,
 
-        [rt.VerboseInfoObject.DEADZONE] = translation.deadzone_description,
-        [rt.VerboseInfoObject.KEYMAP] = translation.keymap_description,
-        [rt.VerboseInfoObject.BATTLE_LOG] = translation.battle_log_description
-    }
+            [rt.VerboseInfoObject.VISUAL_EFFECTS] = translation.visual_effects_description,
+
+            [rt.VerboseInfoObject.DEADZONE] = translation.deadzone_description,
+            [rt.VerboseInfoObject.KEYMAP] = translation.keymap_description,
+            [rt.VerboseInfoObject.BATTLE_LOG] = translation.battle_log_description,
+
+            [rt.VerboseInfoObject.MOVE_SELECTION_KNOCKED_OUT] = translation.move_selection_knocked_out_description,
+            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = translation.move_selection_stunned_description
+        }
+    end
 
     self.realize = function()
         self._is_realized = true
         self.frame:realize()
 
-        self.title_label = rt.Label(titles[which])
+        self.title_label = rt.Label(_titles[which])
         self.title_label:realize()
         self.title_label:set_justify_mode(rt.JustifyMode.LEFT)
 
-        self.description_label = self._description(descriptions[which])
+        self.description_label = self._description(_descriptions[which])
 
         self.content = {
             self.title_label,

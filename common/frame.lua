@@ -11,7 +11,10 @@ rt.settings.frame = {
             mix(a.b, b.b, weight),
             math.max(a.a, b.a)
         )
-    end)()
+    end)(),
+
+    knocked_out_base_color = rt.Palette.RED_8,
+    dead_base_color = rt.Palette.BLACK,
 }
 
 --- @class rt.Frame

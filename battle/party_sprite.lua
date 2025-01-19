@@ -197,3 +197,20 @@ function bt.PartySprite:set_move_selection(move)
         sprite_w, sprite_h
     )
 end
+
+--- @override
+function bt.PartySprite:set_sprite_state(state)
+    meta.assert_enum_value(state, bt.EntitySpriteState)
+
+    if self._sprite:has_animation(state) then
+        self._sprite:set_animation(state)
+    else
+        rt.warning("In bt.EntitySprite.set_sprite_state: sprite `" .. self._sprite:get_id() .. "` does not have animation with id \"idle\"")
+    end
+
+    if state == bt.EntitySpriteState.KNOCKED_OUT then
+        self._frame:set_base_color(rt.settings.frame.knocked_out_base_color)
+    elseif state == bt.EntitySpriteState.DEAD then
+        self._frame:set_base_color(rt.settings.frame.dead_base_color)
+    end
+end

@@ -13,6 +13,13 @@ mn.SlotType = meta.new_enum("SlotType", {
     INTRINSIC = "INTRINSIC"
 })
 
+mn.SlotPalette = meta.new_enum("SlotState", {
+    DEFAULT = "DEFAULT",
+    KNOCKED_OUT = "KNOCKED_OUT",
+    STUNNED = "STUNNED",
+    DEAD = "DEAD"
+})
+
 --- @class mn.Slots
 --- @param layout List<List<mn.SlotType>>
 mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
@@ -31,9 +38,37 @@ mn.Slots = meta.new_type("MenuSlots", rt.Widget, function(layout)
         _snapshot_x = 0,
         _snapshot_y = 0,
         _slot_x = 0,
-        _slot_y = 0
+        _slot_y = 0,
+
+        _palette = mn.SlotPalette.DEFAULT
     })
 end)
+
+local _palette_mapping = {
+    frame_base = {
+        [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_9,
+        [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_10,
+        [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_10
+    },
+
+    frame = {
+        [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_5,
+        [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_4,
+        [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_4
+    },
+
+    base = {
+        [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_7,
+        [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_8,
+        [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_8
+    },
+
+    base_inlay = {
+        [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_9,
+        [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_9,
+        [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_10
+    }
+}
 
 --- @override
 function mn.Slots:realize()
@@ -108,15 +143,10 @@ function mn.Slots:realize()
             to_insert.sprite = nil
             to_insert.type = type
 
-            local base_color = rt.Palette.GRAY_7
-            to_insert.base:set_color(base_color)
-            to_insert.base_inlay:set_color(rt.color_darken(base_color, 0.1))
-
             for frame in range(to_insert.frame, to_insert.frame_selected) do
                 frame:set_is_outline(true)
             end
 
-            to_insert.frame:set_color(rt.Palette.GRAY_5)
             to_insert.frame:set_line_width(rt.settings.menu.slots.frame_unselected_thickness)
             to_insert.frame_selected:set_color(rt.Palette.SELECTION)
             to_insert.frame_selected:set_line_width(rt.settings.menu.slots.frame_selected_thickness)
@@ -134,7 +164,28 @@ function mn.Slots:realize()
         end
     end
 
+    local palette = self._palette
+    self._palette = nil -- force update even though palette doesn't change
+    self:set_palette(palette)
     self._n_slots = slot_i - 1
+end
+
+--- @brief
+function mn.Slots:set_palette(palette)
+    meta.assert_enum_value(palette, mn.SlotPalette)
+
+    if self._palette == palette then return end
+
+    self._palette = palette
+    for item in values(self._slot_i_to_item) do
+        item.base:set_color(_palette_mapping.base[palette])
+        item.base_inlay:set_color(_palette_mapping.base_inlay[palette])
+        item.frame:set_color(_palette_mapping.frame[palette])
+    end
+
+    self._frame:set_color(_palette_mapping.frame[palette])
+    self._frame:set_base_color(_palette_mapping.frame_base[palette])
+    self:_update_snapshot()
 end
 
 --- @override

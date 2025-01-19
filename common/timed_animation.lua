@@ -166,7 +166,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
 
     SHELF = function(x, shelf_width, order)
         -- https://www.desmos.com/calculator/zxo1os3qen
-        if x >= 1 then return 1 elseif x <= 0 then return 0 end
+        if x >= 1 then return 0 elseif x <= 0 then return 0 end
         if shelf_width == nil then shelf_width = 0.5 end
         shelf_width = clamp(shelf_width, 0, 1)
         if order == nil then order = 6 end

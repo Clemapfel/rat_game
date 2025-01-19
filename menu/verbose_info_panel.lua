@@ -35,6 +35,8 @@ rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
     BATTLE_LOG = "battle_log",
     TEXT_SPEED = "text_speed",
     TEXT_SPEED_WIDGET = "text_speed_widget",
+    MOVE_SELECTION_KNOCKED_OUT = "move_selection_knocked_out",
+    MOVE_SELECTION_STUNNED = "move_selection_stunned"
 })
 
 --- @class mn.VerboseInfoPanel
@@ -113,6 +115,9 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     local down_x, down_y = x + 0.5 * width, y + height + thickness
     self._scroll_down_indicator:reformat(down_x, down_y, (2 * math.pi) - angle, arrow_width, thickness)
 
+    local item_m = 0
+    if self._frame_visible then item_m = m end
+
     local current_x, current_y = x, y
     local total_height = 0
     local n_items = sizeof(self._items)
@@ -125,9 +130,9 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
         item.height_above = total_height
         item.aabb = rt.AABB(current_x, current_y, width, h)
         total_height = total_height + h
-        current_y = current_y + h
+        current_y = current_y + h + item_m
 
-        self._total_height = self._total_height + h
+        self._total_height = self._total_height + h + item_m
     end
 
     local reverse_height = 0

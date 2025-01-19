@@ -147,7 +147,6 @@ do
                 end
             elseif animation._state == rt.AnimationState.STARTED then
                 local res = animation:update(delta)
-                --dbg(meta.typeof(animation))
                 if res == rt.AnimationResult.DISCONTINUE then
                     _finish_animation(animation)
                 else
@@ -158,7 +157,7 @@ do
             end
         end
 
-        if is_done then
+        if is_done and self._n_nodes > 0 then
             table.remove(self._nodes, 1)
             self._n_nodes = self._n_nodes - 1
             if self._n_nodes > 0 then
@@ -187,7 +186,7 @@ do
 
         table.remove(self._nodes, 1)
         self._n_nodes = self._n_nodes - 1
-        if self._n_nodes == 0 then self:signal_emit("emptied") end
+        if self._n_nodes <= 0 then self:signal_emit("emptied") end
     end
 
     --- @brief

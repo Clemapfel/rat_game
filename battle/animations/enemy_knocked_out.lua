@@ -39,6 +39,10 @@ end)
 function bt.Animation.ENEMY_KNOCKED_OUT:start()
     self._target = self._scene:get_sprite(self._entity)
 
+    self._message_id = self._scene:send_message(self._message, function()
+        self._message_done = true
+    end)
+
     self._fade_in_shape = rt.VertexRectangle(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     self._fade_in_shape:set_opacity(0)
     self._vignette_shader:send("value", 0)

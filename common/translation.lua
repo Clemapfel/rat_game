@@ -45,6 +45,8 @@ function rt.initialize_translation(x)
    return _make_immutable(x)
 end
 
+local MOVE_STACK_NAME = "PP"
+
 rt.Translation = rt.initialize_translation({
     -- mn.InventoryScene
     inventory_scene = {
@@ -232,7 +234,13 @@ rt.Translation = rt.initialize_translation({
 
             quicksave_title = "Quick Save",
             quicksave_description = "TODO",
-            quicksave_n_turns_passed_prefix_label = "# Turns"
+            quicksave_n_turns_passed_prefix_label = "# Turns",
+
+            move_selection_knocked_out_title = "Knocked Out",
+            move_selection_knocked_out_description = "A move may still be selected, but it will not be performed unless you are helped up, no " .. MOVE_STACK_NAME .. " will be consumed",
+
+            move_selection_stunned_title = "Stunned",
+            move_selection_stunned_description = "A move may still be selected, but it will not be performed, no " .. MOVE_STACK_NAME .. " will be performed"
         }
     },
 
