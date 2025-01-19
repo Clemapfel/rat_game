@@ -423,11 +423,12 @@ function bt.BattleScene:create_simulation_environment()
                     if metatable._type == type then
                         return
                     else
-                        bt.error_function("In assert_is_" .. name .. ": excpected `" .. type .. "`, got `" .. metatable._type .. "`")
+                        bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. ternary(metatable._type == nil, meta.typeof(x), metatable._type) .. "`")
+                        return
                     end
                 end
             end
-            bt.error_function("In assert_is_" .. name .. ": excpected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+            bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
         end
     end
 
@@ -2743,22 +2744,22 @@ function bt.BattleScene:create_simulation_environment()
         env.message(rt.Translation.battle.message.move_used_f)
 
         _push_current_move_user(user_proxy)
-        _invoke(move.effect, move, user_proxy, target_proxies)
+        _invoke(move.effect, move_proxy, user_proxy, target_proxies)
         _pop_current_move_user()
 
         _new_animation_node()
 
         local callback_id = "on_move_used"
         for status_proxy in values(env.list_statuses(user_proxy)) do
-            _try_invoke_status_callback(callback_id, status_proxy, user_proxy)
+            _try_invoke_status_callback(callback_id, status_proxy, user_proxy, move_proxy, target_proxies)
         end
 
         for consumable_proxy in values(env.list_consumables(user_proxy)) do
-            _try_invoke_consumable_callback(callback_id, consumable_proxy, user_proxy)
+            _try_invoke_consumable_callback(callback_id, consumable_proxy, user_proxy, move_proxy, target_proxies)
         end
 
         for global_status_proxy in values(env.list_global_statuses()) do
-            _try_invoke_global_status_callback(callback_id, global_status_proxy, user_proxy, target_proxies)
+            _try_invoke_global_status_callback(callback_id, global_status_proxy, user_proxy, move_proxy, target_proxies)
         end
     end
 
