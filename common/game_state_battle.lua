@@ -124,7 +124,10 @@ function rt.GameState:create_entity(config)
     end
 
     for id in values(config:list_intrinsic_move_ids()) do
-        table.insert(to_add.intrinsic_moves, id)
+        table.insert(to_add.intrinsic_moves, {
+            id = id,
+            storage = {}
+        })
     end
 
     table.insert(state.entities, to_add)
@@ -958,8 +961,8 @@ function rt.GameState:entity_list_intrinsic_moves(entity)
     end
 
     local out = {}
-    for move_id in values(entry.intrinsic_moves) do
-        table.insert(out, bt.MoveConfig(move_id))
+    for move_entry in values(entry.intrinsic_moves) do
+        table.insert(out, bt.MoveConfig(move_entry.id))
     end
 
     return out
@@ -1011,7 +1014,6 @@ end
 --- @brief
 function rt.GameState:entity_get_valid_targets_for_move(user, move)
     meta.assert_isa(user, bt.Entity)
-
     if move == nil then return {} end
     meta.assert_isa(move, bt.MoveConfig)
 
@@ -1019,72 +1021,50 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
     local can_target_self = move:get_can_target_self()
     local can_target_enemies = move:get_can_target_enemies()
     local can_target_allies = move:get_can_target_allies()
-    local target_override = can_target_self == false and can_target_enemies == false and can_target_allies == false
+    local can_target_multiple = move:get_can_target_multiple()
 
-    local out = {}
+    local out = ternary(can_target_multiple, {{}}, {}) -- multiple: one big table, single: each single in one table
     for entry in values(self._state.entities) do
         local config = bt.EntityConfig(entry.id)
-        if target_override or
-            ((entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity()) and can_target_self) or
-            (config:get_is_enemy() == is_enemy and can_target_allies) or
-            (config:get_is_enemy() ~= is_enemy and can_target_enemies)
+        local is_self = (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity())
+        if  (is_self and can_target_self) or
+            (not is_self and config:get_is_enemy() == is_enemy and can_target_allies) or
+            (not is_self and config:get_is_enemy() ~= is_enemy and can_target_enemies)
         then
-            table.insert(out, bt.Entity(config, entry.multiplicity))
+            if can_target_multiple then
+                table.insert(out[1], bt.Entity(config, entry.multiplicity))
+            else
+                table.insert(out, {bt.Entity(config, entry.multiplicity)})
+            end
+        end
+    end
+    return out
+end
+
+--- @brief
+function rt.GameState:entity_get_selectable_moves(entity)
+    local entry = self:_get_entity_entry(entity)
+    if entry == nil then
+        rt.error("In rt.GameState.entity_get_selectable_moves: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    local out = {}
+    for move_entry in values(entry.intrinsic_moves) do
+        table.insert(out, bt.MoveConfig(move_entry.id))
+    end
+
+    for move_entry in values(entry.moves) do
+        if move_entry.id ~= nil and move_entry.id ~= "" then
+            local config = bt.MoveConfig(move_entry.id)
+            if move_entry.is_disabled == false and move_entry.n_used < config:get_max_n_uses() then
+                table.insert(out, config)
+            end
         end
     end
 
     return out
 end
-
---- @brief
-function rt.GameState:entity_get_valid_targets_for_move(user, move)
-    meta.assert_isa(user, bt.Entity)
-    if move == nil then return {} end
-    meta.assert_isa(move, bt.MoveConfig)
-
-    if move:get_can_target_self() == false and move:get_can_target_allies() == false and move:get_can_target_enemies() == false then
-        return {} -- field
-    end
-
-    local can_target_self = move:get_can_target_self()
-    local can_target_party, can_target_enemies
-
-    if self:entity_get_is_enemy(user) == true then
-        can_target_party = move:get_can_target_enemies()
-        can_target_enemies = move:get_can_target_allies()
-    else
-        can_target_party = move:get_can_target_allies()
-        can_target_enemies = move:get_can_target_enemies()
-    end
-
-    if move:get_can_target_multiple() then
-        local targets = {}
-        for entry in values(self._state.entities) do
-
-            if entry.state ~= bt.EntityState.DEAD and
-                (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity() and can_target_self) or
-                (entry.is_enemy == true and can_target_enemies) or
-                (entry.is_enemy == false and can_target_party)
-            then
-                table.insert(targets, bt.Entity(bt.EntityConfig(entry.id), entry.multiplicity))
-            end
-        end
-        return {targets}
-    else
-        local out = {}
-        for entry in values(self._state.entities) do
-            if entry.state ~= bt.EntityState.DEAD and
-                (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity() and can_target_self) or
-                (entry.is_enemy == true and can_target_enemies) or
-                (entry.is_enemy == false and can_target_party)
-            then
-                table.insert(out, {bt.Entity(bt.EntityConfig(entry.id), entry.multiplicity)})
-            end
-        end
-        return out
-    end
-end
-
 
 --- @brief
 function rt.GameState:add_shared_object(object)

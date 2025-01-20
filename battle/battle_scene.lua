@@ -1507,7 +1507,8 @@ end
 function bt.BattleScene:_create_target_selection_graph()
     local user = self._move_selection_order[self._move_selection_i]
     local move = self._entity_id_to_move_selection[user:get_id()].move
-    if move == nil then self:set_scene_state(bt.SceneState.MOVE_SELECTION) end
+
+    dbg(user:get_id(), move:get_id())
 
     local scene = self
     local targets = self._state:entity_get_valid_targets_for_move(user, move)
