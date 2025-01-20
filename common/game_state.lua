@@ -304,14 +304,12 @@ function rt.GameState:run()
             if self._state.show_diagnostics == true then
                 local fps = love.timer.getFPS()
                 local frame_duration = 1 / 60
-                local update_percentage = tostring(math.floor(durations.max_update_duration / frame_duration * 100))
-                local draw_percentage = tostring(math.floor(durations.max_draw_duration / frame_duration * 100))
                 local total_percentage = tostring(math.floor(durations.max_total_duration / frame_duration * 100))
                 local n_draws = tostring(durations.max_n_draws)
                 local n_texture_switches = tostring(durations.max_n_texture_switches)
                 local gpu_side_memory = tostring(math.round(stats.texturememory / 1024 / 1024 * 10) / 10)
 
-                local label = tostring(fps) .. " fps | " .. durations.format(update_percentage) .. "% | " ..  durations.format(draw_percentage) .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " | " .. gpu_side_memory .. " mb (" .. stats.textures .. ")"
+                local label = tostring(fps) .. " fps | " .. total_percentage .. "% | " .. n_draws .. " (" .. n_batched_draws .. ")" .. " draws | " .. gpu_side_memory .. " mb (" .. stats.textures .. ")"
                 love.graphics.setColor(1, 1, 1, 0.75)
                 local margin = 3
                 local label_w, label_h = love.graphics.getFont():getWidth(label), love.graphics.getFont():getHeight(label)
