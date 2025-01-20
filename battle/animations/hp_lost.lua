@@ -11,7 +11,7 @@ end
 
 --- @class bt.Animation.HP_LOST
 bt.Animation.HP_LOST = meta.new_type("HP_LOST", rt.Animation, function(scene, entity, value, message)
-    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(scene,bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_number(value)
     if message ~= nil then meta.assert_string(message) end

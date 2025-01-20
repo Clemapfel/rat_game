@@ -307,7 +307,20 @@ function bt.BattleScene:size_allocate(x, y, width, height)
         -- TODO
         self._env.start_battle("DEBUG_BATTLE")
         --self._env.quicksave()
-        self._env.knock_out(self._env.get_entity_from_id("MC"))
+        --self._env.knock_out(self._env.get_entity_from_id("MC"))
+
+        self._env.set_move_is_disabled(
+            self._env.get_entity_from_id("MC"),
+            bt.create_move_proxy(self, bt.MoveConfig("DEBUG_MOVE")),
+            true
+        )
+
+        self._env.set_intrinsic_move_is_disabled(
+            self._env.get_entity_from_id("MC"),
+            bt.create_move_proxy(self, bt.MoveConfig("STRUGGLE")),
+            true
+        )
+
         self:skip_all()
         self:start_move_selection()
         self._is_first_size_allocate = false
@@ -1055,9 +1068,25 @@ function bt.BattleScene:_create_move_selection_slots(entity)
             state_info = rt.VerboseInfoObject.MOVE_SELECTION_STUNNED
         end
 
-        scene._verbose_info:show(self:get_move(), state_info)
+        local disabled_info, is_disabled = nil, true
+        local move = self:get_move()
+        if move ~= nil then
+            if move:get_is_intrinsic() then
+                is_disabled = scene._state:entity_get_intrinsic_move_is_disabled(self.entity, move)
+            else
+                is_disabled = scene._state:entity_get_move_is_disabled(self.entity, self.slot_i)
+            end
 
-        _update_priority_queue_selection(self.entity, self:get_move())
+            if is_disabled then
+                disabled_info = rt.VerboseInfoObject.MOVE_DISABLED
+            end
+        end
+
+        scene._verbose_info:show(disabled_info, move, state_info)
+        _update_priority_queue_selection(self.entity, move)
+
+        local can_lock = move ~= nil and not is_disabled
+        scene:_update_move_selection_control_indicator(can_lock)
     end
 
     local on_exit = function(self)
@@ -1069,6 +1098,15 @@ function bt.BattleScene:_create_move_selection_slots(entity)
     local on_a = function(self)
         local move = self:get_move()
         if move ~= nil then
+            local is_disabled
+            if move:get_is_intrinsic() then
+                is_disabled = scene._state:entity_get_intrinsic_move_is_disabled(self.entity, move)
+            else
+                is_disabled = scene._state:entity_get_move_is_disabled(self.entity, self.slot_i)
+            end
+
+            if is_disabled then return end
+
             local current_entity = scene._move_selection_order[scene._move_selection_i]
             scene._entity_id_to_move_selection[current_entity:get_id()].move = move
             scene:_update_move_selection(self.entity, move)
@@ -1688,16 +1726,18 @@ function bt.BattleScene:_create_target_selection_graph()
 end
 
 --- @brief
-function bt.BattleScene:_update_move_selection_control_indicator()
+function bt.BattleScene:_update_move_selection_control_indicator(can_lock)
     local current_entity = self._move_selection_order[self._move_selection_i]
+    if current_entity == nil then return end
+
     local selection = self._entity_id_to_move_selection[current_entity:get_id()]
 
     local disable_prefix, disable_postfix = "<s><color=GRAY>", "</s></color>"
 
     local can_jump_left = self._move_selection_i > 1
     local can_jump_right = self._move_selection_i < sizeof(self._move_selection_order)
-    local can_lock = selection.move == nil
-    local can_move = can_lock
+    local can_move = selection.move == nil
+    if can_lock == nil then can_lock = true end
 
     local move_label = rt.Translation.battle_scene.move_selection_control_indicator_move
     if not can_move then move_label = disable_prefix .. move_label .. disable_postfix end
@@ -1712,13 +1752,11 @@ function bt.BattleScene:_update_move_selection_control_indicator()
     if not can_lock then lock_label = disable_prefix .. lock_label .. disable_postfix end
 
     local unlock_label = rt.Translation.battle_scene.move_selection_control_indicator_unconfirm
-    if can_lock then unlock_label = disable_prefix .. unlock_label .. disable_postfix end
-
     local inspect_label = rt.Translation.battle_scene.move_selection_control_indicator_inspect
 
     self._move_selection_control_indicator:create_from({
         {rt.ControlIndicatorButton.ALL_DIRECTIONS, move_label},
-        ternary(can_lock,
+        ternary(selection.move == nil,
             { rt.ControlIndicatorButton.A, lock_label },
             { rt.ControlIndicatorButton.B, unlock_label }
         ),
@@ -1752,12 +1790,12 @@ function bt.BattleScene:_update_move_selection(entity, move)
     if move ~= nil then
         element.moves:set_selection_state(rt.SelectionState.UNSELECTED)
         element.intrinsics:set_selection_state(rt.SelectionState.UNSELECTED)
-        self:_update_move_selection_control_indicator()
+        self:_update_move_selection_control_indicator(false)
         self:set_scene_state(bt.SceneState.TARGET_SELECTION)
     else
         element.moves:set_selection_state(rt.SelectionState.INACTIVE)
         element.intrinsics:set_selection_state(rt.SelectionState.INACTIVE)
-        self:_update_move_selection_control_indicator()
+        self:_update_move_selection_control_indicator(true)
     end
 end
 
@@ -1780,7 +1818,6 @@ function bt.BattleScene:_set_move_selection_i(i)
         math.max(move_bounds.width, intrinsic_bounds.width),
         move_bounds.height + rt.settings.margin_unit + intrinsic_bounds.height
     )
-    self:_update_move_selection_control_indicator()
 
     -- hide sprites behind move selection
     for sprite in values(self._enemy_sprites) do
@@ -1864,6 +1901,9 @@ function bt.BattleScene:start_move_selection()
                     font,
                     font_mono
                 ))
+
+                local is_disabled = self._state:entity_get_move_is_disabled(entity, slot_i)
+                current.moves:set_slot_is_disabled(slot_i, is_disabled)
             else
                 current.moves:set_object(slot_i, nil)
             end
@@ -1871,12 +1911,15 @@ function bt.BattleScene:start_move_selection()
 
         if current.intrinsics ~= nil then
             local slot_i = 1
-            for intrinsic in values(intrinsic_slots) do
-                current.intrinsics:set_object(slot_i, intrinsic, rt.Label(
+            for intrinsic_move in values(intrinsic_slots) do
+                current.intrinsics:set_object(slot_i, intrinsic_move, rt.Label(
                     label_prefix .. rt.Translation.infinity .. label_postfix,
                     font,
                     font_mono
                 ))
+
+                local is_disabled = self._state:entity_get_intrinsic_move_is_disabled(entity, intrinsic_move)
+                current.intrinsics:set_slot_is_disabled(slot_i, is_disabled)
                 slot_i = slot_i + 1
             end
         end
@@ -1996,13 +2039,13 @@ function bt.BattleScene:_handle_button_pressed(which)
 
     elseif state == bt.SceneState.MOVE_SELECTION then
         if which == rt.InputButton.B then
+            -- undo last move selection
             local i = self._move_selection_i
             if i > 1 then
-                -- undo last move selection
                 self:_set_move_selection_i(i - 1)
-                local current_entity = self._move_selection_order[self._move_selection_i]
-                self:_update_move_selection(current_entity, nil)
             end
+            local current_entity = self._move_selection_order[i]
+            self:_update_move_selection(current_entity, nil)
         elseif which == rt.InputButton.Y then
             self:set_scene_state(bt.SceneState.INSPECT)
         elseif which == rt.InputButton.L then

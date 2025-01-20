@@ -1445,7 +1445,9 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
             [rt.VerboseInfoObject.BATTLE_LOG] = format_title(translation.battle_log_title),
 
             [rt.VerboseInfoObject.MOVE_SELECTION_KNOCKED_OUT] = format_title(translation.move_selection_knocked_out_title),
-            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = format_title(translation.move_selection_stunned_title)
+            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = format_title(translation.move_selection_stunned_title),
+
+            [rt.VerboseInfoObject.MOVE_DISABLED] = format_title(translation.move_disabled_title)
         }
     end
 
@@ -1478,7 +1480,9 @@ function mn.VerboseInfoPanel.Item:create_from_enum(which)
             [rt.VerboseInfoObject.BATTLE_LOG] = translation.battle_log_description,
 
             [rt.VerboseInfoObject.MOVE_SELECTION_KNOCKED_OUT] = translation.move_selection_knocked_out_description,
-            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = translation.move_selection_stunned_description
+            [rt.VerboseInfoObject.MOVE_SELECTION_STUNNED] = translation.move_selection_stunned_description,
+
+            [rt.VerboseInfoObject.MOVE_DISABLED] = translation.move_disabled_description
         }
     end
 

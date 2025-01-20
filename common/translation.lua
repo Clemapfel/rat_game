@@ -86,7 +86,7 @@ rt.Translation = rt.initialize_translation({
         consumable_node_unequip = "Unequip",
         consumable_node_sort = "Sort",
 
-        grabbed_object_bottom_right_indicator = "<color=RED_2><o>\u{00D7}</o></color>",
+        grabbed_object_bottom_right_indicator = "<color=RED_4><o>\u{00D7}</o></color>", -- cross
 
         template_confirm_dialog_f = function(name)
             return "Overwrite current Equipment?",
@@ -240,7 +240,10 @@ rt.Translation = rt.initialize_translation({
             move_selection_knocked_out_description = "A move may still be selected, but it will not be performed unless you are helped up, no " .. MOVE_STACK_NAME .. " will be consumed",
 
             move_selection_stunned_title = "Stunned",
-            move_selection_stunned_description = "A move may still be selected, but it will not be performed, no " .. MOVE_STACK_NAME .. " will be performed"
+            move_selection_stunned_description = "A move may still be selected, but it will not be performed, no " .. MOVE_STACK_NAME .. " will be performed",
+
+            move_disabled_title = "<color=RED_4>Move Disabled</color>",
+            move_disabled_description = "It cannot be used",
         }
     },
 

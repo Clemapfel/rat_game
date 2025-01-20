@@ -386,15 +386,25 @@ function bt.BattleScene:create_simulation_environment()
     end
 
     -- debug assertions
-    for metas in range(
-        "is_number",
-        "is_table",
-        "is_string",
-        "is_boolean",
-        "is_nil"
+    for name_type in range(
+        {"is_number", bt.Number},
+        {"is_table", bt.Table},
+        {"is_string", bt.String},
+        {"is_boolean", bt.Boolean},
+        {"is_nil", "nil"}
     ) do
-        env[metas] = function(x)
-            return meta[metas](x)
+        local name, type = table.unpack(name_type)
+        env[name] = function(x)
+            return meta[name](x)
+        end
+
+        env["assert_" .. name] = function(x)
+            if meta[name](x) == false then
+                bt.error_function("In assert_" .. name .. ": expected `" .. type .. "`, got: `" .. _G.type(x) .. "`")
+                return true
+            else
+                return false
+            end
         end
     end
 
@@ -423,12 +433,12 @@ function bt.BattleScene:create_simulation_environment()
                     if metatable._type == type then
                         return
                     else
-                        bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. ternary(metatable._type == nil, meta.typeof(x), metatable._type) .. "`")
+                        bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. ternary(metatable._type == nil, _G.type(x), metatable._type) .. "`")
                         return
                     end
                 end
             end
-            bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+            bt.error_function("In assert_is_" .. name .. ": expected `" .. type .. "`, got `" .. _G.type(x) .. "`")
         end
     end
 
@@ -1349,6 +1359,7 @@ function bt.BattleScene:create_simulation_environment()
 
         --- @brief set_move_is_disabled, set_equip_is_disabled, set_consumable_is_disabled
         env["set_" .. which .. "_is_disabled"] = function(entity_proxy, object_proxy, b)
+            if b == nil then b = true end
             bt.assert_args("set_" .. which .. "_is_disabled",
                 entity_proxy, bt.EntityProxy,
                 object_proxy, proxy,
@@ -1362,6 +1373,48 @@ function bt.BattleScene:create_simulation_environment()
                 env["set_" .. which .. "_slot_is_disabled"](entity_proxy, slot_i, b)
             end
         end
+    end
+
+    env.set_intrinsic_move_is_disabled = function(entity_proxy, move_proxy, b)
+        bt.assert_args("set_intrinsic_move_is_disabled",
+            entity_proxy, bt.EntityProxy,
+            move_proxy, bt.MoveProxy,
+            b, bt.Boolean
+        )
+
+        local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
+        local has_move = _state:entity_has_intrinsic_move(entity, move)
+        if not has_move then
+            bt.error_function("In set_intrinsic_move_is_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have intrinsic move `" .. env.get_id(move_proxy) .. "`")
+            return
+        end
+
+        _state:entity_set_intrinsic_move_is_disabled(entity, move, b)
+    end
+
+    env.get_intrinsic_move_is_disabled = function(entity_proxy, move_proxy)
+        bt.assert_args("get_intrinsic_move_is_disabled",
+            entity_proxy, bt.EntityProxy,
+            move_proxy, bt.MoveProxy
+        )
+
+        local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
+        local has_move = _state:entity_has_intrinsic_move(entity, move)
+        if not has_move then
+            bt.error_function("In get_intrinsic_move_is_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have intrinsic move `" .. env.get_id(move_proxy) .. "`")
+            return false
+        end
+
+        return _state:entity_get_intrinsic_move_is_disabled(entity, move)
+    end
+
+    env.has_intrinsic_move = function(entity_proxy, move_proxy)
+        bt.assert_args("get_intrinsic_move_is_disabled",
+            entity_proxy, bt.EntityProxy,
+            move_proxy, bt.MoveProxy
+        )
+
+        return _state:entity_has_intrinsic_move(_get_native(entity_proxy), _get_native(move_proxy))
     end
 
     -- global status
@@ -2245,15 +2298,15 @@ function bt.BattleScene:create_simulation_environment()
         if performer_proxy ~= nil then
             local callback_id = "on_damage_dealt"
             for status_proxy in values(env.list_statuses(performer_proxy)) do
-                _try_invoke_status_callback(callback_id, status_proxy, performer_proxy, value)
+                _try_invoke_status_callback(callback_id, status_proxy, performer_proxy, entity_proxy, value)
             end
 
             for consumable_proxy in values(env.list_consumables(performer_proxy)) do
-                _try_invoke_consumable_callback(callback_id, consumable_proxy, performer_proxy, value)
+                _try_invoke_consumable_callback(callback_id, consumable_proxy, performer_proxy, entity_proxy, value)
             end
 
             for global_status_proxy in values(env.list_global_statuses()) do
-                _try_invoke_global_status_callback(callback_id, global_status_proxy, performer_proxy, value)
+                _try_invoke_global_status_callback(callback_id, global_status_proxy, performer_proxy, entity_proxy, value)
             end
         end
 
@@ -2713,6 +2766,7 @@ function bt.BattleScene:create_simulation_environment()
             return
         end
 
+        local n_targets = 0
         for target in values(target_proxies) do
             bt.assert_args("use_move", target, bt.EntityProxy)
 
@@ -2730,6 +2784,8 @@ function bt.BattleScene:create_simulation_environment()
                 bt.error_function("In use_move: move `" .. env.get_id(move_proxy) .. "` used by `" .. env.get_id(user_proxy) .. "` targets self, even though `can_target_self` is false")
                 return
             end
+
+            n_targets = n_targets + 1
         end
 
         local move = _get_native(move_proxy)
@@ -2744,7 +2800,11 @@ function bt.BattleScene:create_simulation_environment()
         env.message(rt.Translation.battle.message.move_used_f)
 
         _push_current_move_user(user_proxy)
-        _invoke(move.effect, move_proxy, user_proxy, target_proxies)
+        _invoke(move.effect, move_proxy, user_proxy, ternary(
+            n_targets == 1,
+            table.unpack(target_proxies),
+            target_proxies
+        ))
         _pop_current_move_user()
 
         _new_animation_node()

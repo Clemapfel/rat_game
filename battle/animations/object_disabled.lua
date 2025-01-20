@@ -49,7 +49,7 @@ function bt.Animation.OBJECT_DISABLED:start()
     self._sprite_texture:unbind()
 
     local target_x, target_y = self._target:get_position()
-    local target_width, target_height = self._target:get_snapshot():get_size()
+    local target_width, target_height = self._target:get_size()
 
     local x = target_x + 0.5 * target_width - 0.5 * sprite_w
     local y = target_y + 0.5 * target_height - 0.5 * sprite_h

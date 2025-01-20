@@ -5,7 +5,7 @@ rt.settings.battle.animations.entity_revived = {
 
 --- @class bt.Animation.ENTITY_REVIVED
 bt.Animation.ENTITY_REVIVED = meta.new_type("ENTITY_REVIVED", rt.Animation, function(scene, entity, message)
-    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(scene,bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
 
     local settings = rt.settings.battle.animations.entity_revived

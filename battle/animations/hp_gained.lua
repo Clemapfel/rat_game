@@ -4,7 +4,7 @@ rt.settings.battle.animations.hp_gained = {
 
 --- @class bt.Animation.HP_GAINED
 bt.Animation.HP_GAINED = meta.new_type("HP_GAINED", rt.Animation, function(scene, entity, value, message)
-    meta.assert_isa(scene, bt.Scene)
+    meta.assert_isa(scene,bt.BattleScene)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_number(value)
     if message ~= nil then meta.assert_string(message) end

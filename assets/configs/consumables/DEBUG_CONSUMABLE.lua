@@ -71,7 +71,7 @@ return {
     on_damage_dealt = function(self, holder, damage_taker, value)
         assert_is_consumable_proxy(self)
         assert_is_entity_proxy(holder)
-        assert_is_entity_proxy(receiver)
+        assert_is_entity_proxy(damage_taker)
         assert_is_number(value)
         println(get_id(holder) .. " " .. get_id(self) .. " on_damage_dealt")
     end,

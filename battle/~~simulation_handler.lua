@@ -60,7 +60,7 @@ do
     --- @param scene bt.BattleScene
     --- @param entity bt.Entity
     function bt.create_entity_proxy(scene, native)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(native, bt.Entity)
 
         local metatable = _create_proxy_metatable(bt.EntityProxy, scene, native)
@@ -72,7 +72,7 @@ do
     --- @param scene bt.BattleScene
     --- @param status bt.GlobalStatusConfig
     function bt.create_global_status_proxy(scene, native)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(native, bt.GlobalStatusConfig)
 
         local metatable = _create_proxy_metatable(bt.GlobalStatusProxy, scene, native)
@@ -84,7 +84,7 @@ do
     --- @param scene bt.BattleScene
     --- @param status bt.StatusConfig
     function bt.create_status_proxy(scene, native, afflicted)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(native, bt.StatusConfig)
         meta.assert_isa(afflicted, bt.Entity)
 
@@ -103,7 +103,7 @@ do
     --- @param holder bt.Entity
     --- @param slot_i Unsigned
     function bt.create_consumable_proxy(scene, holder, slot_i)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(holder, bt.Entity)
         meta.assert_number(slot_i)
 
@@ -121,7 +121,7 @@ do
     --- @param holder bt.Entity
     --- @param slot_i Unsigned
     function bt.create_equip_proxy(scene, holder, slot_i)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(holder, bt.Entity)
         meta.assert_number(slot_i)
 
@@ -139,7 +139,7 @@ do
     --- @param holder bt.Entity
     --- @param slot_i Unsigned
     function bt.create_move_proxy(scene, holder, slot_i)
-        meta.assert_isa(scene, bt.Scene)
+        meta.assert_isa(scene,bt.BattleScene)
         meta.assert_isa(holder, bt.Entity)
         meta.assert_number(slot_i)
 

@@ -16,6 +16,6 @@ return {
 
 
     effect = function(self, user, targets)
-        -- TODO
+        reduce_hp(targets, 0.5 * get_attack(user))
     end
 }

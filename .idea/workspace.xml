@@ -22,11 +22,24 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing move debug">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed target selection bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/STRUGGLE.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/entity_revived.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/entity_revived.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_gained.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/animations/object_disabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/~~simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~~simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -686,15 +699,7 @@
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
-      <workItem from="1737301880859" duration="14828000" />
-    </task>
-    <task id="LOCAL-01381" summary="stashing before branching verbose info entity info for battle and non-battle">
-      <option name="closed" value="true" />
-      <created>1736016044640</created>
-      <option name="number" value="01381" />
-      <option name="presentableId" value="LOCAL-01381" />
-      <option name="project" value="LOCAL" />
-      <updated>1736016044640</updated>
+      <workItem from="1737301880859" duration="23795000" />
     </task>
     <task id="LOCAL-01382" summary="label now has global outline color">
       <option name="closed" value="true" />
@@ -1080,7 +1085,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737318172069</updated>
     </task>
-    <option name="localTasksCounter" value="1430" />
+    <task id="LOCAL-01430" summary="fixed target selection bug">
+      <option name="closed" value="true" />
+      <created>1737390288489</created>
+      <option name="number" value="01430" />
+      <option name="presentableId" value="LOCAL-01430" />
+      <option name="project" value="LOCAL" />
+      <updated>1737390288489</updated>
+    </task>
+    <option name="localTasksCounter" value="1431" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1134,7 +1147,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added selection indicator" />
     <MESSAGE value="fixed selection graph navigation" />
     <MESSAGE value="added sdf step" />
     <MESSAGE value="removed unnecessary options" />
@@ -1159,7 +1171,8 @@
     <MESSAGE value="added shader includes" />
     <MESSAGE value="added simulation turn" />
     <MESSAGE value="stashing move debug" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing move debug" />
+    <MESSAGE value="fixed target selection bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed target selection bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

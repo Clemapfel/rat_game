@@ -3,7 +3,8 @@ rt.settings.menu.slots = {
     sprite_scale = 2,
     frame_unselected_thickness = 1,
     frame_selected_thickness = 2,
-    snapshot_padding = 5
+    snapshot_padding = 5,
+    disabled_opacity = 0.5
 }
 
 mn.SlotType = meta.new_enum("SlotType", {
@@ -51,10 +52,16 @@ local _palette_mapping = {
         [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_10
     },
 
-    frame = {
+    slot_frame = {
         [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_5,
         [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_4,
         [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_4
+    },
+
+    frame = {
+        [mn.SlotPalette.DEFAULT] = rt.Palette.GRAY_3,
+        [mn.SlotPalette.KNOCKED_OUT] = rt.Palette.RED_3,
+        [mn.SlotPalette.STUNNED] = rt.Palette.YELLOW_3
     },
 
     base = {
@@ -157,6 +164,7 @@ function mn.Slots:realize()
             to_insert.bounds = rt.AABB(0, 0, 1, 1)
             to_insert.selection_node = rt.SelectionGraphNode()
             to_insert.is_visible = true
+            to_insert.is_disabled = false
 
             table.insert(row, to_insert)
             self._slot_i_to_item[slot_i] = to_insert
@@ -180,7 +188,7 @@ function mn.Slots:set_palette(palette)
     for item in values(self._slot_i_to_item) do
         item.base:set_color(_palette_mapping.base[palette])
         item.base_inlay:set_color(_palette_mapping.base_inlay[palette])
-        item.frame:set_color(_palette_mapping.frame[palette])
+        item.frame:set_color(_palette_mapping.slot_frame[palette])
     end
 
     self._frame:set_color(_palette_mapping.frame[palette])
@@ -386,9 +394,17 @@ function mn.Slots:set_object(slot_i, object, label)
             self._item_to_sprite[item] = nil
         else
             item.sprite = rt.Sprite(object:get_sprite_id())
-            if label ~= nil then
-                item.sprite:set_bottom_right_child(label)
+
+            if item.is_disabled then
+                item.sprite:set_opacity(rt.settings.menu.slots.disabled_opacity)
+                item.sprite:set_bottom_right_child(rt.Label(rt.Translation.inventory_scene.grabbed_object_bottom_right_indicator))
+            else
+                if label ~= nil then
+                    item.sprite:set_bottom_right_child(label)
+                end
+                item.sprite:set_opacity(1)
             end
+
             item.sprite:realize()
             item.sprite:fit_into(item.bounds)
             self._item_to_sprite[item] = item.sprite
@@ -500,4 +516,21 @@ end
 function mn.Slots:set_slot_object_visible(slot_i, b)
     self._slot_i_to_item[slot_i].is_visible = b
     self:_update_snapshot()
+end
+
+--- @brief
+function mn.Slots:set_slot_is_disabled(slot_i, b)
+    local item = self._slot_i_to_item[slot_i]
+    item.is_disabled = b
+    if item.sprite ~= nil then
+        if b then
+            item.sprite:set_opacity(rt.settings.menu.slots.disabled_opacity)
+            item.sprite:set_bottom_right_child(rt.Label(rt.Translation.inventory_scene.grabbed_object_bottom_right_indicator))
+        else
+            item.sprite:set_opacity(1)
+            if item.label ~= nil then
+                item.sprite:set_bottom_right_child(item.label)
+            end
+        end
+    end
 end

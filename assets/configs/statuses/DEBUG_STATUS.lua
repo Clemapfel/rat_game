@@ -166,7 +166,7 @@ return {
         assert_is_entity_proxy(afflicted)
         assert_is_move_proxy(move)
         for entity in values(targets) do
-            assert_is_entity_proxy(targets)
+            assert_is_entity_proxy(entity)
         end
         println(get_id(afflicted) .. " " .. get_id(self) .. " on_move_use")
     end,

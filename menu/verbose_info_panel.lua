@@ -36,7 +36,8 @@ rt.VerboseInfoObject = meta.new_enum("VerboseInfoObject", {
     TEXT_SPEED = "text_speed",
     TEXT_SPEED_WIDGET = "text_speed_widget",
     MOVE_SELECTION_KNOCKED_OUT = "move_selection_knocked_out",
-    MOVE_SELECTION_STUNNED = "move_selection_stunned"
+    MOVE_SELECTION_STUNNED = "move_selection_stunned",
+    MOVE_DISABLED = "move_disabled"
 })
 
 --- @class mn.VerboseInfoPanel
@@ -116,7 +117,7 @@ function mn.VerboseInfoPanel:size_allocate(x, y, width, height)
     self._scroll_down_indicator:reformat(down_x, down_y, (2 * math.pi) - angle, arrow_width, thickness)
 
     local item_m = 0
-    if self._frame_visible then item_m = m end
+    if not self._frame_visible then item_m = m end
 
     local current_x, current_y = x, y
     local total_height = 0
