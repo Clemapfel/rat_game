@@ -26,6 +26,7 @@
 
         intrinsic_moves = {
             id,
+            is_disabled = false,
             storage = {}
         }
 
@@ -99,7 +100,7 @@ function rt.GameState:create_entity(config)
 
     for i = 1, n_moves do
         to_add.moves[i] = {
-            id = "",
+            id = nil,
             n_used = 0,
             is_disabled = false,
             storage = {}
@@ -108,7 +109,7 @@ function rt.GameState:create_entity(config)
 
     for i = 1, n_equips do
         to_add.equips[i] = {
-            id = "",
+            id = nil,
             is_disabled = false,
             storage = {}
         }
@@ -116,7 +117,7 @@ function rt.GameState:create_entity(config)
 
     for i = 1, n_consumables do
         to_add.consumables[i] = {
-            id = "",
+            id = nil,
             n_used = 0,
             is_disabled = false,
             storage = {}
@@ -126,6 +127,7 @@ function rt.GameState:create_entity(config)
     for id in values(config:list_intrinsic_move_ids()) do
         table.insert(to_add.intrinsic_moves, {
             id = id,
+            is_disabled = false,
             storage = {}
         })
     end
@@ -590,7 +592,7 @@ for which_type in range(
         local n_slots = self["entity_get_n_" .. which .. "_slots"](self, entity)
         for slot_i = 1, n_slots do
             local id = entry[which .. "s"][slot_i].id
-            if id ~= "" then
+            if id ~= nil then
                 table.insert(out, Type(id))
             end
         end
@@ -612,7 +614,7 @@ for which_type in range(
         local n_slots = self["entity_get_n_" .. which .. "_slots"](self, entity)
         for slot_i = 1, n_slots do
             local id = entry[which .. "s"][slot_i].id
-            if id ~= "" then
+            if id ~= nil then
                 out[slot_i] = Type(id)
             end
         end
@@ -637,7 +639,7 @@ for which_type in range(
         end
 
         local id = entry[which .. "s"][slot_i].id
-        if id == "" then
+        if id == nil then
             return nil
         else
             return Type(id)
@@ -657,7 +659,7 @@ for which_type in range(
         local n_slots = self["entity_get_n_" .. which .. "_slots"](self, entity)
         local slots = entry[which .. "s"]
         for i = 1, n_slots do
-            if slots[i].id == "" then return i end
+            if slots[i].id == nil then return i end
         end
 
         return nil
@@ -709,14 +711,14 @@ for which_type in range(
 
         local object_entry = entry[which .. "s"]
         local current_id = object_entry[slot_i].id
-        object_entry[slot_i].id = ""
+        object_entry[slot_i].id = nil
         object_entry[slot_i].storage = {}
 
         if object_entry.n_used ~= nil then
             object_entry.n_used = 0
         end
 
-        if current_id == "" then return nil else return Type(current_id) end
+        if current_id == nil then return nil else return Type(current_id) end
     end
 
     --- @brief entity_has_move, entity_has_equip, entity_has_consumable
@@ -838,7 +840,7 @@ for which_type in range(
 
         local object_entry = entity_entry[which .. "s"][slot_i]
         if object_entry == nil or object_entry.id == nil then
-            rt.error("In rt.GameState:entity_set_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` has no consumable in slot `" .. slot_i .. "`")
+            rt.error("In rt.GameState:entity_set_is_" .. which .. "_disabled: entity `" .. entity:get_id() .. "` has no " .. which .. " in slot `" .. slot_i .. "`")
             return
         end
 
@@ -907,6 +909,70 @@ for which_type in range(
 
         object_entry.storage = new_table
     end
+end
+
+--- @brief
+function rt.GameState:entity_has_intrinsic_move(entity, move)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(move, bt.MoveConfig)
+
+    local entity_entry = self:_get_entity_entry(entity)
+    if entity_entry == nil then
+        rt.error("In rt.GameState:entity_has_intrinsic_move: entity `" .. entity:get_id() .. "` is not part of state")
+        return false
+    end
+
+    for entry in values(entity_entry.intrinsic_moves) do
+        if entry.id == move:get_id() then
+            return true
+        end
+    end
+
+    return false
+end
+
+--- @brief
+function rt.GameState:entity_get_intrinsic_move_is_disabled(entity, move)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(move, bt.MoveConfig)
+
+    local entity_entry = self:_get_entity_entry(entity)
+    if entity_entry == nil then
+        rt.error("In rt.GameState:entity_get_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+        return false
+    end
+
+    for entry in values(entity_entry.intrinsic_moves) do
+        if entry.id == move:get_id() then
+            return entry.is_disabled
+        end
+    end
+
+    rt.error("In rt.GameState:entity_get_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` has no intrinsic move `" .. move:get_id() .. "`")
+    return false
+end
+
+--- @brief
+function rt.GameState:entity_set_intrinsic_move_is_disabled(entity, move, b)
+    meta.assert_isa(entity, bt.Entity)
+    meta.assert_isa(move, bt.MoveConfig)
+    meta.assert_boolean(b)
+
+    local entity_entry = self:_get_entity_entry(entity)
+    if entity_entry == nil then
+        rt.error("In rt.GameState:entity_set_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` is not part of state")
+        return
+    end
+
+    for entry in values(entity_entry.intrinsic_moves) do
+        if entry.id == move:get_id() then
+            entry.is_disabled = b
+            return
+        end
+    end
+
+    rt.error("In rt.GameState:entity_set_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` has no intrinsic move `" .. move:get_id() .. "`")
+    return
 end
 
 --- @brief
@@ -1017,6 +1083,7 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
     if move == nil then return {} end
     meta.assert_isa(move, bt.MoveConfig)
 
+    local user_config_id = user:get_config():get_id()
     local is_enemy = self:entity_get_is_enemy(user)
     local can_target_self = move:get_can_target_self()
     local can_target_enemies = move:get_can_target_enemies()
@@ -1026,7 +1093,8 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
     local out = ternary(can_target_multiple, {{}}, {}) -- multiple: one big table, single: each single in one table
     for entry in values(self._state.entities) do
         local config = bt.EntityConfig(entry.id)
-        local is_self = (entry.id == user:get_id() and entry.multiplicity == user:get_multiplicity())
+        local is_self = (entry.id == user_config_id and entry.multiplicity == user:get_multiplicity())
+
         if  (is_self and can_target_self) or
             (not is_self and config:get_is_enemy() == is_enemy and can_target_allies) or
             (not is_self and config:get_is_enemy() ~= is_enemy and can_target_enemies)
@@ -1038,6 +1106,7 @@ function rt.GameState:entity_get_valid_targets_for_move(user, move)
             end
         end
     end
+
     return out
 end
 
@@ -1055,7 +1124,7 @@ function rt.GameState:entity_get_selectable_moves(entity)
     end
 
     for move_entry in values(entry.moves) do
-        if move_entry.id ~= nil and move_entry.id ~= "" then
+        if move_entry.id ~= nil then
             local config = bt.MoveConfig(move_entry.id)
             if move_entry.is_disabled == false and move_entry.n_used < config:get_max_n_uses() then
                 table.insert(out, config)
@@ -1097,7 +1166,7 @@ function rt.GameState:entity_sort_inventory(entity)
     local n_move_slots, n_equip_slots, n_consumable_slots = config:get_n_move_slots(), config:get_n_equip_slots(), config:get_n_consumable_slots()
     for i = 1, n_move_slots do
         local id = entry.moves[i].id
-        if id ~= "" then
+        if id ~= nil then
             local move = bt.MoveConfig(id)
             table.insert(moves, move)
             self:entity_remove_move(entity, i)
@@ -1106,7 +1175,7 @@ function rt.GameState:entity_sort_inventory(entity)
 
     for i = 1, n_equip_slots do
         local id = entry.equips[i].id
-        if id ~= "" then
+        if id ~= nil then
             local equip = bt.EquipConfig(id)
             table.insert(equips, equip)
             self:entity_remove_equip(entity, i)
@@ -1115,7 +1184,7 @@ function rt.GameState:entity_sort_inventory(entity)
 
     for i = 1, n_consumable_slots do
         local id = entry.consumables[i].id
-        if id ~= "" then
+        if id ~= nil then
             local consumable = bt.ConsumableConfig(id)
             table.insert(consumables, consumable)
             self:entity_remove_consumable(entity, i)
