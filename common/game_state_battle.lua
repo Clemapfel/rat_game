@@ -24,9 +24,8 @@
             storage = {}
         }
 
-        intrinsic_moves = {
+        intrinsic_moves = { -- can't be disabled
             id,
-            is_disabled = false,
             storage = {}
         }
 
@@ -127,7 +126,6 @@ function rt.GameState:create_entity(config)
     for id in values(config:list_intrinsic_move_ids()) do
         table.insert(to_add.intrinsic_moves, {
             id = id,
-            is_disabled = false,
             storage = {}
         })
     end
@@ -932,50 +930,6 @@ function rt.GameState:entity_has_intrinsic_move(entity, move)
 end
 
 --- @brief
-function rt.GameState:entity_get_intrinsic_move_is_disabled(entity, move)
-    meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(move, bt.MoveConfig)
-
-    local entity_entry = self:_get_entity_entry(entity)
-    if entity_entry == nil then
-        rt.error("In rt.GameState:entity_get_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` is not part of state")
-        return false
-    end
-
-    for entry in values(entity_entry.intrinsic_moves) do
-        if entry.id == move:get_id() then
-            return entry.is_disabled
-        end
-    end
-
-    rt.error("In rt.GameState:entity_get_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` has no intrinsic move `" .. move:get_id() .. "`")
-    return false
-end
-
---- @brief
-function rt.GameState:entity_set_intrinsic_move_is_disabled(entity, move, b)
-    meta.assert_isa(entity, bt.Entity)
-    meta.assert_isa(move, bt.MoveConfig)
-    meta.assert_boolean(b)
-
-    local entity_entry = self:_get_entity_entry(entity)
-    if entity_entry == nil then
-        rt.error("In rt.GameState:entity_set_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` is not part of state")
-        return
-    end
-
-    for entry in values(entity_entry.intrinsic_moves) do
-        if entry.id == move:get_id() then
-            entry.is_disabled = b
-            return
-        end
-    end
-
-    rt.error("In rt.GameState:entity_set_intrinsic_move_is_disabled: entity `" .. entity:get_id() .. "` has no intrinsic move `" .. move:get_id() .. "`")
-    return
-end
-
---- @brief
 function rt.GameState:entity_set_storage_value(entity, id, new_value)
     meta.assert_isa(entity, bt.Entity)
     meta.assert_string(id)
@@ -1126,7 +1080,7 @@ function rt.GameState:entity_get_selectable_moves(entity)
     for move_entry in values(entry.moves) do
         if move_entry.id ~= nil then
             local config = bt.MoveConfig(move_entry.id)
-            if move_entry.is_disabled == false and move_entry.n_used < config:get_max_n_uses() then
+            if move_entry.is_disabled ~= true and move_entry.n_used < config:get_max_n_uses() then
                 table.insert(out, config)
             end
         end

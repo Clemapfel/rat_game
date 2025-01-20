@@ -22,24 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fixed target selection bug">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing intrinsic move disabling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/consumables/DEBUG_CONSUMABLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/moves/STRUGGLE.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/moves/STRUGGLE.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/configs/statuses/DEBUG_STATUS.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/entity_revived.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/entity_revived.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_gained.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_gained.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/hp_lost.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/hp_lost.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/animations/object_disabled.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/animations/object_disabled.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/enemy_ai.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/enemy_ai.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/~~simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/~~simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/translation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/slots.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/slots.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -699,23 +686,7 @@
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
-      <workItem from="1737301880859" duration="23795000" />
-    </task>
-    <task id="LOCAL-01382" summary="label now has global outline color">
-      <option name="closed" value="true" />
-      <created>1736019620580</created>
-      <option name="number" value="01382" />
-      <option name="presentableId" value="LOCAL-01382" />
-      <option name="project" value="LOCAL" />
-      <updated>1736019620580</updated>
-    </task>
-    <task id="LOCAL-01383" summary="fixed mono space width">
-      <option name="closed" value="true" />
-      <created>1736022180938</created>
-      <option name="number" value="01383" />
-      <option name="presentableId" value="LOCAL-01383" />
-      <option name="project" value="LOCAL" />
-      <updated>1736022180938</updated>
+      <workItem from="1737301880859" duration="25444000" />
     </task>
     <task id="LOCAL-01384" summary="implemented in-battle entity verbose info">
       <option name="closed" value="true" />
@@ -1093,7 +1064,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737390288489</updated>
     </task>
-    <option name="localTasksCounter" value="1431" />
+    <task id="LOCAL-01431" summary="move disabled and turn resolve working">
+      <option name="closed" value="true" />
+      <created>1737401096060</created>
+      <option name="number" value="01431" />
+      <option name="presentableId" value="LOCAL-01431" />
+      <option name="project" value="LOCAL" />
+      <updated>1737401096060</updated>
+    </task>
+    <task id="LOCAL-01432" summary="stashing before removing intrinsic move disabling">
+      <option name="closed" value="true" />
+      <created>1737401111593</created>
+      <option name="number" value="01432" />
+      <option name="presentableId" value="LOCAL-01432" />
+      <option name="project" value="LOCAL" />
+      <updated>1737401111593</updated>
+    </task>
+    <option name="localTasksCounter" value="1433" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1147,8 +1134,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed selection graph navigation" />
-    <MESSAGE value="added sdf step" />
     <MESSAGE value="removed unnecessary options" />
     <MESSAGE value="added sdf" />
     <MESSAGE value="pressure gradient working" />
@@ -1172,7 +1157,9 @@
     <MESSAGE value="added simulation turn" />
     <MESSAGE value="stashing move debug" />
     <MESSAGE value="fixed target selection bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed target selection bug" />
+    <MESSAGE value="move disabled and turn resolve working" />
+    <MESSAGE value="stashing before removing intrinsic move disabling" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing intrinsic move disabling" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

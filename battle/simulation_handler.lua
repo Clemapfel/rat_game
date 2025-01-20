@@ -1375,41 +1375,8 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
-    env.set_intrinsic_move_is_disabled = function(entity_proxy, move_proxy, b)
-        bt.assert_args("set_intrinsic_move_is_disabled",
-            entity_proxy, bt.EntityProxy,
-            move_proxy, bt.MoveProxy,
-            b, bt.Boolean
-        )
-
-        local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-        local has_move = _state:entity_has_intrinsic_move(entity, move)
-        if not has_move then
-            bt.error_function("In set_intrinsic_move_is_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have intrinsic move `" .. env.get_id(move_proxy) .. "`")
-            return
-        end
-
-        _state:entity_set_intrinsic_move_is_disabled(entity, move, b)
-    end
-
-    env.get_intrinsic_move_is_disabled = function(entity_proxy, move_proxy)
-        bt.assert_args("get_intrinsic_move_is_disabled",
-            entity_proxy, bt.EntityProxy,
-            move_proxy, bt.MoveProxy
-        )
-
-        local entity, move = _get_native(entity_proxy), _get_native(move_proxy)
-        local has_move = _state:entity_has_intrinsic_move(entity, move)
-        if not has_move then
-            bt.error_function("In get_intrinsic_move_is_disabled: entity `" .. env.get_id(entity_proxy) .. "` does not have intrinsic move `" .. env.get_id(move_proxy) .. "`")
-            return false
-        end
-
-        return _state:entity_get_intrinsic_move_is_disabled(entity, move)
-    end
-
     env.has_intrinsic_move = function(entity_proxy, move_proxy)
-        bt.assert_args("get_intrinsic_move_is_disabled",
+        bt.assert_args("has_intrinsic_move",
             entity_proxy, bt.EntityProxy,
             move_proxy, bt.MoveProxy
         )

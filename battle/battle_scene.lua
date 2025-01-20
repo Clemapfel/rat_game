@@ -315,12 +315,6 @@ function bt.BattleScene:size_allocate(x, y, width, height)
             true
         )
 
-        self._env.set_intrinsic_move_is_disabled(
-            self._env.get_entity_from_id("MC"),
-            bt.create_move_proxy(self, bt.MoveConfig("STRUGGLE")),
-            true
-        )
-
         self:skip_all()
         self:start_move_selection()
         self._is_first_size_allocate = false
@@ -1072,7 +1066,7 @@ function bt.BattleScene:_create_move_selection_slots(entity)
         local move = self:get_move()
         if move ~= nil then
             if move:get_is_intrinsic() then
-                is_disabled = scene._state:entity_get_intrinsic_move_is_disabled(self.entity, move)
+                is_disabled = false
             else
                 is_disabled = scene._state:entity_get_move_is_disabled(self.entity, self.slot_i)
             end
@@ -1100,7 +1094,7 @@ function bt.BattleScene:_create_move_selection_slots(entity)
         if move ~= nil then
             local is_disabled
             if move:get_is_intrinsic() then
-                is_disabled = scene._state:entity_get_intrinsic_move_is_disabled(self.entity, move)
+                is_disabled = false
             else
                 is_disabled = scene._state:entity_get_move_is_disabled(self.entity, self.slot_i)
             end
@@ -1113,9 +1107,7 @@ function bt.BattleScene:_create_move_selection_slots(entity)
         end
     end
 
-    local on_b = function(self)
-        scene:_update_move_selection(self.entity, nil)
-    end
+    -- b handled in _handle_button_pressed
 
     local on_y = function(self)
         scene:set_scene_state(bt.SceneState.INSPECT)
@@ -1126,7 +1118,6 @@ function bt.BattleScene:_create_move_selection_slots(entity)
             node:signal_connect("enter", on_enter)
             node:signal_connect("exit", on_exit)
             node:signal_connect(rt.InputButton.A, on_a)
-            node:signal_connect(rt.InputButton.B, on_b)
             node:signal_connect(rt.InputButton.Y, on_y)
 
             current.selection_graph:add(node)
@@ -1546,8 +1537,6 @@ function bt.BattleScene:_create_target_selection_graph()
     local user = self._move_selection_order[self._move_selection_i]
     local move = self._entity_id_to_move_selection[user:get_id()].move
 
-    dbg(user:get_id(), move:get_id())
-
     local scene = self
     local targets = self._state:entity_get_valid_targets_for_move(user, move)
     local nodes, default_node = {}, nil
@@ -1918,8 +1907,7 @@ function bt.BattleScene:start_move_selection()
                     font_mono
                 ))
 
-                local is_disabled = self._state:entity_get_intrinsic_move_is_disabled(entity, intrinsic_move)
-                current.intrinsics:set_slot_is_disabled(slot_i, is_disabled)
+                -- intrinsics can't be disabled
                 slot_i = slot_i + 1
             end
         end
@@ -2040,12 +2028,10 @@ function bt.BattleScene:_handle_button_pressed(which)
     elseif state == bt.SceneState.MOVE_SELECTION then
         if which == rt.InputButton.B then
             -- undo last move selection
-            local i = self._move_selection_i
-            if i > 1 then
-                self:_set_move_selection_i(i - 1)
-            end
+            local i = math.max(self._move_selection_i - 1, 1)
             local current_entity = self._move_selection_order[i]
             self:_update_move_selection(current_entity, nil)
+            self:_set_move_selection_i(i)
         elseif which == rt.InputButton.Y then
             self:set_scene_state(bt.SceneState.INSPECT)
         elseif which == rt.InputButton.L then
