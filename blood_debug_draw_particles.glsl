@@ -51,7 +51,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
     int instance_id = love_InstanceID;
     Particle particle = particles[instance_id];
-    color = lch_to_rgb(vec3(0.8, 1, instance_id / float(n_particles)));
+    color = lch_to_rgb(vec3(0.8, 1, particle.cell_id / float(n_rows * n_columns)));
 
     bool is_center = gl_VertexID == 0;
     if (is_center) {
@@ -60,9 +60,8 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     }
     else {
         float angle = atan(vertex_position.y, vertex_position.x); // mesh centroid is 0, 0
-        vertex_position.xy += particle.position + vec2(cos(angle), sin(angle)) * particle_radius;
+        vertex_position.xy = particle.position + vec2(cos(angle), sin(angle)) * particle_radius;
     }
-
 
     return transform_projection * vertex_position;
 }

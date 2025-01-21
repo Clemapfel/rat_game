@@ -20,7 +20,8 @@ rt.settings.fluid_simulation = {
     density_radius = 2, -- factor
 }
 
-local SCREEN_W, SCREEN_H = 1600 / 4, 900 / 4
+local screen_size_div = 4
+local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
 local N_PARTICLES = 1000
 local VSYNC = 1
 
@@ -44,8 +45,10 @@ function rt.FluidSimulation:realize()
     local particle_radius = rt.settings.fluid_simulation.particle_radius
     self._cell_width = 4 * particle_radius
     self._cell_height = self._cell_width
-    self._n_rows = math.ceil(self._area_w / self._cell_width)
-    self._n_columns = math.ceil(self._area_h / self._cell_height)
+    self._n_columns = math.ceil(self._area_w / self._cell_width)
+    self._n_rows = math.ceil(self._area_h / self._cell_height)
+
+    dbg(self._n_rows, self._n_columns)
 
     local local_size = rt.settings.fluid_simulation.local_size
     self._particle_dispatch_size = math.ceil(math.sqrt(self._n_particles))
@@ -56,6 +59,7 @@ function rt.FluidSimulation:realize()
     }
 
     self._debug_run_shader = rt.ComputeShader("blood_debug_run.glsl")
+    self._step_shader = rt.ComputeShader("blood_step.glsl")
 
     -- buffers
 
@@ -86,12 +90,11 @@ function rt.FluidSimulation:realize()
 
             local cell_x = math.floor(px / self._cell_width)
             local cell_y = math.floor(px / self._cell_height)
-            local cell_i = 0 --cell_y * self._n_rows + cell_x
+            local cell_i = cell_y * self._n_rows + cell_x
             table.insert(particles, {
                 px, py, -- position
                 vx, vy, -- velocity
-                cell_i,  -- cell_id,
-                0
+                cell_i,  -- cell_id
             })
         end
 
@@ -105,6 +108,15 @@ function rt.FluidSimulation:realize()
         self._n_rows * self._n_columns,
         buffer_usage
     )
+
+    do
+        local data = {}
+        for i = 1, self._n_rows * self._n_columns do
+            table.insert(data, {0, 0})
+        end
+
+        self._cell_occupations_buffer:setArrayData(data)
+    end
 
     self._sort_global_counts_buffer = love.graphics.newBuffer(
         self._debug_run_shader:get_buffer_format("global_counts_buffer"),
@@ -180,7 +192,8 @@ function rt.FluidSimulation:realize()
 
     for name_value in range(
         {"cell_occupation_buffer", self._cell_occupations_buffer},
-        {"n_rows", self._n_rows},
+        --{"n_rows", self._n_rows},
+        {"n_columns", self._n_columns},
         {"cell_width", self._cell_width},
         {"cell_height", self._cell_height}
     ) do
@@ -201,7 +214,9 @@ function rt.FluidSimulation:realize()
     for name_value in range(
         {"particle_buffer", self._particle_buffer_a},
         {"n_particles", self._n_particles},
-        {"particle_radius", self._particle_radius}
+        {"particle_radius", self._particle_radius},
+        {"n_rows", self._n_rows},
+        {"n_columns", self._n_columns}
     ) do
         self._debug_draw_particles_shader:send(table.unpack(name_value))
     end
@@ -220,26 +235,45 @@ function rt.FluidSimulation:realize()
         {"particle_buffer_b", self._particle_buffer_b},
         {"cell_occupations_buffer", self._cell_occupations_buffer},
         {"global_counts_buffer", self._sort_global_counts_buffer},
-        {"density_texture", self._density_texture},
         {"n_particles", self._n_particles},
         {"particle_radius", self._particle_radius},
-        {"bounds", {0, 0, love.graphics.getDimensions()}},
         {"n_rows", self._n_rows},
         {"n_columns", self._n_columns},
         {"cell_width", self._cell_width},
         {"cell_height", self._cell_height},
-        {"is_sorted_buffer", self._is_sorted_buffer},
-        {"delta", self._sim_delta}
+        {"is_sorted_buffer", self._is_sorted_buffer}
     ) do
         self._debug_run_shader:send(table.unpack(name_value))
     end
 
-    local elapsed = 0
     self._run_debug = function(self, delta)
+        self._debug_run_shader:dispatch(1, 1)
+    end
+
+    for name_value in range(
+        {"particle_buffer_a", self._particle_buffer_a},
+        {"particle_buffer_b", self._particle_buffer_b},
+        {"cell_occupations_buffer", self._cell_occupations_buffer},
+        {"density_texture", self._density_texture},
+        {"delta", self._sim_delta},
+        {"particle_radius", self._particle_radius},
+        {"n_particles", self._n_particles},
+        {"bounds", {0, 0, love.graphics.getDimensions()}},
+        {"n_rows", self._n_rows},
+        {"n_columns", self._n_columns},
+        {"cell_width", self._cell_width},
+        {"cell_height", self._cell_height}
+    ) do
+        self._step_shader:send(table.unpack(name_value))
+    end
+
+    local step_dispatch_size = math.ceil(math.sqrt(self._n_particles) / 16)
+    local elapsed = 0
+    self._step = function(self, delta)
         elapsed = elapsed + delta
         local sim_delta = self._sim_delta
         while elapsed > sim_delta do
-            self._debug_run_shader:dispatch(1, 1)
+            self._step_shader:dispatch(step_dispatch_size, step_dispatch_size)
             elapsed = elapsed - sim_delta
         end
     end
@@ -247,9 +281,9 @@ end
 
 --- @override
 function rt.FluidSimulation:update(delta)
-
-    self:_run_debug(delta)
     self:_update_density_texture()
+    self:_run_debug()
+    self:_step(delta)
 
     local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
     dbg("is_sorted", data:getUInt32(0))
@@ -257,7 +291,7 @@ end
 
 --- @override
 function rt.FluidSimulation:draw()
-    --self:_debug_draw_spatial_hash()
+    self:_debug_draw_spatial_hash()
     self:_debug_draw_particles()
 end
 
@@ -284,6 +318,7 @@ love.keypressed = function(which)
         allow_update = true
     elseif which == "x" then
         sim:realize()
+        sim:update(1 / 60)
         allow_update = true
     end
 end
