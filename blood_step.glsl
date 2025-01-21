@@ -1,6 +1,7 @@
 struct Particle {
     vec2 position;
     vec2 velocity;
+    float mass;
     uint cell_id;
 };
 
@@ -46,12 +47,10 @@ const float sim_delta = 1 / (60 * 2);
 const float target_density = 4.0;
 const float restitution_scale = 0.2;
 const float friction = 0.1;
-const float mass = 1.0;
 const float gravity_scale = 1500;
 const float pressure_strength = gravity_scale * 3;
 const float viscosity_strength = pressure_strength * 0.1;
 float smoothing_radius = particle_radius * 4;
-
 
 const float eps = 0.0001;
 
@@ -78,7 +77,6 @@ float viscosity_kernel_laplacian(float dist) {
 }
 
 void handle_collision(inout vec2 position, inout vec2 velocity) {
-
     // Left boundary
     if (position.x < bounds.x + particle_radius) {
         position.x = bounds.x + particle_radius + eps;
@@ -159,21 +157,22 @@ void computemain() {
             ivec2 cell_xy = center_xy + directions[direction_i];
 
             if (cell_xy.x < 0 || cell_xy.y < 0 || cell_xy.x > n_columns || cell_xy.y > n_rows)
-                continue;
+            continue;
 
             CellOccupation occupation = cell_occupations[cell_xy_to_cell_linear_index(cell_xy)];
             for (uint other_particle_i = occupation.start_i; other_particle_i < occupation.end_i; ++other_particle_i) {
                 if (other_particle_i == self_particle_i)
-                    continue;
-                
+                continue;
+
                 Particle other = particles_b[other_particle_i];
                 vec2 other_position = other.position + delta * other.velocity;
 
                 vec2 r = self_position - other_position;
                 float dist = length(r);
+                float other_mass = other.mass;
 
-                // density
-                density += mass * density_kernel(dist);
+                // density - using other particle's mass
+                density += other.mass * density_kernel(dist);
 
                 // pressure
                 float pressure = pressure_strength * (density - target_density);
@@ -181,12 +180,12 @@ void computemain() {
                 float shared_pressure = (pressure + other_pressure) * 0.5;
 
                 if (dist < smoothing_radius) {
-                    // pressure force
-                    pressure_force += mass * shared_pressure * pressure_kernel_gradient(r, dist);
+                    // pressure force - using other particle's mass
+                    pressure_force += other.mass * shared_pressure * pressure_kernel_gradient(r, dist);
 
-                    // viscosity force
+                    // viscosity force - using other particle's mass
                     vec2 velocity_diff = other.velocity - self.velocity;
-                    viscosity_force += viscosity_strength * mass * velocity_diff * viscosity_kernel_laplacian(dist);
+                    viscosity_force += viscosity_strength * other.mass * velocity_diff * viscosity_kernel_laplacian(dist);
                 }
             }
         }
@@ -200,7 +199,7 @@ void computemain() {
     for (uint i = particle_start_i; i < particle_end_i; ++i) {
         Particle particle = particles_b[i];
 
-        particle.velocity += gravity * gravity_scale * delta;
+        particle.velocity += gravity * gravity_scale * particle.mass * delta;
         particle.position += particle.velocity * delta;
 
         handle_collision(particle.position, particle.velocity);

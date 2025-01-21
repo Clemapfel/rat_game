@@ -24,7 +24,7 @@ uint position_to_cell_linear_index(vec2 position) {
 
 vec4 effect(vec4, Image, vec2, vec2 frag_position) {
     CellOccupation occupation = cell_occupations[position_to_cell_linear_index(frag_position)];
-    return vec4(1, 0, 1, (float(occupation.end_i) - float(occupation.start_i)) / 4.0);
+    return vec4(1, 0, 1, (float(occupation.end_i) - float(occupation.start_i)) / 5.0);
 }
 
 #endif

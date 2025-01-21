@@ -57,7 +57,6 @@ function rt.FluidSimulation:realize()
     }
 
     self._debug_run_shader = rt.ComputeShader("blood_debug_run.glsl")
-    self._step_shader = rt.ComputeShader("blood_step.glsl")
 
     -- buffers
 
@@ -92,6 +91,7 @@ function rt.FluidSimulation:realize()
             table.insert(particles, {
                 px, py, -- position
                 0, 0, --vx, vy, -- velocity
+                1, -- mass
                 cell_i,  -- cell_id
             })
         end
@@ -248,6 +248,9 @@ function rt.FluidSimulation:realize()
         self._debug_run_shader:dispatch(1, 1)
     end
 
+    -- step
+
+    self._step_shader = rt.ComputeShader("blood_step.glsl")
     for name_value in range(
         {"particle_buffer_a", self._particle_buffer_a},
         {"particle_buffer_b", self._particle_buffer_b},
@@ -275,12 +278,36 @@ function rt.FluidSimulation:realize()
             elapsed = elapsed - sim_delta
         end
     end
+
+    -- pick up
+    self._apply_local_force_shader = rt.ComputeShader("blood_apply_local_forces.glsl")
+
+    for name_value in range(
+        {"particle_buffer_a", self._particle_buffer_a},
+        {"particle_buffer_b", self._particle_buffer_b},
+        {"n_particles", self._n_particles},
+        {"delta", self._sim_delta}
+
+    ) do
+        self._apply_local_force_shader:send(table.unpack(name_value))
+    end
+
+    self._apply_local_force = function(self, x, y)
+        self._apply_local_force_shader:send("center", {x, y})
+        self._apply_local_force_shader:send("force_direction", 1)
+        self._apply_local_force_shader:dispatch(step_dispatch_size, step_dispatch_size)
+    end
 end
 
 --- @override
 function rt.FluidSimulation:update(delta)
     self:_update_density_texture()
     self:_run_debug()
+
+    if love.mouse.isDown(1) then
+        self:_apply_local_force(love.mouse.getPosition())
+    end
+
     self:_step(delta)
 
     local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
@@ -305,10 +332,10 @@ end
 
 allow_update = true
 love.update = function(delta)
-    if allow_update or love.keyboard.isDown("space") then
+    --if allow_update or love.keyboard.isDown("space") then
         sim:update(delta)
         allow_update = false
-    end
+    --end
 end
 
 love.keypressed = function(which)
