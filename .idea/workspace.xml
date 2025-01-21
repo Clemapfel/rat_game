@@ -22,11 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing before removing intrinsic move disabling">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="updated diagnostics to show total frame usage">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_battle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -164,7 +164,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main">
+  <component name="RunManager" selected="Lua Application.main_blood">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -686,23 +686,7 @@
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
-      <workItem from="1737301880859" duration="25444000" />
-    </task>
-    <task id="LOCAL-01384" summary="implemented in-battle entity verbose info">
-      <option name="closed" value="true" />
-      <created>1736022307890</created>
-      <option name="number" value="01384" />
-      <option name="presentableId" value="LOCAL-01384" />
-      <option name="project" value="LOCAL" />
-      <updated>1736022307890</updated>
-    </task>
-    <task id="LOCAL-01385" summary="linked underline and strikethrough between words">
-      <option name="closed" value="true" />
-      <created>1736023188867</created>
-      <option name="number" value="01385" />
-      <option name="presentableId" value="LOCAL-01385" />
-      <option name="project" value="LOCAL" />
-      <updated>1736023188868</updated>
+      <workItem from="1737301880859" duration="29209000" />
     </task>
     <task id="LOCAL-01386" summary="verbose info now correctly displays battle entity info">
       <option name="closed" value="true" />
@@ -1080,7 +1064,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737401111593</updated>
     </task>
-    <option name="localTasksCounter" value="1433" />
+    <task id="LOCAL-01433" summary="fixed move undo">
+      <option name="closed" value="true" />
+      <created>1737402746194</created>
+      <option name="number" value="01433" />
+      <option name="presentableId" value="LOCAL-01433" />
+      <option name="project" value="LOCAL" />
+      <updated>1737402746194</updated>
+    </task>
+    <task id="LOCAL-01434" summary="updated diagnostics to show total frame usage">
+      <option name="closed" value="true" />
+      <created>1737402757102</created>
+      <option name="number" value="01434" />
+      <option name="presentableId" value="LOCAL-01434" />
+      <option name="project" value="LOCAL" />
+      <updated>1737402757102</updated>
+    </task>
+    <option name="localTasksCounter" value="1435" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1134,8 +1134,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="removed unnecessary options" />
-    <MESSAGE value="added sdf" />
     <MESSAGE value="pressure gradient working" />
     <MESSAGE value="rendered selected items on top" />
     <MESSAGE value="stashing move highlighting" />
@@ -1159,7 +1157,9 @@
     <MESSAGE value="fixed target selection bug" />
     <MESSAGE value="move disabled and turn resolve working" />
     <MESSAGE value="stashing before removing intrinsic move disabling" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing before removing intrinsic move disabling" />
+    <MESSAGE value="fixed move undo" />
+    <MESSAGE value="updated diagnostics to show total frame usage" />
+    <option name="LAST_COMMIT_MESSAGE" value="updated diagnostics to show total frame usage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

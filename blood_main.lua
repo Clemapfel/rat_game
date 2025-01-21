@@ -20,7 +20,7 @@ rt.settings.fluid_simulation = {
     density_radius = 2, -- factor
 }
 
-local SCREEN_W, SCREEN_H = 1600 / 1.5, 900 / 1.5
+local SCREEN_W, SCREEN_H = 1600 / 4, 900 / 4
 local N_PARTICLES = 1000
 local VSYNC = 1
 
@@ -35,6 +35,7 @@ rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h, n
         _n_rows = 0,
         _n_columns = 0,
         _cell_width = 0,
+        _sim_delta = 1 / 120
     })
 end)
 
@@ -90,7 +91,6 @@ function rt.FluidSimulation:realize()
                 px, py, -- position
                 vx, vy, -- velocity
                 cell_i,  -- cell_id,
-                0,
                 0
             })
         end
@@ -228,14 +228,20 @@ function rt.FluidSimulation:realize()
         {"n_columns", self._n_columns},
         {"cell_width", self._cell_width},
         {"cell_height", self._cell_height},
-        {"is_sorted_buffer", self._is_sorted_buffer}
+        {"is_sorted_buffer", self._is_sorted_buffer},
+        {"delta", self._sim_delta}
     ) do
         self._debug_run_shader:send(table.unpack(name_value))
     end
 
+    local elapsed = 0
     self._run_debug = function(self, delta)
-        self._debug_run_shader:send("delta", delta)
-        self._debug_run_shader:dispatch(1, 1)
+        elapsed = elapsed + delta
+        local sim_delta = self._sim_delta
+        while elapsed > sim_delta do
+            self._debug_run_shader:dispatch(1, 1)
+            elapsed = elapsed - sim_delta
+        end
     end
 end
 
@@ -251,12 +257,8 @@ end
 
 --- @override
 function rt.FluidSimulation:draw()
-    self:_debug_draw_spatial_hash()
+    --self:_debug_draw_spatial_hash()
     self:_debug_draw_particles()
-
-    self._debug_draw_density_shader:bind()
-    love.graphics.draw(self._density_texture)
-    self._debug_draw_density_shader:unbind()
 end
 
 local sim = nil
