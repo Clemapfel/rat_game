@@ -15,14 +15,14 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 5,
+    particle_radius = 4,
     local_size = 8,
     density_radius = 2, -- factor
 }
 
-local screen_size_div = 4
+local screen_size_div = 2
 local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
-local N_PARTICLES = 1000
+local N_PARTICLES = 2000
 local VSYNC = 1
 
 --- @class rt.FluidSimulation
@@ -47,8 +47,6 @@ function rt.FluidSimulation:realize()
     self._cell_height = self._cell_width
     self._n_columns = math.ceil(self._area_w / self._cell_width)
     self._n_rows = math.ceil(self._area_h / self._cell_height)
-
-    dbg(self._n_rows, self._n_columns)
 
     local local_size = rt.settings.fluid_simulation.local_size
     self._particle_dispatch_size = math.ceil(math.sqrt(self._n_particles))
@@ -93,7 +91,7 @@ function rt.FluidSimulation:realize()
             local cell_i = cell_y * self._n_rows + cell_x
             table.insert(particles, {
                 px, py, -- position
-                vx, vy, -- velocity
+                0, 0, --vx, vy, -- velocity
                 cell_i,  -- cell_id
             })
         end

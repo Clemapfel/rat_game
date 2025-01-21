@@ -18,13 +18,20 @@ float spiky_kernel_peak() {
     return 4 / h;
 }
 
-float alt_kernel(float x) {
-    if (abs(x) > h) return 0;
+
+const float h = 0.5;
+float kernel_shape(float x) {
     return exp(-2 * (x - h)) / (exp(h) * sinh(h));
 }
 
-float alt_kernel_peak() {
-    return exp(h) / sinh(h);
+float alt_kernel(float x) {
+    if (abs(x) > h)
+    return 0;
+
+    if (x >= 0)
+    return kernel_shape(x);
+    else
+    return kernel_shape(1 - x - 1);
 }
 
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position) {

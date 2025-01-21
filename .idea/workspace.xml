@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="spatial hash working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -688,15 +686,7 @@
       <workItem from="1736899913049" duration="584000" />
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
-      <workItem from="1737301880859" duration="34934000" />
-    </task>
-    <task id="LOCAL-01387" summary="changed color to HP purple">
-      <option name="closed" value="true" />
-      <created>1736023992264</created>
-      <option name="number" value="01387" />
-      <option name="presentableId" value="LOCAL-01387" />
-      <option name="project" value="LOCAL" />
-      <updated>1736023992264</updated>
+      <workItem from="1737301880859" duration="37288000" />
     </task>
     <task id="LOCAL-01388" summary="stashing before switching to rgba32f">
       <option name="closed" value="true" />
@@ -1082,7 +1072,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737479369110</updated>
     </task>
-    <option name="localTasksCounter" value="1436" />
+    <task id="LOCAL-01436" summary="spatial hash working">
+      <option name="closed" value="true" />
+      <created>1737485192787</created>
+      <option name="number" value="01436" />
+      <option name="presentableId" value="LOCAL-01436" />
+      <option name="project" value="LOCAL" />
+      <updated>1737485192787</updated>
+    </task>
+    <option name="localTasksCounter" value="1437" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1136,7 +1134,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="pressure gradient working" />
     <MESSAGE value="rendered selected items on top" />
     <MESSAGE value="stashing move highlighting" />
     <MESSAGE value="stashing before move slots into realize" />
@@ -1161,7 +1158,8 @@
     <MESSAGE value="fixed move undo" />
     <MESSAGE value="updated diagnostics to show total frame usage" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="spatial hash working" />
+    <option name="LAST_COMMIT_MESSAGE" value="spatial hash working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
