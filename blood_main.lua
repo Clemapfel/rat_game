@@ -15,14 +15,14 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 4,
+    particle_radius = 2,
     local_size = 8,
     density_radius = 2, -- factor
 }
 
 local screen_size_div = 2
 local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
-local N_PARTICLES = 2000
+local N_PARTICLES = 5000
 local VSYNC = 1
 
 --- @class rt.FluidSimulation
@@ -36,7 +36,7 @@ rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h, n
         _n_rows = 0,
         _n_columns = 0,
         _cell_width = 0,
-        _sim_delta = 1 / 120
+        _sim_delta = 1 / (60 * 4)
     })
 end)
 
@@ -318,6 +318,12 @@ end
 function rt.FluidSimulation:draw()
     self:_debug_draw_spatial_hash()
     self:_debug_draw_particles()
+
+    --[[
+    self._debug_draw_density_shader:bind()
+    love.graphics.draw(self._density_texture)
+    self._debug_draw_density_shader:unbind()
+    ]]--
 end
 
 local sim = nil

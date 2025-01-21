@@ -43,14 +43,16 @@ uniform uint n_columns;
 uniform uint cell_width;
 uniform uint cell_height;
 
-const float sim_delta = 1 / (60 * 2);
 const float target_density = 4.0;
+const float target_near_density = 2.0;  // Target density for near particles
 const float restitution_scale = 0.2;
 const float friction = 0.1;
 const float gravity_scale = 1500;
 const float pressure_strength = gravity_scale * 3;
-const float viscosity_strength = pressure_strength * 0.1;
-float smoothing_radius = particle_radius * 4;
+const float near_pressure_strength = pressure_strength * 2;  // Stronger effect for near particles
+const float viscosity_strength = pressure_strength * 0.04;
+float smoothing_radius = particle_radius * 5;
+float near_radius = smoothing_radius * 0.5;  // Smaller radius for near-density calculations
 
 const float eps = 0.0001;
 
@@ -62,11 +64,27 @@ float density_kernel(float dist) {
     return scale * v * v * v;
 }
 
+// Near density kernel (Poly6 with smaller radius)
+float near_density_kernel(float dist) {
+    if (dist > near_radius) return 0.0;
+    float scale = 315.0 / (64.0 * 3.14159 * pow(near_radius, 9));
+    float v = near_radius * near_radius - dist * dist;
+    return scale * v * v * v;
+}
+
 // Pressure kernel gradient (Spiky)
 vec2 pressure_kernel_gradient(vec2 r, float dist) {
     if (dist > smoothing_radius || dist < eps) return vec2(0);
     float scale = -45.0 / (3.14159 * pow(smoothing_radius, 6)) *
     pow(smoothing_radius - dist, 2);
+    return r * (scale / dist);
+}
+
+// Near pressure kernel gradient (Spiky with smaller radius)
+vec2 near_pressure_kernel_gradient(vec2 r, float dist) {
+    if (dist > near_radius || dist < eps) return vec2(0);
+    float scale = -45.0 / (3.14159 * pow(near_radius, 6)) *
+    pow(near_radius - dist, 2);
     return r * (scale / dist);
 }
 
@@ -83,7 +101,6 @@ void handle_collision(inout vec2 position, inout vec2 velocity) {
         if (velocity.x < 0.0) {
             float normal_component = velocity.x;
             float tangent_component = velocity.y;
-
             velocity.x = -normal_component * restitution_scale;
             velocity.y = tangent_component * (1.0 - friction);
         }
@@ -95,7 +112,6 @@ void handle_collision(inout vec2 position, inout vec2 velocity) {
         if (velocity.x > 0.0) {
             float normal_component = velocity.x;
             float tangent_component = velocity.y;
-
             velocity.x = -normal_component * restitution_scale;
             velocity.y = tangent_component * (1.0 - friction);
         }
@@ -107,7 +123,6 @@ void handle_collision(inout vec2 position, inout vec2 velocity) {
         if (velocity.y < 0.0) {
             float normal_component = velocity.y;
             float tangent_component = velocity.x;
-
             velocity.y = -normal_component * restitution_scale;
             velocity.x = tangent_component * (1.0 - friction);
         }
@@ -119,7 +134,6 @@ void handle_collision(inout vec2 position, inout vec2 velocity) {
         if (velocity.y > 0.0) {
             float normal_component = velocity.y;
             float tangent_component = velocity.x;
-
             velocity.y = -normal_component * restitution_scale;
             velocity.x = tangent_component * (1.0 - friction);
         }
@@ -149,7 +163,9 @@ void computemain() {
         vec2 self_position = self.position + delta * self.velocity;
 
         float density = 0.0;
+        float near_density = 0.0;
         vec2 pressure_force = vec2(0);
+        vec2 near_pressure_force = vec2(0);
         vec2 viscosity_force = vec2(0);
 
         ivec2 center_xy = position_to_cell_xy(self.position);
@@ -171,26 +187,33 @@ void computemain() {
                 float dist = length(r);
                 float other_mass = other.mass;
 
-                // density - using other particle's mass
+                // Regular density
                 density += other.mass * density_kernel(dist);
 
-                // pressure
+                // Near density
+                near_density += other.mass * near_density_kernel(dist);
+
+                // Combined pressure forces
                 float pressure = pressure_strength * (density - target_density);
+                float near_pressure = near_pressure_strength * (near_density - target_near_density);
                 float other_pressure = pressure_strength * (density - target_density);
+                float other_near_pressure = near_pressure_strength * (near_density - target_near_density);
+
                 float shared_pressure = (pressure + other_pressure) * 0.5;
+                float shared_near_pressure = (near_pressure + other_near_pressure) * 0.5;
 
                 if (dist < smoothing_radius) {
-                    // pressure force - using other particle's mass
                     pressure_force += other.mass * shared_pressure * pressure_kernel_gradient(r, dist);
+                    near_pressure_force += other.mass * shared_near_pressure * near_pressure_kernel_gradient(r, dist);
 
-                    // viscosity force - using other particle's mass
                     vec2 velocity_diff = other.velocity - self.velocity;
                     viscosity_force += viscosity_strength * other.mass * velocity_diff * viscosity_kernel_laplacian(dist);
                 }
             }
         }
 
-        self.velocity += ((pressure_force + viscosity_force) / max(density, eps)) * delta;
+        vec2 total_force = pressure_force + viscosity_force; // + near_pressure_force;
+        self.velocity += (total_force / max(density, eps)) * delta;
         particles_b[self_particle_i] = self;
     }
 

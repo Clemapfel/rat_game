@@ -12,7 +12,7 @@ vec3 hsv_to_rgb(vec3 c)
 vec4 effect(vec4, Image density, vec2 texture_coords, vec2) {
     vec4 data = texture(density, texture_coords);
     float angle = (atan(data.z, data.y) + PI) / (2 * PI);
-    return vec4(hsv_to_rgb(vec3(angle, data.x, data.x)), 1);
+    return vec4(data.x * hsv_to_rgb(vec3(angle, 1, 1)), data.x);
 }
 
 #endif
