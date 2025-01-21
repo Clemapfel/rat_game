@@ -44,12 +44,12 @@ uniform uint cell_height;
 
 const float sim_delta = 1 / (60 * 2);
 const float target_density = 4.0;
-const float gravity_scale = 1000;
-const float restitution_scale = 0.3;
+const float restitution_scale = 0.2;
 const float friction = 0.1;
 const float mass = 1.0;
-const float pressure_strength = 3000;
-const float viscosity_strength = 3000;
+const float gravity_scale = 1500;
+const float pressure_strength = gravity_scale * 3;
+const float viscosity_strength = pressure_strength * 0.1;
 float smoothing_radius = particle_radius * 4;
 
 

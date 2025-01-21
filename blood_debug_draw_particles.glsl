@@ -51,7 +51,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
     int instance_id = love_InstanceID;
     Particle particle = particles[instance_id];
-    color = lch_to_rgb(vec3(0.8, 1, particle.cell_id / float(n_rows * n_columns)));
+    color = lch_to_rgb(vec3(0.8, 1, instance_id / float(n_particles))); //particle.cell_id / float(n_rows * n_columns)));
 
     bool is_center = gl_VertexID == 0;
     if (is_center) {
