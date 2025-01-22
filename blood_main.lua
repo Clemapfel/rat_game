@@ -21,7 +21,7 @@ rt.settings.fluid_simulation = {
 
 local screen_size_div = 2
 local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
-local particle_density = 0.1
+local particle_density = 0.2
 local VSYNC = 1
 
 --- @class rt.FluidSimulation

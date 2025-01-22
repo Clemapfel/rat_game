@@ -29,7 +29,7 @@ float density_falloff(float x) {
 
 float light_falloff(float x) {
     const float ramp = 0.1;
-    const float peak = 0.7;
+    const float peak = 2;
     return (1 - exp(-2 * ramp * x * x)) * peak;
 }
 
@@ -44,11 +44,10 @@ vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_co
     vec3 normal = normalize(vec3(-dxy.x, -dxy.y, 1.0)) * 1.5;
     float diffuse = dot(normal, light_direction);
     float specular = pow(max(dot(normal, light_direction), 0.0), 32);
-    float value = smoothstep(0, 1, (diffuse + specular) - light_falloff(density));
+    float value =(diffuse + specular) - light_falloff(density);
 
     const float water_surface_eps = 0.15;
-
-    return vec4(vec3(value), smoothstep(0.1, 0.1 + water_surface_eps, density_falloff(density)));
+    return vec4(vec3(value), smoothstep(0.1, 0.1 + water_surface_eps, min(density_falloff(density), 1)));
 }
 
 #endif

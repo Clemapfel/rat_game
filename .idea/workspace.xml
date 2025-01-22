@@ -22,19 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing milk">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_apply_local_forces.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_apply_local_forces.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_kernel_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_kernel_init.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_init_density_kernel.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -695,15 +687,7 @@
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
       <workItem from="1737301880859" duration="58690000" />
-      <workItem from="1737575664686" duration="1893000" />
-    </task>
-    <task id="LOCAL-01392" summary="stashing, need to rework meta such that all intances have same metatable, otherwise __eq is not invoked">
-      <option name="closed" value="true" />
-      <created>1736191614533</created>
-      <option name="number" value="01392" />
-      <option name="presentableId" value="LOCAL-01392" />
-      <option name="project" value="LOCAL" />
-      <updated>1736191614533</updated>
+      <workItem from="1737575664686" duration="4758000" />
     </task>
     <task id="LOCAL-01393" summary="stashing">
       <option name="closed" value="true" />
@@ -1089,7 +1073,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737494496932</updated>
     </task>
-    <option name="localTasksCounter" value="1441" />
+    <task id="LOCAL-01441" summary="stashing milk">
+      <option name="closed" value="true" />
+      <created>1737577580438</created>
+      <option name="number" value="01441" />
+      <option name="presentableId" value="LOCAL-01441" />
+      <option name="project" value="LOCAL" />
+      <updated>1737577580438</updated>
+    </task>
+    <option name="localTasksCounter" value="1442" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1143,7 +1135,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="rendered selected items on top" />
     <MESSAGE value="stashing move highlighting" />
     <MESSAGE value="stashing before move slots into realize" />
     <MESSAGE value="added move selection UI" />
@@ -1168,7 +1159,8 @@
     <MESSAGE value="updated diagnostics to show total frame usage" />
     <MESSAGE value="spatial hash working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing milk" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing milk" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -44,15 +44,16 @@ uniform uint n_columns;
 uniform uint cell_width;
 uniform uint cell_height;
 
-const float target_density = 1.0;
+const float target_density = 10.0;
 const float target_near_density = 2.0;
 const float restitution_scale = 0.2;
 const float friction = 0.1;
 const float gravity_scale = 1500;
 const float pressure_strength = 1500;
 const float near_pressure_strength = pressure_strength * 2;
-const float viscosity_strength = pressure_strength * 0.05;
-const float buoyancy_strength = 0.3;
+const float viscosity_strength = pressure_strength * 0.1;
+const float buoyancy_strength = -0.0;
+const float velocity_damping = 0.996;
 uniform float smoothing_radius = 16;
 float near_radius = smoothing_radius * 0.4;
 
@@ -208,7 +209,7 @@ void computemain() {
         }
 
         vec2 total_force = pressure_force + viscosity_force + near_pressure_force;
-        self.velocity += (total_force / max(density, eps)) * delta * 0.998;
+        self.velocity += (total_force / max(density, eps)) * delta;
         self.density = density;
         particles_b[self_particle_i] = self;
     }
@@ -218,9 +219,9 @@ void computemain() {
     for (uint i = particle_start_i; i < particle_end_i; ++i) {
         Particle particle = particles_b[i];
 
-        vec2 gravity_force = gravity * particle.mass - vec2(0, particle.density - target_density) * buoyancy_strength;
+        vec2 gravity_force = gravity * particle.mass - vec2(0, max(target_density - particle.density, 0)) * buoyancy_strength;
         particle.velocity += gravity_scale * max(gravity_force, 0) * delta;
-        particle.position += particle.velocity * delta;
+        particle.position += particle.velocity * delta * velocity_damping;
 
         handle_collision(particle.position, particle.velocity);
         particles_a[i] = particle;
