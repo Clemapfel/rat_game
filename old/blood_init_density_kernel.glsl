@@ -35,7 +35,7 @@ float alt_kernel(float x) {
 }
 
 vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position) {
-    float value = alt_kernel(distance(texture_coords, vec2(0.5))); // aspect ratio is 1:1
+    float value = distance(texture_coords, vec2(0.5)); // aspect ratio is 1:1
     return vec4(value);
 }
 

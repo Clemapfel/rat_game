@@ -2,6 +2,7 @@ struct Particle {
     vec2 position;
     vec2 velocity;
     float mass;
+    float density;
     uint cell_id;
 };
 
@@ -20,6 +21,7 @@ uniform vec2 center;
 uniform float force_direction = 1;
 uniform float force_scale = 100;
 uniform float max_distance = 100;
+uniform float vortex_strength = 0.2; // Controls the strength of the vortex effect
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
 void computemain() {
@@ -37,8 +39,13 @@ void computemain() {
         float distance = length(to_center);
 
         float weight = exp(-1 * (distance / max_distance));
-        //weight = -1 * tanh(1 - distance / max_distance);
-        particle.velocity += normalize(to_center) * weight * force_scale;
+
+        vec2 radial_force = normalize(to_center) * weight * force_scale;
+        vec2 tangential_dir = vec2(-to_center.y, to_center.x) / distance;
+        vec2 vortex_force = tangential_dir * weight * force_scale * vortex_strength;
+
+        particle.velocity += radial_force + vortex_force;
+
         particles_b[i] = particle;
     }
 }

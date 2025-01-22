@@ -4,6 +4,7 @@ struct Particle {
     vec2 position;
     vec2 velocity;
     float mass;
+    float density;
     uint cell_id;
 };
 

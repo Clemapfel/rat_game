@@ -17,6 +17,7 @@ const mat3 sobel_y = mat3(
 
 layout(local_size_x = 1, local_size_y = 1) in;
 void computemain() {
+
     ivec2 texture_coords = ivec2(gl_GlobalInvocationID.xy);
     ivec2 texture_size = imageSize(density_texture);
 

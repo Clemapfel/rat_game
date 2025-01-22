@@ -2,6 +2,7 @@ struct Particle {
     vec2 position;
     vec2 velocity;
     float mass;
+    float density;
     uint cell_id;
 };
 
@@ -43,20 +44,20 @@ uniform uint n_columns;
 uniform uint cell_width;
 uniform uint cell_height;
 
-const float target_density = 4.0;
-const float target_near_density = 2.0;  // Target density for near particles
+const float target_density = 1.0;
+const float target_near_density = 2.0;
 const float restitution_scale = 0.2;
 const float friction = 0.1;
 const float gravity_scale = 1500;
-const float pressure_strength = gravity_scale * 3;
-const float near_pressure_strength = pressure_strength * 2;  // Stronger effect for near particles
-const float viscosity_strength = pressure_strength * 0.04;
-float smoothing_radius = particle_radius * 5;
-float near_radius = smoothing_radius * 0.5;  // Smaller radius for near-density calculations
+const float pressure_strength = 1500;
+const float near_pressure_strength = pressure_strength * 2;
+const float viscosity_strength = pressure_strength * 0.05;
+const float buoyancy_strength = 0.3;
+uniform float smoothing_radius = 16;
+float near_radius = smoothing_radius * 0.4;
 
 const float eps = 0.0001;
 
-// Density kernel (Poly6)
 float density_kernel(float dist) {
     if (dist > smoothing_radius) return 0.0;
     float scale = 315.0 / (64.0 * 3.14159 * pow(smoothing_radius, 9));
@@ -64,7 +65,6 @@ float density_kernel(float dist) {
     return scale * v * v * v;
 }
 
-// Near density kernel (Poly6 with smaller radius)
 float near_density_kernel(float dist) {
     if (dist > near_radius) return 0.0;
     float scale = 315.0 / (64.0 * 3.14159 * pow(near_radius, 9));
@@ -72,23 +72,18 @@ float near_density_kernel(float dist) {
     return scale * v * v * v;
 }
 
-// Pressure kernel gradient (Spiky)
 vec2 pressure_kernel_gradient(vec2 r, float dist) {
     if (dist > smoothing_radius || dist < eps) return vec2(0);
-    float scale = -45.0 / (3.14159 * pow(smoothing_radius, 6)) *
-    pow(smoothing_radius - dist, 2);
+    float scale = -45.0 / (3.14159 * pow(smoothing_radius, 6)) * pow(smoothing_radius - dist, 2);
     return r * (scale / dist);
 }
 
-// Near pressure kernel gradient (Spiky with smaller radius)
 vec2 near_pressure_kernel_gradient(vec2 r, float dist) {
     if (dist > near_radius || dist < eps) return vec2(0);
-    float scale = -45.0 / (3.14159 * pow(near_radius, 6)) *
-    pow(near_radius - dist, 2);
+    float scale = -45.0 / (3.14159 * pow(near_radius, 6)) * pow(near_radius - dist, 2);
     return r * (scale / dist);
 }
 
-// Viscosity kernel laplacian
 float viscosity_kernel_laplacian(float dist) {
     if (dist > smoothing_radius) return 0.0;
     return 45.0 / (3.14159 * pow(smoothing_radius, 6)) * (smoothing_radius - dist);
@@ -212,8 +207,9 @@ void computemain() {
             }
         }
 
-        vec2 total_force = pressure_force + viscosity_force; // + near_pressure_force;
-        self.velocity += (total_force / max(density, eps)) * delta;
+        vec2 total_force = pressure_force + viscosity_force + near_pressure_force;
+        self.velocity += (total_force / max(density, eps)) * delta * 0.998;
+        self.density = density;
         particles_b[self_particle_i] = self;
     }
 
@@ -222,7 +218,8 @@ void computemain() {
     for (uint i = particle_start_i; i < particle_end_i; ++i) {
         Particle particle = particles_b[i];
 
-        particle.velocity += gravity * gravity_scale * particle.mass * delta;
+        vec2 gravity_force = gravity * particle.mass - vec2(0, particle.density - target_density) * buoyancy_strength;
+        particle.velocity += gravity_scale * max(gravity_force, 0) * delta;
         particle.position += particle.velocity * delta;
 
         handle_collision(particle.position, particle.velocity);

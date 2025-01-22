@@ -15,35 +15,36 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 2,
+    particle_radius = 1,
     local_size = 8,
-    density_radius = 2, -- factor
 }
 
 local screen_size_div = 2
 local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
-local N_PARTICLES = 5000
+local particle_density = 0.1
 local VSYNC = 1
 
 --- @class rt.FluidSimulation
 rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h, n_particles)
+    local radius = rt.settings.fluid_simulation.particle_radius
     return meta.new(rt.FluidSimulation, {
         _area_w = area_w,
         _area_h = area_h,
-        _n_particles = n_particles,
-        _particle_radius = rt.settings.fluid_simulation.particle_radius,
+        _n_particles = math.ceil(((area_w * area_h) / (radius * 4 * math.pi)) * particle_density),
+        _particle_radius = radius,
 
         _n_rows = 0,
         _n_columns = 0,
         _cell_width = 0,
-        _sim_delta = 1 / (60 * 4)
+        _sim_delta = 1 / (60 * 2)
     })
 end)
 
 --- @brief
 function rt.FluidSimulation:realize()
     local particle_radius = rt.settings.fluid_simulation.particle_radius
-    self._cell_width = 4 * particle_radius
+    self._smoothing_radius = 15
+    self._cell_width = self._smoothing_radius * 2
     self._cell_height = self._cell_width
     self._n_columns = math.ceil(self._area_w / self._cell_width)
     self._n_rows = math.ceil(self._area_h / self._cell_height)
@@ -92,6 +93,7 @@ function rt.FluidSimulation:realize()
                 px, py, -- position
                 0, 0, --vx, vy, -- velocity
                 1, -- mass
+                0, -- density
                 cell_i,  -- cell_id
             })
         end
@@ -145,12 +147,12 @@ function rt.FluidSimulation:realize()
     love.graphics.setShader(nil)
     love.graphics.setCanvas(nil)
 
-    local factor = rt.settings.fluid_simulation.density_radius
+    local radius = self._smoothing_radius
     self._density_kernel_mesh = rt.VertexRectangle(
-        -1 * factor * self._particle_radius,
-        -1 * factor * self._particle_radius,
-        2 * factor * self._particle_radius,
-        2 * factor * self._particle_radius
+        -1 * radius,
+        -1 * radius,
+        2 * radius,
+        2 * radius
     )
     self._density_kernel_mesh._native:setTexture(self._density_kernel_texture)
 
@@ -263,7 +265,8 @@ function rt.FluidSimulation:realize()
         {"n_rows", self._n_rows},
         {"n_columns", self._n_columns},
         {"cell_width", self._cell_width},
-        {"cell_height", self._cell_height}
+        {"cell_height", self._cell_height},
+        {"smoothing_radius", self._smoothing_radius}
     ) do
         self._step_shader:send(table.unpack(name_value))
     end
@@ -316,14 +319,12 @@ end
 
 --- @override
 function rt.FluidSimulation:draw()
-    self:_debug_draw_spatial_hash()
-    self:_debug_draw_particles()
+    --self:_debug_draw_spatial_hash()
+    --self:_debug_draw_particles()
 
-    --[[
     self._debug_draw_density_shader:bind()
     love.graphics.draw(self._density_texture)
     self._debug_draw_density_shader:unbind()
-    ]]--
 end
 
 local sim = nil

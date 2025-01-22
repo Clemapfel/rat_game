@@ -27,8 +27,20 @@ float alt_kernel_peak() {
     return exp(h) / sinh(h);
 }
 
+const float peak = 0.3;
+
+float tanh_kernel(float x) {
+    const float n = 1.8;
+    return ((tanh(n * (1.0 - x - 0.5)) / 2.0) + 0.5) * peak;
+}
+
+float gaussian_kernel(float x) {
+    const float n = 1;
+    return exp(-2 * n * x * x) * peak;
+}
+
 vec4 effect(vec4 vertex_color, Image texture, vec2, vec2 vertex_position) {
-    float value = alt_kernel(distance(vertex_position / love_ScreenSize.xy, vec2(0.5))) / alt_kernel_peak(); // aspect ratio is 1:1
+    float value = gaussian_kernel((distance(vertex_position / love_ScreenSize.xy, vec2(0.5)) * 2)); // aspect ratio is 1:1
     return vec4(value);
 }
 
