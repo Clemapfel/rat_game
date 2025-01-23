@@ -3,8 +3,8 @@
 struct Particle {
     vec2 position;
     vec2 velocity;
-    float mass;
     float density;
+    float near_density;
     uint cell_hash;
 };
 

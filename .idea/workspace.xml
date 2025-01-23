@@ -23,8 +23,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing milk">
+      <change afterPath="$PROJECT_DIR$/blood_update_particle_density.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_apply_local_forces.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_apply_local_forces.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_run.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
     </list>
@@ -687,15 +691,7 @@
       <workItem from="1736954123959" duration="14925000" />
       <workItem from="1736975567452" duration="62520000" />
       <workItem from="1737301880859" duration="58690000" />
-      <workItem from="1737575664686" duration="4758000" />
-    </task>
-    <task id="LOCAL-01393" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736265708067</created>
-      <option name="number" value="01393" />
-      <option name="presentableId" value="LOCAL-01393" />
-      <option name="project" value="LOCAL" />
-      <updated>1736265708067</updated>
+      <workItem from="1737575664686" duration="12345000" />
     </task>
     <task id="LOCAL-01394" summary="refactored meta">
       <option name="closed" value="true" />
@@ -1081,7 +1077,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737577580438</updated>
     </task>
-    <option name="localTasksCounter" value="1442" />
+    <task id="LOCAL-01442" summary="stashing milk">
+      <option name="closed" value="true" />
+      <created>1737580771985</created>
+      <option name="number" value="01442" />
+      <option name="presentableId" value="LOCAL-01442" />
+      <option name="project" value="LOCAL" />
+      <updated>1737580771985</updated>
+    </task>
+    <option name="localTasksCounter" value="1443" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
