@@ -31,7 +31,7 @@ void computemain() {
         for (int j = -1; j <= 1; j++) {
             ivec2 position = texture_coords + ivec2(i, j);
             if (position.x < 0 || position.x >= texture_size.x || position.y < 0 || position.y >= texture_size.y)
-            continue;
+                continue;
 
             float value = imageLoad(density_texture, position).r;
 

@@ -46,20 +46,11 @@ uniform uint cell_width;
 uniform uint cell_height;
 uniform float particle_mass = 1;
 
-float density_kernel(float dist) {
-    if (dist > particle_radius)
-        return 0.0;
+#define PI 3.1415926535897932384626433832795
 
-    float scale = 315.0 / (64.0 * 3.14159 * pow(particle_radius, 9));
-    float v = particle_radius * particle_radius - dist * dist;
-    return scale * v * v * v;
-}
-
-float near_density_kernel(float dist) {
-    if (dist > near_radius) return 0.0;
-    float scale = 315.0 / (64.0 * 3.14159 * pow(near_radius, 9));
-    float v = near_radius * near_radius - dist * dist;
-    return scale * v * v * v;
+float poly6_kernel(float dist, float radius) {
+    if (dist > radius) return 0.0;
+    return 315.0 / (64.0 * PI * pow(radius, 9)) * pow(radius * radius - dist * dist, 3);
 }
 
 ivec2 position_to_cell_xy(vec2 position) {
@@ -101,8 +92,8 @@ void computemain() {
                 vec2 other_position = other.position; // + delta * other.velocity;
                 float dist = distance(self_position, other_position);
 
-                density += particle_mass * density_kernel(dist);
-                near_density += particle_mass * near_density_kernel(dist);
+                density += particle_mass * poly6_kernel(dist, particle_radius);
+                near_density += particle_mass * poly6_kernel(dist, near_radius);
             }
         }
 

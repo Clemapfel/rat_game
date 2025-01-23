@@ -24,57 +24,52 @@ layout(std430) buffer readonly cell_occupations_buffer {
 };
 
 const ivec2 directions[9] = ivec2[](
-    ivec2(+0, +0),
-    ivec2(+0, -1),
-    ivec2(+1, +0),
-    ivec2(+0, +1),
-    ivec2(-1, +0),
-    ivec2(+1, -1),
-    ivec2(+1, +1),
-    ivec2(-1, +1),
-    ivec2(-1, -1)
+ivec2(+0, +0),
+ivec2(+0, -1),
+ivec2(+1, +0),
+ivec2(+0, +1),
+ivec2(-1, +0),
+ivec2(+1, -1),
+ivec2(+1, +1),
+ivec2(-1, +1),
+ivec2(-1, -1)
 );
 
 uniform float delta;
 uniform uint n_particles;
-uniform float particle_mass = 100;
+uniform float particle_mass = 1000;
 uniform vec4 bounds;
 uniform uint n_rows;
 uniform uint n_columns;
 uniform uint cell_width;
 uniform uint cell_height;
 uniform float particle_radius;
-uniform float near_radius;
+float near_radius_factor = 0.4;
+float near_radius = particle_radius * near_radius_factor;
 
-const float target_density = 10.0;
-const float target_near_density = 2 * target_density;
+const float target_density = 4.0;
+const float target_near_density = 0.5 * target_density;
 const float restitution_scale = 0.0;
 const float friction = 0.1;
-const float gravity_scale = 20;
-const float pressure_strength = 20;
-const float near_pressure_strength = pressure_strength * 4;
-const float viscosity_strength = pressure_strength * 0.2;
-const float buoyancy_strength = -0.0;
+const float gravity_scale = 1.7;
+const float pressure_strength = 2;
+float near_pressure_strength = pressure_strength * 1;
+const float viscosity_strength = pressure_strength * 0.17;
 const float velocity_damping = 0.996;
+const float max_velocity = 500;
 
-const float eps = 0.0001;
+const float eps = 1e-05;
 #define PI 3.1415926535897932384626433832795
 
-vec2 pressure_kernel_gradient(vec2 r, float dist) {
-    if (dist > particle_radius || dist < eps) return vec2(0);
-    float scale = -45.0 / (PI * pow(particle_radius, 6)) * pow(particle_radius - dist, 2);
+vec2 spiky_kernel_gradient(vec2 r, float dist, float radius) {
+    if (dist > radius || dist < eps) return vec2(0);
+    float scale = -15.0 / (PI * pow(radius, 6)) * pow(radius - dist, 2);
     return r * (scale / dist);
 }
 
-vec2 near_pressure_kernel_gradient(vec2 r, float dist) {
-    if (dist > near_radius || dist < eps) return vec2(0);
-    float scale = -45.0 / (PI * pow(near_radius, 6)) * pow(near_radius - dist, 2);
-    return r * (scale / dist);
-}
-
-float viscosity_kernel_laplacian(float dist) {
-    if (dist > particle_radius) return 0.0;
-    return 45.0 / (PI * pow(particle_radius, 6)) * (particle_radius - dist);
+float viscosity_kernel_laplacian(float dist, float radius) {
+    if (dist > radius) return 0.0;
+    return 45.0 / (PI * pow(radius, 6)) * (radius - dist);
 }
 
 ivec2 position_to_cell_xy(vec2 position) {
@@ -85,8 +80,8 @@ uint cell_xy_to_cell_linear_index(ivec2 xy) {
     return xy.y * n_columns + xy.x;
 }
 
-float density_to_pressure(float density) {
-    return pressure_strength * (density - target_density);
+float density_to_pressure(float density, float strength) {
+    return strength * (density - target_density);
 }
 
 layout(local_size_x = 16, local_size_y = 16, local_size_z = 1) in;
@@ -112,12 +107,12 @@ void computemain() {
             ivec2 cell_xy = center_xy + directions[direction_i];
 
             if (cell_xy.x < 0 || cell_xy.y < 0 || cell_xy.x > n_columns || cell_xy.y > n_rows)
-                continue;
+            continue;
 
             CellOccupation occupation = cell_occupations[cell_xy_to_cell_linear_index(cell_xy)];
             for (uint other_particle_i = occupation.start_i; other_particle_i < occupation.end_i; ++other_particle_i) {
                 if (other_particle_i == self_particle_i)
-                    continue;
+                continue;
 
                 Particle other = particles_b[other_particle_i];
                 vec2 other_position = other.position + delta * other.velocity;
@@ -125,27 +120,25 @@ void computemain() {
                 vec2 r = self_position - other_position;
                 float dist = length(r);
 
-                // Combined pressure forces
-                float pressure = density_to_pressure(self.density);
-                float near_pressure = density_to_pressure(other.near_density);
+                float pressure = density_to_pressure(self.density, pressure_strength);
+                float other_pressure = density_to_pressure(other.density, pressure_strength);
 
-                float other_pressure = density_to_pressure(other.density);
-                float other_near_pressure = density_to_pressure(other.near_density);
+                float near_pressure = density_to_pressure(self.near_density, near_pressure_strength);
+                float other_near_pressure = density_to_pressure(other.near_density, near_pressure_strength);
 
                 float shared_pressure = (pressure + other_pressure) * 0.5;
                 float shared_near_pressure = (near_pressure + other_near_pressure) * 0.5;
 
                 if (dist < particle_radius) {
-                    pressure_force += particle_mass * shared_pressure * pressure_kernel_gradient(r, dist);
-                    near_pressure_force += particle_mass * shared_near_pressure * near_pressure_kernel_gradient(r, dist);
-
+                    pressure_force += particle_mass * shared_pressure * spiky_kernel_gradient(r, dist, particle_radius);
+                    near_pressure_force += particle_mass * shared_near_pressure * spiky_kernel_gradient(r, dist, near_radius);
                     vec2 velocity_diff = other.velocity - self.velocity;
-                    viscosity_force += viscosity_strength * particle_mass * velocity_diff * viscosity_kernel_laplacian(dist);
+                    viscosity_force += viscosity_strength * particle_mass * velocity_diff * viscosity_kernel_laplacian(dist, particle_radius);
                 }
             }
         }
 
-        vec2 total_force = pressure_force + viscosity_force + near_pressure_force;
+        vec2 total_force = pressure_force + near_pressure_force + viscosity_force;
         self.velocity += (total_force / max(self.density, eps)) * delta;
         particles_b[self_particle_i] = self;
     }
@@ -157,9 +150,21 @@ void computemain() {
         vec2 velocity = particle.velocity;
         vec2 position = particle.position;
 
-        vec2 gravity_force = gravity * particle_mass - vec2(0, max(target_density - particle.density, 0)) * buoyancy_strength;
-        velocity += gravity_scale * max(gravity_force, 0) * delta;
-        position += velocity * delta * velocity_damping;
+        // rk4
+        vec2 k1_velocity = gravity * particle_mass;
+        vec2 k1_position = velocity;
+
+        vec2 k2_velocity = gravity * particle_mass;
+        vec2 k2_position = velocity + 0.5 * k1_velocity * delta;
+
+        vec2 k3_velocity = gravity * particle_mass;
+        vec2 k3_position = velocity + 0.5 * k2_velocity * delta;
+
+        vec2 k4_velocity = gravity * particle_mass;
+        vec2 k4_position = velocity + k3_velocity * delta;
+
+        velocity += (k1_velocity + 2.0 * k2_velocity + 2.0 * k3_velocity + k4_velocity) / 6.0 * delta * gravity_scale;
+        position += (k1_position + 2.0 * k2_position + 2.0 * k3_position + k4_position) / 6.0 * delta * velocity_damping;
 
         // left
         if (position.x < bounds.x + particle_radius) {
@@ -168,7 +173,6 @@ void computemain() {
                 float normal_component = velocity.x;
                 float tangent_component = velocity.y;
                 velocity.x = -normal_component * restitution_scale;
-                //velocity.y = tangent_component * (1.0 - friction);
             }
         }
 
@@ -179,7 +183,6 @@ void computemain() {
                 float normal_component = velocity.x;
                 float tangent_component = velocity.y;
                 velocity.x = -normal_component * restitution_scale;
-                //velocity.y = tangent_component * (1.0 - friction);
             }
         }
 
@@ -190,7 +193,6 @@ void computemain() {
                 float normal_component = velocity.y;
                 float tangent_component = velocity.x;
                 velocity.y = -normal_component * restitution_scale;
-                //velocity.x = tangent_component * (1.0 - friction);
             }
         }
 
@@ -201,12 +203,11 @@ void computemain() {
                 float normal_component = velocity.y;
                 float tangent_component = velocity.x;
                 velocity.y = -normal_component * restitution_scale;
-                //velocity.x = tangent_component * (1.0 - friction);
             }
         }
 
         particle.position = position;
-        particle.velocity = velocity;
+        particle.velocity = min(velocity, max_velocity);
         particles_a[i] = particle;
     }
 }

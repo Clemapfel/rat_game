@@ -3102,7 +3102,5 @@ function bt.BattleScene:create_simulation_environment()
         end
     end
 
-
-
     return env
 end

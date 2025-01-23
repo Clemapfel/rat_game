@@ -15,10 +15,10 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 20,
+    particle_radius = 13,
 }
 
-local screen_size_div = 2
+local screen_size_div = 3
 local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
 local n_particles = 5000
 local VSYNC = 1
@@ -35,7 +35,7 @@ rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h)
         _n_rows = 0,
         _n_columns = 0,
         _cell_width = 0,
-        _sim_delta = 1 / (60 * 2.5)
+        _sim_delta = 1 / (60 * 2)
     })
 end)
 
@@ -185,6 +185,8 @@ function rt.FluidSimulation:realize()
     end
 
     self._debug_draw_density_shader = rt.Shader("blood_debug_draw_density.glsl")
+    local red = rt.Palette.RED_4 --rt.Palette.CINNABAR_4
+    self._debug_draw_density_shader:send("red", {red.r, red.g, red.b})
 
     -- draw spatial hash
 
@@ -252,7 +254,7 @@ function rt.FluidSimulation:realize()
 
     -- update density
 
-    self._near_radius = 0.4 * particle_radius
+    self._near_radius = 0.3 * particle_radius
 
     self._update_particle_density_shader = rt.ComputeShader("blood_update_particle_density.glsl")
     for name_value in range(
@@ -387,5 +389,5 @@ love.draw = function()
 
     -- show fps
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(sim._n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
+    --love.graphics.printf(sim._n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 end
