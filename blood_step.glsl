@@ -44,27 +44,35 @@ uniform uint n_columns;
 uniform uint cell_width;
 uniform uint cell_height;
 uniform float particle_radius;
-float near_radius_factor = 0.4;
+float near_radius_factor = 0.5;
 float near_radius = particle_radius * near_radius_factor;
 
 const float target_density = 4.0;
-const float target_near_density = 0.5 * target_density;
+const float target_near_density = target_density;
 const float restitution_scale = 0.0;
 const float friction = 0.1;
 const float gravity_scale = 1.7;
-const float pressure_strength = 2;
-float near_pressure_strength = pressure_strength * 1;
+const float pressure_strength = 1;
+float near_pressure_strength = pressure_strength * 2;
 const float viscosity_strength = pressure_strength * 0.17;
 const float velocity_damping = 0.996;
 const float max_velocity = 500;
 
-const float eps = 1e-05;
+const float eps = 0.0001;
+const float max_gradient = 2;
 #define PI 3.1415926535897932384626433832795
 
-vec2 spiky_kernel_gradient(vec2 r, float dist, float radius) {
-    if (dist > radius || dist < eps) return vec2(0);
-    float scale = -15.0 / (PI * pow(radius, 6)) * pow(radius - dist, 2);
-    return r * (scale / dist);
+vec2 spiky_kernel_gradient(vec2 r_vec, float h) {
+    float r = length(r_vec);
+    if (r >= h || r <= 0)
+        return vec2(0.0);
+
+    float sigma = -45.0 / (PI * pow(h, 6.0));
+    vec2 res = (sigma * pow(h - r, 2.0) * (r_vec / r));
+    if (length(res) > max_gradient)
+        return normalize(res) * max_gradient;
+    else
+        return res;
 }
 
 float viscosity_kernel_laplacian(float dist, float radius) {
@@ -130,8 +138,8 @@ void computemain() {
                 float shared_near_pressure = (near_pressure + other_near_pressure) * 0.5;
 
                 if (dist < particle_radius) {
-                    pressure_force += particle_mass * shared_pressure * spiky_kernel_gradient(r, dist, particle_radius);
-                    near_pressure_force += particle_mass * shared_near_pressure * spiky_kernel_gradient(r, dist, near_radius);
+                    pressure_force += particle_mass * shared_pressure * spiky_kernel_gradient(r, particle_radius);
+                    near_pressure_force += particle_mass * shared_near_pressure * spiky_kernel_gradient(r, near_radius);
                     vec2 velocity_diff = other.velocity - self.velocity;
                     viscosity_force += viscosity_strength * particle_mass * velocity_diff * viscosity_kernel_laplacian(dist, particle_radius);
                 }

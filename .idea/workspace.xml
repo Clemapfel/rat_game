@@ -22,15 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing separate update">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing, lighting done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_kernel_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_density_kernel_init.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_update_particle_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_update_particle_density.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -692,15 +688,8 @@
       <workItem from="1736975567452" duration="62520000" />
       <workItem from="1737301880859" duration="58690000" />
       <workItem from="1737575664686" duration="13637000" />
-      <workItem from="1737656475511" duration="10609000" />
-    </task>
-    <task id="LOCAL-01395" summary="refactored entity comparison">
-      <option name="closed" value="true" />
-      <created>1736288795926</created>
-      <option name="number" value="01395" />
-      <option name="presentableId" value="LOCAL-01395" />
-      <option name="project" value="LOCAL" />
-      <updated>1736288795926</updated>
+      <workItem from="1737656475511" duration="12576000" />
+      <workItem from="1737737585212" duration="1421000" />
     </task>
     <task id="LOCAL-01396" summary="added selection indicator">
       <option name="closed" value="true" />
@@ -1086,7 +1075,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737655269296</updated>
     </task>
-    <option name="localTasksCounter" value="1444" />
+    <task id="LOCAL-01444" summary="stashing, lighting done">
+      <option name="closed" value="true" />
+      <created>1737667699705</created>
+      <option name="number" value="01444" />
+      <option name="presentableId" value="LOCAL-01444" />
+      <option name="project" value="LOCAL" />
+      <updated>1737667699706</updated>
+    </task>
+    <option name="localTasksCounter" value="1445" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1140,7 +1137,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before move slots into realize" />
     <MESSAGE value="added move selection UI" />
     <MESSAGE value="fixed strikethrough alignment bug" />
     <MESSAGE value="added scene transitions" />
@@ -1165,7 +1161,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing milk" />
     <MESSAGE value="stashing separate update" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing separate update" />
+    <MESSAGE value="stashing, lighting done" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing, lighting done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -68,7 +68,7 @@ mat3 rotation_z(float angle) {
 
 vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_coords) {
     vec4 data = texture(density_image, texture_coords);
-    float density = smoothstep(0, 0.5, data.x);
+    float density = smoothstep(0.00, 0.5, data.x);
     vec2 dxy = data.yz; // directional derivative of surface
 
     float light_strength = 0.5;
@@ -76,7 +76,6 @@ vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_co
     vec3 normal = normalize(vec3(-dxy.x, -dxy.y, 1.0));
     float diffuse = dot(normal, diffuse_light_direction);
 
-    // Specify rotation angles for x, y, and z axes
     float angle_x = radians(0);
     float angle_y = radians(0);
     float angle_z = radians(45 / 4.0);

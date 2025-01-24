@@ -15,7 +15,7 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 13,
+    particle_radius = 12,
 }
 
 local screen_size_div = 3
@@ -389,5 +389,5 @@ love.draw = function()
 
     -- show fps
     love.graphics.setColor(1, 1, 1, 1)
-    --love.graphics.printf(sim._n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
+    love.graphics.printf(sim._n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 end
