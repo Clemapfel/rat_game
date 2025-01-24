@@ -35,7 +35,8 @@ rt.FluidSimulation = meta.new_type("FluidSimulation", function(area_w, area_h)
         _n_rows = 0,
         _n_columns = 0,
         _cell_width = 0,
-        _sim_delta = 1 / (60 * 2)
+        _sim_delta = 1 / (60 * 2),
+        _elapsed = 0
     })
 end)
 
@@ -307,8 +308,128 @@ function rt.FluidSimulation:realize()
         local sim_delta = self._sim_delta
         while elapsed > sim_delta do
             self._step_shader:dispatch(step_dispatch_size, step_dispatch_size)
+            self._elapsed = self._elapsed + sim_delta
             elapsed = elapsed - sim_delta
         end
+    end
+
+    -- sdf collision
+    self._sdf_preprocess_hitbox_shader = rt.ComputeShader("blood_preprocess_hitbox.glsl")
+    self._sdf_init_shader = rt.ComputeShader("blood_compute_sdf.glsl", {MODE = 0})
+    self._sdf_step_shader = rt.ComputeShader("blood_compute_sdf.glsl", {MODE = 1})
+    self._sdf_compute_gradient_shader = rt.ComputeShader("blood_compute_sdf.glsl", {MODE = 2})
+
+    local hitbox_texture_config = {
+        format = rt.TextureFormat.R8,
+        computewrite = true,
+        msaa = 4
+    }
+
+    self._hitbox_texture_a = love.graphics.newCanvas(self._area_w, self._area_h, hitbox_texture_config)
+    self._hitbox_texture_b = love.graphics.newCanvas(self._area_w, self._area_h, hitbox_texture_config)
+
+    local sdf_texture_config = {
+        format = rt.TextureFormat.RGBA32F,
+        computewrite = true
+    }
+
+    self._sdf_texture_a = love.graphics.newCanvas(self._area_w, self._area_h, sdf_texture_config)
+    self._sdf_texture_b = love.graphics.newCanvas(self._area_w, self._area_h, sdf_texture_config)
+    self._sdf_texture = self._sdf_texture_a -- weak reference for debug_draw_sdf
+
+    self._debug_draw_sdf_shader = rt.Shader("blood_debug_draw_sdf.glsl")
+    self._debug_draw_sdf_shader:send("hitbox_texture_a", self._hitbox_texture_a)
+    self._debug_draw_sdf_shader:send("hitbox_texture_b", self._hitbox_texture_b)
+
+    for name_value in range(
+        {"input_texture", self._hitbox_texture_a},
+        {"output_texture", self._hitbox_texture_b},
+        {"particle_radius", self._particle_radius}
+    ) do
+        self._sdf_preprocess_hitbox_shader:send(table.unpack(name_value))
+    end
+
+    for name_value in range(
+        {"input_texture", self._sdf_texture_a},
+        {"output_texture", self._sdf_texture_b}
+    ) do
+        self._sdf_init_shader:send(table.unpack(name_value))
+        self._sdf_step_shader:send(table.unpack(name_value))
+    end
+    self._sdf_init_shader:send("hitbox_texture", self._hitbox_texture_b)
+
+    self._update_sdf_texture = function(self)
+        self._sdf_init_shader:dispatch(self._area_w / 8, self._area_h / 8)
+
+        -- jump flood fill
+        local jump = 0.5 * math.min(self._area_w, self._area_h)
+        local jump_a_or_b = true
+        while jump > 0.5 do -- JFA+1
+            if jump_a_or_b then
+                self._sdf_step_shader:send("input_texture", self._sdf_texture_a)
+                self._sdf_step_shader:send("output_texture", self._sdf_texture_b)
+                self._sdf_texture = self._sdf_texture_b
+            else
+                self._sdf_step_shader:send("input_texture", self._sdf_texture_b)
+                self._sdf_step_shader:send("output_texture", self._sdf_texture_a)
+                self._sdf_texture = self._sdf_texture_a
+            end
+
+            self._sdf_step_shader:send("jump_distance", jump)
+            self._sdf_step_shader:dispatch(self._area_w / 8, self._area_h / 8)
+
+            jump_a_or_b = not jump_a_or_b
+            jump = jump / 2
+        end
+    end
+
+    self._debug_draw_sdf = function(self)
+        self._debug_draw_sdf_shader:bind()
+        love.graphics.draw(self._sdf_texture)
+        self._debug_draw_sdf_shader:unbind()
+    end
+
+    self._update_hitbox_texture = function(self)
+        love.graphics.setColor(1, 1, 1, 1)
+        love.graphics.setCanvas({self._hitbox_texture_a, stencil = true})
+        love.graphics.clear(0, 0, 0, 0)
+        local wall_w = math.max(0.02 * self._area_w, 0.02 * self._area_h)
+        local w, h = self._area_w, self._area_h
+        local stencil_value = 128
+        rt.graphics.stencil(stencil_value, function()
+            love.graphics.rectangle("fill",
+                wall_w,
+                wall_w,
+                w - 2 * wall_w,
+                h - 2 * wall_w
+            )
+        end)
+        rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL)
+        love.graphics.rectangle("fill", 0, 0, w, h)
+        rt.graphics.set_stencil_test(nil)
+
+        local clock = rt.InterpolationFunctions.SINE_WAVE(self._elapsed, 0.2)
+        local pillar_w, pillar_h = 0.1 * w, clock * 0.5 * h
+        local pillar_x, pillar_y = 0.5 * w - 0.5 * pillar_w, h - pillar_h
+        love.graphics.rectangle("fill", pillar_x, pillar_y, pillar_w, pillar_h)
+
+        love.graphics.circle("fill",
+            pillar_x + 0.5 * pillar_w,
+                pillar_y,
+                0.5 * pillar_w,
+                0.5 * pillar_w
+        )
+
+        local platform_w, platform_h = 0.4 * w, 0.01 * h
+        love.graphics.rectangle("fill",
+            pillar_x + 0.5 * pillar_w - 0.5 * platform_w,
+                pillar_y,
+                platform_w, platform_h
+        )
+        love.graphics.setCanvas(nil)
+
+        -- preprocess
+        self._sdf_preprocess_hitbox_shader:dispatch(self._area_w / 8, self._area_h / 8)
     end
 
     -- pick up
@@ -333,8 +454,10 @@ end
 --- @override
 function rt.FluidSimulation:update(delta)
     self:_update_density_texture()
-    self:_run_debug()
+    self:_update_hitbox_texture()
+    self:_update_sdf_texture()
 
+    self:_run_debug()
     if love.mouse.isDown(1) then
         self:_apply_local_force(love.mouse.getPosition())
     end
@@ -343,7 +466,7 @@ function rt.FluidSimulation:update(delta)
     self:_step(delta)
 
     local data = love.graphics.readbackBuffer(self._is_sorted_buffer)
-    dbg("is_sorted", data:getUInt32(0))
+    assert(data:getUInt32(0))
 end
 
 --- @override
@@ -354,6 +477,8 @@ function rt.FluidSimulation:draw()
     self._debug_draw_density_shader:bind()
     love.graphics.draw(self._density_texture)
     self._debug_draw_density_shader:unbind()
+
+    self:_debug_draw_sdf()
 end
 
 local sim = nil

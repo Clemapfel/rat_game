@@ -191,7 +191,7 @@ rt.InterpolationFunctions = meta.new_enum("InterpolationFunction", {
     SINE_WAVE = function(x, frequency)
         -- \frac{\cos\left(3\pi\left(bx-1\right)\right)}{2}+0.5
         if frequency == nil then frequency = 2 end
-        return (math.cos(math.pi * (2 * x + 1)) + 1) / 2
+        return (math.cos(frequency * math.pi * (2 * x + 1)) + 1) / 2
     end,
 
     INVERTED_SINE_WAVE = function(x, frequency)
