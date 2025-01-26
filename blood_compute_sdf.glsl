@@ -34,15 +34,18 @@ const ivec2 directions[8] = ivec2[](
     ivec2(-1, -1)
 );
 
-layout (local_size_x = 8, local_size_y = 8, local_size_z = 1) in; // dispatch with texture_width / 8, texture_height / 8
+layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in; // dispatch with texture_width / 16, texture_height / 16
 void computemain() {
-    ivec2 size = imageSize(input_texture);
+    ivec2 image_size = imageSize(input_texture);
     ivec2 position = ivec2(gl_GlobalInvocationID.xy);
 
-    if (position.x > size.x || position.y > size.y)
-        return;
+    if (position.x >= image_size.x || position.y >= image_size.y) return;
 
     #if MODE == MODE_INITIALIZE
+        const vec4 inner_wall = vec4(-1, -1, infinity, -1);      // inside walled area
+        const vec4 wall = vec4(position.x, position.y, -1, 0);   // boundary of walled area
+        const vec4 non_wall = vec4(-1, -1, infinity, 1);         // free space
+
         vec4 pixel = imageLoad(hitbox_texture, position);
         bool is_wall = false;
         if (pixel.r > threshold) {
@@ -50,7 +53,11 @@ void computemain() {
 
             uint n_others = 0;
             for (uint i = 0; i < 8; ++i) {
-                vec4 other = imageLoad(hitbox_texture, position + directions[i]);
+                ivec2 neighbor_position = position + directions[i];
+                if (neighbor_position.x < 0 || neighbor_position.x >= image_size.x || neighbor_position.y < 0 || neighbor_position.y >= image_size.y)
+                    continue;
+
+                vec4 other = imageLoad(hitbox_texture, neighbor_position);
                 if (other.r > threshold)
                     n_others += 1;
                 else
@@ -58,28 +65,25 @@ void computemain() {
             }
 
             if (n_others >= 8) {
-                vec4 inner_wall = vec4(-1, -1, infinity, -1);
                 imageStore(input_texture, position, inner_wall);
             }
             else {
-                vec4 wall = vec4(position.x, position.y, -1, 0);
                 imageStore(input_texture, position, wall);
                 imageStore(output_texture, position, wall);
             }
         } else {
-            vec4 non_wall = vec4(-1, -1, infinity, 1);
             imageStore(input_texture, position, non_wall);
         }
     #elif MODE == MODE_JUMP
         vec4 self = imageLoad(input_texture, position);
-        if (self.z < 0) // is wall
-        return;
+        if (self.z <= 0) // is wall
+            return;
 
         vec4 best = self;
         for (int i = 0; i < 8; ++i) {
             ivec2 neighbor_position = position + directions[i] * jump_distance;
 
-            if (neighbor_position.x < 0 || neighbor_position.x >= size.x || neighbor_position.y < 0 || neighbor_position.y >= size.y)
+            if (neighbor_position.x < 0 || neighbor_position.x >= image_size.x || neighbor_position.y < 0 || neighbor_position.y >= image_size.y)
                 continue;
 
             vec4 neighbor = imageLoad(input_texture, neighbor_position);
@@ -87,10 +91,52 @@ void computemain() {
                 continue;
 
             float dist = distance(vec2(position), vec2(neighbor.xy));
-            if (dist < best.z)
-            best = vec4(neighbor.xy, dist, self.w);
+            if (dist <= best.z)
+                best = vec4(neighbor.xy, dist, self.w);
         }
 
         imageStore(output_texture, position, best);
+
+    #elif MODE == MODE_COMPUTE_GRADIENT
+    const mat3 sobel_x = mat3(
+        -1.0,  0.0,  1.0,
+        -2.0,  0.0,  2.0,
+        -1.0,  0.0,  1.0
+    );
+    const mat3 sobel_y = mat3(
+        -1.0, -2.0, -1.0,
+        0.0,  0.0,  0.0,
+        1.0,  2.0,  1.0
+    );
+
+    float x_gradient = 0.0;
+    float y_gradient = 0.0;
+
+    for (int i = -1; i <= 1; i++) {
+        for (int j = -1; j <= 1; j++) {
+            ivec2 current_position = position + ivec2(i, j);
+            if (current_position.x < 0 || current_position.x >= image_size.x || current_position.y < 0 || current_position.y >= image_size.y)
+                continue;
+
+            float value = imageLoad(input_texture, current_position).z;
+            x_gradient += value * sobel_x[j + 1][i + 1];
+            y_gradient += value * sobel_y[j + 1][i + 1];
+        }
+    }
+
+    // replace xy: nearest wall pixel, with xy: gradient
+    vec4 current = imageLoad(input_texture, position);
+    float sign = current.w <= 0 ? 1 : 0; // disable gradient on non-wall
+
+    // flip if gradient points to edge of area
+    vec2 nearest_wall = current.xy;
+    if (nearest_wall.x <= 1 || nearest_wall.x >= image_size.x - 1 || nearest_wall.y <= 1 || nearest_wall.y >= image_size.y - 1)
+        sign = -1;
+
+    vec2 gradient = vec2(x_gradient * sign, y_gradient * sign);
+    imageStore(output_texture, position, vec4(
+        gradient, current.z, current.w
+    ));
+
     #endif
 }

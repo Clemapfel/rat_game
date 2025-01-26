@@ -1,6 +1,6 @@
 rt.settings.text_box = {
     max_n_lines = 10,
-    letters_per_second = 60,
+    letters_per_second = 20,
     reveal_duration = 0.3, -- seconds, frame reveal / hide
     scroll_speed = 500, -- px / s, text scroll
     expand_speed = 500, -- px / s, frame resize

@@ -63,8 +63,8 @@ end
 
 do
     local _vertex_format = {
-        {name = "VertexPosition", format = "floatvec2"},
-        {name = "VertexTexCoord", format = "floatvec2"}
+        {location = 0, name = "VertexPosition", format = "floatvec2"},
+        {location = 1, name = "VertexTexCoord", format = "floatvec2"}
     }
 
     --- @brief

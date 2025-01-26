@@ -66,6 +66,8 @@ mat3 rotation_z(float angle) {
     );
 }
 
+uniform sampler2D hitbox_texture; // r: is wall
+
 vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_coords) {
     vec4 data = texture(density_image, texture_coords);
     float density = smoothstep(0.00, 0.5, data.x);
@@ -77,17 +79,17 @@ vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_co
     float diffuse = dot(normal, diffuse_light_direction);
 
     float angle_x = radians(0);
-    float angle_y = radians(0);
-    float angle_z = radians(45 / 4.0);
+    float angle_y = radians(20);
+    float angle_z = radians(0);
 
     // Combine rotation matrices
     mat3 rotation_matrix = rotation_z(angle_z) * rotation_y(angle_y) * rotation_x(angle_x);
-    vec3 specular_light_direction = normalize(rotation_matrix * vec3(0, -1, 1));
+    vec3 specular_light_direction = normalize(rotation_matrix * vec3(0, 0, 1));
 
-    float specular_intensity = 1.5;
+    float specular_intensity = 2;
     float shininess = 128.0;
     float specular = pow(max(dot(normal, specular_light_direction), 0), shininess);
-    specular = specular * specular_intensity * smoothstep(0, 0.5, density);
+    specular = specular * specular_intensity * density;
 
     // Subsurface scattering effect
     float subsurface_scattering = 0.3 * (density) * max(dot(normal, specular_light_direction), 0.0);
@@ -95,7 +97,9 @@ vec4 effect(vec4 color, Image density_image, vec2 texture_coords, vec2 screen_co
     float value = (diffuse + subsurface_scattering) - light_falloff(density);
 
     const float water_surface_eps = 0.15;
-    return vec4(mix(vec3(value) * red, vec3(1), specular), smoothstep(0.1, 0.1 + water_surface_eps, min(density_falloff(density), 1)));
+    vec4 blood = vec4(mix(vec3(value) * red, vec3(1), specular), smoothstep(0.1, 0.1 + water_surface_eps, min(density_falloff(density), 1)));
+    vec4 hitbox = vec4(texture(hitbox_texture, texture_coords).r);
+    return max(blood, hitbox);
 }
 
 #endif

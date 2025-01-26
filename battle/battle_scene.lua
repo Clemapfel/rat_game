@@ -2001,6 +2001,14 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
+
+    if which == rt.InputButton.A then
+        self:set_scene_state(bt.SceneState.SIMULATION)
+        self._text_box:append([[
+        <b>This <u>is a</u> <shake><rainbow>LOVE</rainbow></shake> showcase</b>, I need to also make this text longer so that it wraps
+        ]])
+    end
+
     local state = self._scene_state
     if state == bt.SceneState.INSPECT then
         if self._text_box_scroll_mode_active then

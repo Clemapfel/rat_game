@@ -2,6 +2,12 @@
 
 #define PI 3.1415926535897932384626433832795
 
+float gaussian(float x, float ramp)
+{
+    // e^{-\frac{4\pi}{3}\left(r\cdot\left(x-c\right)\right)^{2}}
+    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
+}
+
 vec3 lch_to_rgb(vec3 lch) {
     float L = lch.x * 100.0;
     float C = lch.y * 100.0;
@@ -29,16 +35,6 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
-float gaussian(float x, float ramp)
-{
-    // e^{-\frac{4\pi}{3}\left(r\cdot\left(x-c\right)\right)^{2}}
-    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
-}
-
-float sine_wave(float x, float frequency) {
-    return (sin(2.0 * 3.14159 * x * frequency - 3.14159 / 2.0) + 1.0) * 0.5;
-}
-
 uniform float elapsed;
 
 uniform sampler2D hitbox_texture_a; // x: is wall
@@ -48,10 +44,16 @@ vec4 effect(vec4 color, Image sdf_texture, vec2 texture_coords, vec2 screen_coor
     vec4 pixel = texture(sdf_texture, texture_coords);
     vec2 size = textureSize(sdf_texture, 0);
     float dist = pixel.z / (max(size.x, size.y) / 2);
+    float magnitude = length(pixel.xy) / (max(size.x, size.y) / 2);
+    float angle = (atan(pixel.y, pixel.x) + PI) / (2 * PI);
+
+    const float intensity = 0.1;
     float hitbox_a = texture(hitbox_texture_a, texture_coords).r;
     float hitbox_b = texture(hitbox_texture_b, texture_coords).r;
+    float hitbox = max(hitbox_a, hitbox_b) * intensity;
 
-    return vec4(vec3(dist) + vec3(hitbox_a, 0, 0) + vec3(0, 0, hitbox_b), 1);
+    float is_wall = float(pixel.a <= 0);
+    return vec4(lch_to_rgb(vec3(0.8, length(pixel.xy), angle)), 1);
 }
 
 #endif

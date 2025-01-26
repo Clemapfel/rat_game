@@ -15,11 +15,11 @@ linear: scatter, construct memory mapping
 require "include"
 
 rt.settings.fluid_simulation = {
-    particle_radius = 12,
+    particle_radius = 11.5,
 }
 
-local screen_size_div = 3
-local SCREEN_W, SCREEN_H = 1600 / screen_size_div, 900 / screen_size_div
+local screen_size_div = 1
+local SCREEN_W, SCREEN_H = 600, 300  --math.round(1600 / screen_size_div), math.round(900 / screen_size_div)
 local n_particles = 5000
 local VSYNC = 1
 
@@ -186,7 +186,7 @@ function rt.FluidSimulation:realize()
     end
 
     self._debug_draw_density_shader = rt.Shader("blood_debug_draw_density.glsl")
-    local red = rt.Palette.RED_4 --rt.Palette.CINNABAR_4
+    local red = rt.Palette.CINNABAR_4
     self._debug_draw_density_shader:send("red", {red.r, red.g, red.b})
 
     -- draw spatial hash
@@ -304,11 +304,14 @@ function rt.FluidSimulation:realize()
 
     local elapsed = 0
     self._step = function(self, delta)
+        delta = 1 / 60
         elapsed = elapsed + delta
         local sim_delta = self._sim_delta
         while elapsed > sim_delta do
             self._step_shader:dispatch(step_dispatch_size, step_dispatch_size)
-            self._elapsed = self._elapsed + sim_delta
+            if love.keyboard.isDown("space") then
+                self._elapsed = self._elapsed + sim_delta
+            end
             elapsed = elapsed - sim_delta
         end
     end
@@ -349,6 +352,8 @@ function rt.FluidSimulation:realize()
         self._sdf_preprocess_hitbox_shader:send(table.unpack(name_value))
     end
 
+    self._debug_draw_density_shader:send("hitbox_texture", self._hitbox_texture_a)
+
     for name_value in range(
         {"input_texture", self._sdf_texture_a},
         {"output_texture", self._sdf_texture_b}
@@ -358,29 +363,41 @@ function rt.FluidSimulation:realize()
     end
     self._sdf_init_shader:send("hitbox_texture", self._hitbox_texture_b)
 
+    local sdf_dispatch_size_x, sdf_dispatch_size_y = math.ceil(self._area_w) / 16 + 1, math.ceil(self._area_h) / 16 + 1
     self._update_sdf_texture = function(self)
-        self._sdf_init_shader:dispatch(self._area_w / 8, self._area_h / 8)
-
         -- jump flood fill
+        self._sdf_init_shader:dispatch(sdf_dispatch_size_x, sdf_dispatch_size_y)
+
         local jump = 0.5 * math.min(self._area_w, self._area_h)
         local jump_a_or_b = true
-        while jump > 0.5 do -- JFA+1
+        while jump >= 1 do -- JFA+1
             if jump_a_or_b then
                 self._sdf_step_shader:send("input_texture", self._sdf_texture_a)
                 self._sdf_step_shader:send("output_texture", self._sdf_texture_b)
-                self._sdf_texture = self._sdf_texture_b
             else
                 self._sdf_step_shader:send("input_texture", self._sdf_texture_b)
                 self._sdf_step_shader:send("output_texture", self._sdf_texture_a)
-                self._sdf_texture = self._sdf_texture_a
             end
 
-            self._sdf_step_shader:send("jump_distance", jump)
-            self._sdf_step_shader:dispatch(self._area_w / 8, self._area_h / 8)
+            self._sdf_step_shader:send("jump_distance", math.ceil(jump))
+            self._sdf_step_shader:dispatch(sdf_dispatch_size_x, sdf_dispatch_size_y)
 
             jump_a_or_b = not jump_a_or_b
             jump = jump / 2
         end
+
+        if jump_a_or_b then
+            self._sdf_compute_gradient_shader:send("input_texture", self._sdf_texture_a)
+            self._sdf_compute_gradient_shader:send("output_texture", self._sdf_texture_b)
+            self._sdf_texture = self._sdf_texture_b
+        else
+            self._sdf_compute_gradient_shader:send("input_texture", self._sdf_texture_b)
+            self._sdf_compute_gradient_shader:send("output_texture", self._sdf_texture_a)
+            self._sdf_texture = self._sdf_texture_a
+        end
+
+        self._sdf_compute_gradient_shader:dispatch(sdf_dispatch_size_x, sdf_dispatch_size_y)
+        self._step_shader:send("sdf_texture", self._sdf_texture)
     end
 
     self._debug_draw_sdf = function(self)
@@ -393,7 +410,8 @@ function rt.FluidSimulation:realize()
         love.graphics.setColor(1, 1, 1, 1)
         love.graphics.setCanvas({self._hitbox_texture_a, stencil = true})
         love.graphics.clear(0, 0, 0, 0)
-        local wall_w = math.max(0.02 * self._area_w, 0.02 * self._area_h)
+        local wall_fraction = 0.02
+        local wall_w = math.max(wall_fraction * self._area_w, wall_fraction * self._area_h)
         local w, h = self._area_w, self._area_h
         local stencil_value = 128
         rt.graphics.stencil(stencil_value, function()
@@ -401,7 +419,8 @@ function rt.FluidSimulation:realize()
                 wall_w,
                 wall_w,
                 w - 2 * wall_w,
-                h - 2 * wall_w
+                h - 2 * wall_w,
+                50
             )
         end)
         rt.graphics.set_stencil_test(rt.StencilCompareMode.EQUAL)
@@ -426,10 +445,20 @@ function rt.FluidSimulation:realize()
                 pillar_y,
                 platform_w, platform_h
         )
+
+        --[[
+        local cage_w, cage_h = 0.2 * w, 0.25 * h
+        love.graphics.setLineWidth(10)
+        love.graphics.rectangle("line",
+            0.5 * w - 0.5 * cage_w,
+            wall_w,
+            cage_w, cage_h
+        )
+
         love.graphics.setCanvas(nil)
 
         -- preprocess
-        self._sdf_preprocess_hitbox_shader:dispatch(self._area_w / 8, self._area_h / 8)
+        self._sdf_preprocess_hitbox_shader:dispatch(sdf_dispatch_size_x, sdf_dispatch_size_y)
     end
 
     -- pick up
@@ -477,8 +506,6 @@ function rt.FluidSimulation:draw()
     self._debug_draw_density_shader:bind()
     love.graphics.draw(self._density_texture)
     self._debug_draw_density_shader:unbind()
-
-    self:_debug_draw_sdf()
 end
 
 local sim = nil
@@ -513,6 +540,7 @@ love.draw = function()
     sim:draw()
 
     -- show fps
-    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setColor(0, 0, 0, 1)
     love.graphics.printf(sim._n_particles .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 end
+]]--

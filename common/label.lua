@@ -76,6 +76,8 @@ end, {
     render_shader = rt.Shader("common/glyph_render.glsl"),
 })
 
+local _texture_format = rt.TextureFormat.RGBA32F
+
 --- @brief
 function rt.Label:_glyph_new(
     text, font, style, is_mono,
@@ -90,9 +92,7 @@ function rt.Label:_glyph_new(
     local font_native = font:get_native(style)
     local out = {
         text = text, -- necessary for beat weights
-        glyph = love.graphics.newTextBatch(font_native, text, {
-            sdf = true
-        }),
+        glyph = love.graphics.newTextBatch(font_native, text),
         font = font_native,
         is_mono = is_mono,
         is_underlined = is_underlined,
@@ -837,13 +837,13 @@ do
 
         if self._use_outline and self._width > 0 and self._height > 0 then
             if self._outline_texture ~= nil then self._outline_texture:free() end
-            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
+            self._outline_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, _texture_format)
             self.outline_shader:send("texture_resolution", {outline_texture_w, outline_texture_h})
             self.outline_shader:send("outline_color", { self._outline_color_r, self._outline_color_g, self._outline_color_b, self._outline_color_a})
         end
 
         if self._swap_texture ~= nil then self._swap_texture:free() end
-        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, "rgba4")
+        self._swap_texture = rt.RenderTexture(outline_texture_w, outline_texture_h, 4, _texture_format)
         self:_update_n_visible_characters()
     end
 

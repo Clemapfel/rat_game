@@ -21,9 +21,9 @@ rt.VertexAttribute = meta.new_enum("VertexAttribute", {
 })
 
 rt.VertexFormat = {
-    {name = "VertexPosition", format = "floatvec2"},
-    {name = "VertexTexCoord", format = "floatvec2"},
-    {name = "VertexColor", format = "floatvec4"},
+    {location = 0, name = "VertexPosition", format = "floatvec2"},
+    {location = 1, name = "VertexTexCoord", format = "floatvec2"},
+    {location = 2, name = "VertexColor", format = "floatvec4"},
 }
 
 --- @class rt.VertexShape

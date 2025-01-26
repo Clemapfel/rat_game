@@ -1,5 +1,44 @@
 require "include"
 
+local font_size = 100
+local font = love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Bold.ttf", font_size, {
+    sdf = true
+})
+
+local str = "########"
+local text = love.graphics.newTextBatch(font, str)
+
+local shader = rt.Shader("common/glyph_sdf.glsl")
+local elapsed = 0
+
+love.update = function(delta)
+    elapsed = elapsed + delta
+    shader:send("elapsed", elapsed)
+    shader:send("is_effect_rainbow", true)
+    shader:send("is_effect_shake", true)
+    shader:send("is_effect_wave", true)
+    shader:send("draw_outline", true)
+    shader:send("outline_color", {rt.color_unpack(rt.Palette.BLACK)})
+    shader:send("font_size", font_size)
+    shader:send("n_visible_characters", rt.InterpolationFunctions.SINE_WAVE(elapsed, 0.2) * #str + 1)
+end
+
+love.draw = function()
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+    love.graphics.setColor(1, 1, 1, 1)
+    shader:bind()
+    shader:send("draw_outline", true)
+    love.graphics.draw(text, 200, 200)
+    shader:send("draw_outline", false)
+    love.graphics.draw(text, 200, 200)
+    shader:unbind()
+end
+
+love.keypressed = function()
+    shader = rt.Shader("common/glyph_sdf.glsl")
+end
+
+--[[
 profiler_active = false
 
 STATE = rt.GameState()
@@ -61,3 +100,4 @@ end
 love.run = function()
     STATE:run()
 end
+]]--

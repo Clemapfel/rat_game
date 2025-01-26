@@ -47,6 +47,8 @@ uniform float particle_radius;
 float near_radius_factor = 0.5;
 float near_radius = particle_radius * near_radius_factor;
 
+layout(rgba32f) uniform readonly image2D sdf_texture; // xy: gradient, z: distance, w: sign
+
 const float target_density = 4.0;
 const float target_near_density = target_density;
 const float restitution_scale = 0.0;
@@ -55,6 +57,7 @@ const float gravity_scale = 1.7;
 const float pressure_strength = 1;
 float near_pressure_strength = pressure_strength * 2;
 const float viscosity_strength = pressure_strength * 0.17;
+const float hitbox_strength = 8;
 const float velocity_damping = 0.996;
 const float max_velocity = 500;
 
@@ -158,6 +161,9 @@ void computemain() {
         vec2 velocity = particle.velocity;
         vec2 position = particle.position;
 
+        // object collision
+        velocity += -1 * imageLoad(sdf_texture, ivec2(round(position))).xy * hitbox_strength;
+
         // rk4
         vec2 k1_velocity = gravity * particle_mass;
         vec2 k1_position = velocity;
@@ -174,45 +180,9 @@ void computemain() {
         velocity += (k1_velocity + 2.0 * k2_velocity + 2.0 * k3_velocity + k4_velocity) / 6.0 * delta * gravity_scale;
         position += (k1_position + 2.0 * k2_position + 2.0 * k3_position + k4_position) / 6.0 * delta * velocity_damping;
 
-        // left
-        if (position.x < bounds.x + particle_radius) {
-            position.x = bounds.x + particle_radius + eps;
-            if (velocity.x < 0.0) {
-                float normal_component = velocity.x;
-                float tangent_component = velocity.y;
-                velocity.x = -normal_component * restitution_scale;
-            }
-        }
-
-        // right
-        if (position.x > bounds.z - particle_radius) {
-            position.x = bounds.z - particle_radius - eps;
-            if (velocity.x > 0.0) {
-                float normal_component = velocity.x;
-                float tangent_component = velocity.y;
-                velocity.x = -normal_component * restitution_scale;
-            }
-        }
-
-        // top
-        if (position.y < bounds.y + particle_radius) {
-            position.y = bounds.y + particle_radius + eps;
-            if (velocity.y < 0.0) {
-                float normal_component = velocity.y;
-                float tangent_component = velocity.x;
-                velocity.y = -normal_component * restitution_scale;
-            }
-        }
-
-        // bottom
-        if (position.y > bounds.w - particle_radius) {
-            position.y = bounds.w - particle_radius - eps;
-            if (velocity.y > 0.0) {
-                float normal_component = velocity.y;
-                float tangent_component = velocity.x;
-                velocity.y = -normal_component * restitution_scale;
-            }
-        }
+        // prevent particles from leaving spatial hash area
+        position.x = clamp(position.x, bounds.x + particle_radius + eps, bounds.z - particle_radius - eps);
+        position.y = clamp(position.y, bounds.y + particle_radius + eps, bounds.w - particle_radius - eps);
 
         particle.position = position;
         particle.velocity = min(velocity, max_velocity);

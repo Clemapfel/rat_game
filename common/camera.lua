@@ -137,8 +137,8 @@ function rt.Camera:set_viewport(x, y, w, h)
     self._blur_shader_vertical:send("texture_size", { self._aabb.width, self._aabb.height })
 
     local vertex_format = {
-        {name = "VertexPosition", format = "floatvec2"},
-        {name = "VertexTexCoord", format = "floatvec2"},
+        {location = 0, name = "VertexPosition", format = "floatvec2"},
+        {location = 1, name = "VertexTexCoord", format = "floatvec2"},
     }
 
     -- use padded mesh that is larger than the screen, such that when the

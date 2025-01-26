@@ -22,13 +22,42 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="blood stable, stashing before sdf collision">
-      <change afterPath="$PROJECT_DIR$/blood_compute_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf dilation pass">
+      <change afterPath="$PROJECT_DIR$/assets/fonts/NotoSansJP/SourceHanSans-VF.otf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/glyph_sdf.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/conf.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/font_sdf.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/temp.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_compute_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/timed_animation.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/OpenAL32.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/OpenAL32.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/game.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/game.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/love.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/love.exe" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/love.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.ico" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/lovec.exe" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/lovec.exe" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/lua51.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/lua51.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_1.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_1.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_2.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_atomic_wait.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_atomic_wait.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_codecvt_ids.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_codecvt_ids.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/readme.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/vcruntime140.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/vcruntime140.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/love/windows/vcruntime140_1.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/vcruntime140_1.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +165,7 @@
     &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/assets&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/assets/fonts/NotoSansJP&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -152,11 +181,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\assets\fonts\NotoSansJP" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
       <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\backgrounds" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
@@ -166,7 +195,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -691,15 +720,11 @@
       <workItem from="1737301880859" duration="58690000" />
       <workItem from="1737575664686" duration="13637000" />
       <workItem from="1737656475511" duration="12576000" />
-      <workItem from="1737737585212" duration="6924000" />
-    </task>
-    <task id="LOCAL-01397" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736364073329</created>
-      <option name="number" value="01397" />
-      <option name="presentableId" value="LOCAL-01397" />
-      <option name="project" value="LOCAL" />
-      <updated>1736364073329</updated>
+      <workItem from="1737737585212" duration="15252000" />
+      <workItem from="1737762629045" duration="617000" />
+      <workItem from="1737763538108" duration="1579000" />
+      <workItem from="1737824860240" duration="9369000" />
+      <workItem from="1737906313366" duration="4701000" />
     </task>
     <task id="LOCAL-01398" summary="fixed selection graph navigation">
       <option name="closed" value="true" />
@@ -1085,7 +1110,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737739121802</updated>
     </task>
-    <option name="localTasksCounter" value="1446" />
+    <task id="LOCAL-01446" summary="added sdf dilation pass">
+      <option name="closed" value="true" />
+      <created>1737744530047</created>
+      <option name="number" value="01446" />
+      <option name="presentableId" value="LOCAL-01446" />
+      <option name="project" value="LOCAL" />
+      <updated>1737744530047</updated>
+    </task>
+    <option name="localTasksCounter" value="1447" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1139,7 +1172,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed strikethrough alignment bug" />
     <MESSAGE value="added scene transitions" />
     <MESSAGE value="added move selection indicators" />
     <MESSAGE value="disabled debug output" />
@@ -1164,7 +1196,8 @@
     <MESSAGE value="stashing separate update" />
     <MESSAGE value="stashing, lighting done" />
     <MESSAGE value="blood stable, stashing before sdf collision" />
-    <option name="LAST_COMMIT_MESSAGE" value="blood stable, stashing before sdf collision" />
+    <MESSAGE value="added sdf dilation pass" />
+    <option name="LAST_COMMIT_MESSAGE" value="added sdf dilation pass" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
