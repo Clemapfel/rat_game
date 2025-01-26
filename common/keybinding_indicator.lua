@@ -1,10 +1,6 @@
 rt.settings.keybinding_indicator = {
-    font = rt.Font(rt.settings.font.default_size,
-        "assets/fonts/NotoSans/NotoSans-Regular.ttf"
-    ),
-    font_small = rt.Font(rt.settings.font.default_size_tiny,
-        "assets/fonts/NotoSans/NotoSans-Regular.ttf"
-    ),
+    font = rt.settings.font.default_small,
+    font_small = rt.settings.font.default_tiny,
 }
 
 --- @class rt.KeybindingIndicator
@@ -31,7 +27,6 @@ function rt.KeybindingIndicator:size_allocate(x, y, width, height)
     if self._final_width == -1 then
         self._final_width = width
     end
-
 end
 
 --- @override
@@ -913,7 +908,7 @@ function rt.KeybindingIndicator:create_as_key(text, is_space)
         label:set_justify_mode(rt.JustifyMode.CENTER)
         label:realize()
         local label_w, label_h = label:measure()
-        label:fit_into(0, 0 + 0.5 * width - 0.5 * label_h - y_offset, width, width)
+        label:fit_into(0, y + 0.5 * height - 0.5 * label_h - y_offset, width, label_h)
 
         self._content = {
             outer,

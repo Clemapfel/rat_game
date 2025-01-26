@@ -73,7 +73,7 @@ do
     function bt.Animation.TURN_START_END:start()
         if _start_label == nil or _end_label == nil then
             _start_label = rt.Label(
-                "<b><o><wave>" .. rt.Translation.battle.turn_start_label .. "</wave></o></b>",
+                "<b><o><wave><outline_color=WHITE><rainbow>" .. rt.Translation.battle.turn_start_label .. "</rainbow></outline_color></wave></o></b>",
                 rt.settings.font.default_huge,
                 rt.settings.font.default_mono_huge
             )

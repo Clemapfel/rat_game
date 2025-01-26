@@ -61,6 +61,7 @@ uniform bool draw_outline;
 uniform vec4 outline_color;
 uniform float font_size;
 uniform float elapsed;
+uniform float opacity = 1;
 
 #ifdef VERTEX
 
@@ -97,22 +98,21 @@ vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 vertex_position) 
     if (letter_index >= n_visible_characters)
         discard;
 
-    float dist = Texel(image, texture_coords).a;
-    float eps = (1.0 + anti_aliasing) * length(vec2(dFdx(dist), dFdy(dist)));
-    float value = smoothstep(0.5 - eps, 0.5 + eps, dist);
-
     if (draw_outline) {
-        float outline = smoothstep(0.0, 0.02, pow(dist, 6));
-        return outline * outline_color;
+        // outline uses sdf font texture
+        float dist = Texel(image, texture_coords).a;
+        float outline = smoothstep(0.0, 0.02, pow(dist, 5));
+        return outline * outline_color * opacity;
     }
     else {
+        // foreground uses regular font texture
         vec4 rainbow = vec4(1.0);
         if (is_effect_rainbow) {
             float time = elapsed * 0.3;
             rainbow.rgb = lch_to_rgb(vec3(0.8, 1.0, fract(vertex_position.x / rainbow_width - time)));
         }
 
-        return rainbow * color * value;
+        return rainbow * color * Texel(image, texture_coords) * opacity;
     }
 }
 

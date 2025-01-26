@@ -32,10 +32,16 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         _bold_path = regular_path,
         _bold_italic_path = regular_path,
         _size = size,
+
         _regular = nil, -- love.Font
         _bold = nil,
         _italic = nil,
-        _bold_italic = nil
+        _bold_italic = nil,
+
+        _regular_sdf = nil, -- love.Font
+        _bold_sdf = nil,
+        _italic_sdf = nil,
+        _bold_italic_sdf = nil
     })
 
     if bold_path ~= nil then
@@ -64,35 +70,76 @@ rt.FontStyle = meta.new_enum("FontStyle", {
     BOLD_ITALIC = 3
 })
 
-rt.Font._regular = love.graphics.getFont()
-rt.Font._bold = love.graphics.getFont()
-rt.Font._italic = love.graphics.getFont()
-rt.Font._bold_italic = love.graphics.getFont()
-
-local _new_font = function(path, size)
+local _new_font = function(path, size, sdf)
     return love.graphics.newFont(path, size, {
-        sdf = true
+        sdf = sdf
     })
 end
 
 --- @brief [internal] update held fonts
 function rt.Font:_update()
     local config = {}
-    self._regular = _new_font(self._regular_path, self._size)
-    self._bold = _new_font(self._bold_path, self._size)
-    self._italic = _new_font(self._italic_path, self._size)
-    self._bold_italic = _new_font(self._bold_italic_path, self._size)
+    self._regular = _new_font(self._regular_path, self._size, false)
+    self._bold = _new_font(self._bold_path, self._size, false)
+    self._italic = _new_font(self._italic_path, self._size, false)
+    self._bold_italic = _new_font(self._bold_italic_path, self._size, false)
 
-    self._regular:setFallbacks(splat(rt.settings.font.regular_fallbacks))
-    self._bold:setFallbacks(splat(rt.settings.font.bold_fallbacks))
-    self._italic:setFallbacks(splat(rt.settings.font.italic_fallbacks))
-    self._bold_italic:setFallbacks(splat(rt.settings.font.bold_italic_fallbacks))
+    self._regular_sdf = _new_font(self._regular_path, self._size, true)
+    self._bold_sdf = _new_font(self._bold_path, self._size, true)
+    self._italic_sdf = _new_font(self._italic_path, self._size, true)
+    self._bold_italic_sdf = _new_font(self._bold_italic_path, self._size, true)
 
-    --[[
-    for font in range(self._regular, self._bold, self._italic, self._bold_italic) do
-        font:setLineHeight(0)
-    end
-    ]]--
+    -- fallback fonts to support more symbols
+    local noto_math = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf", self._size, false)
+    local noto_math_sdf = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf", self._size, true)
+
+    self._regular:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf", self._size, false),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", self._size, false)
+    )
+
+    self._italic:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Italic.ttf", self._size, false),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", self._size, false)
+    )
+
+    self._bold:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Bold.ttf", self._size, false),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf", self._size, false)
+    )
+
+    self._bold_italic:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf", self._size, false),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf", self._size, false)
+    )
+
+    self._regular_sdf:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf", self._size, true),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", self._size, true)
+    )
+
+    self._italic_sdf:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Italic.ttf", self._size, true),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf", self._size, true)
+    )
+
+    self._bold_sdf:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-Bold.ttf", self._size, true),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf", self._size, true)
+    )
+
+    self._bold_italic_sdf:setFallbacks(
+        noto_math,
+        _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf", self._size, true),
+        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf", self._size, true)
+    )
 end
 
 --- @brief set font size, in px
@@ -116,8 +163,29 @@ do
         [rt.FontStyle.BOLD_ITALIC] = "_bold_italic"
     }
     --- @brief
-    function rt.Font:get_native(style)
-        return self[_font_style_to_field[style]]
+    function rt.Font:get_native(style, sdf)
+        if sdf == nil then sdf = false end
+        if sdf == false then
+            if style == rt.FontStyle.REGULAR then
+                return self._regular
+            elseif style == rt.FontStyle.BOLD then
+                return self._bold
+            elseif style == rt.FontStyle.ITALIC then
+                return self._italic
+            elseif style == rt.FontStyle.BOLD_ITALIC then
+                return self._bold_italic
+            end
+        else
+            if style == rt.FontStyle.REGULAR then
+                return self._regular_sdf
+            elseif style == rt.FontStyle.BOLD then
+                return self._bold_sdf
+            elseif style == rt.FontStyle.ITALIC then
+                return self._italic_sdf
+            elseif style == rt.FontStyle.BOLD_ITALIC then
+                return self._bold_italic_sdf
+            end
+        end
     end
 end
 
@@ -128,38 +196,6 @@ end
 
 --- @brief [internal] load default fonts and fallbacks
 function rt.load_default_fonts()
-    -- fallback fonts to support more symbols
-    local noto_math = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf")
-    local gnu_unifont = _new_font("assets/fonts/fallback.otf")
-
-    rt.settings.font.regular_fallbacks = {
-        _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf"),
-        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"),
-        noto_math,
-        --gnu_unifont
-    }
-
-    rt.settings.font.italic_fallbacks = {
-        _new_font("assets/fonts/NotoSans/NotoSans-Italic.ttf"),
-        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Regular.ttf"), -- no italic in japanese
-        noto_math,
-        --gnu_unifont
-    }
-
-    rt.settings.font.bold_fallbacks = {
-        _new_font("assets/fonts/NotoSans/NotoSans-Bold.ttf"),
-        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"),
-        noto_math,
-        --gnu_unifont
-    }
-
-    rt.settings.font.bold_italic_fallbacks = {
-        _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf"),
-        _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf"), -- no italic in japanese
-        noto_math,
-        --gnu_unifont
-    }
-
     rt.settings.font.default = rt.Font(rt.settings.font.default_size,
         "assets/fonts/DejaVuSans/DejaVuSans-Regular.ttf",
         "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf",

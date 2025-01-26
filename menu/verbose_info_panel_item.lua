@@ -1233,20 +1233,16 @@ function mn.VerboseInfoPanel.Item:create_from_battle_entity(entity)
         local state_value
         local outline_color
         if entity_state == bt.EntityState.ALIVE then
-            state_value = "<color=GREEN><o><b>" .. translation.entity_state_alive .. "</b></o></color>"
-            outline_color = rt.Palette.GREEN_6
+            state_value = "<outline_color=GREEN_6><color=GREEN><o><b>" .. translation.entity_state_alive .. "</b></o></color></outline_color>"
         elseif entity_state == bt.EntityState.ALIVE then
-            state_value = "<color=BLACK><o><b>" .. translation.entity_state_dead .. "</b></o></color>"
-            outline_color = rt.Palette.WHITE
+            state_value = "<outline_color=WHITE><color=BLACK><o><b>" .. translation.entity_state_dead .. "</b></o></color></outline_color>"
         elseif entity_state == bt.EntityState.ALIVE then
-            state_value = "<color=ORANGE_1><o><b>" .. translation.entity_state_knocked_out .. "</b></o></color>"
-            outline_color = rt.Palette.RED_5
+            state_value = "<outline_color=RED_5><color=ORANGE_1><o><b>" .. translation.entity_state_knocked_out .. "</b></o></color></outline_color>"
         else
             assert(false, "unhandled entity state")
         end
 
         self.state_value_label = self._description(state_value)
-        self.state_value_label:set_outline_color(outline_color)
 
         self.content = {
             self.title_label,
