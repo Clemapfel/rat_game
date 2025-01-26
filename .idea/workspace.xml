@@ -22,41 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf dilation pass">
-      <change afterPath="$PROJECT_DIR$/assets/fonts/NotoSansJP/SourceHanSans-VF.otf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/common/glyph_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/conf.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/font_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/temp.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added sdf font rendering">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/quicksave_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/quicksave_indicator.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_compute_sdf.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_density.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/text_box.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/vertex_shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/OpenAL32.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/OpenAL32.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/game.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/game.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/love.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/love.exe" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/love.ico" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/love.ico" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/lovec.exe" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/lovec.exe" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/lua51.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/lua51.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_1.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_1.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_2.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_2.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_atomic_wait.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_atomic_wait.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/msvcp140_codecvt_ids.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/msvcp140_codecvt_ids.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/readme.txt" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/readme.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/vcruntime140.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/vcruntime140.dll" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/windows/vcruntime140_1.dll" beforeDir="false" afterPath="$PROJECT_DIR$/love/windows/vcruntime140_1.dll" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/glyph_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/glyph_sdf.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -724,23 +692,7 @@
       <workItem from="1737762629045" duration="617000" />
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
-      <workItem from="1737906313366" duration="4701000" />
-    </task>
-    <task id="LOCAL-01398" summary="fixed selection graph navigation">
-      <option name="closed" value="true" />
-      <created>1736369305551</created>
-      <option name="number" value="01398" />
-      <option name="presentableId" value="LOCAL-01398" />
-      <option name="project" value="LOCAL" />
-      <updated>1736369305551</updated>
-    </task>
-    <task id="LOCAL-01399" summary="added sdf step">
-      <option name="closed" value="true" />
-      <created>1736454417343</created>
-      <option name="number" value="01399" />
-      <option name="presentableId" value="LOCAL-01399" />
-      <option name="project" value="LOCAL" />
-      <updated>1736454417343</updated>
+      <workItem from="1737906313366" duration="5402000" />
     </task>
     <task id="LOCAL-01400" summary="removed unnecessary options">
       <option name="closed" value="true" />
@@ -1118,7 +1070,23 @@
       <option name="project" value="LOCAL" />
       <updated>1737744530047</updated>
     </task>
-    <option name="localTasksCounter" value="1447" />
+    <task id="LOCAL-01447" summary="updated love">
+      <option name="closed" value="true" />
+      <created>1737911478880</created>
+      <option name="number" value="01447" />
+      <option name="presentableId" value="LOCAL-01447" />
+      <option name="project" value="LOCAL" />
+      <updated>1737911478880</updated>
+    </task>
+    <task id="LOCAL-01448" summary="added sdf font rendering">
+      <option name="closed" value="true" />
+      <created>1737911492926</created>
+      <option name="number" value="01448" />
+      <option name="presentableId" value="LOCAL-01448" />
+      <option name="project" value="LOCAL" />
+      <updated>1737911492926</updated>
+    </task>
+    <option name="localTasksCounter" value="1449" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1172,8 +1140,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added scene transitions" />
-    <MESSAGE value="added move selection indicators" />
     <MESSAGE value="disabled debug output" />
     <MESSAGE value="fixed text box output" />
     <MESSAGE value="deprecated blood" />
@@ -1197,7 +1163,9 @@
     <MESSAGE value="stashing, lighting done" />
     <MESSAGE value="blood stable, stashing before sdf collision" />
     <MESSAGE value="added sdf dilation pass" />
-    <option name="LAST_COMMIT_MESSAGE" value="added sdf dilation pass" />
+    <MESSAGE value="updated love" />
+    <MESSAGE value="added sdf font rendering" />
+    <option name="LAST_COMMIT_MESSAGE" value="added sdf font rendering" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

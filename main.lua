@@ -1,6 +1,6 @@
 require "include"
 
-local font_size = 100
+local font_size = 10
 local font = love.graphics.newFont("assets/fonts/NotoSans/NotoSans-Bold.ttf", font_size, {
     sdf = true
 })
@@ -18,7 +18,7 @@ love.update = function(delta)
     shader:send("is_effect_shake", true)
     shader:send("is_effect_wave", true)
     shader:send("draw_outline", true)
-    shader:send("outline_color", {rt.color_unpack(rt.Palette.BLACK)})
+    shader:send("outline_color", {rt.color_unpack(rt.Palette.PURPLE)})
     shader:send("font_size", font_size)
     shader:send("n_visible_characters", rt.InterpolationFunctions.SINE_WAVE(elapsed, 0.2) * #str + 1)
 end

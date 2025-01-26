@@ -1,6 +1,5 @@
 vec2 hash(vec2 p) {
-    p = vec2(dot(p, vec2(127.1, 311.7)),
-    dot(p, vec2(269.5, 183.3)));
+    p = vec2(dot(p, vec2(127.1, 311.7)), dot(p, vec2(269.5, 183.3)));
     return -1.0 + 2.0 * fract(sin(p) * 43758.5453123);
 }
 
@@ -15,9 +14,7 @@ float noise(vec2 p) {
     vec2 c = a - 1.0 + 2.0 * K2;
 
     vec3 h = max(0.5 - vec3(dot(a, a), dot(b, b), dot(c, c)), 0.0);
-    vec3 n = h * h * h * h * vec3(dot(a, hash(i + 0.0)),
-    dot(b, hash(i + o)),
-    dot(c, hash(i + 1.0)));
+    vec3 n = h * h * h * h * vec3(dot(a, hash(i + 0.0)), dot(b, hash(i + o)), dot(c, hash(i + 1.0)));
 
     return dot(n, vec3(70.0));
 }
@@ -49,11 +46,12 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
-const float rainbow_width = 150;
-const float shake_speed = 10; // steps per second
-const float wave_period = 10;
-const float wave_offset = 5;
-const float wave_speed = 4;
+const float rainbow_width = 150.0;
+const float shake_speed = 10.0; // steps per second
+const float wave_period = 10.0;
+const float wave_offset = 5.0;
+const float wave_speed = 4.0;
+const float anti_aliasing = 0.1; // [0, 1], where 0: maximum sharpness
 
 uniform int n_visible_characters;
 uniform bool is_effect_rainbow;
@@ -70,23 +68,19 @@ uniform float elapsed;
 
 flat varying int letter_index;
 
-vec4 position(mat4 transform, vec4 vertex_position)
-{
+vec4 position(mat4 transform, vec4 vertex_position) {
     letter_index = gl_VertexID / 4;
 
     vec2 position = vertex_position.xy;
-    if (is_effect_shake)
-    {
+    if (is_effect_shake) {
         float i_offset = round(elapsed * shake_speed);
-        float magnitude = max(font_size / 85, 1);
-        position.x += noise(position * vec2(i_offset)) * magnitude;
-        position.y += noise(position * vec2(i_offset + 1234.5678)) * magnitude;
+        float magnitude = max(font_size / 50, 1.0); // shake magnitude as function of font_size
+        position += noise(position * vec2(i_offset)) * magnitude;
     }
 
-    if (is_effect_wave)
-    {
-        float x = ((elapsed * wave_speed) + letter_index);
-        position.y += sin((x * 2 * PI) / wave_period) * wave_offset;
+    if (is_effect_wave) {
+        float x = ((elapsed * wave_speed) + float(letter_index));
+        position.y += sin((x * 2.0 * PI) / wave_period) * wave_offset;
     }
 
     vertex_position.xy = position;
@@ -97,27 +91,25 @@ vec4 position(mat4 transform, vec4 vertex_position)
 
 #ifdef PIXEL
 
-const float anti_aliasing = 0.1; // [0, 1], where 0: maximum sharpness
 flat varying int letter_index;
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 vertex_position) {
-
     if (letter_index >= n_visible_characters)
         discard;
 
     float dist = Texel(image, texture_coords).a;
-    float eps = (1 + anti_aliasing) * length(vec2(dFdx(dist), dFdy(dist)));
+    float eps = (1.0 + anti_aliasing) * length(vec2(dFdx(dist), dFdy(dist)));
     float value = smoothstep(0.5 - eps, 0.5 + eps, dist);
 
     if (draw_outline) {
-        float outline = min(smoothstep(0, 1 / 1.75 * exp(1 / font_size), dist), 1);
+        float outline = smoothstep(0.0, 0.02, pow(dist, 6));
         return outline * outline_color;
     }
     else {
-        vec4 rainbow = vec4(1);
+        vec4 rainbow = vec4(1.0);
         if (is_effect_rainbow) {
             float time = elapsed * 0.3;
-            rainbow.rgb = lch_to_rgb(vec3(0.8, 1, fract(vertex_position / rainbow_width - time)));
+            rainbow.rgb = lch_to_rgb(vec3(0.8, 1.0, fract(vertex_position.x / rainbow_width - time)));
         }
 
         return rainbow * color * value;
