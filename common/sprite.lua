@@ -300,5 +300,20 @@ end
 --- @brief
 function rt.Sprite:set_opacity(alpha)
     self._opacity = alpha
-    -- child widgets retain their opacity
+
+    if self._top_left_child ~= nil then
+        self._top_left_child:set_opacity(alpha)
+    end
+
+    if self._top_right_child ~= nil then
+        self._top_right_child:set_opacity(alpha)
+    end
+
+    if self._bottom_right_child ~= nil then
+        self._bottom_right_child:set_opacity(alpha)
+    end
+
+    if self._bottom_left_child ~= nil then
+        self._bottom_left_child:set_opacity(alpha)
+    end
 end

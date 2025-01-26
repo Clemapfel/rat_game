@@ -8,7 +8,6 @@ rt.ComputeShader = meta.new_type("ComputeShader", function(filename, defines)
     })
     if not success then
         rt.error("In rt.ComputeShader: Error when evaluating shader at `" .. filename .. "`:\n" .. shader)
-        return
     end
 
     return meta.new(rt.ComputeShader, {

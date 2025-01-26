@@ -46,6 +46,13 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
+#define MODE_DRAW_OUTLINE 0
+#define MODE_DRAW_TEXT 1
+
+#ifndef MODE
+#error "In label.glsl: expected MODE to be either 0 or 1"
+#endif
+
 const float rainbow_width = 150.0;
 const float shake_speed = 10.0; // steps per second
 const float wave_period = 10.0;
@@ -54,14 +61,17 @@ const float wave_speed = 4.0;
 const float anti_aliasing = 0.1; // [0, 1], where 0: maximum sharpness
 
 uniform int n_visible_characters;
-uniform bool is_effect_rainbow;
 uniform bool is_effect_wave;
 uniform bool is_effect_shake;
-uniform bool draw_outline;
-uniform vec4 outline_color;
 uniform float font_size;
 uniform float elapsed;
 uniform float opacity = 1;
+
+#if MODE == MODE_DRAW_OUTLINE
+    uniform vec4 outline_color;
+#elif MODE == MODE_DRAW_TEXT
+    uniform bool is_effect_rainbow;
+#endif
 
 #ifdef VERTEX
 
@@ -98,13 +108,13 @@ vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 vertex_position) 
     if (letter_index >= n_visible_characters)
         discard;
 
-    if (draw_outline) {
+    #if MODE == MODE_DRAW_OUTLINE
         // outline uses sdf font texture
         float dist = Texel(image, texture_coords).a;
         float outline = smoothstep(0.0, 0.02, pow(dist, 5));
         return outline * outline_color * opacity;
-    }
-    else {
+
+    #elif MODE == MODE_DRAW_TEXT
         // foreground uses regular font texture
         vec4 rainbow = vec4(1.0);
         if (is_effect_rainbow) {
@@ -113,7 +123,7 @@ vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 vertex_position) 
         }
 
         return rainbow * color * Texel(image, texture_coords) * opacity;
-    }
+    #endif
 }
 
 #endif

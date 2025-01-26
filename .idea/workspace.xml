@@ -22,16 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing befor label rework">
-      <change afterPath="$PROJECT_DIR$/common/~~label.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="label refactored">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/keybinding_indicator.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/verbose_info_panel_item.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -698,15 +695,7 @@
       <workItem from="1737762629045" duration="617000" />
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
-      <workItem from="1737906313366" duration="16740000" />
-    </task>
-    <task id="LOCAL-01401" summary="added sdf">
-      <option name="closed" value="true" />
-      <created>1736457027522</created>
-      <option name="number" value="01401" />
-      <option name="presentableId" value="LOCAL-01401" />
-      <option name="project" value="LOCAL" />
-      <updated>1736457027522</updated>
+      <workItem from="1737906313366" duration="18156000" />
     </task>
     <task id="LOCAL-01402" summary="pressure gradient working">
       <option name="closed" value="true" />
@@ -1092,7 +1081,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737912196409</updated>
     </task>
-    <option name="localTasksCounter" value="1450" />
+    <task id="LOCAL-01450" summary="label refactored">
+      <option name="closed" value="true" />
+      <created>1737923609080</created>
+      <option name="number" value="01450" />
+      <option name="presentableId" value="LOCAL-01450" />
+      <option name="project" value="LOCAL" />
+      <updated>1737923609080</updated>
+    </task>
+    <option name="localTasksCounter" value="1451" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1146,7 +1143,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed text box output" />
     <MESSAGE value="deprecated blood" />
     <MESSAGE value="stashing before refactoring battle scene" />
     <MESSAGE value="refactored battle scene" />
@@ -1171,7 +1167,8 @@
     <MESSAGE value="updated love" />
     <MESSAGE value="added sdf font rendering" />
     <MESSAGE value="stashing befor label rework" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing befor label rework" />
+    <MESSAGE value="label refactored" />
+    <option name="LAST_COMMIT_MESSAGE" value="label refactored" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
