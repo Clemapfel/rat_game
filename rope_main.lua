@@ -12,10 +12,10 @@ function rt.ClothSimulation:realize()
     self._apply_constraints_shader = rt.ComputeShader("rope_apply_constraints.glsl")
     self._apply_anchors_shader = rt.ComputeShader("rope_apply_anchors.glsl")
 
-    self._n_nodes = 1000
+    self._n_nodes = 0
     self._n_node_pairs = 0
     self._n_anchors = 1
-    self._n_constraint_iterations = 256
+    self._n_constraint_iterations = 1024
     self._friction = 0
     self._gravity = 1
 
@@ -24,39 +24,66 @@ function rt.ClothSimulation:realize()
         usage = "static"
     }
 
-    local node_buffer_format = self._apply_constraints_shader:get_buffer_format("node_buffer_a")
-    self._node_buffer_a = love.graphics.newBuffer(node_buffer_format, self._n_nodes, buffer_usage)
-    self._node_buffer_b = love.graphics.newBuffer(node_buffer_format, self._n_nodes, buffer_usage)
-
     self._initialize_node_buffers = function(self)
+        local fraction = 0.75
+        local width, height = love.graphics.getDimensions()
+        local x, y, w, h = (1 - fraction) * width / 2, (1 - fraction) * height / 2, fraction * width, fraction * height
+        local step = 10
+        local n_rows, n_columns = math.ceil(w / step), math.ceil(h / step)
+        self._n_nodes = n_rows * n_columns
+        self._n_rows = n_rows
+        self._n_columns = n_columns
+
+        local node_matrix = {}
         local node_data = {}
         local node_pair_data = {}
-        local x, y = 0.5 * love.graphics.getWidth(), 0.5 * love.graphics.getHeight()
-        local y_step = love.graphics.getHeight() / self._n_nodes
-        local x_step = 20
-        local length = 0.5 * love.graphics.getHeight() / self._n_nodes
-        for i = 1, self._n_nodes do
-            table.insert(node_data, {
-                x, y,   -- position
-                x, y,   -- old_position
-                1       -- mass
-            })
 
-            local vx, vy = rt.random.number(-1, 1), rt.random.number(-1, 1)
-            vx, vy = rt.normalize(vx, vy)
-            x = x + vx * y_step
-            y = y + vy * y_step
+        local current_row = {}
+        local node_i = 1
 
-            if i < self._n_nodes then
-                table.insert(node_pair_data, {
-                    i - 1, -- a_index
-                    i,     -- b_index
-                    length -- target_distance
+        for row_i = 1, n_rows do
+            local row = {}
+            for column_i = 1, n_columns do
+                local current_x, current_y = x + (row_i - 1) * step, y + (column_i - 1) * step
+                table.insert(node_data, {
+                    current_x, current_y,   -- position
+                    current_x, current_y,   -- old_position
+                    1       -- mass
                 })
-                self._n_node_pairs = self._n_node_pairs + 1
+                table.insert(row, node_i)
+                node_i = node_i + 1
             end
+            table.insert(node_matrix, row)
         end
 
+        local n_pairs = 0
+        for row_i = 1, n_rows do
+            for column_i = 1, n_columns do
+                local current = node_matrix[row_i][column_i]
+                local hnext = node_matrix[row_i][column_i + 1]
+                if hnext ~= nil then
+                    table.insert(node_pair_data, {
+                        current - 1, hnext - 1, step
+                    })
+                    n_pairs = n_pairs + 1
+                end
+
+                if node_matrix[row_i + 1] ~= nil then
+                    local vnext = node_matrix[row_i + 1][column_i]
+                    if vnext ~= nil then
+                        table.insert(node_pair_data, {
+                            current - 1, vnext - 1, step
+                        })
+                        n_pairs = n_pairs + 1
+                    end
+                end
+            end
+        end
+        self._n_node_pairs = n_pairs
+
+        local node_buffer_format = self._apply_constraints_shader:get_buffer_format("node_buffer_a")
+        self._node_buffer_a = love.graphics.newBuffer(node_buffer_format, self._n_nodes, buffer_usage)
+        self._node_buffer_b = love.graphics.newBuffer(node_buffer_format, self._n_nodes, buffer_usage)
         self._node_buffer_a:setArrayData(node_data)
         self._node_buffer_b:setArrayData(node_data)
 
@@ -71,10 +98,7 @@ function rt.ClothSimulation:realize()
 
     self._update_anchors = function(self, x, y)
         local anchor_data = {
-            {
-                0, -- node_i
-                x, y -- position
-            }
+            {math.ceil(0.5 * self._n_columns) - 1, x, y },
         }
         self._anchor_buffer:setArrayData(anchor_data)
         self._apply_anchors_shader:send("anchor_buffer", self._anchor_buffer)
@@ -110,9 +134,11 @@ function rt.ClothSimulation:realize()
     ) do
         shader:send("node_buffer", self._node_buffer_a)
         shader:send("node_pair_buffer", self._node_pair_buffer)
-        shader:send("n_instances", self._n_node_pairs)
         shader:send("line_thickness", self._line_thickness)
     end
+
+    self._draw_segments_shader:send("n_instances", self._n_node_pairs)
+    self._draw_joints_shader:send("n_instances", self._n_nodes)
 end
 
 function rt.ClothSimulation:update(delta)
@@ -125,16 +151,16 @@ function rt.ClothSimulation:update(delta)
 
     -- jakobsen constraints
     local constraints_dispatch_size = math.ceil(math.sqrt(self._n_node_pairs) / 32)
-    local a_or_b = true
+    local a_or_b = false
     local node_buffer
     for i = 1, self._n_constraint_iterations do
         if a_or_b then
-            self._apply_constraints_shader:send("node_buffer_a", self._node_buffer_a)
-            self._apply_constraints_shader:send("node_buffer_b", self._node_buffer_b)
+            self._apply_constraints_shader:send("node_buffer_a", self._node_buffer_b)
+            self._apply_constraints_shader:send("node_buffer_b", self._node_buffer_a)
             node_buffer = self._node_buffer_b
         else
-            self._apply_constraints_shader:send("node_buffer_b", self._node_buffer_a)
-            self._apply_constraints_shader:send("node_buffer_a", self._node_buffer_b)
+            self._apply_constraints_shader:send("node_buffer_a", self._node_buffer_a)
+            self._apply_constraints_shader:send("node_buffer_b", self._node_buffer_b)
             node_buffer = self._node_buffer_a
         end
         a_or_b = not a_or_b

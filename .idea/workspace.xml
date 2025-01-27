@@ -22,11 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="rope working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing rope">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rope_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/rope_draw.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rope_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/rope_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rope_verlet_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/rope_verlet_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -706,15 +704,7 @@
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
       <workItem from="1737906313366" duration="20098000" />
-      <workItem from="1737995218041" duration="15927000" />
-    </task>
-    <task id="LOCAL-01405" summary="stashing move highlighting">
-      <option name="closed" value="true" />
-      <created>1736627910094</created>
-      <option name="number" value="01405" />
-      <option name="presentableId" value="LOCAL-01405" />
-      <option name="project" value="LOCAL" />
-      <updated>1736627910094</updated>
+      <workItem from="1737995218041" duration="19518000" />
     </task>
     <task id="LOCAL-01406" summary="stashing before move slots into realize">
       <option name="closed" value="true" />
@@ -1100,7 +1090,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738010546896</updated>
     </task>
-    <option name="localTasksCounter" value="1454" />
+    <task id="LOCAL-01454" summary="stashing rope">
+      <option name="closed" value="true" />
+      <created>1738011285645</created>
+      <option name="number" value="01454" />
+      <option name="presentableId" value="LOCAL-01454" />
+      <option name="project" value="LOCAL" />
+      <updated>1738011285645</updated>
+    </task>
+    <option name="localTasksCounter" value="1455" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1154,7 +1152,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored battle scene" />
     <MESSAGE value="added sdf aura shader" />
     <MESSAGE value="sdf aura done" />
     <MESSAGE value="added shader includes" />
@@ -1179,7 +1176,8 @@
     <MESSAGE value="label done" />
     <MESSAGE value="refactored blood" />
     <MESSAGE value="rope working" />
-    <option name="LAST_COMMIT_MESSAGE" value="rope working" />
+    <MESSAGE value="stashing rope" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing rope" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
