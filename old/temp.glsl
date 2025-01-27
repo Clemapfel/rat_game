@@ -1,12 +1,12 @@
-#ifdef PIXEL
+uniform float value; // in [0, 1], where 0: all occluded, 1: all visible
 
-vec4 effect(vec4 vertex_color, Image texture, vec2 texture_coords, vec2 vertex_position)
-{
-    vec2 offset_normalized = (offset / 0.1 + vec2(1)) / vec2(2);
-    float value = project(0.2, 0.8, dot(offset_normalized, offset_normalized));
+vec4 effect(vec4 color, Image tex, vec2 tex_coords, vec2 frag_position) {
+    vec2 position = frag_position / love_ScreenSize.xy;
+    position.x *= love_ScreenSize.x / love_ScreenSize.y;
 
-    //vec4 texcolor = texture2D(texture, texture_coords);
-    return vec4(hsv_to_rgb(vec3(1, 0, value)) * vertex_color.xyz, 1);
+    vec2 center = vec2(0.5);
+    center.x *= love_ScreenSize.x / love_ScreenSize.y;
+
+    const float eps = 0.03;
+    return color * vec4(vec3(smoothstep(value, value + eps, distance(position, center))), 1);
 }
-
-#endif

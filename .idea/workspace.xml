@@ -22,44 +22,28 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="label done">
-      <change afterPath="$PROJECT_DIR$/assets/configs/moves/TEST.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/blood.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/old/common/blood_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored blood">
+      <change afterPath="$PROJECT_DIR$/rope_apply_anchors.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rope_apply_constraints.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rope_draw.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rope_main.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rope_verlet_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.lua" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/sprites/moves.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/sprites/moves.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/simulation_handler.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/simulation_handler.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_apply_local_forces.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_apply_local_forces.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_compute_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_compute_sdf.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_draw_density.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_particles.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_debug_draw_particles.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_debug_draw_sdf.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_draw_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/blood_debug_draw_spatial_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_debug_run.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_construct_particle_occupations.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_compute_derivative.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_density_compute_derivative.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_kernel_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_density_kernel_draw.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_density_kernel_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_density_kernel_init.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/blood_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_preprocess_hitbox.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_preprocess_hitbox.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_step.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/blood_update_particle_density.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_update_particle_density.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_construct_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/blood_construct_spatial_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/blood_draw.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_initialize_spatial_hash.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/blood_initialize_spatial_hash.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_sort.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/blood_sort.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/blood_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/blood_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state_inventory.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state_inventory.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_outline.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~glyph_outline.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/glyph_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/~~glyph_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/label.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/font_sdf.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/temp.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader_include_01.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_01.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader_include_01_error.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_01_error.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader_include_main.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader_include_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/shader_include_main_error.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main_error.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_jump_flood.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_jump_flood.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/smoke_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/sort_radix_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/sort_radix_pass.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/vector_benchmark.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/vector_benchmark.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/~main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/~main_blood_lattice_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/~sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~sort_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -190,14 +174,14 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites\battle" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\old_main" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_blood">
+  <component name="RunManager" selected="Lua Application.main_rope">
     <configuration name="Makefile" type="MAKEFILE_TARGET_RUN_CONFIGURATION" factoryName="Makefile" temporary="true">
       <makefile filename="$PROJECT_DIR$/midi/lovemidi/Makefile" target="" workingDirectory="" arguments="">
         <envs />
@@ -219,6 +203,17 @@
       <module name="rat_game" />
       <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
       <option name="file" value="blood_main.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
+    <configuration name="main_rope" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="rope_main.lua" />
       <option name="workingDir" value="$PROJECT_DIR$" />
       <option name="debuggerType" value="2" />
       <option name="params" value="" />
@@ -309,6 +304,7 @@
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_blood" />
+      <item itemvalue="Lua Application.main_rope" />
       <item itemvalue="Lua Application.main_shader_include" />
       <item itemvalue="Lua Application.main_smoke" />
       <item itemvalue="Lua Application.main_sort" />
@@ -727,15 +723,7 @@
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
       <workItem from="1737906313366" duration="20098000" />
-      <workItem from="1737995218041" duration="7388000" />
-    </task>
-    <task id="LOCAL-01403" summary="rendered selected items on top">
-      <option name="closed" value="true" />
-      <created>1736539339439</created>
-      <option name="number" value="01403" />
-      <option name="presentableId" value="LOCAL-01403" />
-      <option name="project" value="LOCAL" />
-      <updated>1736539339440</updated>
+      <workItem from="1737995218041" duration="15278000" />
     </task>
     <task id="LOCAL-01404" summary="stashing">
       <option name="closed" value="true" />
@@ -1121,7 +1109,15 @@
       <option name="project" value="LOCAL" />
       <updated>1737924837677</updated>
     </task>
-    <option name="localTasksCounter" value="1452" />
+    <task id="LOCAL-01452" summary="refactored blood">
+      <option name="closed" value="true" />
+      <created>1738002783120</created>
+      <option name="number" value="01452" />
+      <option name="presentableId" value="LOCAL-01452" />
+      <option name="project" value="LOCAL" />
+      <updated>1738002783120</updated>
+    </task>
+    <option name="localTasksCounter" value="1453" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1179,7 +1175,6 @@
     <MESSAGE value="refactored battle scene" />
     <MESSAGE value="added sdf aura shader" />
     <MESSAGE value="sdf aura done" />
-    <MESSAGE value="refactored blood" />
     <MESSAGE value="added shader includes" />
     <MESSAGE value="added simulation turn" />
     <MESSAGE value="stashing move debug" />
@@ -1200,7 +1195,8 @@
     <MESSAGE value="stashing befor label rework" />
     <MESSAGE value="label refactored" />
     <MESSAGE value="label done" />
-    <option name="LAST_COMMIT_MESSAGE" value="label done" />
+    <MESSAGE value="refactored blood" />
+    <option name="LAST_COMMIT_MESSAGE" value="refactored blood" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
