@@ -13,7 +13,8 @@ layout(std430) writeonly buffer node_buffer_b {
 }; // size: n_nodes
 
 uniform uint n_nodes;
-uniform float friction = 0.02;
+uniform float friction = 0.2;
+uniform float gravity_factor = 1000;
 uniform float delta;
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in; // dispatch with xy = sqrt(n_nodes) / 32
@@ -29,14 +30,13 @@ void computemain() {
     uint node_start_i = thread_i * n_nodes_per_thread;
     uint node_end_i = min(node_start_i + n_nodes_per_thread, n_nodes);
 
-    const vec2 gravity = vec2(0, 1000);
+    const vec2 gravity = vec2(0, 1) * gravity_factor;
 
     for (uint node_i = node_start_i; node_i < node_end_i; ++node_i) {
         Node node = nodes_a[node_i];
 
         node.old_position = node.position;
         node.position += (node.position - node.old_position) * (1.0 - friction) + gravity * node.mass * delta;
-
         nodes_b[node_i] = node;
     }
 }

@@ -16,6 +16,8 @@ function rt.ClothSimulation:realize()
     self._n_node_pairs = 0
     self._n_anchors = 1
     self._n_constraint_iterations = 256
+    self._friction = 0
+    self._gravity = 1
 
     local buffer_usage = {
         shaderstorage = true,
@@ -90,6 +92,8 @@ function rt.ClothSimulation:realize()
     self._verlet_step_shader:send("node_buffer_a", self._node_buffer_a)
     self._verlet_step_shader:send("node_buffer_b", self._node_buffer_b)
     self._verlet_step_shader:send("n_nodes", self._n_nodes)
+    self._verlet_step_shader:send("friction", self._friction)
+    self._verlet_step_shader:send("gravity_factor", self._gravity)
 
     self._apply_constraints_shader:send("node_buffer_a", self._node_buffer_a)
     self._apply_constraints_shader:send("node_buffer_b", self._node_buffer_b)
@@ -188,6 +192,6 @@ love.draw = function()
 
     -- show fps
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.printf(sim._n_node_pairs * sim._n_constraint_iterations .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
+    love.graphics.printf(sim._n_node_pairs .. " * " .. sim._n_constraint_iterations .. " | " .. love.timer.getFPS(), 0, 0, POSITIVE_INFINITY)
 end
 

@@ -22,28 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored blood">
-      <change afterPath="$PROJECT_DIR$/rope_apply_anchors.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rope_apply_constraints.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rope_draw.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rope_main.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rope_verlet_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="rope working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/font_sdf.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/temp.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/temp.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader_include_01.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_01.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader_include_01_error.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_01_error.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader_include_main.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader_include_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/shader_include_main_error.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/shader_include_main_error.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/smoke_jump_flood.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_jump_flood.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/smoke_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/smoke_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/smoke_render.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sort_radix_pass.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/sort_radix_pass.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.glsl" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/vector_benchmark.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/vector_benchmark.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/~main_blood_lattice_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/old/~main_blood_lattice_step.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/~sort_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/~sort_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rope_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/rope_draw.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rope_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/rope_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rope_verlet_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/rope_verlet_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -723,15 +706,7 @@
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
       <workItem from="1737906313366" duration="20098000" />
-      <workItem from="1737995218041" duration="15278000" />
-    </task>
-    <task id="LOCAL-01404" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736539864011</created>
-      <option name="number" value="01404" />
-      <option name="presentableId" value="LOCAL-01404" />
-      <option name="project" value="LOCAL" />
-      <updated>1736539864011</updated>
+      <workItem from="1737995218041" duration="15927000" />
     </task>
     <task id="LOCAL-01405" summary="stashing move highlighting">
       <option name="closed" value="true" />
@@ -1117,7 +1092,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738002783120</updated>
     </task>
-    <option name="localTasksCounter" value="1453" />
+    <task id="LOCAL-01453" summary="rope working">
+      <option name="closed" value="true" />
+      <created>1738010546896</created>
+      <option name="number" value="01453" />
+      <option name="presentableId" value="LOCAL-01453" />
+      <option name="project" value="LOCAL" />
+      <updated>1738010546896</updated>
+    </task>
+    <option name="localTasksCounter" value="1454" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1171,7 +1154,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before refactoring battle scene" />
     <MESSAGE value="refactored battle scene" />
     <MESSAGE value="added sdf aura shader" />
     <MESSAGE value="sdf aura done" />
@@ -1196,7 +1178,8 @@
     <MESSAGE value="label refactored" />
     <MESSAGE value="label done" />
     <MESSAGE value="refactored blood" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored blood" />
+    <MESSAGE value="rope working" />
+    <option name="LAST_COMMIT_MESSAGE" value="rope working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

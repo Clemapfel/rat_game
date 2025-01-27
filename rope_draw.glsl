@@ -61,6 +61,13 @@ varying vec3 color;
 #endif
 
 uniform uint n_instances;
+uniform float delta = 1 / 60;
+
+vec2 get_position(Node node) {
+    return node.position;
+    vec2 velocity = node.position - node.old_position;
+    return node.position + velocity * delta * 0.5;
+}
 
 vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
@@ -72,8 +79,11 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 
         Node node_a = nodes[pair.a_index];
         Node node_b = nodes[pair.b_index];
+    
+        vec2 b_position = get_position(node_b);
+        vec2 a_position = get_position(node_a);
 
-        vec2 direction = normalize(node_b.position - node_a.position);
+        vec2 direction = normalize(b_position - a_position);
         vec2 perpendicular = vec2(-direction.y, direction.x);
         float half_thickness = line_thickness / 2.0;
 
@@ -86,19 +96,19 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
             offset = half_thickness * perpendicular;
         }
         else if (vertex_id == 2) { // bottom right
-            offset = half_thickness * perpendicular + (node_b.position - node_a.position);
+            offset = half_thickness * perpendicular + (b_position - a_position);
         }
         else if (vertex_id == 3) { // bottom left
-            offset = -half_thickness * perpendicular + (node_b.position - node_a.position);
+            offset = -half_thickness * perpendicular + (b_position - a_position);
         }
 
-        vec2 final_position = node_a.position + offset;
+        vec2 final_position = a_position + offset;
         return transform_projection * vec4(final_position, 0.0, 1.0);
 
     #elif MODE == MODE_JOINTS
 
         Node node = nodes[instance_id];
-        vertex_position.xy += node.position;
+        vertex_position.xy += get_position(node);
         return transform_projection * vertex_position;
 
     #endif
