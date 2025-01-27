@@ -2,7 +2,7 @@
 // compute directional derivative of x and write to yz components
 //
 
-layout(rgba32f) uniform image2D density_texture;
+layout(rgba32f) uniform image2D density_texture; // single texture because shader does not read and modify same components
 
 const mat3 sobel_x = mat3(
     -1.0,  0.0,  1.0,
@@ -15,7 +15,7 @@ const mat3 sobel_y = mat3(
     1.0,  2.0,  1.0
 );
 
-layout(local_size_x = 1, local_size_y = 1) in;
+layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 void computemain() {
 
     ivec2 texture_coords = ivec2(gl_GlobalInvocationID.xy);

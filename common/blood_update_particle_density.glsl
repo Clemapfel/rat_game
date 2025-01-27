@@ -1,3 +1,7 @@
+//
+// update density and near density properties of particles
+//
+
 struct Particle {
     vec2 position;
     vec2 velocity;
@@ -6,12 +10,8 @@ struct Particle {
     uint cell_id;
 };
 
-layout(std430) buffer particle_buffer_a {
-    Particle particles_a[];
-};
-
 layout(std430) buffer particle_buffer_b {
-    Particle particles_b[];
+    Particle particles[];
 };
 
 struct CellOccupation {
@@ -71,7 +71,7 @@ void computemain() {
     uint particle_end_i = min(particle_start_i + particles_per_thread, n_particles);
 
     for (uint self_particle_i = particle_start_i; self_particle_i < particle_end_i; ++self_particle_i) {
-        Particle self = particles_b[self_particle_i];
+        Particle self = particles[self_particle_i];
         vec2 self_position = self.position; // + delta * self.velocity;
 
         float density = 0.0;
@@ -88,7 +88,7 @@ void computemain() {
                 if (other_particle_i == self_particle_i)
                     continue;
 
-                Particle other = particles_b[other_particle_i];
+                Particle other = particles[other_particle_i];
                 vec2 other_position = other.position; // + delta * other.velocity;
                 float dist = distance(self_position, other_position);
 
@@ -99,6 +99,6 @@ void computemain() {
 
         self.density = density;
         self.near_density = near_density;
-        particles_b[self_particle_i] = self;
+        particles[self_particle_i] = self;
     }
 }

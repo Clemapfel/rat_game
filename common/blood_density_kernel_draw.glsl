@@ -1,5 +1,9 @@
 #pragma language glsl4
 
+//
+// draw particles using geometry instancing
+//
+
 struct Particle {
     vec2 position;
     vec2 velocity;

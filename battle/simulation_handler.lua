@@ -3082,10 +3082,6 @@ function bt.BattleScene:create_simulation_environment()
                 end
             end
 
-            -- TODO
-            --table.insert(statuses, bt.create_status_proxy(_scene, bt.StatusConfig("DEBUG_STATUS")))
-            -- TODO
-
             table.insert(to_spawn, {
                 id,
                 moves,

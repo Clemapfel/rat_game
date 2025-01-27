@@ -171,6 +171,7 @@ require "common.twinkle"
 
 require "common.rope"
 require "common.cloth"
+require "common.blood"
 
 require "common.loading_screen"
 require "common.loading_screen_default"

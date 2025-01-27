@@ -35,7 +35,7 @@ end
 rt.GameState = meta.new_type("GameState", function()
     local state = {
         -- system settings
-        vsync_mode = rt.VSyncMode.OFF,
+        vsync_mode = rt.VSyncMode.ADAPTIVE,
         msaa_quality = rt.MSAAQuality.OFF,
         gamma = 1,
         is_fullscreen = false,
@@ -74,7 +74,6 @@ rt.GameState = meta.new_type("GameState", function()
         _entity_to_entity_index = {},   -- Table<bt.Entity, Number>
         _grabbed_object = nil, -- helper for mn.InventoryScene
         _quicksave_screenshot = nil, -- helper for bt.QuicksaveIndicator
-        _render_shader = rt.Shader("common/game_state_render_shader.glsl"),
         _use_coroutines = false,    -- use loading screens and background loading
         _use_scene_caching = true,  -- keep scenes after allocating them once
 

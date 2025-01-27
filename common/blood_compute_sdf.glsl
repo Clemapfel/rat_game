@@ -1,3 +1,7 @@
+//
+// use JFA to construct SDF, then post-process gradient of SDF
+//
+
 #define MODE_INITIALIZE 0        // initialize jump flood fill
 #define MODE_JUMP 1              // step jump flood fill
 #define MODE_COMPUTE_GRADIENT 2  // modify and compute gradient of sdf
@@ -34,7 +38,7 @@ const ivec2 directions[8] = ivec2[](
     ivec2(-1, -1)
 );
 
-layout (local_size_x = 16, local_size_y = 16, local_size_z = 1) in; // dispatch with texture_width / 16, texture_height / 16
+layout (local_size_x = 32, local_size_y = 32, local_size_z = 1) in; // dispatch with area_w / 32, area_h / 32
 void computemain() {
     ivec2 image_size = imageSize(input_texture);
     ivec2 position = ivec2(gl_GlobalInvocationID.xy);

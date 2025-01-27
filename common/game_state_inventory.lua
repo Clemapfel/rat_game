@@ -534,6 +534,7 @@ for which_type in range(
     end
 end
 
+--- @brief
 function rt.GameState:initialize_debug_inventory()
     local moves = {
         "BOMB",
@@ -586,8 +587,8 @@ function rt.GameState:initialize_debug_inventory()
     for entity_config in values(entities) do
         local current_moves, current_consumables, current_equips = {}, {}, {}
 
-        local current_moves = {bt.MoveConfig("DEBUG_MOVE")}
-        local move_i = 1
+        local current_moves = {bt.MoveConfig("TEST"), bt.MoveConfig("DEBUG_MOVE")}
+        local move_i = 2
         for slot_i = 2, entity_config.n_move_slots do
             if rt.random.toss_coin(0.2) then
                 current_moves[slot_i] = bt.MoveConfig(moves[move_i])

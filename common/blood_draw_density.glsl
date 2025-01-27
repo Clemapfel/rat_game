@@ -1,4 +1,6 @@
-#pragma language glsl4
+//
+// Initialize particle mesh texture, will be used for drawing particles using metaballs
+//
 
 #ifdef PIXEL
 

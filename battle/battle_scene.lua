@@ -2001,7 +2001,6 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
-
     local state = self._scene_state
     if state == bt.SceneState.INSPECT then
         if self._text_box_scroll_mode_active then

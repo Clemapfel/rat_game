@@ -1,3 +1,7 @@
+//
+// serially sort particles and construct particle occupations
+//
+
 struct Particle {
     vec2 position;
     vec2 velocity;

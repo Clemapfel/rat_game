@@ -817,7 +817,7 @@ function rt.Label:_apply_wrapping()
     self._height = line_height * row_i
     self._n_lines = row_i
 
-    self._texture_offset_x = -_padding
+    self._texture_offset_x = -_padding - 1 -- TODO: why is -1 necessary?
     self._texture_offset_y = -_padding
     local outline_texture_w = self._width + 2 * _padding
     local outline_texture_h = self._height + 2 * _padding
@@ -854,6 +854,10 @@ end
 --- @brief
 function rt.Label:update_n_visible_characters_from_elapsed(elapsed, scroll_speed)
     if self:get_is_realized() ~= true then self:realize() end
+
+    self._font:initialize()
+    self._monospace_font:initialize()
+
     local so_far = elapsed
     local step = 1 / which(scroll_speed, rt.settings.label.scroll_speed)
     local n_visible = 0

@@ -32,6 +32,7 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         _bold_path = regular_path,
         _bold_italic_path = regular_path,
         _size = size,
+        _is_initialized = false,
 
         _regular = nil, -- love.Font
         _bold = nil,
@@ -56,9 +57,9 @@ rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_p
         out._bold_italic_path = bold_italic_path
     end
 
-    out:_update()
     return out
 end)
+
 
 --- @class love.Font
 ---
@@ -76,8 +77,13 @@ local _new_font = function(path, size, sdf)
     })
 end
 
---- @brief [internal] update held fonts
-function rt.Font:_update()
+local total = 0
+
+--- @brief update held fonts, delayed until font is used for the first time
+function rt.Font:initialize()
+    if self._is_initialized == true then return end
+    self._is_initialized = true
+
     local config = {}
     self._regular = _new_font(self._regular_path, self._size, false)
     self._bold = _new_font(self._bold_path, self._size, false)
@@ -93,6 +99,25 @@ function rt.Font:_update()
     local noto_math = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf", self._size, false)
     local noto_math_sdf = _new_font("assets/fonts/NotoSansMath/NotoSansMath-Regular.ttf", self._size, true)
 
+    for font in range(
+        self._regular,
+        self._bold,
+        self._italic,
+        self._bold_italic
+    ) do
+        font:setFallbacks(noto_math)
+    end
+
+    for font in range(
+        self._regular_sdf,
+        self._bold_sdf,
+        self._italic_sdf,
+        self._bold_italic_sdf
+    ) do
+        font:setFallbacks(noto_math_sdf)
+    end
+
+    --[[
     self._regular:setFallbacks(
         noto_math,
         _new_font("assets/fonts/NotoSans/NotoSans-Regular.ttf", self._size, false),
@@ -140,13 +165,15 @@ function rt.Font:_update()
         _new_font("assets/fonts/NotoSans/NotoSans-BoldItalic.ttf", self._size, true),
         _new_font("assets/fonts/NotoSansJP/NotoSansJP-Bold.ttf", self._size, true)
     )
+    ]]--
 end
 
 --- @brief set font size, in px
 --- @param px Number
 function rt.Font:set_size(px)
     self._size = px
-    self:_update()
+    self._is_initialized = false
+    self:initialize()
 end
 
 --- @brief get font size, in px
@@ -164,6 +191,7 @@ do
     }
     --- @brief
     function rt.Font:get_native(style, sdf)
+        self:initialize()
         if sdf == nil then sdf = false end
         if sdf == false then
             if style == rt.FontStyle.REGULAR then
@@ -191,6 +219,7 @@ end
 
 --- @brief
 function rt.Font:measure_glyph(label)
+    self:initialize()
     return self._bold_italic:getWidth(label), self._bold_italic:getHeight(label)
 end
 
