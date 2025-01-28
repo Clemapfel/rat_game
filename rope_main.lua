@@ -15,7 +15,7 @@ function rt.ClothSimulation:realize()
     self._n_nodes = 0
     self._n_node_pairs = 0
     self._n_anchors = 1
-    self._n_constraint_iterations = 1024
+    self._n_constraint_iterations = 256
     self._friction = 0
     self._gravity = 1
 
@@ -29,14 +29,38 @@ function rt.ClothSimulation:realize()
         local width, height = love.graphics.getDimensions()
         local x, y, w, h = (1 - fraction) * width / 2, (1 - fraction) * height / 2, fraction * width, fraction * height
         local step = 10
+        local node_data = {}
+        local node_pair_data = {}
+
+        local n_nodes = 0
+        local node_i = 1
+        for i = 1, h / step do
+            for j = 1, w / step do
+                table.insert(node_data, {
+                    x + (j - 1) * step, y + (i - 1) * step,
+                    x + (j - 1) * step, y + (i - 1) * step,
+                    1
+                })
+                node_i = node_i + 1
+
+                table.insert(node_pair_data, {
+                    node_i - 1, node_i, step
+                })
+            end
+        end
+
+        self._n_nodes = sizeof(node_data)
+        self._n_node_pairs = sizeof(node_pair_data)
+
+
+        --[[
         local n_rows, n_columns = math.ceil(w / step), math.ceil(h / step)
         self._n_nodes = n_rows * n_columns
         self._n_rows = n_rows
         self._n_columns = n_columns
 
         local node_matrix = {}
-        local node_data = {}
-        local node_pair_data = {}
+
 
         local current_row = {}
         local node_i = 1
@@ -80,6 +104,7 @@ function rt.ClothSimulation:realize()
             end
         end
         self._n_node_pairs = n_pairs
+        ]]--
 
         local node_buffer_format = self._apply_constraints_shader:get_buffer_format("node_buffer_a")
         self._node_buffer_a = love.graphics.newBuffer(node_buffer_format, self._n_nodes, buffer_usage)
@@ -98,7 +123,7 @@ function rt.ClothSimulation:realize()
 
     self._update_anchors = function(self, x, y)
         local anchor_data = {
-            {math.ceil(0.5 * self._n_columns) - 1, x, y },
+            {0, x, y },
         }
         self._anchor_buffer:setArrayData(anchor_data)
         self._apply_anchors_shader:send("anchor_buffer", self._anchor_buffer)

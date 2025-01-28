@@ -207,26 +207,26 @@ for which in range("top_right", "bottom_right", "bottom_left", "top_left") do
 end
 
 --- @override
-function rt.Sprite:draw()
+function rt.Sprite:draw(...)
     local x, y = self._mesh_x, self._mesh_y
     love.graphics.translate(x, y)
     love.graphics.setColor(1, 1, 1, self._opacity)
-    love.graphics.draw(self._mesh)
+    love.graphics.draw(self._mesh, ...)
 
     if self._top_left_child ~= nil then
-        self._top_left_child:draw()
+        self._top_left_child:draw(...)
     end
 
     if self._top_right_child ~= nil then
-        self._top_right_child:draw()
+        self._top_right_child:draw(...)
     end
 
     if self._bottom_right_child ~= nil then
-        self._bottom_right_child:draw()
+        self._bottom_right_child:draw(...)
     end
 
     if self._bottom_left_child ~= nil then
-        self._bottom_left_chlid:draw()
+        self._bottom_left_chlid:draw(...)
     end
 
     love.graphics.translate(-x, -y)

@@ -36,7 +36,7 @@ rt.GameState = meta.new_type("GameState", function()
     local state = {
         -- system settings
         vsync_mode = rt.VSyncMode.ADAPTIVE,
-        msaa_quality = rt.MSAAQuality.OFF,
+        msaa_quality = 8,
         gamma = 1,
         is_fullscreen = false,
         resolution_x = 1280,
@@ -193,6 +193,7 @@ function rt.GameState:_update_window_mode()
     local before_w, before_h = love.graphics.getWidth(), love.graphics.getHeight()
 
     local native_msaa = self._state.msaa_quality
+
     love.window.updateMode(
         window_res_x,
         window_res_y,
@@ -209,9 +210,6 @@ function rt.GameState:_update_window_mode()
             minheight = window_res_y,
         }
     )
-
-    love.window.updateMode(window_res_x, window_res_y, {minwidth = window_res_x, minheight = window_res_y})
-    -- window does not shrink unless updateMode is called twice
 
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.text_speed = self._state.text_speed
@@ -280,7 +278,7 @@ function rt.GameState:run()
         rt.graphics.frame_start = love.timer.getTime()
 
         local update_before = love.timer.getTime()
-        love.update(delta)
+        if love.update then love.update(delta) end
         update_duration = love.timer.getTime() - update_before
 
         local stats
@@ -292,7 +290,7 @@ function rt.GameState:run()
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
 
             local draw_before = love.timer.getTime()
-            love.draw()
+            if love.draw then love.draw() end
             local now =  love.timer.getTime()
             draw_duration = now - draw_before
             total_duration = now - update_before
@@ -392,7 +390,7 @@ function rt.GameState:resize(new_width, new_height)
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
     self._loading_screen:fit_into(0, 0, true_w, true_h)
 
-    if self._use_coroutines then
+    if false then -- self._use_coroutines then
         self:_loading_screen_show(function()
             table.insert(self._active_coroutines, rt.Coroutine(function()
                 if self._current_scene ~= nil then

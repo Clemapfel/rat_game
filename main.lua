@@ -20,7 +20,7 @@ input:signal_connect("keyboard_pressed", function(_, which)
     elseif which == rt.KeyboardKey.FOUR then
         STATE:set_current_scene(bt.BattleScene)
     elseif which == rt.KeyboardKey.FIVE then
-        STATE:set_current_scene(rt.LeakScene)
+        STATE:set_current_scene(mn.ObjectGetScene)
     elseif which == rt.KeyboardKey.ZERO then
         STATE:set_current_scene(nil)
     elseif which == rt.KeyboardKey.RETURN then
@@ -41,8 +41,7 @@ end)
 
 love.load = function()
     STATE:load()
-
-    STATE:set_current_scene(bt.BattleScene)--mn.InventoryScene)
+    STATE:set_current_scene(mn.ObjectGetScene)--mn.InventoryScene)
     love.resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 

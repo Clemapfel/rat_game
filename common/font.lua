@@ -73,7 +73,7 @@ rt.FontStyle = meta.new_enum("FontStyle", {
 
 local _new_font = function(path, size, sdf)
     return love.graphics.newFont(path, size, {
-        sdf = sdf
+        sdf = true
     })
 end
 
