@@ -12,6 +12,7 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state)
             bt.ConsumableConfig("DEBUG_CONSUMABLE")
         },
 
+
         _sprites = {}
     })
 end, {
@@ -55,6 +56,151 @@ function mn.ObjectGetScene:realize()
             slots_visible = true
         })
     end
+
+    local fireworks = {}
+    self._fireworks = fireworks
+    
+    fireworks.realize = function(self)
+        self.render_shader = rt.Shader("menu/object_get_fireworks_render.glsl")
+        self.step_shader = rt.ComputeShader("menu/object_get_fireworks_step.glsl")
+
+        self.n_groups = 3
+        self.n_particles_per_group = 1000
+        self.particle_radius = 5
+
+        local n_particles = self.n_particles_per_group * self.n_groups
+
+        local particle_buffer_format = self.step_shader:get_buffer_format("particle_buffer_a")
+        self.particle_buffer_a = rt.GraphicsBuffer(particle_buffer_format, n_particles)
+        self.particle_buffer_b = rt.GraphicsBuffer(particle_buffer_format, n_particles)
+
+        local group_buffer_format = self.step_shader:get_buffer_format("group_buffer")
+        self.group_buffer = rt.GraphicsBuffer(group_buffer_format, self.n_groups)
+
+        do
+            local w, h = love.graphics.getDimensions()
+            local group_to_center = {
+                [1] = {0.25 * w, 0.2 * h, 0},
+                [2] = {0.5 * w, 0.2 * h, 0},
+                [3] = {0.75 * w, 0.2 * h, 0}
+            }
+
+            local group_data = {}
+            local particle_data = {}
+            local w, h = love.graphics.getDimensions()
+            local group_to_center = {
+                [1] = {0.25 * w, 0.2 * h, 0},
+                [2] = {0.5 * w, 0.2 * h, 0},
+                [3] = {0.75 * w, 0.2 * h, 0}
+            }
+
+            local group_data = {}
+            local particle_data = {}
+            local initial_velocity = 100
+            for group_i = 1, self.n_groups do
+                local cx, cy, cz = table.unpack(group_to_center[group_i])
+                table.insert(group_data, {
+                    cx, cy, cz, 1
+                })
+
+                for particle_i = 1, self.n_particles_per_group do
+                    local x_angle = rt.random.number(-math.pi, math.pi)
+                    local y_angle = rt.random.number(-math.pi, math.pi)
+                    local z_angle = rt.random.number(-math.pi, math.pi)
+
+                    -- Calculate the point on the sphere
+                    local vx = initial_velocity * math.cos(x_angle) * math.sin(y_angle)
+                    local vy = initial_velocity * math.sin(x_angle) * math.sin(y_angle)
+                    local vz = initial_velocity * math.cos(y_angle)
+
+                    table.insert(particle_data, {
+                        cx, cy, cz,
+                        vx, vy, vz,
+                        rt.random.number(0, 1), -- hue
+                        1, -- value
+                        group_i - 1
+                    })
+                end
+            end
+
+            self.particle_buffer_a:replace_data(particle_data)
+            self.particle_buffer_b:replace_data(particle_data)
+            self.group_buffer:replace_data(group_data)
+            self.group_data = group_data
+
+            dbg(group_data)
+        end
+
+        self.update_group_data = function(self, mode)
+            for i = 1, self.n_groups do
+                self.group_data[i][4] = mode
+            end
+            self.group_buffer:replace_data(self.group_data)
+        end
+
+        self.particle_mesh = rt.VertexCircle(0, 0, self.particle_radius)
+        local particle_texture_w = 1000
+        self.particle_mesh_texture = rt.RenderTexture(particle_texture_w, particle_texture_w, rt.TextureFormat.R32F)
+        self.particle_texture_shader = rt.Shader("menu/object_get_fireworks_particle_texture.glsl")
+
+        do
+            love.graphics.push()
+            love.graphics.origin()
+           self.particle_mesh_texture:bind()
+           self.particle_texture_shader:bind()
+            love.graphics.rectangle("fill", 0, 0, particle_texture_w, particle_texture_w)
+           self.particle_texture_shader:unbind()
+           self.particle_mesh_texture:unbind()
+            love.graphics.pop()
+           self.particle_mesh:set_texture(fireworks.particle_mesh_texture)
+        end
+
+        for name_value in range(
+            {"particle_buffer_a",self.particle_buffer_a},
+            {"particle_buffer_a",self.particle_buffer_a},
+            {"particle_buffer_b",self.particle_buffer_b},
+            {"group_buffer",self.group_buffer},
+            {"n_groups",self.n_groups},
+            {"n_particles_per_group",self.n_particles_per_group}
+        ) do
+           self.step_shader:send(table.unpack(name_value))
+        end
+
+        local fireworks_dispatch_size = math.ceil(math.sqrt(n_particles) / 32)
+       self.a_or_b = true
+       self.update = function(self, delta)
+            if self.a_or_b then
+                self.step_shader:send("particle_buffer_a", self.particle_buffer_a)
+                self.step_shader:send("particle_buffer_b", self.particle_buffer_b)
+                self.render_shader:send("particle_buffer", self.particle_buffer_b)
+            else
+                self.step_shader:send("particle_buffer_a", self.particle_buffer_b)
+                self.step_shader:send("particle_buffer_b", self.particle_buffer_a)
+                self.render_shader:send("particle_buffer", self.particle_buffer_a)
+            end
+            self.a_or_b = not self.a_or_b
+
+            self.step_shader:send("delta", delta)
+            self.step_shader:dispatch(fireworks_dispatch_size, fireworks_dispatch_size)
+        end
+
+       self.draw = function(self)
+            self.render_shader:bind()
+            love.graphics.setColor(1, 1, 1, 1)
+            self.particle_mesh:draw_instanced(self.n_particles_per_group * self.n_groups)
+            self.render_shader:unbind()
+        end 
+    end
+    fireworks:realize()
+
+    self._input = rt.InputController()
+    self._input:signal_connect("pressed", function(self, which)
+        if which == rt.InputButton.A then
+            fireworks:update_group_data(1)
+        elseif which == rt.InputButton.X then
+            fireworks:realize()
+        end
+    end)
 end
 
 function mn.ObjectGetScene:size_allocate(x, y, width, height)
@@ -113,10 +259,13 @@ function mn.ObjectGetScene:update(delta)
         end
         entry.color = entry.color_animation:get_value()
     end
+
+    self._fireworks:update(delta)
 end
 
 --- @brief
 function mn.ObjectGetScene:draw()
+    --[[
     for entry in values(self._sprites) do
         love.graphics.push()
         love.graphics.origin()
@@ -137,6 +286,12 @@ function mn.ObjectGetScene:draw()
 
         love.graphics.pop()
     end
+    ]]--
+
+    love.graphics.setColor(0, 0, 0, 1)
+    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+
+    self._fireworks:draw()
 end
 
 --- @override

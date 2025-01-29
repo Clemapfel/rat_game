@@ -19,6 +19,8 @@ end)
 --- @param name String
 --- @param value
 function rt.Shader:send(name, value)
+    assert(value ~= nil)
+    if meta.isa(value, rt.GraphicsBuffer) or meta.isa(value, rt.Texture) then value = value._native end
     if self._native:hasUniform(name) then
         self._native:send(name, value)
     end

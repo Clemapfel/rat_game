@@ -77,7 +77,7 @@ rt.GameState = meta.new_type("GameState", function()
         _use_coroutines = false,    -- use loading screens and background loading
         _use_scene_caching = true,  -- keep scenes after allocating them once
 
-        _loading_screen = rt.LoadingScreen.DEFAULT(),
+        _loading_screen = nil,
         _loading_screen_active = false,
         _bounds = rt.AABB(0, 0, rt.graphics.get_width(), rt.graphics.get_height()),
         _current_scene = nil,
@@ -88,6 +88,8 @@ rt.GameState = meta.new_type("GameState", function()
         _camera = nil, -- rt.Camera
     })
     out._camera = rt.Camera(out)
+
+    if out._use_coroutines then out._loading_screen = rt.LoadingScreen.DEFAULT() end
     out:realize()
     return out
 end)
@@ -96,7 +98,7 @@ end)
 function rt.GameState:realize()
     self:load_input_mapping()
     rt.get_active_state = function() return self end
-    self._loading_screen:realize()
+    if self._use_coroutines then self._loading_screen:realize() end
 end
 
 --- @brief
@@ -211,6 +213,8 @@ function rt.GameState:_update_window_mode()
         }
     )
 
+    love.graphics.present() -- necessary because of a vulkan bug
+
     rt.settings.contrast = self._state.vfx_contrast_level
     rt.settings.text_speed = self._state.text_speed
 
@@ -288,12 +292,12 @@ function rt.GameState:run()
             love.graphics.clear()
             love.graphics.setColor(background_color.r, background_color.g, background_color.b, 1)
             love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
-
             local draw_before = love.timer.getTime()
             if love.draw then love.draw() end
             local now =  love.timer.getTime()
             draw_duration = now - draw_before
             total_duration = now - update_before
+
             stats = love.graphics.getStats()
             local n_batched_draws = stats.drawcallsbatched
             local n_canvas_switches = stats.canvasswitches
@@ -388,9 +392,10 @@ end
 --- @brief
 function rt.GameState:resize(new_width, new_height)
     local true_w, true_h = love.graphics.getWidth(), love.graphics.getHeight()
-    self._loading_screen:fit_into(0, 0, true_w, true_h)
 
-    if false then -- self._use_coroutines then
+
+    if self._use_coroutines then
+        self._loading_screen:fit_into(0, 0, true_w, true_h)
         self:_loading_screen_show(function()
             table.insert(self._active_coroutines, rt.Coroutine(function()
                 if self._current_scene ~= nil then

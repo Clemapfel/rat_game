@@ -11,9 +11,9 @@
   </component>
   <component name="CMakeRunConfigurationManager">
     <generated>
-      <config projectName="rat_game" targetName="love" />
-      <config projectName="rat_game" targetName="battle_main" />
-      <config projectName="rat_game" targetName="rat_game" />
+      <config projectName="Project" targetName="rat_game" />
+      <config projectName="Project" targetName="battle_main" />
+      <config projectName="Project" targetName="love" />
     </generated>
   </component>
   <component name="CMakeSettings">
@@ -22,19 +22,17 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing cloth">
-      <change afterPath="$PROJECT_DIR$/.idea/customTargets.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_scene_reveal.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_particle_texture.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_render.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/conf.lua" beforeDir="false" afterPath="$PROJECT_DIR$/conf.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/love/love" beforeDir="false" afterPath="$PROJECT_DIR$/love/love" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rope_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/rope_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -61,7 +59,7 @@
         <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/love/love" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitLabMergeRequestsSettings">{}</component>
@@ -728,15 +726,7 @@
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
       <workItem from="1737906313366" duration="20098000" />
-      <workItem from="1737995218041" duration="31240000" />
-    </task>
-    <task id="LOCAL-01407" summary="added move selection UI">
-      <option name="closed" value="true" />
-      <created>1736713222762</created>
-      <option name="number" value="01407" />
-      <option name="presentableId" value="LOCAL-01407" />
-      <option name="project" value="LOCAL" />
-      <updated>1736713222762</updated>
+      <workItem from="1737995218041" duration="42121000" />
     </task>
     <task id="LOCAL-01408" summary="fixed strikethrough alignment bug">
       <option name="closed" value="true" />
@@ -1122,7 +1112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738017011126</updated>
     </task>
-    <option name="localTasksCounter" value="1456" />
+    <task id="LOCAL-01456" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1738094854597</created>
+      <option name="number" value="01456" />
+      <option name="presentableId" value="LOCAL-01456" />
+      <option name="project" value="LOCAL" />
+      <updated>1738094854597</updated>
+    </task>
+    <option name="localTasksCounter" value="1457" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1186,7 +1184,6 @@
     <MESSAGE value="fixed move undo" />
     <MESSAGE value="updated diagnostics to show total frame usage" />
     <MESSAGE value="spatial hash working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing milk" />
     <MESSAGE value="stashing separate update" />
     <MESSAGE value="stashing, lighting done" />
@@ -1201,7 +1198,8 @@
     <MESSAGE value="rope working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="stashing cloth" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing cloth" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

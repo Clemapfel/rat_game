@@ -21,9 +21,10 @@ end)
 --- @param value
 function rt.ComputeShader:send(name, value)
     assert(value ~= nil)
-    --if rt.settings.compute_shader.allow_unused_uniform and self._native:hasUniform(name) then
+    if meta.isa(value, rt.GraphicsBuffer) or meta.isa(value, rt.Texture) then value = value._native end
+    if self._native:hasUniform(name) then
         self._native:send(name, value)
-    --end
+    end
 end
 
 --- @brief

@@ -6,8 +6,6 @@ STATE = rt.GameState()
 STATE:set_loading_screen(rt.LoadingScreen.DEFAULT)
 STATE:initialize_debug_state()
 
-camera = STATE:get_camera()
-
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
@@ -27,22 +25,12 @@ input:signal_connect("keyboard_pressed", function(_, which)
         profiler_active = not profiler_active
     elseif which == rt.KeyboardKey.ESCAPE then
     end
-
-    if which == rt.KeyboardKey.SPACE then
-        --camera:set_angle(rt.random.number(-math.pi, math.pi))
-        --camera:set_scale(rt.random.number(1 / 4, 4))
-        --camera:set_position(love.mouse.getPosition())
-    elseif which == rt.KeyboardKey.B then
-        --camera:shake(10 / 60)
-    elseif which == rt.KeyboardKey.X then
-        --camera:skip()
-    end
 end)
 
 love.load = function()
     STATE:load()
     STATE:set_current_scene(mn.ObjectGetScene)--mn.InventoryScene)
-    love.resize(love.graphics.getWidth(), love.graphics.getHeight())
+    STATE:resize(love.graphics.getWidth(), love.graphics.getHeight())
 end
 
 love.update = function(delta)
