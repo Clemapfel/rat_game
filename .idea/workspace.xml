@@ -22,16 +22,10 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_particle_texture.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_render.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_fireworks_step.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing random velocity">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/compute_shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/game_state.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/conf.lua" beforeDir="false" afterPath="$PROJECT_DIR$/conf.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_fireworks_render.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_fireworks_render.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_fireworks_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_fireworks_step.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -726,15 +720,7 @@
       <workItem from="1737763538108" duration="1579000" />
       <workItem from="1737824860240" duration="9369000" />
       <workItem from="1737906313366" duration="20098000" />
-      <workItem from="1737995218041" duration="42121000" />
-    </task>
-    <task id="LOCAL-01408" summary="fixed strikethrough alignment bug">
-      <option name="closed" value="true" />
-      <created>1736713539116</created>
-      <option name="number" value="01408" />
-      <option name="presentableId" value="LOCAL-01408" />
-      <option name="project" value="LOCAL" />
-      <updated>1736713539116</updated>
+      <workItem from="1737995218041" duration="45374000" />
     </task>
     <task id="LOCAL-01409" summary="added scene transitions">
       <option name="closed" value="true" />
@@ -1120,7 +1106,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738094854597</updated>
     </task>
-    <option name="localTasksCounter" value="1457" />
+    <task id="LOCAL-01457" summary="stashing random velocity">
+      <option name="closed" value="true" />
+      <created>1738187101887</created>
+      <option name="number" value="01457" />
+      <option name="presentableId" value="LOCAL-01457" />
+      <option name="project" value="LOCAL" />
+      <updated>1738187101887</updated>
+    </task>
+    <option name="localTasksCounter" value="1458" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1174,7 +1168,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="sdf aura done" />
     <MESSAGE value="added shader includes" />
     <MESSAGE value="added simulation turn" />
     <MESSAGE value="stashing move debug" />
@@ -1199,7 +1192,8 @@
     <MESSAGE value="stashing rope" />
     <MESSAGE value="stashing cloth" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing random velocity" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing random velocity" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

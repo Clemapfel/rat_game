@@ -59,14 +59,17 @@ function mn.ObjectGetScene:realize()
 
     local fireworks = {}
     self._fireworks = fireworks
-    
+
+    local scene = self
     fireworks.realize = function(self)
         self.render_shader = rt.Shader("menu/object_get_fireworks_render.glsl")
         self.step_shader = rt.ComputeShader("menu/object_get_fireworks_step.glsl")
 
         self.n_groups = 3
-        self.n_particles_per_group = 1000
+        self.n_particles_per_group = 800
         self.particle_radius = 5
+        local perturbation = 0.024
+        self.dim_velocity = 0.8
 
         local n_particles = self.n_particles_per_group * self.n_groups
 
@@ -77,8 +80,10 @@ function mn.ObjectGetScene:realize()
         local group_buffer_format = self.step_shader:get_buffer_format("group_buffer")
         self.group_buffer = rt.GraphicsBuffer(group_buffer_format, self.n_groups)
 
+        local w, h = scene._bounds.width, scene._bounds.height
         do
-            local w, h = love.graphics.getDimensions()
+            local group_data = {}
+            local particle_data = {}
             local group_to_center = {
                 [1] = {0.25 * w, 0.2 * h, 0},
                 [2] = {0.5 * w, 0.2 * h, 0},
@@ -87,16 +92,8 @@ function mn.ObjectGetScene:realize()
 
             local group_data = {}
             local particle_data = {}
-            local w, h = love.graphics.getDimensions()
-            local group_to_center = {
-                [1] = {0.25 * w, 0.2 * h, 0},
-                [2] = {0.5 * w, 0.2 * h, 0},
-                [3] = {0.75 * w, 0.2 * h, 0}
-            }
+            local initial_velocity = 10
 
-            local group_data = {}
-            local particle_data = {}
-            local initial_velocity = 100
             for group_i = 1, self.n_groups do
                 local cx, cy, cz = table.unpack(group_to_center[group_i])
                 table.insert(group_data, {
@@ -104,20 +101,25 @@ function mn.ObjectGetScene:realize()
                 })
 
                 for particle_i = 1, self.n_particles_per_group do
-                    local x_angle = rt.random.number(-math.pi, math.pi)
-                    local y_angle = rt.random.number(-math.pi, math.pi)
-                    local z_angle = rt.random.number(-math.pi, math.pi)
 
-                    -- Calculate the point on the sphere
-                    local vx = initial_velocity * math.cos(x_angle) * math.sin(y_angle)
-                    local vy = initial_velocity * math.sin(x_angle) * math.sin(y_angle)
-                    local vz = initial_velocity * math.cos(y_angle)
+                    local index = particle_i - 1 + 0.5
+                    local phi = math.acos(1 - 2 * index / self.n_particles_per_group)
+                    local theta = math.pi * (1 + math.sqrt(5)) * index
+
+                    phi = phi + rt.random.number(-perturbation * math.pi, perturbation * math.pi)
+                    theta = theta + rt.random.number(-perturbation * math.pi, perturbation * math.pi)
+
+                    local vx = math.cos(theta) * math.sin(phi)
+                    local vy = math.sin(theta) * math.sin(phi)
+                    local vz = math.cos(phi)
 
                     table.insert(particle_data, {
                         cx, cy, cz,
                         vx, vy, vz,
+                        initial_velocity * vx, initial_velocity * vy, initial_velocity * vz,
                         rt.random.number(0, 1), -- hue
                         1, -- value
+                        1, -- mass
                         group_i - 1
                     })
                 end
@@ -127,8 +129,6 @@ function mn.ObjectGetScene:realize()
             self.particle_buffer_b:replace_data(particle_data)
             self.group_buffer:replace_data(group_data)
             self.group_data = group_data
-
-            dbg(group_data)
         end
 
         self.update_group_data = function(self, mode)
@@ -146,13 +146,13 @@ function mn.ObjectGetScene:realize()
         do
             love.graphics.push()
             love.graphics.origin()
-           self.particle_mesh_texture:bind()
-           self.particle_texture_shader:bind()
+            self.particle_mesh_texture:bind()
+            self.particle_texture_shader:bind()
             love.graphics.rectangle("fill", 0, 0, particle_texture_w, particle_texture_w)
-           self.particle_texture_shader:unbind()
-           self.particle_mesh_texture:unbind()
+            self.particle_texture_shader:unbind()
+            self.particle_mesh_texture:unbind()
             love.graphics.pop()
-           self.particle_mesh:set_texture(fireworks.particle_mesh_texture)
+            self.particle_mesh:set_texture(fireworks.particle_mesh_texture)
         end
 
         for name_value in range(
@@ -166,30 +166,52 @@ function mn.ObjectGetScene:realize()
            self.step_shader:send(table.unpack(name_value))
         end
 
-        local fireworks_dispatch_size = math.ceil(math.sqrt(n_particles) / 32)
-       self.a_or_b = true
-       self.update = function(self, delta)
-            if self.a_or_b then
-                self.step_shader:send("particle_buffer_a", self.particle_buffer_a)
-                self.step_shader:send("particle_buffer_b", self.particle_buffer_b)
-                self.render_shader:send("particle_buffer", self.particle_buffer_b)
-            else
-                self.step_shader:send("particle_buffer_a", self.particle_buffer_b)
-                self.step_shader:send("particle_buffer_b", self.particle_buffer_a)
-                self.render_shader:send("particle_buffer", self.particle_buffer_a)
-            end
-            self.a_or_b = not self.a_or_b
+        self.texture = rt.RenderTexture(w, h)
 
-            self.step_shader:send("delta", delta)
-            self.step_shader:dispatch(fireworks_dispatch_size, fireworks_dispatch_size)
+        local fireworks_dispatch_size = math.ceil(math.sqrt(n_particles) / 32)
+        self.a_or_b = true
+        self.elapsed = 0
+        local so_far = 0
+        self.update = function(self, delta)
+            self.elapsed = self.elapsed + delta
+
+            so_far = so_far + delta
+            local step = 1 / 120
+            while so_far > step do
+                if self.a_or_b then
+                    self.step_shader:send("particle_buffer_a", self.particle_buffer_a)
+                    self.step_shader:send("particle_buffer_b", self.particle_buffer_b)
+                    self.render_shader:send("particle_buffer", self.particle_buffer_b)
+                else
+                    self.step_shader:send("particle_buffer_a", self.particle_buffer_b)
+                    self.step_shader:send("particle_buffer_b", self.particle_buffer_a)
+                    self.render_shader:send("particle_buffer", self.particle_buffer_a)
+                end
+                self.a_or_b = not self.a_or_b
+
+                self.step_shader:send("elapsed", self.elapsed)
+                self.step_shader:send("delta", step)
+                self.step_shader:dispatch(fireworks_dispatch_size, fireworks_dispatch_size)
+
+                self.texture:bind()
+                love.graphics.setBlendMode("subtract")
+                love.graphics.setColor(step * self.dim_velocity, step * self.dim_velocity, step * self.dim_velocity, 1)
+                love.graphics.rectangle("fill", 0, 0, self.texture:get_size())
+                love.graphics.setBlendMode("alpha")
+
+                self.render_shader:bind()
+                love.graphics.setColor(1, 1, 1, 1)
+                self.particle_mesh:draw_instanced(self.n_particles_per_group * self.n_groups)
+                self.render_shader:unbind()
+                self.texture:unbind()
+
+                so_far = so_far - step
+            end
         end
 
-       self.draw = function(self)
-            self.render_shader:bind()
-            love.graphics.setColor(1, 1, 1, 1)
-            self.particle_mesh:draw_instanced(self.n_particles_per_group * self.n_groups)
-            self.render_shader:unbind()
-        end 
+        self.draw = function(self)
+            self.texture:draw()
+        end
     end
     fireworks:realize()
 

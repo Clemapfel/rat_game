@@ -1,8 +1,10 @@
 struct Particle {
     vec3 position;
+    vec3 direction;
     vec3 velocity;
     float hue;
     float value;
+    float mass;
     uint group_id;
 };
 
@@ -17,6 +19,7 @@ layout(std430) buffer writeonly particle_buffer_b {
 uniform uint n_groups;
 uniform uint n_particles_per_group;
 uniform float delta;
+uniform float elapsed;
 
 const uint PARTICLE_GROUP_MODE_ASCEND = 0;
 const uint PARTICLE_GROUP_MODE_SPREAD = 1;
@@ -31,8 +34,13 @@ layout(std430) buffer readonly group_buffer {
 }; // size: n_groups
 
 const float acceleration = 1.05;
-const float gravity_factor = 50;
-const float value_decay = 0.2;
+const float gravity_factor = 0.4;
+const float value_decay = 0.4;
+const float mass_decay = 0.1;
+const float boost_duration = 1;
+const float boost_velocity = 1000;
+const float friction_coefficient = 0.98; // Friction coefficient
+const float air_resistance = 0.01; // Air resistance factor
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 void computemain() {
@@ -44,15 +52,22 @@ void computemain() {
     uint start_i = global_thread_id * particles_per_thread;
     uint end_i = min(start_i + particles_per_thread, n_particles);
 
-    const vec3 gravity = vec3(0, 1, 0) * gravity_factor;
+    const vec3 gravity = vec3(0, -9.81, 0) * gravity_factor; // Realistic gravity
 
     for (uint particle_i = start_i; particle_i < end_i; ++particle_i) {
         Particle particle = particles_a[particle_i];
         ParticleGroup group = groups[particle.group_id];
         vec3 to_center = normalize(group.center - particle.position) * 100;
 
+        float mass = particle.mass;
+        particle.velocity += max(1 - elapsed / boost_duration, 0) * boost_velocity * normalize(particle.direction) * delta;
+        particle.velocity += mass * gravity * delta;
+
         particle.position += particle.velocity * delta;
+
         particle.value = max(particle.value - value_decay * delta, 0);
+        particle.mass = max(particle.mass - mass_decay * delta, 0);
+
         particles_b[particle_i] = particle;
     }
 }

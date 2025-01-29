@@ -29,9 +29,11 @@ vec3 lch_to_rgb(vec3 lch) {
 
 struct Particle {
     vec3 position;
+    vec3 direction;
     vec3 velocity;
     float hue;
     float value;
+    float mass;
     uint group_id;
 };
 
@@ -39,12 +41,17 @@ layout(std430) buffer readonly particle_buffer {
     Particle particles[];
 }; // size: n_particles
 
+#define PI 3.1415926535897932384626433832795
+
 #ifdef VERTEX
+
 varying vec4 color;
+
 vec4 position(mat4 transform_projection, vec4 vertex_position)
 {
     int instance_id = love_InstanceID;
     Particle particle = particles[instance_id];
+
     color = vec4(lch_to_rgb(vec3(0.8, 1, particle.hue)), particle.value);
     vertex_position.xy += particle.position.xy;
     return transform_projection * vertex_position;
