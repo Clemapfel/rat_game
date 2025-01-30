@@ -3,7 +3,7 @@ rt.settings.menu.fireworks = {
    n_particles_per_group = 800,
    particle_perturbation = 0.024,
    step_size = 1 / 120,
-   particle_radius = 4,
+   particle_radius = 3.5,
    dim_velocity = 3
 }
 
@@ -190,7 +190,6 @@ function mn.Fireworks:update(delta)
 end
 
 function mn.Fireworks:draw()
-    self._particle_mesh_texture:draw()
     love.graphics.setColor(1, 1, 1, 1)
     self._texture:draw(self._bounds.x, self._bounds.y)
 end

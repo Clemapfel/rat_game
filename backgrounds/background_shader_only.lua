@@ -90,4 +90,7 @@ rt.Background.KARO_CROSSES = rt.Background.new_shader_only_background("KARO_CROS
 --- @class rt.Background.SQUIGGLY_DANCE
 rt.Background.SQUIGGLY_DANCE = rt.Background.new_shader_only_background("SQUIGGLY_DANCE", "backgrounds/squiggly_dance.glsl")
 
+--- @class rt.Background.CELEBRATION
+rt.Background.CELEBRATION = rt.Background.new_shader_only_background("CELEBRATION", "backgrounds/celebration.glsl")
+
 

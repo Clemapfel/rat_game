@@ -13,7 +13,8 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state)
         },
 
         _sprites = {},
-        _background = rt.Background()
+        _background = rt.Background(),
+        _input = rt.InputController(),
     })
 end, {
     _reveal_shader = rt.Shader("menu/object_get_scene_reveal.glsl")
@@ -23,7 +24,7 @@ end, {
 function mn.ObjectGetScene:realize()
     if self:already_realized() then return end
 
-    self._background:set_implementation(rt.Background.CONFUSION)
+    self._background:set_implementation(rt.Background.CELEBRATION)
 
     local black = rt.Palette.BLACK
     self._reveal_shader:send("black", {black.r, black.g, black.b})
@@ -70,6 +71,12 @@ function mn.ObjectGetScene:realize()
 
     self._fireworks:realize()
     self._background:realize()
+
+    self._input:signal_connect("pressed", function(_, which)
+        if which == rt.InputButton.Y then
+            self._background:set_implementation(rt.Background.CELEBRATION)
+        end
+    end)
 end
 
 function mn.ObjectGetScene:size_allocate(x, y, width, height)
