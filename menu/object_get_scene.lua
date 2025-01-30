@@ -12,7 +12,8 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state)
             bt.ConsumableConfig("DEBUG_CONSUMABLE")
         },
 
-        _sprites = {}
+        _sprites = {},
+        _background = rt.Background()
     })
 end, {
     _reveal_shader = rt.Shader("menu/object_get_scene_reveal.glsl")
@@ -21,6 +22,8 @@ end, {
 --- @brief
 function mn.ObjectGetScene:realize()
     if self:already_realized() then return end
+
+    self._background:set_implementation(rt.Background.CONFUSION)
 
     local black = rt.Palette.BLACK
     self._reveal_shader:send("black", {black.r, black.g, black.b})
@@ -56,186 +59,17 @@ function mn.ObjectGetScene:realize()
         })
     end
 
-    local fireworks = {}
-    self._fireworks = fireworks
+    local w, h = love.graphics.getDimensions()
+    local bottom = 0.8 * h
+    local top = 0.25 * h
+    self._fireworks = mn.Fireworks(
+        {0.25 * w, bottom, 0.2 * w, top},
+        {0.5 * w, bottom, 0.5 * w, top},
+        {0.75 * w, bottom, 0.8 * w, top}
+    )
 
-    local scene = self
-    fireworks.realize = function(self)
-        self.render_shader = rt.Shader("menu/object_get_fireworks_render.glsl")
-        self.step_shader = rt.ComputeShader("menu/object_get_fireworks_step.glsl")
-
-        self.n_groups = 3
-        self.n_particles_per_group = 800
-        self.particle_radius = 5
-        local perturbation = 0.024
-        self.dim_velocity = 0.9
-
-        local n_particles = self.n_particles_per_group * self.n_groups
-
-        local particle_buffer_format = self.step_shader:get_buffer_format("particle_buffer_a")
-        self.particle_buffer_a = rt.GraphicsBuffer(particle_buffer_format, n_particles)
-        self.particle_buffer_b = rt.GraphicsBuffer(particle_buffer_format, n_particles)
-
-        local group_buffer_format = self.step_shader:get_buffer_format("group_buffer")
-        self.group_buffer = rt.GraphicsBuffer(group_buffer_format, self.n_groups)
-
-        local fade_out_buffer_format = self.step_shader:get_buffer_format("fade_out_buffer")
-        self.fade_out_buffer = rt.GraphicsBuffer(fade_out_buffer_format, 1)
-
-        local w, h = scene._bounds.width, scene._bounds.height
-        do
-            local group_data = {}
-            local particle_data = {}
-            local group_to_center = {
-                [1] = {0.25 * w, 0.2 * h, 0},
-                [2] = {0.5 * w, 0.2 * h, 0},
-                [3] = {0.75 * w, 0.2 * h, 0}
-            }
-
-            local group_data = {}
-            local particle_data = {}
-            local initial_velocity = 10
-
-            for group_i = 1, self.n_groups do
-                local cx, cy, cz = table.unpack(group_to_center[group_i])
-                table.insert(group_data, {
-                    cx, cy, cz, 1
-                })
-
-                for particle_i = 1, self.n_particles_per_group do
-
-                    local index = particle_i - 1 + 0.5
-                    local phi = math.acos(1 - 2 * index / self.n_particles_per_group)
-                    local theta = math.pi * (1 + math.sqrt(5)) * index
-
-                    phi = phi + rt.random.number(-perturbation * math.pi, perturbation * math.pi)
-                    theta = theta + rt.random.number(-perturbation * math.pi, perturbation * math.pi)
-
-                    local vx = math.cos(theta) * math.sin(phi)
-                    local vy = math.sin(theta) * math.sin(phi)
-                    local vz = math.cos(phi)
-
-                    table.insert(particle_data, {
-                        cx, cy, cz,
-                        vx, vy, vz,
-                        initial_velocity * vx, initial_velocity * vy, initial_velocity * vz,
-                        rt.random.number(0, 1), -- hue
-                        1, -- value
-                        1, -- mass
-                        group_i - 1
-                    })
-                end
-            end
-
-            self.particle_buffer_a:replace_data(particle_data)
-            self.particle_buffer_b:replace_data(particle_data)
-            self.group_buffer:replace_data(group_data)
-            self.group_data = group_data
-        end
-
-        self.update_group_data = function(self, mode)
-            for i = 1, self.n_groups do
-                self.group_data[i][4] = mode
-            end
-            self.group_buffer:replace_data(self.group_data)
-        end
-
-        self.particle_mesh = rt.VertexCircle(0, 0, self.particle_radius)
-        local particle_texture_w = 1000
-        self.particle_mesh_texture = rt.RenderTexture(particle_texture_w, particle_texture_w, rt.TextureFormat.R32F)
-        self.particle_texture_shader = rt.Shader("menu/object_get_fireworks_particle_texture.glsl")
-
-        do
-            love.graphics.push()
-            love.graphics.origin()
-            self.particle_mesh_texture:bind()
-            self.particle_texture_shader:bind()
-            love.graphics.rectangle("fill", 0, 0, particle_texture_w, particle_texture_w)
-            self.particle_texture_shader:unbind()
-            self.particle_mesh_texture:unbind()
-            love.graphics.pop()
-            self.particle_mesh:set_texture(fireworks.particle_mesh_texture)
-        end
-
-        for name_value in range(
-            {"particle_buffer_a", self.particle_buffer_a},
-            {"particle_buffer_a", self.particle_buffer_a},
-            {"particle_buffer_b", self.particle_buffer_b},
-            {"group_buffer", self.group_buffer},
-            {"fade_out_buffer", self.fade_out_buffer},
-            {"n_groups", self.n_groups},
-            {"n_particles_per_group",self.n_particles_per_group}
-        ) do
-           self.step_shader:send(table.unpack(name_value))
-        end
-
-        self.texture = rt.RenderTexture(w, h, rt.TextureFormat.RGBA32F)
-
-        local fireworks_dispatch_size = math.ceil(math.sqrt(n_particles) / 32)
-        self.a_or_b = true
-        self.elapsed = 0
-        local so_far = 0
-        local buffer_ready = self.fade_out_buffer:readback_data_async()
-        local fade_out_color = 1
-
-        self.update = function(self, delta)
-            self.elapsed = self.elapsed + delta
-
-            so_far = so_far + delta
-            local step = 1 / 120
-            while so_far > step do
-                if self.a_or_b then
-                    self.step_shader:send("particle_buffer_a", self.particle_buffer_a)
-                    self.step_shader:send("particle_buffer_b", self.particle_buffer_b)
-                    self.render_shader:send("particle_buffer", self.particle_buffer_b)
-                else
-                    self.step_shader:send("particle_buffer_a", self.particle_buffer_b)
-                    self.step_shader:send("particle_buffer_b", self.particle_buffer_a)
-                    self.render_shader:send("particle_buffer", self.particle_buffer_a)
-                end
-                self.a_or_b = not self.a_or_b
-
-                self.step_shader:send("elapsed", self.elapsed)
-                self.step_shader:send("delta", step)
-                self.step_shader:dispatch(fireworks_dispatch_size, fireworks_dispatch_size)
-
-                self.texture:bind()
-                love.graphics.setBlendMode("subtract")
-                love.graphics.setColor(step * self.dim_velocity, step * self.dim_velocity, step * self.dim_velocity, 1)
-                love.graphics.rectangle("fill", 0, 0, self.texture:get_size())
-                love.graphics.setBlendMode("alpha")
-
-                self.render_shader:bind()
-                self.render_shader:send("use_value", true)
-
-                if buffer_ready:isComplete() then
-                    fade_out_color = buffer_ready:getBufferData():getFloat(0)
-                    buffer_ready = self.fade_out_buffer:readback_data_async()
-                end
-
-                love.graphics.setColor(fade_out_color, fade_out_color, fade_out_color, 1)
-                self.particle_mesh:draw_instanced(self.n_particles_per_group * self.n_groups)
-                self.render_shader:unbind()
-                self.texture:unbind()
-
-                so_far = so_far - step
-            end
-        end
-
-        self.draw = function(self)
-            self.texture:draw()
-        end
-    end
-    fireworks:realize()
-
-    self._input = rt.InputController()
-    self._input:signal_connect("pressed", function(self, which)
-        if which == rt.InputButton.A then
-            fireworks:update_group_data(1)
-        elseif which == rt.InputButton.X then
-            fireworks:realize()
-        end
-    end)
+    self._fireworks:realize()
+    self._background:realize()
 end
 
 function mn.ObjectGetScene:size_allocate(x, y, width, height)
@@ -278,6 +112,9 @@ function mn.ObjectGetScene:size_allocate(x, y, width, height)
         entry.slots_visible = true
         current_x = current_x + entry.sprite_w + margin
     end
+
+    self._fireworks:fit_into(x, y, width, height)
+    self._background:fit_into(x, y, width, height)
 end
 
 --- @brief
@@ -294,11 +131,13 @@ function mn.ObjectGetScene:update(delta)
         entry.color = entry.color_animation:get_value()
     end
 
+    self._background:update(delta)
     self._fireworks:update(delta)
 end
 
 --- @brief
 function mn.ObjectGetScene:draw()
+    self._background:draw()
     --[[
     for entry in values(self._sprites) do
         love.graphics.push()
@@ -321,9 +160,6 @@ function mn.ObjectGetScene:draw()
         love.graphics.pop()
     end
     ]]--
-
-    love.graphics.setColor(0, 0, 0, 1)
-    love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
 
     self._fireworks:draw()
 end

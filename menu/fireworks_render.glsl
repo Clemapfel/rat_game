@@ -35,6 +35,7 @@ struct Particle {
     float value;
     float mass;
     uint group_id;
+    uint mode;
 };
 
 layout(std430) buffer readonly particle_buffer {
@@ -51,7 +52,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     int instance_id = love_InstanceID;
     Particle particle = particles[instance_id];
 
-    color = vec4(lch_to_rgb(vec3(0.8, 1, particle.hue)), particle.value);
+    color = vec4(lch_to_rgb(vec3(0.8, particle.value, particle.hue)), particle.value);
     vertex_position.xy += particle.position.xy;
     return transform_projection * vertex_position;
 }
@@ -64,7 +65,7 @@ varying vec4 color;
 
 vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 frag_position)
 {
-    return color * texture(image, texture_coords);
+    return color * vec4(texture(image, texture_coords).r);
 }
 
 #endif

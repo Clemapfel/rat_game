@@ -229,6 +229,7 @@ require "menu.msaa_intensity_widget"
 require "menu.deadzone_visualization_widget"
 require "menu.options_scene"
 require "menu.keybinding_scene"
+require "menu.fireworks"
 require "menu.object_get_scene"
 
 -- battle
