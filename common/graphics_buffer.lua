@@ -28,3 +28,8 @@ end
 function rt.GraphicsBuffer:readback_data()
     return love.graphics.readbackBuffer(self._native)
 end
+
+--- @brief
+function rt.GraphicsBuffer:readback_data_async()
+    return love.graphics.readbackBufferAsync(self._native)
+end

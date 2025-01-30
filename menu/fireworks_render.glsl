@@ -41,11 +41,10 @@ layout(std430) buffer readonly particle_buffer {
     Particle particles[];
 }; // size: n_particles
 
-#define PI 3.1415926535897932384626433832795
-
 #ifdef VERTEX
 
 varying vec4 color;
+uniform bool use_value;
 
 vec4 position(mat4 transform_projection, vec4 vertex_position)
 {

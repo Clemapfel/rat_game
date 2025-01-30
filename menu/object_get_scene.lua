@@ -12,7 +12,6 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state)
             bt.ConsumableConfig("DEBUG_CONSUMABLE")
         },
 
-
         _sprites = {}
     })
 end, {
@@ -69,7 +68,7 @@ function mn.ObjectGetScene:realize()
         self.n_particles_per_group = 800
         self.particle_radius = 5
         local perturbation = 0.024
-        self.dim_velocity = 0.8
+        self.dim_velocity = 0.9
 
         local n_particles = self.n_particles_per_group * self.n_groups
 
@@ -79,6 +78,9 @@ function mn.ObjectGetScene:realize()
 
         local group_buffer_format = self.step_shader:get_buffer_format("group_buffer")
         self.group_buffer = rt.GraphicsBuffer(group_buffer_format, self.n_groups)
+
+        local fade_out_buffer_format = self.step_shader:get_buffer_format("fade_out_buffer")
+        self.fade_out_buffer = rt.GraphicsBuffer(fade_out_buffer_format, 1)
 
         local w, h = scene._bounds.width, scene._bounds.height
         do
@@ -156,22 +158,26 @@ function mn.ObjectGetScene:realize()
         end
 
         for name_value in range(
-            {"particle_buffer_a",self.particle_buffer_a},
-            {"particle_buffer_a",self.particle_buffer_a},
-            {"particle_buffer_b",self.particle_buffer_b},
-            {"group_buffer",self.group_buffer},
-            {"n_groups",self.n_groups},
+            {"particle_buffer_a", self.particle_buffer_a},
+            {"particle_buffer_a", self.particle_buffer_a},
+            {"particle_buffer_b", self.particle_buffer_b},
+            {"group_buffer", self.group_buffer},
+            {"fade_out_buffer", self.fade_out_buffer},
+            {"n_groups", self.n_groups},
             {"n_particles_per_group",self.n_particles_per_group}
         ) do
            self.step_shader:send(table.unpack(name_value))
         end
 
-        self.texture = rt.RenderTexture(w, h)
+        self.texture = rt.RenderTexture(w, h, rt.TextureFormat.RGBA32F)
 
         local fireworks_dispatch_size = math.ceil(math.sqrt(n_particles) / 32)
         self.a_or_b = true
         self.elapsed = 0
         local so_far = 0
+        local buffer_ready = self.fade_out_buffer:readback_data_async()
+        local fade_out_color = 1
+
         self.update = function(self, delta)
             self.elapsed = self.elapsed + delta
 
@@ -200,7 +206,14 @@ function mn.ObjectGetScene:realize()
                 love.graphics.setBlendMode("alpha")
 
                 self.render_shader:bind()
-                love.graphics.setColor(1, 1, 1, 1)
+                self.render_shader:send("use_value", true)
+
+                if buffer_ready:isComplete() then
+                    fade_out_color = buffer_ready:getBufferData():getFloat(0)
+                    buffer_ready = self.fade_out_buffer:readback_data_async()
+                end
+
+                love.graphics.setColor(fade_out_color, fade_out_color, fade_out_color, 1)
                 self.particle_mesh:draw_instanced(self.n_particles_per_group * self.n_groups)
                 self.render_shader:unbind()
                 self.texture:unbind()
@@ -263,7 +276,6 @@ function mn.ObjectGetScene:size_allocate(x, y, width, height)
         entry.slot_mesh_top:set_vertex_color(4, black)
 
         entry.slots_visible = true
-
         current_x = current_x + entry.sprite_w + margin
     end
 end

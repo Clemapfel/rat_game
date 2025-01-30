@@ -1,3 +1,4 @@
+/*
 struct Particle {
     vec3 position;
     vec3 direction;
@@ -26,19 +27,24 @@ const uint PARTICLE_GROUP_MODE_SPREAD = 1;
 const uint PARTICLE_GROUP_MODE_BURN_OUT = 2;
 
 struct ParticleGroup {
-    vec3 center;
+    vec2 start;
+    vec2 end;
+    uint mode;
 };
 
 layout(std430) buffer readonly group_buffer {
     ParticleGroup groups[];
 }; // size: n_groups
 
-const float acceleration = 1.05;
-const float gravity_factor = 0.4;
-const float value_decay = 0.4;
-const float mass_decay = 0.1;
+layout(std430) buffer writeonly fade_out_buffer {
+    float fade_out[];
+}; // size: 1
+
+const float gravity_factor = 75;
+const float mass_decay = 0.3;
+const float value_decay = mass_decay * 0.8;
 const float boost_duration = 1;
-const float boost_velocity = 1000;
+const float boost_velocity = 500;
 const float friction_coefficient = 0.98; // Friction coefficient
 const float air_resistance = 0.01; // Air resistance factor
 
@@ -52,7 +58,7 @@ void computemain() {
     uint start_i = global_thread_id * particles_per_thread;
     uint end_i = min(start_i + particles_per_thread, n_particles);
 
-    const vec3 gravity = vec3(0, -9.81, 0) * gravity_factor; // Realistic gravity
+    const vec3 gravity = vec3(0, 1, 0) * gravity_factor; // Realistic gravity
 
     for (uint particle_i = start_i; particle_i < end_i; ++particle_i) {
         Particle particle = particles_a[particle_i];
@@ -61,13 +67,12 @@ void computemain() {
 
         float mass = particle.mass;
         particle.velocity += max(1 - elapsed / boost_duration, 0) * boost_velocity * normalize(particle.direction) * delta;
-        particle.velocity += mass * gravity * delta;
+        particle.velocity += gravity * delta * dot(normalize(particle.direction), normalize(particle.velocity));
 
-        particle.position += particle.velocity * delta;
-
-        particle.value = max(particle.value - value_decay * delta, 0);
+        particle.position += mass * particle.velocity * delta;
         particle.mass = max(particle.mass - mass_decay * delta, 0);
-
+        particle.value = max(particle.value - value_decay * delta, 0);
         particles_b[particle_i] = particle;
     }
 }
+*/
