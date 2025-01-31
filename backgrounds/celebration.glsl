@@ -68,10 +68,21 @@ float gaussian(float x, float ramp) {
 
 uniform float elapsed;
 
-float sine_wave_shape(float x, float y, float center_y, float y_height, float thickness) {
-    float wave1 = center_y + (sin(x + elapsed) * y_height / 2.0);
+float sine_wave_shape(float x, float y, float center_y, float y_height, float thickness, float elapsed_sign) {
+    float wave1 = center_y + (sin(x + elapsed_sign * elapsed) * y_height / 2.0);
     float eps = 0.005;
     return 1 - smoothstep(thickness - eps, thickness + eps, distance(y, wave1));
+}
+
+float triangle_wave(float x)
+{
+    float pi = 2 * (335 / 113); // 2 * pi
+    return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
+}
+
+float project(float lower, float upper, float value)
+{
+    return value * abs(upper - lower) + min(lower, upper);
 }
 
 vec2 complex_sine(vec2 a) {
@@ -91,18 +102,18 @@ vec2 complex_to_polar(vec2 complex) {
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position) {
     vec2 uv = texture_coords.xy;
 
-    float sine_height = ((sin(elapsed) + 1) / 2) * 0.1;
+    float sine_height = sin(1.2 * elapsed) * 0.1;
     float sine_thickness = 0.01;
     float sine_speed = 0.05;
     float sine_frequency = 20;
     float sine_margin = 10.0 / love_ScreenSize.y + 0.05 + sine_thickness;
 
-    float top = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, sine_margin, sine_height, sine_thickness) +
-    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, sine_margin, sine_height, sine_thickness);
+    float top = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, sine_margin, sine_height, sine_thickness, 1) +
+    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, sine_margin, sine_height, sine_thickness, 1);
     top = clamp(top, 0, 1);
 
-    float bottom = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness) +
-    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness);
+    float bottom = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness, -1) +
+    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness, -1);
     bottom = clamp(bottom, 0, 1);
 
     float texture_y = (texture_coords.y > 0.5 ? 1 - texture_coords.y : texture_coords.y);

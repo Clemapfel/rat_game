@@ -22,13 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="fireworks done">
-      <change afterPath="$PROJECT_DIR$/backgrounds/celebration.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/menu/fireworks_init.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/background_shader_only.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/common/sprite_scale_correction.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/celebration.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/celebration.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/fireworks.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -719,15 +717,8 @@
       <workItem from="1737906313366" duration="20098000" />
       <workItem from="1737995218041" duration="60484000" />
       <workItem from="1738272735940" duration="2000" />
-      <workItem from="1738273073609" duration="4412000" />
-    </task>
-    <task id="LOCAL-01412" summary="fixed text box output">
-      <option name="closed" value="true" />
-      <created>1736799510666</created>
-      <option name="number" value="01412" />
-      <option name="presentableId" value="LOCAL-01412" />
-      <option name="project" value="LOCAL" />
-      <updated>1736799510666</updated>
+      <workItem from="1738273073609" duration="7837000" />
+      <workItem from="1738339555277" duration="1760000" />
     </task>
     <task id="LOCAL-01413" summary="stashing">
       <option name="closed" value="true" />
@@ -1113,7 +1104,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738268081347</updated>
     </task>
-    <option name="localTasksCounter" value="1461" />
+    <task id="LOCAL-01461" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1738277656912</created>
+      <option name="number" value="01461" />
+      <option name="presentableId" value="LOCAL-01461" />
+      <option name="project" value="LOCAL" />
+      <updated>1738277656912</updated>
+    </task>
+    <option name="localTasksCounter" value="1462" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1187,12 +1186,12 @@
     <MESSAGE value="rope working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="stashing cloth" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing random velocity" />
     <MESSAGE value="stashing fireworks" />
     <MESSAGE value="stashing before extracting fireworks" />
     <MESSAGE value="fireworks done" />
-    <option name="LAST_COMMIT_MESSAGE" value="fireworks done" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
