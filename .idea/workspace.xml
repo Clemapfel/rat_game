@@ -22,17 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="moved init to compute shader">
-      <change afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/sprite_morph_marching_squares.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing sort by angle">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/font.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/fireworks.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/fireworks_init.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks_init.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -724,15 +716,7 @@
       <workItem from="1737995218041" duration="60484000" />
       <workItem from="1738272735940" duration="2000" />
       <workItem from="1738273073609" duration="7837000" />
-      <workItem from="1738339555277" duration="10335000" />
-    </task>
-    <task id="LOCAL-01414" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736880639544</created>
-      <option name="number" value="01414" />
-      <option name="presentableId" value="LOCAL-01414" />
-      <option name="project" value="LOCAL" />
-      <updated>1736880639545</updated>
+      <workItem from="1738339555277" duration="12172000" />
     </task>
     <task id="LOCAL-01415" summary="deprecated blood">
       <option name="closed" value="true" />
@@ -1118,7 +1102,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738341369276</updated>
     </task>
-    <option name="localTasksCounter" value="1463" />
+    <task id="LOCAL-01463" summary="stashing sort by angle">
+      <option name="closed" value="true" />
+      <created>1738349933099</created>
+      <option name="number" value="01463" />
+      <option name="presentableId" value="LOCAL-01463" />
+      <option name="project" value="LOCAL" />
+      <updated>1738349933099</updated>
+    </task>
+    <option name="localTasksCounter" value="1464" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1172,7 +1164,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="move disabled and turn resolve working" />
     <MESSAGE value="stashing before removing intrinsic move disabling" />
     <MESSAGE value="fixed move undo" />
     <MESSAGE value="updated diagnostics to show total frame usage" />
@@ -1197,7 +1188,8 @@
     <MESSAGE value="fireworks done" />
     <MESSAGE value="stashing" />
     <MESSAGE value="moved init to compute shader" />
-    <option name="LAST_COMMIT_MESSAGE" value="moved init to compute shader" />
+    <MESSAGE value="stashing sort by angle" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing sort by angle" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

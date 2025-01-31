@@ -119,6 +119,8 @@ function mn.SpriteMorph:update(_)
             end
         end
 
+        dbg(self._origin_vertex_data)
+
         centroid_x = centroid_x / n
         centroid_y = centroid_y / n
 
@@ -136,41 +138,6 @@ function mn.SpriteMorph:update(_)
 
         self._origin_ready = true
     end
-
-    if self._destination_vertex_readback:is_ready() and self._destination_vertex_data == nil then
-        self._destination_vertex_data = {}
-        local data = self._destination_vertex_readback:get()
-        local centroid_x, centroid_y, n = 0, 0, 0
-        for i = 1, self._destination_vertex_buffer_size * 2, 2 do
-            local x = data:getFloat((i - 1 + 0) * 4)
-            local y = data:getFloat((i - 1 + 1) * 4)
-
-            if x > -1 and y > -1 then
-                centroid_x = centroid_x + x
-                centroid_y = centroid_y + y
-                n = n + 1
-                table.insert(self._destination_vertex_data, {x, y})
-            end
-        end
-
-        centroid_x = centroid_x / n
-        centroid_y = centroid_y / n
-
-        -- sort by angle
-        table.sort(self._destination_vertex_data, function(a, b)
-            return angle(a, centroid_x, centroid_y) < angle(b, centroid_x, centroid_y)
-        end)
-
-        self._destination_line = table.new(n * 2, 0)
-        for i = 1, n do
-            local xy = self._destination_vertex_data[i]
-            table.insert(self._destination_line, xy[1])
-            table.insert(self._destination_line, xy[2])
-        end
-
-        self._destination_ready = true
-    end
-
 end
 
 function mn.SpriteMorph:draw()
@@ -179,8 +146,8 @@ function mn.SpriteMorph:draw()
     love.graphics.push()
     love.graphics.translate(self._bounds.x, self._bounds.y)
 
-
     if self._origin_ready then
+        self._origin:draw()
         local hue = 0
         local n = #self._origin_line / 2
         local hue_step = 1 / n
@@ -189,6 +156,8 @@ function mn.SpriteMorph:draw()
             love.graphics.points(self._origin_line[i], self._origin_line[i + 1])
             hue = hue + hue_step
         end
+
+        --love.graphics.polygon("fill", self._origin_line)
     end
 
     love.graphics.translate(select(1, self._destination:get_size()), 0)
