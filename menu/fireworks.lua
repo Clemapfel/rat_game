@@ -8,7 +8,7 @@ rt.settings.menu.fireworks = {
 
 --- @class mn.Fireworks
 --- @param ... Table<Number, Number, Number, Number>
-mn.Fireworks = meta.new_type("Fireworks", rt.Widget, function(...)
+mn.Fireworks = meta.new_type("Fireworks", rt.Updatable, rt.Widget, function(...)
     local n_args = select("#", ...)
     for i = 1, n_args do
         meta.assert_table(select(i, ...))
@@ -114,7 +114,6 @@ function mn.Fireworks:size_allocate(x, y, width, height)
         _init_shader:dispatch(self._dispatch_size, self._dispatch_size)
     end
     self:_reset()
-
     self._texture = rt.RenderTexture(width, height, rt.TextureFormat.RGBA32F)
 end
 

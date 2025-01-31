@@ -72,6 +72,10 @@ function mn.ObjectGetScene:realize()
     self._fireworks:realize()
     self._background:realize()
 
+    local target = rt.Texture("assets/sprites/why.png")
+    self._sprite_morph = mn.SpriteMorph(target)
+    self._sprite_morph:realize()
+
     self._input:signal_connect("pressed", function(_, which)
         if which == rt.InputButton.Y then
             self._background:set_implementation(rt.Background.CELEBRATION)
@@ -122,6 +126,7 @@ function mn.ObjectGetScene:size_allocate(x, y, width, height)
 
     self._fireworks:fit_into(x, y, width, height)
     self._background:fit_into(x, y, width, height)
+    self._sprite_morph:fit_into(x, y, width, height)
 end
 
 --- @brief
@@ -140,11 +145,12 @@ function mn.ObjectGetScene:update(delta)
 
     self._background:update(delta)
     self._fireworks:update(delta)
+    self._sprite_morph:update(delta)
 end
 
 --- @brief
 function mn.ObjectGetScene:draw()
-    self._background:draw()
+    --self._background:draw()
     --[[
     for entry in values(self._sprites) do
         love.graphics.push()
@@ -168,7 +174,9 @@ function mn.ObjectGetScene:draw()
     end
     ]]--
 
-    self._fireworks:draw()
+    --self._fireworks:draw()
+
+    self._sprite_morph:draw()
 end
 
 --- @override

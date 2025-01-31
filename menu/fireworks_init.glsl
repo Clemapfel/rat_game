@@ -28,7 +28,6 @@ uint n_particles = n_groups * n_particles_per_group;
 
 const uint MODE_ASCEND = 0;
 const uint MODE_EXPLODE = 1;
-
 const float perturbation = 0.01;
 
 // @return [-1, 1]

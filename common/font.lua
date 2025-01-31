@@ -26,6 +26,8 @@ rt.settings.font = {
 --- @param italic_path String (or nil)
 --- @param bold_italic_path String (or nil)
 rt.Font = meta.new_type("Font", function(size, regular_path, bold_path, italic_path, bold_italic_path)
+    meta.assert_number(size)
+    meta.assert_string(regular_path)
     local out = meta.new(rt.Font, {
         _regular_path = regular_path,
         _italic_path = regular_path,
@@ -73,11 +75,10 @@ rt.FontStyle = meta.new_enum("FontStyle", {
 
 local _new_font = function(path, size, sdf)
     return love.graphics.newFont(path, size, {
-        sdf = true
+        sdf = sdf
     })
 end
 
-local total = 0
 
 --- @brief update held fonts, delayed until font is used for the first time
 function rt.Font:initialize()
