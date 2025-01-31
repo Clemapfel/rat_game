@@ -58,7 +58,7 @@ function mn.SpriteMorph:realize()
     do
         local data = {}
         for i = 1, origin_buffer_size do
-            table.insert(data, {-1, -1})
+            table.insert(data, {-1, -1, -1, -1})
         end
         origin_vertex_buffer:replace_data(data)
 
@@ -78,7 +78,7 @@ function mn.SpriteMorph:realize()
     do
         local data = {}
         for i = 1, destination_buffer_size do
-            table.insert(data, {-1, -1})
+            table.insert(data, {-1, -1, -1, -1})
         end
         destination_vertex_buffer:replace_data(data)
 
@@ -103,39 +103,79 @@ function mn.SpriteMorph:update(_)
         return (math.atan(a[2] - center_y, a[1] - center_y) + math.pi) / (2 * math.pi)
     end
 
+    -- Function to link line segments
+    function link_segments(segments)
+        local linked_lines = {}
+        local used_segments = {}
+
+        -- Helper function to find a segment starting with a given point
+        local function find_segment(start_point)
+            for i, segment in ipairs(segments) do
+                if not used_segments[i] then
+                    if segment[1] == start_point[1] and segment[2] == start_point[2] then
+                        return i, segment
+                    elseif segment[3] == start_point[1] and segment[4] == start_point[2] then
+                        -- Reverse the segment if it matches in reverse
+                        return i, {segment[3], segment[4], segment[1], segment[2]}
+                    end
+                end
+            end
+            return nil
+        end
+
+        -- Iterate over each segment
+        for i, segment in ipairs(segments) do
+            if not used_segments[i] then
+                local line = {segment}
+                used_segments[i] = true
+                local current_end = {segment[3], segment[4]}
+
+                -- Try to extend the line by finding connecting segments
+                while true do
+                    local next_index, next_segment = find_segment(current_end)
+                    if next_index then
+                        table.insert(line, next_segment)
+                        used_segments[next_index] = true
+                        current_end = {next_segment[3], next_segment[4]}
+                    else
+                        break
+                    end
+                end
+
+                table.insert(linked_lines, line)
+            end
+        end
+
+        return linked_lines
+    end
+
+
     if self._origin_vertex_readback:is_ready() and self._origin_vertex_data == nil then
         self._origin_vertex_data = {}
         local data = self._origin_vertex_readback:get()
         local centroid_x, centroid_y, n = 0, 0, 0
-        for i = 1, self._origin_vertex_buffer_size * 2, 2 do
-            local x = data:getFloat((i - 1 + 0) * 4)
-            local y = data:getFloat((i - 1 + 1) * 4)
+        for i = 1, self._origin_vertex_buffer_size * 4, 4 do
+            local x1 = data:getFloat((i - 1 + 0) * 4)
+            local y1 = data:getFloat((i - 1 + 1) * 4)
+            local x2 = data:getFloat((i - 1 + 2) * 4)
+            local y2 = data:getFloat((i - 1 + 3) * 4)
 
-            if x > -1 and y > -1 then
-                centroid_x = centroid_x + x
-                centroid_y = centroid_y + y
+            if (x1 > -1 and y1 > -1) or (x2 > -1 and y2 > -1) then
+                centroid_x = centroid_x + x1
+                centroid_y = centroid_y + y1
+                centroid_x = centroid_x + x2
+                centroid_y = centroid_y + y2
                 n = n + 1
-                table.insert(self._origin_vertex_data, {x, y})
+                table.insert(self._origin_vertex_data, {x1, y1, x2, y1})
             end
         end
-
-        dbg(self._origin_vertex_data)
 
         centroid_x = centroid_x / n
         centroid_y = centroid_y / n
 
-        -- sort by angle
-        table.sort(self._origin_vertex_data, function(a, b)
-            return angle(a, centroid_x, centroid_y) < angle(b, centroid_x, centroid_y)
-        end)
+        self._origin_n = n
 
-        self._origin_line = table.new(n * 2, 0)
-        for i = 1, n do
-            local xy = self._origin_vertex_data[i]
-            table.insert(self._origin_line, xy[1])
-            table.insert(self._origin_line, xy[2])
-        end
-
+        self._origin_line = link_segments(self._origin_vertex_data)
         self._origin_ready = true
     end
 end
@@ -147,17 +187,9 @@ function mn.SpriteMorph:draw()
     love.graphics.translate(self._bounds.x, self._bounds.y)
 
     if self._origin_ready then
-        self._origin:draw()
-        local hue = 0
-        local n = #self._origin_line / 2
-        local hue_step = 1 / n
-        for i = 1, 2 * n, 2 do
-            love.graphics.setColor(rt.color_unpack(rt.hsva_to_rgba(rt.HSVA(hue, 1, 1, 1))))
-            love.graphics.points(self._origin_line[i], self._origin_line[i + 1])
-            hue = hue + hue_step
+        for i = 1, sizeof(self._origin_line) do
+            love.graphics.line(self._origin_line[i])
         end
-
-        --love.graphics.polygon("fill", self._origin_line)
     end
 
     love.graphics.translate(select(1, self._destination:get_size()), 0)
