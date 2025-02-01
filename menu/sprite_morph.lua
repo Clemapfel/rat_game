@@ -23,8 +23,8 @@ function mn.SpriteMorph:realize()
     destination_w = destination_w + 2 * padding
     destination_h = destination_h + 2 * padding
 
-    self._origin = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
-    self._destination = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
+    self._from_texture = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
+    self._to_texture = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
 
     do
         local text = rt.Label("?", rt.Font(destination_h, "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf"))
@@ -35,56 +35,45 @@ function mn.SpriteMorph:realize()
         love.graphics.push()
         love.graphics.origin()
 
-        self._origin:bind()
+        self._from_texture:bind()
         text:draw(0.5 * destination_w - 0.5 * text_w, 0.5 * destination_h - 0.5 * text_h)
-        self._origin:unbind()
+        self._from_texture:unbind()
 
         local todo = rt.Label("ß", rt.Font(destination_h, "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf"))
         todo:realize()
         todo:fit_into(0, 0)
         local todo_w, todo_h = todo:measure()
 
-        self._destination:bind()
+        self._to_texture:bind()
         todo:draw(0.5 * destination_w - 0.5 * todo_w, 0.5 * destination_h - 0.5 * todo_h)
-        self._destination:unbind()
+        self._to_texture:unbind()
 
         --[[
-        self._destination:bind()
+        self._to_texture:bind()
         self._sprite_texture:draw(padding, padding)
-        self._destination:unbind()
+        self._to_texture:unbind()
         ]]--
 
         love.graphics.pop()
     end
+    
+    self._construct_paths_shader = rt.ComputeShader("menu/sprite_morph_compute_paths.glsl")
+    self._draw_paths_shader = rt.Shader("menu/sprite_morph_draw_paths.glsl")
+    
+    local path_buffer_format = self._construct_paths_shader:get_buffer_format("path_buffer")
+    self._path_buffer_size = destination_w * destination_h;
+    self._path_buffer = rt.GraphicsBuffer(path_buffer_format, self._path_buffer_size)
 
-    if _marching_squares_shader == nil then _marching_squares_shader = rt.ComputeShader("menu/sprite_morph_get_segments.glsl") end
+    self._construct_paths_shader:send("from_texture", self._from_texture)
+    self._construct_paths_shader:send("to_texture", self._to_texture)
+    self._construct_paths_shader:send("path_buffer", self._path_buffer)
+    self._construct_paths_shader:dispatch(destination_w / 16, destination_h / 16)
+    
+    self._draw_paths_shader:send("from_texture", self._from_texture)
+    self._draw_paths_shader:send("to_texture", self._to_texture)
+    self._draw_paths_shader:send("path_buffer", self._path_buffer)
 
-    local segments_buffer_format = _marching_squares_shader:get_buffer_format("segments_buffer")
-
-    local origin_w, origin_h = self._origin:get_size()
-    local origin_buffer_size = origin_w * origin_h * 4
-    local origin_segments_buffer = rt.GraphicsBuffer(segments_buffer_format, origin_buffer_size)
-    self._origin_dispatch_size_x, self._origin_dispatch_size_y = math.ceil(origin_w / 16), math.ceil(origin_h / 16)
-    self._origin_segments_buffer = origin_segments_buffer
-    self._origin_segments_buffer_size = origin_buffer_size
-
-    _marching_squares_shader:send("input_texture", self._origin)
-    _marching_squares_shader:send("segments_buffer", self._origin_segments_buffer)
-    _marching_squares_shader:dispatch(self._origin_dispatch_size_x, self._origin_dispatch_size_y)
-    self._origin_vertex_readback = origin_segments_buffer:readback_data_async()
-    self._origin_segment_data = nil
-
-    local destination_buffer_size = destination_w * destination_h * 4
-    local destination_segments_buffer = rt.GraphicsBuffer(segments_buffer_format, destination_buffer_size)
-    self._destination_dispatch_size_x, self._destination_dispatch_size_y = math.ceil(destination_w / 16), math.ceil(destination_h / 16)
-    self._destination_segments_buffer = destination_segments_buffer
-    self._destination_segments_buffer_size = destination_buffer_size
-
-    _marching_squares_shader:send("input_texture", self._destination)
-    _marching_squares_shader:send("segments_buffer", self._destination_segments_buffer)
-    _marching_squares_shader:dispatch(self._destination_dispatch_size_x, self._destination_dispatch_size_y)
-    self._destination_vertex_readback = destination_segments_buffer:readback_data_async()
-    self._destination_segment_data = nil
+    self._draw_paths_mesh = rt.VertexRectangle(0, 0, 1, 1)
 end
 
 function mn.SpriteMorph:size_allocate(x, y, width, height)
@@ -96,100 +85,12 @@ local mesh_format = {
 }
 
 function mn.SpriteMorph:update(delta)
-    local angle = function(a, center_x, center_y)
-        return (math.atan(a[2] - center_y, a[1] - center_y) + math.pi) / (2 * math.pi)
-    end
-
-    local scale = 1
-
-    if self._origin_vertex_readback:is_ready() and self._origin_segment_data == nil then
-        self._origin_segment_data = {}
-        local data = self._origin_vertex_readback:get()
-        local n = 0
-        for i = 1, self._origin_segments_buffer_size * 4, 4 do
-            local x1 = data:getFloat((i - 1 + 0) * 4) * scale
-            local y1 = data:getFloat((i - 1 + 1) * 4) * scale
-            local x2 = data:getFloat((i - 1 + 2) * 4) * scale
-            local y2 = data:getFloat((i - 1 + 3) * 4) * scale
-
-            if x1 > -1 and y1 > -1 and x2 > -1 and y2 > -1 then
-                n = n + 1
-                table.insert(self._origin_segment_data, {x1, y1, x2, y2})
-            end
-        end
-
-        self._origin_n = n
-        self._origin_ready = true
-    end
-
-    if self._destination_vertex_readback:is_ready() and self._destination_segment_data == nil then
-        self._destination_segment_data = {}
-        local data = self._destination_vertex_readback:get()
-        local n = 0
-        for i = 1, self._destination_segments_buffer_size * 4, 4 do
-            local x1 = data:getFloat((i - 1 + 0) * 4) * scale
-            local y1 = data:getFloat((i - 1 + 1) * 4) * scale
-            local x2 = data:getFloat((i - 1 + 2) * 4) * scale
-            local y2 = data:getFloat((i - 1 + 3) * 4) * scale
-
-            if x1 > -1 and y1 > -1 and x2 > -1 and y2 > -1 then
-                n = n + 1
-                table.insert(self._destination_segment_data, {x1, y1, x2, y2})
-            end
-        end
-
-        self._destination_n = n
-        self._destination_ready = true
-    end
-
-    if self._origin_ready and self._destination_ready then
-        -- init paths
-        if self._paths == nil then
-            local n = self._destination_n
-            self._paths = {}
-            self._to_draw = {}
-            self._n_paths = n
-            for i = 1, n do
-                local from = self._origin_segment_data[math.min(i, self._origin_n)]
-                local to = self._destination_segment_data[math.min(i, self._destination_n)]
-                table.insert(self._paths, {
-                    from = from,
-                    to = to
-                })
-
-                table.insert(self._to_draw, from)
-            end
-            self._paths_ready = true
-        end
-
-        -- interpolate
-        self._elapsed = self._elapsed + delta
-        local t = math.min(self._elapsed / self._duration, 1)
-        for i = 1, self._n_paths do
-            local from = self._paths[i].from
-            local to = self._paths[i].to
-
-            local current = self._to_draw[i]
-            current[1] = mix(from[1], to[1], t)
-            current[2] = mix(from[2], to[2], t)
-            current[3] = mix(from[3], to[3], t)
-            current[4] = mix(from[4], to[4], t)
-        end
-    end
+    self._elapsed = self._elapsed + delta
 end
 
 function mn.SpriteMorph:draw()
-    love.graphics.clear() -- TODO
-
-    love.graphics.push()
     love.graphics.translate(self._bounds.x, self._bounds.y)
-
-    if self._paths_ready then
-        love.graphics.setColor(1, 1, 1, 1)
-        for i = 1, self._n_paths do
-            love.graphics.line(self._to_draw[i])
-        end
-    end
-
-    love.graphics.pop()
+    self._draw_paths_shader:bind()
+    self._draw_paths_mesh:draw_instanced(self._path_buffer_size)
+    self._draw_paths_shader:unbind()
 end
