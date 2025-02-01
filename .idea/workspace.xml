@@ -22,11 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing contour sprite morph">
-      <change afterPath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/~sprite_morph.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/menu/sprite_morph_draw_paths.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/~~sprite_morph.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/~sprite_morph.lua" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -719,15 +721,7 @@
       <workItem from="1738272735940" duration="2000" />
       <workItem from="1738273073609" duration="7837000" />
       <workItem from="1738339555277" duration="17639000" />
-      <workItem from="1738430729792" duration="3762000" />
-    </task>
-    <task id="LOCAL-01418" summary="added sdf aura shader">
-      <option name="closed" value="true" />
-      <created>1736976944610</created>
-      <option name="number" value="01418" />
-      <option name="presentableId" value="LOCAL-01418" />
-      <option name="project" value="LOCAL" />
-      <updated>1736976944610</updated>
+      <workItem from="1738430729792" duration="7131000" />
     </task>
     <task id="LOCAL-01419" summary="stashing">
       <option name="closed" value="true" />
@@ -1113,7 +1107,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738432305614</updated>
     </task>
-    <option name="localTasksCounter" value="1467" />
+    <task id="LOCAL-01467" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1738434912642</created>
+      <option name="number" value="01467" />
+      <option name="presentableId" value="LOCAL-01467" />
+      <option name="project" value="LOCAL" />
+      <updated>1738434912642</updated>
+    </task>
+    <option name="localTasksCounter" value="1468" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1190,9 +1192,9 @@
     <MESSAGE value="fireworks done" />
     <MESSAGE value="moved init to compute shader" />
     <MESSAGE value="stashing sort by angle" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing contour sprite morph" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing contour sprite morph" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
