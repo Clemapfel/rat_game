@@ -169,6 +169,22 @@ function mn.SpriteMorph:update(delta)
             end
 
             -- segment correspondence
+            table.sort(self._origin_segment_data, function(a, b)
+                local a_x = mix(a[1], a[3], 0.5)
+                local a_y = mix(a[2], a[4], 0.5)
+                local b_x = mix(b[1], b[3], 0.5)
+                local b_y = mix(b[2], b[4], 0.5)
+                if a_x == b_x then return a_y < b_y else return a_x < b_x end
+            end)
+
+            table.sort(self._destination_segment_data, function(a, b)
+                local a_x = mix(a[1], a[3], 0.5)
+                local a_y = mix(a[2], a[4], 0.5)
+                local b_x = mix(b[1], b[3], 0.5)
+                local b_y = mix(b[2], b[4], 0.5)
+                if a_x == b_x then return a_y < b_y else return a_x < b_x end
+            end)
+
             self._paths = {}
             self._to_draw = {}
             self._n_paths = origin_n

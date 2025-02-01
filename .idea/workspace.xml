@@ -22,10 +22,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
-    </list>
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing naive correspondence" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -717,15 +714,7 @@
       <workItem from="1738272735940" duration="2000" />
       <workItem from="1738273073609" duration="7837000" />
       <workItem from="1738339555277" duration="17639000" />
-      <workItem from="1738430729792" duration="7792000" />
-    </task>
-    <task id="LOCAL-01420" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736986707290</created>
-      <option name="number" value="01420" />
-      <option name="presentableId" value="LOCAL-01420" />
-      <option name="project" value="LOCAL" />
-      <updated>1736986707290</updated>
+      <workItem from="1738430729792" duration="8127000" />
     </task>
     <task id="LOCAL-01421" summary="stashing">
       <option name="closed" value="true" />
@@ -1111,7 +1100,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738438312675</updated>
     </task>
-    <option name="localTasksCounter" value="1469" />
+    <task id="LOCAL-01469" summary="stashing naive correspondence">
+      <option name="closed" value="true" />
+      <created>1738439178675</created>
+      <option name="number" value="01469" />
+      <option name="presentableId" value="LOCAL-01469" />
+      <option name="project" value="LOCAL" />
+      <updated>1738439178675</updated>
+    </task>
+    <option name="localTasksCounter" value="1470" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1165,7 +1162,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fixed move undo" />
     <MESSAGE value="updated diagnostics to show total frame usage" />
     <MESSAGE value="spatial hash working" />
     <MESSAGE value="stashing milk" />
@@ -1190,7 +1186,8 @@
     <MESSAGE value="stashing sort by angle" />
     <MESSAGE value="stashing contour sprite morph" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing naive correspondence" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing naive correspondence" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
