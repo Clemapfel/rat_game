@@ -8,7 +8,7 @@ mn.SpriteMorph = meta.new_type("SpriteMorph", rt.Updatable, rt.Widget, function(
     return meta.new(mn.SpriteMorph, {
         _sprite_texture = sprite_texture,
         _elapsed = 0,
-        _duration = 10
+        _duration = 2
     })
 end)
 
@@ -172,23 +172,38 @@ function mn.SpriteMorph:update(delta)
             self._paths = {}
             self._to_draw = {}
             self._n_paths = origin_n
+            local candidates = {}
             for i = 1, self._n_paths do
-                local from = self._origin_segment_data[i]
+                candidates[self._origin_segment_data[i]] = true
+            end
+
+            for i = 1, self._n_paths do
                 local to = self._destination_segment_data[i]
+
+                -- find closest point in to TODO: optimize
+                local min_distance = POSITIVE_INFINITY
+                local from = nil
+                for other in keys(candidates) do
+                    local self_x = mix(to[1], to[3], 0.5)
+                    local self_y = mix(to[2], to[4], 0.5)
+                    local other_x = mix(other[1], other[3], 0.5)
+                    local other_y = mix(other[2], other[4], 0.5)
+                    local distance = rt.distance(self_x, self_y, other_x, other_y)
+                    if distance < min_distance then
+                        min_distance = distance
+                        from = other
+                    end
+                end
+
+                candidates[from] = nil
                 table.insert(self._paths, {
                     from = from,
                     to = to
                 })
 
-                table.insert(self._to_draw, from)
+                table.insert(self._to_draw, { from[1], from[2], from[3], from[4] })
             end
             self._paths_ready = true
-        end
-
-        function mix(x1, y1, x2, y2, t)
-            local x = x1 + (x2 - x1) * t
-            local y = y1 + (y2 - y1) * t
-            return x, y
         end
 
         -- interpolate
@@ -199,8 +214,10 @@ function mn.SpriteMorph:update(delta)
             local to = self._paths[i].to
 
             local current = self._to_draw[i]
-            current[1], current[2] = mix(from[1], from[2], to[1], to[2], t)
-            current[3], current[4] = mix(from[3], from[4], to[3], to[4], t)
+            current[1] = mix(from[1], to[1], t)
+            current[2] = mix(from[2], to[2], t)
+            current[3] = mix(from[3], to[3], t)
+            current[4] = mix(from[4], to[4], t)
         end
     end
 end

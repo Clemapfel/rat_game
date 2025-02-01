@@ -23,12 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/menu/sprite_morph_draw_paths.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/~~sprite_morph.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/~sprite_morph.lua" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -721,15 +717,7 @@
       <workItem from="1738272735940" duration="2000" />
       <workItem from="1738273073609" duration="7837000" />
       <workItem from="1738339555277" duration="17639000" />
-      <workItem from="1738430729792" duration="7131000" />
-    </task>
-    <task id="LOCAL-01419" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736984729502</created>
-      <option name="number" value="01419" />
-      <option name="presentableId" value="LOCAL-01419" />
-      <option name="project" value="LOCAL" />
-      <updated>1736984729502</updated>
+      <workItem from="1738430729792" duration="7792000" />
     </task>
     <task id="LOCAL-01420" summary="stashing">
       <option name="closed" value="true" />
@@ -1115,7 +1103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738434912642</updated>
     </task>
-    <option name="localTasksCounter" value="1468" />
+    <task id="LOCAL-01468" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1738438312675</created>
+      <option name="number" value="01468" />
+      <option name="presentableId" value="LOCAL-01468" />
+      <option name="project" value="LOCAL" />
+      <updated>1738438312675</updated>
+    </task>
+    <option name="localTasksCounter" value="1469" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
