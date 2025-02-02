@@ -27,7 +27,6 @@ uniform uint n_particles_per_group;
 uint n_particles = n_groups * n_particles_per_group;
 
 uniform float delta;
-uniform float elapsed;
 
 const uint MODE_ASCEND = 0;
 const uint MODE_EXPLODE = 1;
@@ -56,6 +55,9 @@ void computemain() {
 
     for (uint particle_i = start_i; particle_i < end_i; ++particle_i) {
         Particle particle = particles[particle_i];
+        if (particle.value <= 0)
+            continue;
+
         if (particle.mode == MODE_ASCEND) {
             ParticleGroup group = groups[particle.group_id];
             vec3 direction = group.end - particle.position;

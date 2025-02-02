@@ -50,33 +50,11 @@ function mn.Fireworks:realize()
     love.graphics.pop()
     self._particle_mesh:set_texture(self._particle_mesh_texture)
     self._particle_mesh:set_color(1, 1, 1, 1)
-
-    -- TODO
-    self._input = rt.InputController()
-    self._input:signal_connect("pressed", function(_, which)
-        if which == rt.InputButton.X then
-            self:start()
-        elseif which == rt.InputButton.Y then
-            self._particle_mesh_texture = rt.RenderTexture(particle_texture_w, particle_texture_w, rt.TextureFormat.R32F)
-            self._particle_texture_shader = rt.Shader("menu/fireworks_particle_texture.glsl")
-
-            love.graphics.push()
-            love.graphics.origin()
-            self._particle_mesh_texture:bind()
-            self._particle_texture_shader:bind()
-            love.graphics.rectangle("fill", 0, 0, particle_texture_w, particle_texture_w)
-            self._particle_texture_shader:unbind()
-            self._particle_mesh_texture:unbind()
-            love.graphics.pop()
-            self._particle_mesh:set_texture(self._particle_mesh_texture)
-            self._particle_mesh:set_color(1, 1, 1, 1)
-        end
-    end)
-    -- TODO
 end
 
 local _MODE_ASCEND = 0
 local _MODE_EXPLODE = 1
+local once = true
 
 function mn.Fireworks:size_allocate(x, y, width, height)
     local n_particles_per_group = rt.settings.menu.fireworks.n_particles_per_group
@@ -139,9 +117,8 @@ function mn.Fireworks:update(delta)
 
     self._render_shader:send("particle_buffer", self._particle_buffer)
     local dim_color = rt.settings.menu.fireworks.dim_velocity * step
-    while so_far > step do
+    while so_far >= step do
         self._step_shader:dispatch(self._dispatch_size, self._dispatch_size)
-
         self._texture:bind()
 
         rt.graphics.set_blend_mode(rt.BlendMode.SUBTRACT, rt.BlendMode.SUBTRACT)
@@ -163,7 +140,9 @@ function mn.Fireworks:draw()
     self._texture:draw(self._bounds.x, self._bounds.y)
 end
 
-function mn.Fireworks:start(group_i)
+function mn.Fireworks:start()
+    dbg("called")
+    if self._is_started == true then self:_reset() end
+    self._elapsed = 0
     self._is_started = true
-    self:_reset()
 end

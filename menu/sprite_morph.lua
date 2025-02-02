@@ -1,255 +1,211 @@
---[[
-marchin squares to get mesh for both sprites
-for each vertex in target sprite, get vertex closest in angle to target sprite
-]]--
-
 mn.SpriteMorph = meta.new_type("SpriteMorph", rt.Updatable, rt.Widget, function(sprite_texture)
     meta.assert_isa(sprite_texture, rt.Texture)
     return meta.new(mn.SpriteMorph, {
         _sprite_texture = sprite_texture,
         _elapsed = 0,
-        _duration = 2
+        _duration = 2,
+        _direction = 1,
+        _draw_from_or_to = true,
+        _scale = 5,
+        _is_started = false,
+        _should_emit_signal_done = false,
     })
 end)
-
-local _marching_squares_shader = nil
+meta.add_signal(mn.SpriteMorph, "done")
 
 function mn.SpriteMorph:realize()
     if self:already_realized() then return end
 
-    -- init question mark texture
-    local destination_w, destination_h = self._sprite_texture:get_size()
+    local texture_w, texture_h = self._sprite_texture:get_size()
     local padding = rt.settings.label.outline_offset_padding
-    destination_w = destination_w + 2 * padding
-    destination_h = destination_h + 2 * padding
+    texture_w = texture_w + 2 * padding
+    texture_h = texture_h + 2 * padding
 
-    self._origin = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
-    self._destination = rt.RenderTexture(destination_w, destination_h, 4, rt.TextureFormat.RGBA8, true)
-
+    self._from_texture = rt.RenderTexture(texture_w, texture_h, 4, rt.TextureFormat.RGBA8, true)
+    self._to_texture = rt.RenderTexture(texture_w, texture_h, 4, rt.TextureFormat.RGBA8, true)
+    self._texture_w, self._texture_h = texture_w, texture_h
+    
     do
-        local text = rt.Label("?", rt.Font(destination_h, "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf"))
+        local text = rt.Label("?", rt.Font(texture_h, "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf"))
         text:realize()
         text:fit_into(0, 0)
         local text_w, text_h = text:measure()
 
         love.graphics.push()
         love.graphics.origin()
+        
+        self._from_texture:bind()
+        text:draw(0.5 * texture_w - 0.5 * text_w, 0.5 * texture_h - 0.5 * text_h)
+        self._from_texture:unbind()
 
-        self._origin:bind()
-        text:draw(0.5 * destination_w - 0.5 * text_w, 0.5 * destination_h - 0.5 * text_h)
-        self._origin:unbind()
-
-        local todo = rt.Label("ß", rt.Font(destination_h, "assets/fonts/DejaVuSans/DejaVuSans-Bold.ttf"))
-        todo:realize()
-        todo:fit_into(0, 0)
-        local todo_w, todo_h = todo:measure()
-
-        self._destination:bind()
-        todo:draw(0.5 * destination_w - 0.5 * todo_w, 0.5 * destination_h - 0.5 * todo_h)
-        self._destination:unbind()
-
-        --[[
-        self._destination:bind()
+        self._to_texture:bind()
         self._sprite_texture:draw(padding, padding)
-        self._destination:unbind()
-        ]]--
+        self._to_texture:unbind()
 
         love.graphics.pop()
     end
 
-    if _marching_squares_shader == nil then _marching_squares_shader = rt.ComputeShader("menu/sprite_morph_get_segments.glsl") end
+    self._compute_paths_shader = rt.ComputeShader("menu/sprite_morph_compute_paths.glsl")
+    
+    local paths_buffer_format = self._compute_paths_shader:get_buffer_format("paths_buffer")
+    local buffer_n = texture_w * texture_h * 4
+    self._from_paths_buffer = rt.GraphicsBuffer(paths_buffer_format, buffer_n)
+    self._to_paths_buffer = rt.GraphicsBuffer(paths_buffer_format, buffer_n)
 
-    local segments_buffer_format = _marching_squares_shader:get_buffer_format("segments_buffer")
+    local circle_factor = 0.5
+    
+    self._compute_paths_shader:send("image_center", {0.5 * texture_w, 0.5 * texture_h})
+    self._compute_paths_shader:send("circle_radius", math.min(circle_factor * texture_w, circle_factor * texture_h) / 2)
+    
+    self._compute_paths_shader:send("paths_buffer", self._from_paths_buffer)
+    self._compute_paths_shader:send("image", self._from_texture)
+    self._compute_paths_shader:dispatch(math.ceil(texture_w / 16), math.ceil(texture_h / 16))
+    self._from_paths_buffer:start_readback()
+    self._from_paths = {}
+    self._from_paths_ready = false
+    self._n_from_paths = 0
 
-    local origin_w, origin_h = self._origin:get_size()
-    local origin_buffer_size = origin_w * origin_h * 4
-    local origin_segments_buffer = rt.GraphicsBuffer(segments_buffer_format, origin_buffer_size)
-    self._origin_dispatch_size_x, self._origin_dispatch_size_y = math.ceil(origin_w / 16), math.ceil(origin_h / 16)
-    self._origin_segments_buffer = origin_segments_buffer
-    self._origin_segments_buffer_size = origin_buffer_size
-
-    _marching_squares_shader:send("input_texture", self._origin)
-    _marching_squares_shader:send("segments_buffer", self._origin_segments_buffer)
-    _marching_squares_shader:dispatch(self._origin_dispatch_size_x, self._origin_dispatch_size_y)
-    self._origin_vertex_readback = origin_segments_buffer:readback_data_async()
-    self._origin_segment_data = nil
-
-    local destination_buffer_size = destination_w * destination_h * 4
-    local destination_segments_buffer = rt.GraphicsBuffer(segments_buffer_format, destination_buffer_size)
-    self._destination_dispatch_size_x, self._destination_dispatch_size_y = math.ceil(destination_w / 16), math.ceil(destination_h / 16)
-    self._destination_segments_buffer = destination_segments_buffer
-    self._destination_segments_buffer_size = destination_buffer_size
-
-    _marching_squares_shader:send("input_texture", self._destination)
-    _marching_squares_shader:send("segments_buffer", self._destination_segments_buffer)
-    _marching_squares_shader:dispatch(self._destination_dispatch_size_x, self._destination_dispatch_size_y)
-    self._destination_vertex_readback = destination_segments_buffer:readback_data_async()
-    self._destination_segment_data = nil
-
-    self._input = rt.InputController()
-    self._input:signal_connect("pressed", function(_, which)
-        if which == rt.InputButton.X then
-            self._elapsed = 0
-        end
-    end)
+    self._compute_paths_shader:send("paths_buffer", self._to_paths_buffer)
+    self._compute_paths_shader:send("image", self._to_texture)
+    self._compute_paths_shader:dispatch(math.ceil(texture_w / 16), math.ceil(texture_h / 16))
+    self._to_paths_buffer:start_readback()
+    self._to_paths = {}
+    self._to_paths_ready = false
+    self._n_to_paths = 0
 end
 
 function mn.SpriteMorph:size_allocate(x, y, width, height)
     self._bounds = rt.AABB(x, y, width, height)
 end
 
-local mesh_format = {
-    { location = 0, name = "VertexPosition", format = "floatvec2" },
-}
-
 function mn.SpriteMorph:update(delta)
-    local angle = function(a, center_x, center_y)
-        return (math.atan(a[2] - center_y, a[1] - center_y) + math.pi) / (2 * math.pi)
+    local before = love.timer.getTime()
+    local scale_x = function(x)  
+        return x * self._scale
     end
+    
+    local scale_y = function(y)  
+        return y * self._scale
+    end
+    
+    if self._from_paths_buffer:get_is_readback_ready() and self._from_paths_ready == false then
+        local n_paths = 0
+        for i = 1, self._from_paths_buffer:get_n_elements() do
+            if self._from_paths_buffer:at(i, 1) > 0 then -- is_valid
+                local element = self._from_paths_buffer:at(i)
+                local path = {
+                    a_from_x = scale_x(element[2]),
+                    a_from_y = scale_y(element[3]),
+                    b_from_x = scale_x(element[4]),
+                    b_from_y = scale_y(element[5]),
+                    a_to_x = scale_x(element[6]),
+                    a_to_y = scale_y(element[7]),
+                    b_to_x = scale_x(element[8]),
+                    b_to_y = scale_y(element[9])
+                }
 
-    local scale = 1
+                path.a_current_x = path.a_from_x
+                path.a_current_y = path.a_from_y
+                path.b_current_x = path.b_from_x
+                path.b_current_y = path.b_from_y
 
-    if self._origin_vertex_readback:is_ready() and self._origin_segment_data == nil then
-        self._origin_segment_data = {}
-        local data = self._origin_vertex_readback:get()
-        local n = 0
-        for i = 1, self._origin_segments_buffer_size * 4, 4 do
-            local x1 = data:getFloat((i - 1 + 0) * 4) * scale
-            local y1 = data:getFloat((i - 1 + 1) * 4) * scale
-            local x2 = data:getFloat((i - 1 + 2) * 4) * scale
-            local y2 = data:getFloat((i - 1 + 3) * 4) * scale
-
-            if x1 > -1 and y1 > -1 and x2 > -1 and y2 > -1 then
-                n = n + 1
-                table.insert(self._origin_segment_data, {x1, y1, x2, y2})
+                table.insert(self._from_paths, path)
+                n_paths = n_paths + 1
             end
         end
 
-        self._origin_n = n
-        self._origin_ready = true
+        self._n_from_paths = n_paths
+        self._from_paths_ready = true
     end
 
-    if self._destination_vertex_readback:is_ready() and self._destination_segment_data == nil then
-        self._destination_segment_data = {}
-        local data = self._destination_vertex_readback:get()
-        local n = 0
-        for i = 1, self._destination_segments_buffer_size * 4, 4 do
-            local x1 = data:getFloat((i - 1 + 0) * 4) * scale
-            local y1 = data:getFloat((i - 1 + 1) * 4) * scale
-            local x2 = data:getFloat((i - 1 + 2) * 4) * scale
-            local y2 = data:getFloat((i - 1 + 3) * 4) * scale
+    if self._to_paths_buffer:get_is_readback_ready() and self._to_paths_ready == false then
+        local n_paths = 0
+        for i = 1, self._to_paths_buffer:get_n_elements() do
+            if self._to_paths_buffer:at(i, 1) > 0 then -- is_valid
+                local element = self._to_paths_buffer:at(i)
+                local path = {
+                    a_to_x = scale_x(element[2]),
+                    a_to_y = scale_y(element[3]),
+                    b_to_x = scale_x(element[4]),
+                    b_to_y = scale_y(element[5]),
+                    a_from_x = scale_x(element[6]),
+                    a_from_y = scale_y(element[7]),
+                    b_from_x = scale_x(element[8]),
+                    b_from_y = scale_y(element[9])
+                }
 
-            if x1 > -1 and y1 > -1 and x2 > -1 and y2 > -1 then
-                n = n + 1
-                table.insert(self._destination_segment_data, {x1, y1, x2, y2})
+                path.a_current_x = path.a_from_x
+                path.a_current_y = path.a_from_y
+                path.b_current_x = path.b_from_x
+                path.b_current_y = path.b_from_y
+
+                table.insert(self._to_paths, path)
+                n_paths = n_paths + 1
             end
         end
 
-        self._destination_n = n
-        self._destination_ready = true
+        self._n_to_paths = n_paths
+        self._to_paths_ready = true
     end
 
-    if self._origin_ready and self._destination_ready then
-        if self._paths == nil then
-            -- resize to same number of segments
-            local origin_n = self._origin_n
-            local destination_n = self._destination_n
-            while (origin_n > destination_n) do
-                local i = rt.random.integer(0, destination_n)
-                local at = self._destination_segment_data[i]
-                table.insert(self._destination_segment_data, {table.unpack(at)})
-                destination_n = destination_n + 1
-            end
+    if self._is_started and self._from_paths_ready and self._to_paths_ready then
+        self._elapsed = clamp(self._elapsed + self._direction * delta, 0, self._duration)
+        local fraction = rt.InterpolationFunctions.EXPONENTIAL_ACCELERATION(self._elapsed / self._duration)
 
-            while (destination_n > origin_n) do
-                local i = rt.random.integer(0, origin_n)
-                local at = self._origin_segment_data[i]
-                table.insert(self._origin_segment_data, {table.unpack(at)})
-                origin_n = origin_n + 1
-            end
-
-            -- segment correspondence
-            table.sort(self._origin_segment_data, function(a, b)
-                local a_x = mix(a[1], a[3], 0.5)
-                local a_y = mix(a[2], a[4], 0.5)
-                local b_x = mix(b[1], b[3], 0.5)
-                local b_y = mix(b[2], b[4], 0.5)
-                if a_x == b_x then return a_y < b_y else return a_x < b_x end
-            end)
-
-            table.sort(self._destination_segment_data, function(a, b)
-                local a_x = mix(a[1], a[3], 0.5)
-                local a_y = mix(a[2], a[4], 0.5)
-                local b_x = mix(b[1], b[3], 0.5)
-                local b_y = mix(b[2], b[4], 0.5)
-                if a_x == b_x then return a_y < b_y else return a_x < b_x end
-            end)
-
-            self._paths = {}
-            self._to_draw = {}
-            self._n_paths = origin_n
-            local candidates = {}
-            for i = 1, self._n_paths do
-                candidates[self._origin_segment_data[i]] = true
-            end
-
-            for i = 1, self._n_paths do
-                local to = self._destination_segment_data[i]
-
-                -- find closest point in to TODO: optimize
-                local min_distance = POSITIVE_INFINITY
-                local from = nil
-                for other in keys(candidates) do
-                    local self_x = mix(to[1], to[3], 0.5)
-                    local self_y = mix(to[2], to[4], 0.5)
-                    local other_x = mix(other[1], other[3], 0.5)
-                    local other_y = mix(other[2], other[4], 0.5)
-                    local distance = rt.distance(self_x, self_y, other_x, other_y)
-                    if distance < min_distance then
-                        min_distance = distance
-                        from = other
-                    end
-                end
-
-                candidates[from] = nil
-                table.insert(self._paths, {
-                    from = from,
-                    to = to
-                })
-
-                table.insert(self._to_draw, { from[1], from[2], from[3], from[4] })
-            end
-            self._paths_ready = true
+        local paths, n_paths, t = nil
+        if fraction < 0.5 then
+            self._draw_from_or_to = true
+            t = fraction / 0.5
+            paths = self._from_paths
+            n_paths = self._n_from_paths
+        else
+            self._draw_from_or_to = false
+            t = (fraction - 0.5) / 0.5
+            paths = self._to_paths
+            n_paths = self._n_to_paths
         end
 
-        -- interpolate
-        self._elapsed = self._elapsed + delta
-        local t = math.min(self._elapsed / self._duration, 1)
-        for i = 1, self._n_paths do
-            local from = self._paths[i].from
-            local to = self._paths[i].to
+        for i = 1, n_paths do
+            local path = paths[i]
+            path.a_current_x = mix(path.a_from_x, path.a_to_x, t)
+            path.a_current_y = mix(path.a_from_y, path.a_to_y, t)
+            path.b_current_x = mix(path.b_from_x, path.b_to_x, t)
+            path.b_current_y = mix(path.b_from_y, path.b_to_y, t)
+        end
 
-            local current = self._to_draw[i]
-            current[1] = mix(from[1], to[1], t)
-            current[2] = mix(from[2], to[2], t)
-            current[3] = mix(from[3], to[3], t)
-            current[4] = mix(from[4], to[4], t)
+        if self._should_emit_signal_done and ((self._direction == 1 and self._elapsed >= self._duration) or (self._direction == -1 and self._elapsed <= 0)) then
+            self:signal_emit("done")
+            self._should_emit_signal_done = false
         end
     end
 end
 
 function mn.SpriteMorph:draw()
-    love.graphics.clear() -- TODO
-
     love.graphics.push()
-    love.graphics.translate(self._bounds.x, self._bounds.y)
 
-    if self._paths_ready then
-        love.graphics.setColor(1, 1, 1, 1)
-        for i = 1, self._n_paths do
-            love.graphics.line(self._to_draw[i])
+    love.graphics.translate(
+        0.5 * self._bounds.width - 0.5 * self._texture_w * self._scale,
+        0.5 * self._bounds.height - 0.5 * self._texture_h * self._scale
+    )
+
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.setLineWidth(self._scale * 2)
+    if self._from_paths_ready and self._draw_from_or_to == true then
+        for i = 1, self._n_from_paths do
+            local path = self._from_paths[i]
+            love.graphics.line(path.a_current_x, path.a_current_y, path.b_current_x, path.b_current_y)
+        end
+    elseif self._to_paths_ready and self._draw_from_or_to == false then
+        for i = 1, self._n_to_paths do
+            local path = self._to_paths[i]
+            love.graphics.line(path.a_current_x, path.a_current_y, path.b_current_x, path.b_current_y)
         end
     end
-
     love.graphics.pop()
+end
+
+function mn.SpriteMorph:start()
+    self._is_started = true
+    self._should_emit_signal_done = true
+    self._elapsed = 0
 end

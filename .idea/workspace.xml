@@ -22,7 +22,22 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing naive correspondence" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing naive">
+      <change afterPath="$PROJECT_DIR$/common/~graphics_buffer.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/object_get_scene_overlay.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/object_get_scene_rainbow.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/~sprite_morph.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/~sprite_morph_compute_paths.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/fireworks.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/fireworks_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_draw_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~sprite_morph_draw_paths.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_get_segments.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~sprite_morph_get_segments.glsl" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -714,15 +729,8 @@
       <workItem from="1738272735940" duration="2000" />
       <workItem from="1738273073609" duration="7837000" />
       <workItem from="1738339555277" duration="17639000" />
-      <workItem from="1738430729792" duration="8127000" />
-    </task>
-    <task id="LOCAL-01421" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1736988147404</created>
-      <option name="number" value="01421" />
-      <option name="presentableId" value="LOCAL-01421" />
-      <option name="project" value="LOCAL" />
-      <updated>1736988147404</updated>
+      <workItem from="1738430729792" duration="11455000" />
+      <workItem from="1738509483062" duration="16346000" />
     </task>
     <task id="LOCAL-01422" summary="stashing">
       <option name="closed" value="true" />
@@ -1108,7 +1116,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738439178675</updated>
     </task>
-    <option name="localTasksCounter" value="1470" />
+    <task id="LOCAL-01470" summary="stashing naive">
+      <option name="closed" value="true" />
+      <created>1738439422733</created>
+      <option name="number" value="01470" />
+      <option name="presentableId" value="LOCAL-01470" />
+      <option name="project" value="LOCAL" />
+      <updated>1738439422733</updated>
+    </task>
+    <option name="localTasksCounter" value="1471" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1162,7 +1178,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="updated diagnostics to show total frame usage" />
     <MESSAGE value="spatial hash working" />
     <MESSAGE value="stashing milk" />
     <MESSAGE value="stashing separate update" />
@@ -1187,7 +1202,8 @@
     <MESSAGE value="stashing contour sprite morph" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing naive correspondence" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing naive correspondence" />
+    <MESSAGE value="stashing naive" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing naive" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -13,8 +13,17 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state)
         },
 
         _sprites = {},
-        _background = rt.Background(),
+        _background_rainbow_shader = rt.Shader("menu/object_get_scene_rainbow.glsl"),
+        _background_overlay_shader = rt.Shader("menu/object_get_scene_overlay.glsl"),
+        _background_overlay = nil, -- rt.RenderTexture
+        _background_mesh = nil, -- rt.VertexRectangle
+        _background_active = false,
+        _background_elapsed = 0,
+
+        _reveal_animation = rt.TimedAnimation(1.5, 0, 0.8, rt.InterpolationFunctions.LINEAR),
+
         _input = rt.InputController(),
+
     })
 end, {
     _reveal_shader = rt.Shader("menu/object_get_scene_reveal.glsl")
@@ -23,8 +32,6 @@ end, {
 --- @brief
 function mn.ObjectGetScene:realize()
     if self:already_realized() then return end
-
-    self._background:set_implementation(rt.Background.CELEBRATION)
 
     local black = rt.Palette.BLACK
     self._reveal_shader:send("black", {black.r, black.g, black.b})
@@ -70,15 +77,31 @@ function mn.ObjectGetScene:realize()
     )
 
     self._fireworks:realize()
-    self._background:realize()
 
     local target = rt.Texture("assets/sprites/why.png")
+    self._target = target
+    self._target_scale = 5
+    self._target_opacity = 0
+
     self._sprite_morph = mn.SpriteMorph(target)
     self._sprite_morph:realize()
 
+    self._sprite_morph:signal_connect("done", function(_)
+        self._background_active = true
+        self._fireworks:start()
+    end)
+
+    self._input = rt.InputController()
     self._input:signal_connect("pressed", function(_, which)
-        if which == rt.InputButton.Y then
-            self._background:set_implementation(rt.Background.CELEBRATION)
+        if which == rt.InputButton.X then
+            self._background_active = false
+            self._reveal_animation:reset()
+            self._background_elapsed = 0
+            self._target_opacity = 0
+            self._sprite_morph:start()
+        elseif which == rt.InputButton.Y then
+            self._background_rainbow_shader:recompile()
+            self._background_overlay_shader:recompile()
         end
     end)
 end
@@ -124,8 +147,10 @@ function mn.ObjectGetScene:size_allocate(x, y, width, height)
         current_x = current_x + entry.sprite_w + margin
     end
 
+    self._background_mesh = rt.VertexRectangle(x, y, width, height)
+    self._background_overlay = rt.RenderTexture(width, height, 0, rt.TextureFormat.RGBA8)
+
     self._fireworks:fit_into(x, y, width, height)
-    self._background:fit_into(x, y, width, height)
     self._sprite_morph:fit_into(x, y, width, height)
 end
 
@@ -143,14 +168,49 @@ function mn.ObjectGetScene:update(delta)
         entry.color = entry.color_animation:get_value()
     end
 
-    self._background:update(delta)
+    if self._background_active then
+        self._background_elapsed = self._background_elapsed + delta
+        self._background_rainbow_shader:send("elapsed", self._background_elapsed)
+        self._background_overlay_shader:send("elapsed", self._background_elapsed)
+
+        self._reveal_animation:update(delta)
+        self._target_opacity = self._reveal_animation:get_value()
+    end
+
     self._fireworks:update(delta)
     self._sprite_morph:update(delta)
 end
 
 --- @brief
 function mn.ObjectGetScene:draw()
-    --self._background:draw()
+    self._background_rainbow_shader:bind()
+    self._background_mesh:draw()
+    self._background_rainbow_shader:unbind()
+
+    self._background_overlay:bind()
+    love.graphics.clear(0, 0, 0, 1)
+    rt.graphics.set_blend_mode(rt.BlendMode.SUBTRACT, rt.BlendMode.SUBTRACT)
+    love.graphics.setColor(1, 1, 1, 1)
+    self._background_overlay_shader:bind()
+    self._background_mesh:draw()
+    self._background_overlay_shader:unbind()
+
+    self._sprite_morph:draw()
+    rt.graphics.set_blend_mode(nil)
+    self._background_overlay:unbind()
+    self._background_overlay:draw()
+
+    love.graphics.push()
+    love.graphics.translate(
+        0.5 * self._bounds.width - 0.5 * self._target:get_width() * self._target_scale,
+        0.5 * self._bounds.height - 0.5 * self._target:get_height() * self._target_scale
+    )
+    love.graphics.scale(self._target_scale, self._target_scale)
+    love.graphics.setColor(1, 1, 1, self._target_opacity)
+    love.graphics.draw(self._target._native)
+
+    love.graphics.pop()
+    self._fireworks:draw()
     --[[
     for entry in values(self._sprites) do
         love.graphics.push()
@@ -173,10 +233,6 @@ function mn.ObjectGetScene:draw()
         love.graphics.pop()
     end
     ]]--
-
-    --self._fireworks:draw()
-
-    self._sprite_morph:draw()
 end
 
 --- @override
