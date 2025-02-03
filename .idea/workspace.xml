@@ -22,21 +22,18 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing naive">
-      <change afterPath="$PROJECT_DIR$/common/~graphics_buffer.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_scene_overlay.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/object_get_scene_rainbow.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/~sprite_morph.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/menu/~sprite_morph_compute_paths.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="sprite_morph working, added graphics buffer">
+      <change afterPath="$PROJECT_DIR$/menu/~object_get_scene.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/fireworks.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/fireworks_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/fireworks_step.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backgrounds/celebration.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/backgrounds/celebration.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/shader.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/sprite_morph_compute_paths.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_draw_paths.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~sprite_morph_draw_paths.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/sprite_morph_get_segments.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/~sprite_morph_get_segments.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_scene_overlay.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene_overlay.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_scene_rainbow.glsl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/menu/object_get_scene_reveal.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene_reveal.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -730,15 +727,8 @@
       <workItem from="1738273073609" duration="7837000" />
       <workItem from="1738339555277" duration="17639000" />
       <workItem from="1738430729792" duration="11455000" />
-      <workItem from="1738509483062" duration="16346000" />
-    </task>
-    <task id="LOCAL-01422" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1737065457374</created>
-      <option name="number" value="01422" />
-      <option name="presentableId" value="LOCAL-01422" />
-      <option name="project" value="LOCAL" />
-      <updated>1737065457374</updated>
+      <workItem from="1738509483062" duration="20045000" />
+      <workItem from="1738598577537" duration="7225000" />
     </task>
     <task id="LOCAL-01423" summary="sdf aura done">
       <option name="closed" value="true" />
@@ -1124,7 +1114,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738439422733</updated>
     </task>
-    <option name="localTasksCounter" value="1471" />
+    <task id="LOCAL-01471" summary="sprite_morph working, added graphics buffer">
+      <option name="closed" value="true" />
+      <created>1738526135802</created>
+      <option name="number" value="01471" />
+      <option name="presentableId" value="LOCAL-01471" />
+      <option name="project" value="LOCAL" />
+      <updated>1738526135802</updated>
+    </task>
+    <option name="localTasksCounter" value="1472" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1178,7 +1176,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="spatial hash working" />
     <MESSAGE value="stashing milk" />
     <MESSAGE value="stashing separate update" />
     <MESSAGE value="stashing, lighting done" />
@@ -1203,7 +1200,8 @@
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing naive correspondence" />
     <MESSAGE value="stashing naive" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing naive" />
+    <MESSAGE value="sprite_morph working, added graphics buffer" />
+    <option name="LAST_COMMIT_MESSAGE" value="sprite_morph working, added graphics buffer" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

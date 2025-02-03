@@ -1,36 +1,5 @@
 #define PI 3.1415926535897932384626433832795
 
-vec3 random_3d(in vec3 p) {
-    return fract(sin(vec3(
-    dot(p, vec3(127.1, 311.7, 74.7)),
-    dot(p, vec3(269.5, 183.3, 246.1)),
-    dot(p, vec3(113.5, 271.9, 124.6)))
-    ) * 43758.5453123);
-}
-
-float gradient_noise(vec3 p) {
-    vec3 i = floor(p);
-    vec3 v = fract(p);
-
-    vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
-
-    return mix( mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
-    dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
-    mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
-    dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
-    mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
-    dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
-    mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
-    dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
-}
-
-vec2 rotate(vec2 point, float angle) {
-    return vec2(
-    point.x * cos(angle) - point.y * sin(angle),
-    point.x * sin(angle) + point.y * cos(angle)
-    );
-}
-
 vec3 lch_to_rgb(vec3 lch) {
     float L = lch.x * 100.0;
     float C = lch.y * 100.0;
@@ -58,71 +27,15 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
-float sine_wave(float x) {
-    return (sin(x) + 1) / 2;
-}
-
-float gaussian(float x, float ramp) {
-    return exp(((-4 * PI) / 3) * (ramp * x) * (ramp * x));
-}
-
 uniform float elapsed;
 
-float sine_wave_shape(float x, float y, float center_y, float y_height, float thickness, float elapsed_sign) {
-    float wave1 = center_y + (sin(x + elapsed_sign * elapsed) * y_height / 2.0);
-    float eps = 0.005;
-    return 1 - smoothstep(thickness - eps, thickness + eps, distance(y, wave1));
-}
-
-float triangle_wave(float x)
-{
-    float pi = 2 * (335 / 113); // 2 * pi
-    return 4 * abs((x / pi) + 0.25 - floor((x / pi) + 0.75)) - 1;
-}
-
-float project(float lower, float upper, float value)
-{
-    return value * abs(upper - lower) + min(lower, upper);
-}
-
-vec2 complex_sine(vec2 a) {
-    return vec2(sin(a.x) * cosh(a.y), cos(a.x) * sinh(a.y));
-}
-
-// @param polar vec2 (magnitude, angle)
-vec2 polar_to_complex(vec2 polar) {
-    return vec2(polar.x * cos(polar.y), polar.x * sin(polar.y));
-}
-
-/// @param complex vec2 (real, imag)
-vec2 complex_to_polar(vec2 complex) {
-    return vec2(length(complex), atan(complex.y, complex.x));
-}
-
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position) {
-    vec2 uv = texture_coords.xy;
+    vec2 xy = vertex_position / love_ScreenSize.xy;
+    vec2 center = vec2(0.5);
 
-    float sine_height = sin(1.2 * elapsed) * 0.1;
-    float sine_thickness = 0.01;
-    float sine_speed = 0.05;
-    float sine_frequency = 20;
-    float sine_margin = 10.0 / love_ScreenSize.y + 0.05 + sine_thickness;
+    xy.x /= love_ScreenSize.y / love_ScreenSize.x;
+    center.x /= love_ScreenSize.y / love_ScreenSize.x;
 
-    float top = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, sine_margin, sine_height, sine_thickness, 1) +
-    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, sine_margin, sine_height, sine_thickness, 1);
-    top = clamp(top, 0, 1);
-
-    float bottom = sine_wave_shape(sine_frequency * texture_coords.x + PI, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness, -1) +
-    sine_wave_shape(sine_frequency * texture_coords.x, texture_coords.y, 1 - sine_margin, sine_height, sine_thickness, -1);
-    bottom = clamp(bottom, 0, 1);
-
-    float texture_y = (texture_coords.y > 0.5 ? 1 - texture_coords.y : texture_coords.y);
-    float texture_x = (texture_coords.y > 0.5 ? 1 - texture_coords.x : texture_coords.x);
-
-    vec2 as_polar = complex_to_polar(complex_sine(rotate(vec2(texture_x, texture_y) - vec2(0.5, 0.5), radians(90))));
-
-    float value = top + bottom;
-    vec3 color = lch_to_rgb(vec3(0.6 + 0.15 * sin(elapsed), 1, (as_polar.y + PI) / 2)) * value;
-
-    return vec4(color, 1.0);
+    float angle = (atan(xy.y - center.y, xy.x - center.x) + PI) / (2 * PI);
+    return vec4(lch_to_rgb(vec3(0.8, 1, 4 * angle - elapsed / 5)), 1.0);
 }

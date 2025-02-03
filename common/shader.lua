@@ -19,7 +19,7 @@ end)
 --- @param name String
 --- @param value
 function rt.Shader:send(name, value)
-    assert(value ~= nil)
+    assert(value ~= nil, "In rt.Shader.send: uniform `" .. name .. "` is nil")
     if meta.isa(value, rt.GraphicsBuffer) or meta.isa(value, rt.Texture) then value = value._native end
     if self._native:hasUniform(name) then
         self._native:send(name, value)

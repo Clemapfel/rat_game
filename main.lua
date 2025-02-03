@@ -6,7 +6,6 @@ STATE = rt.GameState()
 STATE:set_loading_screen(rt.LoadingScreen.DEFAULT)
 STATE:initialize_debug_state()
 
-
 local draw_state = true
 input = rt.InputController()
 input:signal_connect("keyboard_pressed", function(_, which)
