@@ -221,7 +221,6 @@ function mn.ObjectGetScene:_set_slot_i(slot_i)
     self._slot_i = slot_i
     local offset = self._slots[self._slot_i].position_x
     self._slot_offset_motion:set_target_value(offset)
-    dbg(offset)
 end
 
 --- @brief
