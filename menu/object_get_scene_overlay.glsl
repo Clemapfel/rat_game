@@ -8,20 +8,16 @@ float sine_wave_shape(float x, float y, float center_y, float y_height, float th
     float wave = center_y + (tan(sin(x)) / (PI / 2) * y_height / 2.0);
     float value = 1 - smoothstep(thickness - eps, thickness + eps, distance(y, wave));
 
-
-    /*
-    if (mod(x, PI / 2) < 0.01)
-        value = 1;
-    */
-
     return value;
 }
+
+uniform float line_width;
 
 vec4 effect(vec4 vertex_color, Image image, vec2 texture_coords, vec2 vertex_position) {
     vec2 uv = texture_coords;
 
     float sine_height = tanh(sin(1.2 * elapsed)) * 0.13;
-    float sine_thickness = 0.01;
+    float sine_thickness = line_width / max(love_ScreenSize.x, love_ScreenSize.y);
     float sine_frequency = 24;
     float sine_margin = 10 / love_ScreenSize.y + 0.13 / 2 + eps + sine_thickness;
 

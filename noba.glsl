@@ -8,9 +8,6 @@ float luma(vec3 color) {
     return dot(color, vec3(0.299, 0.587, 0.114));
 }
 
-float luma(vec4 color) {
-    return dot(color.rgb, vec3(0.299, 0.587, 0.114));
-}
 float dither4x4(vec2 position, float brightness) {
     int x = int(mod(position.x, 4.0));
     int y = int(mod(position.y, 4.0));
@@ -43,10 +40,6 @@ vec3 dither4x4(vec2 position, vec3 color) {
     return color * dither4x4(position, luma(color));
 }
 
-vec4 dither4x4(vec2 position, vec4 color) {
-    return vec4(color.rgb * dither4x4(position, luma(color)), 1.0);
-}
-
 vec4 colourFromGreyscale(float colour)
 {
     colour = clamp(colour, 0.0, 1.0);
@@ -64,21 +57,21 @@ vec4 effect(vec4 screenColour, Image texture, vec2 texCoord, vec2 screenCoord)
 {
     vec2 center = vec2(resolution.x, resolution.y) / (8.0 + (time * 2.0));
     vec2 pos = screenCoord / center;
+    pos *= 3;
 
     float radius = length(pos);
     float angle = atan(pos.y, pos.x);
 
     vec2 uv = vec2(radius, angle);
-    vec3 col = 0.5 + 0.5*cos(time+uv.xyy+vec3(0.0,2.0,4.0));
+    vec3 col = 0.5 + 0.5 * cos(time + uv.xyy + vec3(0.0, 2.0, 4.0));
 
     float intensity = dot(col.xyz, vec3(0.3, 0.3, 0.3));
     float levels = 128.0;
     float quantized = floor(intensity * levels) / levels;
 
     col = col * quantized * 5.0;
-    col = dither4x4(screenCoord, col);
+    //col = dither4x4(screenCoord, col);
 
     float gray = dot(col, vec3(0.3, 0.3, 0.3));
-
     return colourFromGreyscale(gray);
 }

@@ -145,6 +145,7 @@ require "common.shape_ellipse"
 require "common.vertex_shape"
 require "common.spline"
 require "common.path"
+require "common.contour"
 
 require "common.translation"
 require "common.sound_atlas"

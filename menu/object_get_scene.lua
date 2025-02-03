@@ -1,7 +1,7 @@
 rt.settings.menu.object_get_scene = {
     n_shakes_per_second = 0.5,
     reveal_duration = 0.5,
-    sprite_scale = 3
+    sprite_scale = 5
 }
 
 --- @class mn.ObjectGetScene
@@ -25,6 +25,11 @@ mn.ObjectGetScene = meta.new_type("ObjectGetScene", rt.Scene, function(state, ..
 
         _elapsed = 0,
         _input = rt.InputController(),
+        _line_width = 10,
+
+        _slot_offset_motion = rt.SmoothedMotion1D(0),
+        _slot_offset = 0,
+        _slot_i = 1
     })
     --out:set_objects(...)
     out:set_objects(
@@ -66,6 +71,7 @@ function mn.ObjectGetScene:_create_slots()
     local angle_magnitude = 0.05 * math.pi
 
     self._slots = {}
+    self._n_slots = 0
     for object in values(self._objects) do
         local slot = {
             object = object,
@@ -79,7 +85,7 @@ function mn.ObjectGetScene:_create_slots()
                 rt.settings.menu.object_get_scene.reveal_duration
             ),
             texture_resolution = {0, 0},
-            opacity = 1,
+            opacity = 0,
 
             shake_started = true,
             shake_animation = rt.TimedAnimation(shake_duration,
@@ -89,6 +95,8 @@ function mn.ObjectGetScene:_create_slots()
             shake_origin_x = 0,
             shake_origin_y = 0,
             angle = 0,
+
+            contour = rt.Contour(),
 
             width = 0,
             height = 0
@@ -102,25 +110,38 @@ function mn.ObjectGetScene:_create_slots()
             to_realize:realize()
         end
 
-        local sprite_w, sprite_h = slot.sprite:measure()
+        local sprite_w, sprite_h = slot.sprite:get_resolution()
+        slot.sprite:set_opacity(1)
+        do -- use x1 sprite for contour
+            slot.sprite:set_minimum_size(sprite_w, sprite_h)
+            slot.sprite:fit_into(0, 0, sprite_w, sprite_h)
+            slot.contour:set_scale(sprite_scale)
+            slot.contour:set_line_width(self._line_width)
+            slot.contour:create_from(slot.sprite, sprite_w, sprite_h)
+        end
+
         sprite_w = sprite_w * sprite_scale
         sprite_h = sprite_h * sprite_scale
-        slot.sprite:set_minimum_size(sprite_w, sprite_h)
         slot.texture_resolution = {slot.sprite._spritesheet:get_texture_resolution()}
+        slot.sprite:set_opacity(0)
+        slot.sprite:set_minimum_size(sprite_w, sprite_h)
+        slot.sprite:fit_into(0, 0, sprite_w, sprite_h)
+
+        local name_w, name_h = slot.name:measure()
+        slot.width = sprite_w
+        slot.height = sprite_h + name_h + m
+
+        slot.name:fit_into(0, sprite_h + m, sprite_w, POSITIVE_INFINITY)
 
         slot.shake_animation:set_should_loop(true)
         slot.shake_origin_x = 0.5 * sprite_w
         slot.shake_origin_y = 1 * sprite_h
 
-        local name_w, name_h = slot.name:measure()
-        slot.width = math.max(sprite_w, name_w)
-        slot.height = sprite_h + name_h + m
-
-        slot.sprite:fit_into(0, 0, sprite_w, sprite_h)
-        slot.name:fit_into(0, sprite_h + m, sprite_w, POSITIVE_INFINITY)
-
         table.insert(self._slots, slot)
+        self._n_slots = self._n_slots + 1
     end
+
+    self:_set_slot_i(1)
 end
 
 --- @brief
@@ -168,13 +189,20 @@ end
 
 --- @brief
 function mn.ObjectGetScene:_draw_slots()
+    love.graphics.push()
+    love.graphics.translate(self._slot_offset, 0)
     for slot in values(self._slots) do
         love.graphics.push()
-        love.graphics.translate(slot.position_x, slot.position_y)
+        love.graphics.translate(math.floor(slot.position_x), math.floor(slot.position_y))
+
         love.graphics.push()
         love.graphics.translate(slot.shake_origin_x, slot.shake_origin_y)
         love.graphics.rotate(slot.angle)
         love.graphics.translate(-slot.shake_origin_x, -slot.shake_origin_y)
+
+        rt.graphics.set_blend_mode(rt.BlendMode.SUBTRACT, rt.BlendMode.SUBTRACT)
+        slot.contour:draw()
+        rt.graphics.set_blend_mode()
 
         self._slot_reveal_shader:bind()
         self._slot_reveal_shader:send("value", slot.opacity)
@@ -182,10 +210,18 @@ function mn.ObjectGetScene:_draw_slots()
         slot.sprite:draw()
         self._slot_reveal_shader:unbind()
         love.graphics.pop()
-
         slot.name:draw()
         love.graphics.pop()
     end
+    love.graphics.pop()
+end
+
+function mn.ObjectGetScene:_set_slot_i(slot_i)
+    slot_i = clamp(slot_i, 1, self._n_slots)
+    self._slot_i = slot_i
+    local offset = self._slots[self._slot_i].position_x
+    self._slot_offset_motion:set_target_value(offset)
+    dbg(offset)
 end
 
 --- @brief
@@ -215,6 +251,12 @@ function mn.ObjectGetScene:realize()
             self._slot_reveal_shader:recompile()
         elseif which == rt.InputButton.B then
             self._fireworks:start()
+        end
+
+        if which == rt.InputButton.LEFT then
+            self:_set_slot_i(self._slot_i - 1)
+        elseif which == rt.InputButton.RIGHT then
+            self:_set_slot_i(self._slot_i + 1)
         end
     end)
 end
@@ -255,9 +297,13 @@ function mn.ObjectGetScene:update(delta)
     end
 
     self:_update_slots(delta)
+    self._slot_offset_motion:update(delta)
+    self._slot_offset = -1 * self._slot_offset_motion:get_value()
+
     self._background:update(delta)
     if self._background_active then
         self._background_overlay_shader:send("elapsed", self._elapsed)
+        self._background_overlay_shader:send("line_width", self._line_width)
     end
 
     self._fireworks:update(delta)
@@ -275,13 +321,16 @@ function mn.ObjectGetScene:draw()
     self._background_overlay_shader:bind()
     self._background_overlay_mesh:draw()
     self._background_overlay_shader:unbind()
-    self._background_overlay_texture:unbind()
     rt.graphics.set_blend_mode()
-    self._background_overlay_texture:draw()
 
     self:_draw_slots()
+    self._background_overlay_texture:unbind()
+
+    self._background_overlay_texture:draw()
+
 
     love.graphics.setColor(1, 1, 1, 0.5)
+    love.graphics.setLineWidth(1)
     love.graphics.line(0, self._center_y, love.graphics.getWidth(), self._center_y)
     self._fireworks:draw()
 end

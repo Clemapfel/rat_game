@@ -53,6 +53,8 @@ function rt.SmoothedMotion2D:update(delta)
     then
         self._current_position_y = self._target_position_y
     end
+
+    return self._current_position_x, self._current_position_y
 end
 
 
