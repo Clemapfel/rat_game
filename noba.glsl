@@ -1,5 +1,4 @@
-/*
-
+/// @brief 3d worley noise
 /// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/worley.glsl
 float worley_noise(vec3 p) {
     vec3 n = floor(p);
@@ -26,75 +25,63 @@ float worley_noise(vec3 p) {
     return 1 - dist;
 }
 
-uniform sampler2D palette_texture;
-uniform int palette_y_index; // 1-based
-uniform vec2 palette_size;
+/// @brief bayer dithering
+/// @source adapted from https://www.shadertoy.com/view/WstXR8
+vec3 dither_4x4(vec3 color_a, vec3 color_b, float mix_fraction, vec2 screen_position) {
+    const mat4 bayer_4x4 = mat4(
+         0.0 / 16.0, 12.0 / 16.0,  3.0 / 16.0, 15.0 / 16.0,
+         8.0 / 16.0,  4.0 / 16.0, 11.0 / 16.0,  7.0 / 16.0,
+         2.0 / 16.0, 14.0 / 16.0,  1.0 / 16.0, 13.0 / 16.0,
+        10.0 / 16.0,  6.0 / 16.0,  9.0 / 16.0,  5.0 / 16.0
+    );
 
-uniform uint palette_background_offset = 6u;
-uniform uint palette_background_width = 5u;
-
-
-#define MODE_NEAREST 0u  // get closest color in palette, can only return colors from palette
-#define MODE_LINEAR 1u // get two closest colors in palette and linearly interpolate
-#define MODE_DITHER 2u // get two closest colors and dither
-const uint color_mode = MODE_DITHER;
-
-float dither_4x4(vec2 position, float brightness) {
-    int x = int(mod(position.x, 4.0));
-    int y = int(mod(position.y, 4.0));
-    int index = x + y * 4;
-    float limit = 0.0;
-
-    if (x < 8) {
-        if (index == 0) limit = 0.0625;
-        else if (index == 1) limit = 0.5625;
-        else if (index == 2) limit = 0.1875;
-        else if (index == 3) limit = 0.6875;
-        else  if (index == 4) limit = 0.8125;
-        else if (index == 5) limit = 0.3125;
-        else if (index == 6) limit = 0.9375;
-        else if (index == 7) limit = 0.4375;
-        else if (index == 8) limit = 0.25;
-        else if (index == 9) limit = 0.75;
-        else if (index == 10) limit = 0.125;
-        else if (index == 11) limit = 0.625;
-        else if (index == 12) limit = 1.0;
-        else if (index == 13) limit = 0.5;
-        else if (index == 14) limit = 0.875;
-        else if (index == 15) limit = 0.375;
-    }
-
-    return brightness < limit ? 0.0 : 1.0;
+    vec3 color = mix(color_a, color_b, mix_fraction);
+    color = pow(color.rgb, vec3(2.2)) - 0.004; // gamma correction
+    float bayer_value = bayer_4x4[int(screen_position.x) % 4][int(screen_position.y) % 4];
+    return vec3(step(bayer_value,color.r), step(bayer_value,color.g), step(bayer_value,color.b));
 }
 
-vec3 grayscale_to_color(vec2 uv, float gray)
+const uint MODE_TOON = 0u; 
+const uint MODE_LINEAR = 1u; 
+const uint MODE_DITHER = 2u;  
+uniform uint color_mode = MODE_DITHER; // interpolation mode, cf. `grayscale_to_color`
+
+uniform sampler2D palette_texture;   // palette texture
+uniform int palette_y_index;         // y index of which palette to use, 1-based
+
+uniform uint palette_offset = 6u;    // n pixels for background color palette to start
+uniform uint palette_n_colors = 5u;  // n steps in background palette
+
+vec3 grayscale_to_color(float gray, vec2 fragment_position)
 {
     gray = clamp(gray, 0, 1);
-    if (color_mode == MODE_NEAREST) {
-        uint mapped = uint(floor(gray * palette_background_width)) + palette_background_offset;
+    if (color_mode == MODE_TOON) {
+        // get closest color in palette, only return colors from palette
+        uint mapped = uint(floor(gray * palette_n_colors)) + palette_offset;
         return texelFetch(palette_texture, ivec2(mapped, palette_y_index - 1), 0).rgb;
     }
-    if (color_mode == MODE_LINEAR) {
-        uint mapped_left = uint(floor(gray * palette_background_width)) + palette_background_offset;
-        uint mapped_right = uint(floor(gray * palette_background_width)) + palette_background_offset + 1u;
-        mapped_right = clamp(mapped_right, palette_background_offset, palette_background_offset + palette_background_width - 1u);
+    else if (color_mode == MODE_LINEAR) {
+        // get two closest colors in palette and linearly interpolate
+        uint mapped_left = uint(floor(gray * palette_n_colors)) + palette_offset;
+        uint mapped_right = uint(floor(gray * palette_n_colors)) + palette_offset + 1u;
+        mapped_right = clamp(mapped_right, palette_offset, palette_offset + palette_n_colors - 1u);
         vec4 left_color = texelFetch(palette_texture, ivec2(mapped_left, palette_y_index - 1), 0);
         vec4 right_color = texelFetch(palette_texture, ivec2(mapped_right, palette_y_index - 1), 0);
-        float factor = 1 / float(palette_background_width);
+        float factor = 1 / float(palette_n_colors);
         return mix(left_color, right_color, mod(gray, factor) / factor).rgb;
     }
     else if (color_mode == MODE_DITHER) {
-
-        uint mapped_left = uint(floor(gray * palette_background_width)) + palette_background_offset;
-        uint mapped_right = uint(floor(gray * palette_background_width)) + palette_background_offset + 1u;
-        mapped_right = clamp(mapped_right, palette_background_offset, palette_background_offset + palette_background_width - 1u);
+        // get two closest colors and dither
+        uint mapped_left = uint(floor(gray * palette_n_colors)) + palette_offset;
+        uint mapped_right = uint(floor(gray * palette_n_colors)) + palette_offset;
+        mapped_right = clamp(mapped_right, palette_offset, palette_offset + palette_n_colors - 1u);
         vec4 left_color = texelFetch(palette_texture, ivec2(mapped_left, palette_y_index - 1), 0);
         vec4 right_color = texelFetch(palette_texture, ivec2(mapped_right, palette_y_index - 1), 0);
-        float factor = 1 / float(palette_background_width);
-        return vec3(dither_4x4(uv, mod(gray, factor) / factor ));
-    //}
-
-    return vec3(0);
+        float factor = 1 / float(palette_n_colors);
+        return dither_4x4(left_color.rgb, right_color.rgb, 0.5, vec2(fragment_position));
+    }
+    else
+        discard; // invalid `color_mode`
 }
 
 uniform float time;
@@ -106,21 +93,5 @@ vec4 effect(vec4 color, Image image, vec2 uv, vec2 fragment_position) {
     vec2 position = fragment_position / space_scale;
     float elapsed = time / time_scale;
     float value = worley_noise(vec3(position, elapsed));
-    return vec4(grayscale_to_color(uv, value), 1);
-}
-*/
-
-mat4 bayerIndex = mat4(
-vec4(00.0/16.0, 12.0/16.0, 03.0/16.0, 15.0/16.0),
-vec4(08.0/16.0, 04.0/16.0, 11.0/16.0, 07.0/16.0),
-vec4(02.0/16.0, 14.0/16.0, 01.0/16.0, 13.0/16.0),
-vec4(10.0/16.0, 06.0/16.0, 09.0/16.0, 05.0/16.0));
-
-vec4 effect(vec4 color, Image image, vec2 uv, vec2 fragment_position) {
-    // sample the texture
-    vec4 col = mix(vec4(0, 1, 0, 1), vec4(1, 0, 1, 1), uv.x);
-
-    // find bayer matrix entry based on fragment position
-    float bayerValue = bayerIndex[int(fragment_position.x) % 4][int(fragment_position.y) % 4];
-    return vec4(step(bayerValue,col.r), step(bayerValue,col.g), step(bayerValue,col.b), col.a);
+    return vec4(grayscale_to_color(value, fragment_position), 1);
 }

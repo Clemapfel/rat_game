@@ -22,10 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing, fix smooth motion for negative target values">
-      <change afterPath="$PROJECT_DIR$/noba_old.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="dither working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/menu/object_get_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/menu/object_get_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
     </list>
@@ -736,15 +734,7 @@
       <workItem from="1738430729792" duration="11455000" />
       <workItem from="1738509483062" duration="20045000" />
       <workItem from="1738598577537" duration="13968000" />
-      <workItem from="1738619667998" duration="4530000" />
-    </task>
-    <task id="LOCAL-01425" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1737157370465</created>
-      <option name="number" value="01425" />
-      <option name="presentableId" value="LOCAL-01425" />
-      <option name="project" value="LOCAL" />
-      <updated>1737157370465</updated>
+      <workItem from="1738619667998" duration="5622000" />
     </task>
     <task id="LOCAL-01426" summary="stashing">
       <option name="closed" value="true" />
@@ -1130,7 +1120,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738615391742</updated>
     </task>
-    <option name="localTasksCounter" value="1474" />
+    <task id="LOCAL-01474" summary="dither working">
+      <option name="closed" value="true" />
+      <created>1738624484599</created>
+      <option name="number" value="01474" />
+      <option name="presentableId" value="LOCAL-01474" />
+      <option name="project" value="LOCAL" />
+      <updated>1738624484599</updated>
+    </task>
+    <option name="localTasksCounter" value="1475" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1184,7 +1182,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing, lighting done" />
     <MESSAGE value="blood stable, stashing before sdf collision" />
     <MESSAGE value="added sdf dilation pass" />
     <MESSAGE value="updated love" />
@@ -1209,7 +1206,8 @@
     <MESSAGE value="sprite_morph working, added graphics buffer" />
     <MESSAGE value="stashing object get" />
     <MESSAGE value="stashing, fix smooth motion for negative target values" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing, fix smooth motion for negative target values" />
+    <MESSAGE value="dither working" />
+    <option name="LAST_COMMIT_MESSAGE" value="dither working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
