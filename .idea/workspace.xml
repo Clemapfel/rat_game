@@ -22,10 +22,9 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="dither working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="dithering done">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/contour.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/contour.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -167,7 +166,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\sprites" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_noba">
+  <component name="RunManager" selected="Lua Application.main">
     <configuration name="love-dbg" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="main.lua" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rat_game" TARGET_NAME="Unnamed" CONFIG_NAME="Unnamed" RUN_PATH="$PROJECT_DIR$/love/windows/love.exe">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -734,15 +733,7 @@
       <workItem from="1738430729792" duration="11455000" />
       <workItem from="1738509483062" duration="20045000" />
       <workItem from="1738598577537" duration="13968000" />
-      <workItem from="1738619667998" duration="5622000" />
-    </task>
-    <task id="LOCAL-01426" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1737162555601</created>
-      <option name="number" value="01426" />
-      <option name="presentableId" value="LOCAL-01426" />
-      <option name="project" value="LOCAL" />
-      <updated>1737162555601</updated>
+      <workItem from="1738619667998" duration="6346000" />
     </task>
     <task id="LOCAL-01427" summary="added shader includes">
       <option name="closed" value="true" />
@@ -1128,7 +1119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738624484599</updated>
     </task>
-    <option name="localTasksCounter" value="1475" />
+    <task id="LOCAL-01475" summary="dithering done">
+      <option name="closed" value="true" />
+      <created>1738625848170</created>
+      <option name="number" value="01475" />
+      <option name="presentableId" value="LOCAL-01475" />
+      <option name="project" value="LOCAL" />
+      <updated>1738625848170</updated>
+    </task>
+    <option name="localTasksCounter" value="1476" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1182,7 +1181,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="blood stable, stashing before sdf collision" />
     <MESSAGE value="added sdf dilation pass" />
     <MESSAGE value="updated love" />
     <MESSAGE value="added sdf font rendering" />
@@ -1207,7 +1205,8 @@
     <MESSAGE value="stashing object get" />
     <MESSAGE value="stashing, fix smooth motion for negative target values" />
     <MESSAGE value="dither working" />
-    <option name="LAST_COMMIT_MESSAGE" value="dither working" />
+    <MESSAGE value="dithering done" />
+    <option name="LAST_COMMIT_MESSAGE" value="dithering done" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

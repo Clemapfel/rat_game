@@ -11,7 +11,8 @@ rt.Contour = meta.new_type("Contour", function()
         _segments = {},
         _n_segments = 0,
         _scale = 1,
-        _line_width = 3
+        _line_width = 3,
+        _padding = rt.settings.contour.padding
     })
 end)
 
@@ -21,7 +22,7 @@ local _buffer_format = nil
 --- @brief
 function rt.Contour:create_from(drawable, width, height)
     local texture_w, texture_h = width, height
-    local padding = rt.settings.contour.padding
+    local padding = self._padding
     texture_w = texture_w + 2 * padding
     texture_h = texture_h + 2 * padding
 
@@ -93,16 +94,15 @@ function rt.Contour:draw()
     end
 
     love.graphics.setColor(1, 1, 1, 1)
-    local scale, centroid_x, centroid_y, line_width = self._scale, self._centroid_x, self._centroid_y, self._line_width
-    love.graphics.setLineWidth(line_width)
-    line_width = 0.5 * line_width
+    local scale, centroid_x, centroid_y, padding = self._scale, self._centroid_x, self._centroid_y, self._padding
+    love.graphics.setLineWidth(self._line_width)
     for i = 1, self._n_segments do
         local a_x, a_y, b_x, b_y = table.unpack(self._segments[i])
         love.graphics.line(
-            a_x * scale - centroid_x - line_width,
-            a_y * scale - centroid_y - line_width,
-            b_x * scale - centroid_x - line_width,
-            b_y * scale - centroid_y - line_width
+            a_x * scale - centroid_x - padding,
+            a_y * scale - centroid_y - padding,
+            b_x * scale - centroid_x - padding,
+            b_y * scale - centroid_y - padding
         )
     end
 end
