@@ -22,9 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="dithering done">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/contour.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/contour.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -734,14 +733,7 @@
       <workItem from="1738509483062" duration="20045000" />
       <workItem from="1738598577537" duration="13968000" />
       <workItem from="1738619667998" duration="6346000" />
-    </task>
-    <task id="LOCAL-01427" summary="added shader includes">
-      <option name="closed" value="true" />
-      <created>1737235363807</created>
-      <option name="number" value="01427" />
-      <option name="presentableId" value="LOCAL-01427" />
-      <option name="project" value="LOCAL" />
-      <updated>1737235363807</updated>
+      <workItem from="1738708260629" duration="2000" />
     </task>
     <task id="LOCAL-01428" summary="added simulation turn">
       <option name="closed" value="true" />
@@ -1127,7 +1119,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738625848170</updated>
     </task>
-    <option name="localTasksCounter" value="1476" />
+    <task id="LOCAL-01476" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1738708217696</created>
+      <option name="number" value="01476" />
+      <option name="presentableId" value="LOCAL-01476" />
+      <option name="project" value="LOCAL" />
+      <updated>1738708217696</updated>
+    </task>
+    <option name="localTasksCounter" value="1477" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1198,7 +1198,6 @@
     <MESSAGE value="moved init to compute shader" />
     <MESSAGE value="stashing sort by angle" />
     <MESSAGE value="stashing contour sprite morph" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing naive correspondence" />
     <MESSAGE value="stashing naive" />
     <MESSAGE value="sprite_morph working, added graphics buffer" />
@@ -1206,7 +1205,8 @@
     <MESSAGE value="stashing, fix smooth motion for negative target values" />
     <MESSAGE value="dither working" />
     <MESSAGE value="dithering done" />
-    <option name="LAST_COMMIT_MESSAGE" value="dithering done" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
