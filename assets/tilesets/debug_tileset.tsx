@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="debug_tileset" tilewidth="32" tileheight="32" tilecount="33" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="debug_tileset" tilewidth="32" tileheight="32" tilecount="35" columns="0">
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="25">
   <image source="debug_tileset/Frame001.png" width="32" height="32"/>
  </tile>
  <tile id="26">
   <image source="debug_tileset/Frame002.png" width="32" height="32"/>
-  <objectgroup draworder="index" id="2">
-   <object id="1" x="0" y="0" width="32" height="32"/>
-   <object id="2" x="0" y="0" width="32" height="32"/>
-  </objectgroup>
  </tile>
  <tile id="27">
   <image source="debug_tileset/Frame003.png" width="32" height="32"/>
@@ -205,5 +201,11 @@
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="32" height="32"/>
   </objectgroup>
+ </tile>
+ <tile id="66">
+  <image source="debug_tileset/Frame034.png" width="32" height="32"/>
+ </tile>
+ <tile id="67">
+  <image source="debug_tileset/Frame035.png" width="32" height="32"/>
  </tile>
 </tileset>
