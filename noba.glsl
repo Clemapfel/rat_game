@@ -43,8 +43,10 @@ vec3 dither_4x4(vec3 color_a, vec3 color_b, float mix_fraction, vec2 screen_posi
 
 const uint MODE_TOON = 0u; 
 const uint MODE_LINEAR = 1u; 
-const uint MODE_DITHER = 2u;  
-uniform uint color_mode = MODE_DITHER; // interpolation mode, cf. `grayscale_to_color`
+const uint MODE_DITHER = 2u;
+const uint MODE_TOON_ANTI_ALIASED = 3u;
+uniform uint color_mode = MODE_TOON_ANTI_ALIASED; // interpolation mode, cf. `grayscale_to_color`
+uniform float color_mode_toon_aa_eps = 0.01;
 
 uniform sampler2D palette_texture;   // palette texture
 uniform int palette_y_index;         // y index of which palette to use, 1-based
@@ -59,6 +61,20 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
         // get closest color in palette, only return colors from palette
         uint mapped = uint(floor(gray * palette_n_colors)) + palette_offset;
         return texelFetch(palette_texture, ivec2(mapped, palette_y_index - 1), 0).rgb;
+    }
+    else if (color_mode == MODE_TOON_ANTI_ALIASED) {
+        uint mapped_left = uint(floor(gray * palette_n_colors)) + palette_offset;
+        uint mapped_right = uint(floor(gray * palette_n_colors)) + palette_offset + 1u;
+        mapped_right = clamp(mapped_right, palette_offset, palette_offset + palette_n_colors - 1u);
+        vec4 left_color = texelFetch(palette_texture, ivec2(mapped_left, palette_y_index - 1), 0);
+        vec4 right_color = texelFetch(palette_texture, ivec2(mapped_right, palette_y_index - 1), 0);
+        float factor = 1 / float(palette_n_colors);
+        float local_eps = mod(gray, factor) / factor;
+
+        if (distance(local_eps, 0.5) < color_mode_toon_aa_eps)
+            return mix(left_color, right_color, (local_eps - 0.5) / color_mode_toon_aa_eps).rgb;
+        else
+            return mix(left_color, right_color, 1 - step(local_eps, 0.5)).rgb;
     }
     else if (color_mode == MODE_LINEAR) {
         // get two closest colors in palette and linearly interpolate

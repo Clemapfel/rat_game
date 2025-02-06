@@ -326,7 +326,7 @@ love.gamepadaxis = function(joystick, axis, value)
 
         -- convert analog to digital
         local before = rt.InputControllerState.previous_gamepad_direction
-        local angle = math.atan2(x, y) % (2 * math.pi)
+        local angle = math.atan2(y, x) % (2 * math.pi)
         local dpad
         if (angle >= 7 * math.pi / 4 or angle < math.pi / 4) then
             dpad = rt.GamepadButton.DPAD_DOWN

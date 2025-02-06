@@ -4,6 +4,7 @@ shader = nil
 palette = nil
 palette_index = 3
 mode = 0
+mode_aa_eps = 0.01
 elapsed = 0
 
 love.load = function()
@@ -21,7 +22,7 @@ love.draw = function()
 
         shader:send("palette_texture", palette)
         shader:send("palette_y_index", palette_index)
-        shader:send("color_mode", mode)
+        shader:send("color_mode_toon_aa_eps", mode_aa_eps)
         shader:send("time", elapsed)
 
         love.graphics.setShader(shader)
@@ -39,8 +40,8 @@ love.keypressed = function(which)
     elseif which == "down" then
         palette_index = clamp(palette_index - 1, 1, 10)
     elseif which == "right" then
-        mode = clamp(mode + 1, 0, 3)
+        mode_aa_eps = clamp(mode_aa_eps + 0.01, 0, 3)
     elseif which == "left" then
-        mode = clamp(mode - 1, 0, 3)
+        mode_aa_eps = clamp(mode_aa_eps - 0.01, 0, 3)
     end
 end
