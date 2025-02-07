@@ -113,6 +113,7 @@ require "common.log"
 require "common.coroutine"
 require "common.thread"
 
+require "common.matrix"
 require "common.filesystem"
 require "common.save_file_handler"
 require "common.config"
@@ -262,6 +263,11 @@ require "battle.move_selection"
 require "battle.enemy_ai"
 require "battle.battle_scene"
 require "battle.simulation_handler"
+
+-- overworld
+require "overworld.tileset_config"
+require "overworld.stage_config"
+require "overworld.overworld_scene"
 
 -- state
 require "common.game_state"

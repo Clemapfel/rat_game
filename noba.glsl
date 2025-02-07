@@ -25,6 +25,14 @@ float worley_noise(vec3 p) {
     return 1 - dist;
 }
 
+#define PI 3.1415926535897932384626433832795
+
+vec2 rotate(vec2 v, float angle) {
+    float s = sin(angle);
+    float c = cos(angle);
+    return v * mat2(c, -s, s, c);
+}
+
 /// @brief bayer dithering
 /// @source adapted from https://www.shadertoy.com/view/WstXR8
 vec3 dither_4x4(vec3 color_a, vec3 color_b, float mix_fraction, vec2 screen_position) {
@@ -71,10 +79,10 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
         float factor = 1 / float(palette_n_colors);
         float local_eps = mod(gray, factor) / factor;
 
-        if (distance(local_eps, 0.5) < color_mode_toon_aa_eps)
-            return mix(left_color, right_color, (local_eps - 0.5) / color_mode_toon_aa_eps).rgb;
+        if (distance(local_eps, 1) < color_mode_toon_aa_eps)
+            return mix(left_color, right_color, (local_eps - 1) / color_mode_toon_aa_eps).rgb;
         else
-            return mix(left_color, right_color, 1 - step(local_eps, 0.5)).rgb;
+            return mix(left_color, right_color, 1 - step(local_eps, 1)).rgb;
     }
     else if (color_mode == MODE_LINEAR) {
         // get two closest colors in palette and linearly interpolate
@@ -102,12 +110,20 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
 
 uniform float time;
 
-vec4 effect(vec4 color, Image image, vec2 uv, vec2 fragment_position) {
-    const float space_scale = 100; // increase to zoom in
+vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 fragment_position) {
     const float time_scale = 5;   // increase to slow down
-
-    vec2 position = fragment_position / space_scale;
     float elapsed = time / time_scale;
-    float value = worley_noise(vec3(position, elapsed));
+
+    vec2 vortex_center = vec2(0.5) * love_ScreenSize.xy;
+    vec2 uv = fragment_position / love_ScreenSize.xy;
+    uv.x *= love_ScreenSize.y / love_ScreenSize.x;
+    vortex_center.x *= love_ScreenSize.y / love_ScreenSize.x;
+
+    //position = rotate(position, (1 - distance(uv, vortex_center)) * 2 * PI - elapsed);
+    vec2 position = uv;
+    position = rotate(position, distance(uv, vortex_center) * 2 * PI);
+
+
+    float value = position.y / love_ScreenSize.y; //worley_noise(vec3(position, elapsed));
     return vec4(grayscale_to_color(value, fragment_position), 1);
 }
