@@ -31,6 +31,12 @@ function rt.GraphicsBuffer:start_readback()
 end
 
 --- @brief
+function rt.GraphicsBuffer:readback_now()
+    self._readback = love.graphics.readbackBufferAsync(self._native)
+    self._readback:wait()
+end
+
+--- @brief
 function rt.GraphicsBuffer:get_is_readback_ready()
     return self._readback:isComplete()
 end

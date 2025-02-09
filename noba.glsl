@@ -82,7 +82,7 @@ const uint MODE_LINEAR = 1u;
 const uint MODE_DITHER = 2u;
 const uint MODE_TOON_ANTI_ALIASED = 3u;
 uniform uint color_mode = MODE_TOON_ANTI_ALIASED; // interpolation mode, cf. `grayscale_to_color`
-uniform float color_mode_toon_aa_eps = 0.03;
+uniform float color_mode_toon_aa_eps = 0.02;
 
 uniform sampler2D palette_texture;   // palette texture
 uniform int palette_y_index;         // y index of which palette to use, 1-based
