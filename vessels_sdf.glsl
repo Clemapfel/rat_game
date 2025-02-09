@@ -130,7 +130,7 @@ void computemain() {
 
     // replace xy: nearest wall pixel, with xy: gradient
     vec4 current = imageLoad(input_texture, position);
-    float sign = current.w <= 0 ? 1 : 1; // disable gradient on non-wall
+    float sign = current.w <= 0 ? 1 : 0; // disable gradient on non-wall
 
     // flip if gradient points to edge of area
     vec2 nearest_wall = current.xy;

@@ -22,16 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing texture">
-      <change afterPath="$PROJECT_DIR$/vessels_draw.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vessels_sdf.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/vessels_step.glsl" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/~vessels_main.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing broken branching">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vessels_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/vessels_draw.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/vessels_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/vessels_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vessels_sdf.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/vessels_sdf.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/vessels_step.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/vessels_step.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -772,15 +768,7 @@
       <workItem from="1738941751684" duration="2898000" />
       <workItem from="1738948292556" duration="5635000" />
       <workItem from="1739048790169" duration="14044000" />
-      <workItem from="1739121245177" duration="11075000" />
-    </task>
-    <task id="LOCAL-01434" summary="updated diagnostics to show total frame usage">
-      <option name="closed" value="true" />
-      <created>1737402757102</created>
-      <option name="number" value="01434" />
-      <option name="presentableId" value="LOCAL-01434" />
-      <option name="project" value="LOCAL" />
-      <updated>1737402757102</updated>
+      <workItem from="1739121245177" duration="15095000" />
     </task>
     <task id="LOCAL-01435" summary="stashing">
       <option name="closed" value="true" />
@@ -1166,7 +1154,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739067187135</updated>
     </task>
-    <option name="localTasksCounter" value="1483" />
+    <task id="LOCAL-01483" summary="stashing broken branching">
+      <option name="closed" value="true" />
+      <created>1739132456721</created>
+      <option name="number" value="01483" />
+      <option name="presentableId" value="LOCAL-01483" />
+      <option name="project" value="LOCAL" />
+      <updated>1739132456721</updated>
+    </task>
+    <option name="localTasksCounter" value="1484" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1220,7 +1216,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="refactored blood" />
     <MESSAGE value="rope working" />
     <MESSAGE value="stashing rope" />
     <MESSAGE value="stashing cloth" />
@@ -1245,7 +1240,8 @@
     <MESSAGE value="added stage decoder" />
     <MESSAGE value="stashing envelope shaping" />
     <MESSAGE value="stashing texture" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing texture" />
+    <MESSAGE value="stashing broken branching" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing broken branching" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

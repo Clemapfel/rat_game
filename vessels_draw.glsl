@@ -8,8 +8,10 @@ struct Branch {
     float angular_velocity;
     float mass;
     float distance_since_last_split;
-    uint next_index;
+    float total_distance;
+    uvec2 next_indices;
     bool has_split;
+    float split_delay;
     uint split_depth;
 };
 
@@ -50,7 +52,7 @@ vec3 lch_to_rgb(vec3 lch) {
     return vec3(clamp(R, 0.0, 1.0), clamp(G, 0.0, 1.0), clamp(B, 0.0, 1.0));
 }
 
-varying vec3 color;
+varying vec4 color;
 varying flat uint should_discard;
 
 vec4 position(mat4 transform_projection, vec4 vertex_position)
@@ -60,12 +62,12 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     should_discard = uint(!branch.is_active || (branch.mass <= 0));
 
     if (should_discard == 0) {
-        color = lch_to_rgb(vec3(0.8, 1, branch.split_depth / float(max_split_depth)));
+        color = vec4(lch_to_rgb(vec3(0.8, 1, branch.split_depth / float(max_split_depth))), 1);
 
         if (gl_VertexID == 0)  // center
             vertex_position.xy += branch.position;
         else {
-            float current_radius = branch.mass * radius;
+            float current_radius = clamp(branch.mass, 0.2, 1) * radius;
             float angle = atan(vertex_position.y, vertex_position.x);
             vertex_position.xy += branch.position + vec2(cos(angle), sin(angle)) * current_radius;
         }
@@ -78,7 +80,7 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
 
 #ifdef PIXEL
 
-varying vec3 color;
+varying vec4 color;
 varying flat uint should_discard;
 
 vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 frag_position)
@@ -86,7 +88,7 @@ vec4 effect(vec4 _, Image image, vec2 texture_coords, vec2 frag_position)
     if (should_discard == 1)
         discard;
 
-    return vec4(color, 1);
+    return vec4(color);
 }
 
 #endif

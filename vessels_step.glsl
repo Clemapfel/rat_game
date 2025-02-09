@@ -56,8 +56,10 @@ struct Branch {
     float angular_velocity;
     float mass;
     float distance_since_last_split;
-    uint next_index;
+    float total_distance;
+    uvec2 next_indices;
     bool has_split;
+    float split_delay;
     uint split_depth;
 };
 
@@ -80,13 +82,12 @@ layout(std430) buffer BranchBuffer {
 #define PI 3.1415926535897932384626433832795
 
 uniform float delta = 1 / 120;
-uniform float inertia = 0.985;
+uniform float inertia = 0.998;
 uniform float position_speed = 100;
-uniform float mass_decay_speed = 0.1;
-uniform float velocity_perturbation = 0.0 * PI;
+uniform float velocity_perturbation = 0.1 * PI;
 
 uniform float split_distance = 200;
-uniform float split_cooldown = 20;
+uniform float split_cooldown = 70;
 
 layout(local_size_x = 32, local_size_y = 32, local_size_z = 1) in;
 void computemain() {
@@ -113,7 +114,7 @@ void computemain() {
     // step simulation
     for (uint i = start_i; i < end_i; ++i) {
         Branch current = branches[i];
-        if (!current.is_active || current.mass <= 0)
+        if (!current.is_active || current.has_split || current.mass <= 0)
             continue;
 
         float offset = noise(current.position * i) * velocity_perturbation;
@@ -131,33 +132,53 @@ void computemain() {
         vec2 step = delta * position_speed * current.velocity;
         current.position += step;
         current.distance_since_last_split += length(step);
+        current.total_distance += length(step);
 
-        current.mass = current.mass - delta * mass_decay_speed;
+        current.mass = 1 - current.total_distance / (max_split_depth * split_cooldown);
 
         // split
         if (current.split_depth <= max_split_depth && !current.has_split) {
             if (current.distance_since_last_split > split_cooldown) {
-                float threshold = max(current.distance_since_last_split - current.mass * split_cooldown, 0) / split_distance;
+                float threshold = max(current.distance_since_last_split - clamp(current.split_delay, 0.3, 1) * split_cooldown, 0) / split_distance;
                 if (gradient_noise(vec3(current.position * i * PI, noise_offset)) < threshold) {
-                    Branch next = branches[current.next_index];
-
-                    vec2 velocity = current.velocity;
-                    current.distance_since_last_split = 0;
-                    current.velocity = rotate(velocity, -1 * PI / 8);
+                    Branch self = branches[current.next_indices.x];
+                    Branch other = branches[current.next_indices.y];
                     current.has_split = true;
 
-                    next.is_active = false;
-                    next.mark_active = true;
-                    next.position = current.position;
-                    next.velocity = rotate(velocity, +1 * PI / 8);
-                    next.angular_velocity = 0;
-                    next.mass = current.mass;
-                    next.distance_since_last_split = 0;
-                    next.next_index = next.next_index;
-                    next.has_split = false;
-                    next.split_depth = next.split_depth;
+                    self.is_active = false;
+                    other.is_active = false;
 
-                    branches[current.next_index] = next;
+                    self.mark_active = true;
+                    other.mark_active = true;
+
+                    self.position = current.position;
+                    other.position = current.position;
+
+                    self.velocity = rotate(current.velocity, -1 * PI / 8);
+                    other.velocity = rotate(current.velocity, +1 * PI / 8);
+
+                    self.angular_velocity = current.angular_velocity;
+                    other.angular_velocity = current.angular_velocity;
+
+                    self.mass = current.mass;
+                    other.mass = current.mass;
+
+                    self.distance_since_last_split = 0;
+                    other.distance_since_last_split = 0;
+
+                    self.total_distance = current.total_distance;
+                    other.total_distance = current.total_distance;
+
+                    self.has_split = false;
+                    other.has_split = false;
+
+                    current.has_split = true;
+                    current.is_active = false;
+
+                    // keep next_indices, split_depth
+
+                    branches[current.next_indices.x] = self;
+                    branches[current.next_indices.y] = other;
                 }
             }
         }

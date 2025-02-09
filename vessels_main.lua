@@ -2,7 +2,7 @@ require "include"
 
 local self = _G
 
-self._max_split_depth = 20 -- number of times a branch can become 2 branches
+self._max_split_depth = 15 -- number of times a branch can become 2 branches
 self._step = 1 / 120
 self._radius = 3
 
@@ -33,12 +33,16 @@ self.realize = function(self)
             [7] = 0,   -- angular_velocity
             [8] = 1,   -- mass
             [9] = 0,   -- distance_since_last_split
-s            [11] = 0,  -- has_split
-            [12] = 0,  -- split_depth
+            [10] = 0,  -- total_distance
+            [11] = -1,  -- next index
+            [12] = -1,
+            [13] = 0,  -- has_split
+            [14] = love.math.random(0, 1),  -- split_delay
+            [15] = 0,  -- split_depth
         })
     end
 
-    push_seed_branch(0.5 * width, 0.5 * height, 0, -1)
+    push_seed_branch(0.5 * width, 0.6 * height, 0, -1)
     --push_seed_branch(0.5 * width, 0.5 * height, 0, 1)
     --push_seed_branch(0.5 * width, 0.5 * height, -1, 0)
     --push_seed_branch(0.5 * width, 0.5 * height,  1, 0)
@@ -48,10 +52,14 @@ s            [11] = 0,  -- has_split
         table.insert(branch_data, {
             0, 0,
             0, 0,
-            0, 0, 0, 1,
+            0, 0,
             0,
-            -1,
-            0, depth
+            1,
+            0, 0,
+            -1, -1,
+            0,
+            love.math.random(0, 1), -- split delay
+            depth
         })
     end
 
@@ -62,17 +70,19 @@ s            [11] = 0,  -- has_split
         local end_n = current_n_branches
         for i = start_i, end_n do
             local data = branch_data[i]
-            if data[10] == -1 or data[11] == -1 then -- not yet split
-                local current_depth = data[12]
+            if data[11] == -1 or data[12] == -1 then -- not yet split
+                local current_depth = data[14]
                 push_branch(current_depth + 1)
-                data[10] = max_branch_i + 1
-                max_branch_i = max_branch_i + 1
-                current_n_branches = current_n_branches + 1
+                push_branch(current_depth + 1)
+
+                data[11] = max_branch_i + 1
+                data[12] = max_branch_i + 2
+
+                max_branch_i = max_branch_i + 2
+                current_n_branches = current_n_branches + 2
             end
         end
     end
-
-    --dbg(branch_data)
 
     -- last pushed branches will keep -1, -1, but split depth signals to stop there
     local branch_buffer = rt.GraphicsBuffer(buffer_format, current_n_branches)
@@ -168,11 +178,13 @@ self.update = function(self, delta)
         -- draw
         love.graphics.setCanvas(self._render_texture)
         self._draw_shader:bind()
+        rt.graphics.set_blend_mode(rt.BlendMode.NORMAL, rt.BlendMode.MAX)
         love.graphics.setColor(1, 1, 1, 1)
         self._branch_mesh:draw_instanced(self._n_branches)
         self._draw_shader:unbind()
         love.graphics.setCanvas(nil)
 
+        --[[
         -- jump flood fill
         self._sdf_init_shader:dispatch(self._sdf_dispatch_x, self._sdf_dispatch_y)
 
@@ -207,7 +219,7 @@ self.update = function(self, delta)
         end
 
         self._sdf_compute_gradient_shader:dispatch(self._sdf_dispatch_x, self._sdf_dispatch_y)
-
+        ]]--
         -- step
         self._step_shader:dispatch(self._dispatch_x, self._dispatch_y)
         self._mark_active_shader:dispatch(self._dispatch_x, self._dispatch_y)
@@ -225,6 +237,7 @@ self.draw = function(self)
 end
 
 love.load = function()
+    love.window.updateMode(1000, 1000)
     local before = love.timer.getTime()
     self:realize()
     dbg((love.timer.getTime() - before) / (1 / 60))
