@@ -24,9 +24,9 @@ love.draw = function()
 
         shader:send("palette_texture", palette)
         shader:send("palette_y_index", palette_index)
-        shader:send("color_mode_toon_aa_eps", mode_aa_eps)
+        --shader:send("color_mode_toon_aa_eps", mode_aa_eps)
         shader:send("time", elapsed)
-        shader:send("time_since_last_pulse", time_since_last_pulse)
+        --shader:send("time_since_last_pulse", time_since_last_pulse)
 
         love.graphics.setShader(shader)
         love.graphics.setColor(1, 1, 1, 1)

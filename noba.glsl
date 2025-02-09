@@ -25,6 +25,34 @@ float worley_noise(vec3 p) {
     return 1 - dist;
 }
 
+
+/// @brief 3d discontinuous noise, in [0, 1]
+vec3 random_3d(in vec3 p) {
+    return fract(sin(vec3(
+    dot(p, vec3(127.1, 311.7, 74.7)),
+    dot(p, vec3(269.5, 183.3, 246.1)),
+    dot(p, vec3(113.5, 271.9, 124.6)))
+    ) * 43758.5453123);
+}
+
+/// @brief gradient noise
+/// @source adapted from https://github.com/patriciogonzalezvivo/lygia/blob/main/generative/gnoise.glsl
+float gradient_noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 v = fract(p);
+
+    vec3 u = v * v * v * (v *(v * 6.0 - 15.0) + 10.0);
+
+    return mix( mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,0.0)), v - vec3(0.0,0.0,0.0)),
+    dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,0.0)), v - vec3(1.0,0.0,0.0)), u.x),
+    mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,0.0)), v - vec3(0.0,1.0,0.0)),
+    dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,0.0)), v - vec3(1.0,1.0,0.0)), u.x), u.y),
+    mix( mix( dot( -1 + 2 * random_3d(i + vec3(0.0,0.0,1.0)), v - vec3(0.0,0.0,1.0)),
+    dot( -1 + 2 * random_3d(i + vec3(1.0,0.0,1.0)), v - vec3(1.0,0.0,1.0)), u.x),
+    mix( dot( -1 + 2 * random_3d(i + vec3(0.0,1.0,1.0)), v - vec3(0.0,1.0,1.0)),
+    dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
+}
+
 #define PI 3.1415926535897932384626433832795
 
 vec2 rotate(vec2 v, float angle) {
@@ -54,7 +82,7 @@ const uint MODE_LINEAR = 1u;
 const uint MODE_DITHER = 2u;
 const uint MODE_TOON_ANTI_ALIASED = 3u;
 uniform uint color_mode = MODE_TOON_ANTI_ALIASED; // interpolation mode, cf. `grayscale_to_color`
-uniform float color_mode_toon_aa_eps = 0.05;
+uniform float color_mode_toon_aa_eps = 0.03;
 
 uniform sampler2D palette_texture;   // palette texture
 uniform int palette_y_index;         // y index of which palette to use, 1-based
@@ -80,7 +108,7 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
         float local_eps = mod(gray, factor) / factor;
 
         if (distance(local_eps, 1) < color_mode_toon_aa_eps)
-            return mix(left_color, right_color, (local_eps - 1) / color_mode_toon_aa_eps).rgb;
+            return mix(left_color, right_color, 1  + (local_eps - 1) / color_mode_toon_aa_eps).rgb;
         else
             return mix(left_color, right_color, 1 - step(local_eps, 1)).rgb;
     }
@@ -120,27 +148,43 @@ float pulse_shape(float t, float ramp)
     return 1 - exp(-1 * pow(4 * PI / 3 * ramp * (t - pulse_attack) / pulse_duration, 2));
 }
 
+/*
 float dilation_from_pulse_t(float t) {
     float result;
     if (t < pulse_attack)
-        result = pulse_shape(t, 3);
+        result = 1 / pulse_attack * t;
     else
-        result = pulse_shape(t, 1);
+        result = -1 * (1 / pulse_attack * (t / 10 - pulse_attack));
 
-    return result;
+    return max((1 + 1 - result * pulse_max_dilation), 1);
+}
+*/
+
+float dilation_from_pulse_t(float t) {
+    float result;
+    if (t < pulse_attack)
+        result = pulse_shape(t, 1);
+    else
+        result = pulse_shape(t, 2);
+
+    return max((1 + result * (pulse_max_dilation - 1)), 1);
 }
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 fragment_position) {
     const float time_scale = 5;   // increase to slow down
 
-    float elapsed = time / time_scale * dilation_from_pulse_t(time_since_last_pulse);
+    float elapsed = time / time_scale;
 
     vec2 uv = fragment_position / love_ScreenSize.xy;
 
     vec2 position = uv;
-    position *= 10;
+    position -= vec2(0.5);
+    position = rotate(position, distance(uv, vec2(0.5)) * PI - 2 * elapsed);
+    position += vec2(0.5);
 
-    float value = worley_noise(vec3(position + vec2(elapsed / 5, 0), elapsed / 10));
-    value = smoothstep(0 - 0.01, 0 + 0.01, distance(uv.y, dilation_from_pulse_t(uv.x)));
+    //float value = worley_noise(vec3(vec2(distance(uv, vec2(0.5))) * 2 * position.xy, elapsed / 10));
+    float value = (gradient_noise(vec3(10 * position.xy, elapsed)) + 1) / 2;
+    value /= 2 * worley_noise(vec3(3 * position.xy, elapsed));
+    value = clamp(value, 0, 1 - 0.0001);
     return vec4(grayscale_to_color(value, fragment_position), 1);
 }

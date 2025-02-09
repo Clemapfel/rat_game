@@ -22,10 +22,8 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added stage decoder">
-      <change afterPath="$PROJECT_DIR$/vessels_main.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing envelope shaping">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/color.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
     </list>
@@ -767,15 +765,7 @@
       <workItem from="1738711851147" duration="6842000" />
       <workItem from="1738941751684" duration="2898000" />
       <workItem from="1738948292556" duration="5635000" />
-      <workItem from="1739048790169" duration="11356000" />
-    </task>
-    <task id="LOCAL-01432" summary="stashing before removing intrinsic move disabling">
-      <option name="closed" value="true" />
-      <created>1737401111593</created>
-      <option name="number" value="01432" />
-      <option name="presentableId" value="LOCAL-01432" />
-      <option name="project" value="LOCAL" />
-      <updated>1737401111593</updated>
+      <workItem from="1739048790169" duration="13796000" />
     </task>
     <task id="LOCAL-01433" summary="fixed move undo">
       <option name="closed" value="true" />
@@ -1161,7 +1151,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738953653713</updated>
     </task>
-    <option name="localTasksCounter" value="1481" />
+    <task id="LOCAL-01481" summary="stashing envelope shaping">
+      <option name="closed" value="true" />
+      <created>1739064779768</created>
+      <option name="number" value="01481" />
+      <option name="presentableId" value="LOCAL-01481" />
+      <option name="project" value="LOCAL" />
+      <updated>1739064779768</updated>
+    </task>
+    <option name="localTasksCounter" value="1482" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1215,7 +1213,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="label refactored" />
     <MESSAGE value="label done" />
     <MESSAGE value="refactored blood" />
     <MESSAGE value="rope working" />
@@ -1240,7 +1237,8 @@
     <MESSAGE value="added debug map" />
     <MESSAGE value="added edge interpolation" />
     <MESSAGE value="added stage decoder" />
-    <option name="LAST_COMMIT_MESSAGE" value="added stage decoder" />
+    <MESSAGE value="stashing envelope shaping" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing envelope shaping" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
