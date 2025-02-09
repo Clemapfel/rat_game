@@ -54,7 +54,7 @@ const uint MODE_LINEAR = 1u;
 const uint MODE_DITHER = 2u;
 const uint MODE_TOON_ANTI_ALIASED = 3u;
 uniform uint color_mode = MODE_TOON_ANTI_ALIASED; // interpolation mode, cf. `grayscale_to_color`
-uniform float color_mode_toon_aa_eps = 0.01;
+uniform float color_mode_toon_aa_eps = 0.05;
 
 uniform sampler2D palette_texture;   // palette texture
 uniform int palette_y_index;         // y index of which palette to use, 1-based
@@ -109,21 +109,38 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
 }
 
 uniform float time;
+uniform float time_since_last_pulse;
+uniform float pulse_max_dilation = 4; // maximum speedup after pulse
+uniform float pulse_duration = 1; // duration of speedup
+uniform float pulse_attack = 0.5; // in [0, 1]
+
+float pulse_shape(float t, float ramp)
+{
+    // gaussian with peak at attack, width of duration
+    return 1 - exp(-1 * pow(4 * PI / 3 * ramp * (t - pulse_attack) / pulse_duration, 2));
+}
+
+float dilation_from_pulse_t(float t) {
+    float result;
+    if (t < pulse_attack)
+        result = pulse_shape(t, 3);
+    else
+        result = pulse_shape(t, 1);
+
+    return result;
+}
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 fragment_position) {
     const float time_scale = 5;   // increase to slow down
-    float elapsed = time / time_scale;
 
-    vec2 vortex_center = vec2(0.5) * love_ScreenSize.xy;
+    float elapsed = time / time_scale * dilation_from_pulse_t(time_since_last_pulse);
+
     vec2 uv = fragment_position / love_ScreenSize.xy;
-    uv.x *= love_ScreenSize.y / love_ScreenSize.x;
-    vortex_center.x *= love_ScreenSize.y / love_ScreenSize.x;
 
-    //position = rotate(position, (1 - distance(uv, vortex_center)) * 2 * PI - elapsed);
     vec2 position = uv;
-    position = rotate(position, distance(uv, vortex_center) * 2 * PI);
+    position *= 10;
 
-
-    float value = position.y / love_ScreenSize.y; //worley_noise(vec3(position, elapsed));
+    float value = worley_noise(vec3(position + vec2(elapsed / 5, 0), elapsed / 10));
+    value = smoothstep(0 - 0.01, 0 + 0.01, distance(uv.y, dilation_from_pulse_t(uv.x)));
     return vec4(grayscale_to_color(value, fragment_position), 1);
 }

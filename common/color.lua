@@ -193,10 +193,23 @@ function rt.hsva_to_rgba(hsva)
 end
 
 --- @brief convert lcha to rgba
-function rt.lcha_to_rgba(lcha)
-    local L = lcha.l * 100.0
-    local C = lcha.c * 100.0
-    local H = lcha.h * 360.0
+function rt.lcha_to_rgba(lcha, c, h, alpha)
+    local L, C, H, alpha
+    if type(lcha) == "number" then
+        L = lcha
+        C = c
+        H = h
+        alpha = alpha
+    else
+        L = lcha.l
+        C = lcha.c
+        H = lcha.h
+        alpha = lcha.a
+    end
+
+    L = L * 100
+    C = C * 100
+    H = H * 360
 
     local a = math.cos(math.rad(H)) * C
     local b = math.sin(math.rad(H)) * C
@@ -249,7 +262,7 @@ function rt.lcha_to_rgba(lcha)
         clamp(R, 0.0, 1.0),
         clamp(G, 0.0, 1.0),
         clamp(B, 0.0, 1.0),
-        lcha.a
+        alpha
     )
 end
 

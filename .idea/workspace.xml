@@ -22,26 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added edge interpolation">
-      <change afterPath="$PROJECT_DIR$/common/matrix.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld/overworld_scene.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld_main.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added stage decoder">
+      <change afterPath="$PROJECT_DIR$/vessels_main.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle_medium.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle_medium.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle_medium.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle_medium.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle_small.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle_small.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/circle_small.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/circle_small.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/irregular_polygon.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/irregular_polygon.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/irregular_polygon.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/irregular_polygon.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/zuckerstange.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/zuckerstange.hxl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/zuckerstange.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects/zuckerstange.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/color.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/color.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -95,76 +81,77 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;CMake Application.box2d.executor&quot;: &quot;Run&quot;,
-    &quot;CMake Application.test.executor&quot;: &quot;Run&quot;,
-    &quot;Custom Build Application.love-dbg.executor&quot;: &quot;Run&quot;,
-    &quot;Custom Build Application.love.executor&quot;: &quot;Run&quot;,
-    &quot;Emmy Debugger(NEW).remote_debugger.executor&quot;: &quot;Debug&quot;,
-    &quot;Emmy Debugger(NEW).remote_debugger_v2.executor&quot;: &quot;Debug&quot;,
-    &quot;Lua Application.Unnamed.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.keybinding_scene.lua.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love11.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.love12.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_blood.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_blood_lattice.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_blood_particles.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_bounce.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_box2d.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_lichen.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_linux.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_midi.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_noba.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_normal_map.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_overworld.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_overworld_windows.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_physics_blood.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_rope.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_rope_windows.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_shader_include.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_signal.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_smoke.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_sort.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_swirl.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_tesselation.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_thread.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_vertex_blood.lua.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows_battle.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.main_windows_menu.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.meta.lua.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.overworld.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.quicksave_indicator.lua.executor&quot;: &quot;Run&quot;,
-    &quot;Lua Application.rope.executor&quot;: &quot;Run&quot;,
-    &quot;Makefile Target.Makefile.executor&quot;: &quot;Run&quot;,
-    &quot;Native Application.love.executor&quot;: &quot;Debug&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.RadMigrateCodeStyle&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;cf.advertisement.text.has.clang-format&quot;: &quot;true&quot;,
-    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
-    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
-    &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/assets/fonts/NotoSansJP&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propDebugger&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "CMake Application.box2d.executor": "Run",
+    "CMake Application.test.executor": "Run",
+    "Custom Build Application.love-dbg.executor": "Run",
+    "Custom Build Application.love.executor": "Run",
+    "Emmy Debugger(NEW).remote_debugger.executor": "Debug",
+    "Emmy Debugger(NEW).remote_debugger_v2.executor": "Debug",
+    "Lua Application.Unnamed.executor": "Run",
+    "Lua Application.keybinding_scene.lua.executor": "Run",
+    "Lua Application.love.executor": "Run",
+    "Lua Application.love11.executor": "Run",
+    "Lua Application.love12.executor": "Run",
+    "Lua Application.main.executor": "Run",
+    "Lua Application.main_blood.executor": "Run",
+    "Lua Application.main_blood_lattice.executor": "Run",
+    "Lua Application.main_blood_particles.executor": "Run",
+    "Lua Application.main_bounce.executor": "Run",
+    "Lua Application.main_box2d.executor": "Run",
+    "Lua Application.main_lichen.executor": "Run",
+    "Lua Application.main_linux.executor": "Run",
+    "Lua Application.main_midi.executor": "Run",
+    "Lua Application.main_noba.executor": "Run",
+    "Lua Application.main_normal_map.executor": "Run",
+    "Lua Application.main_overworld.executor": "Run",
+    "Lua Application.main_overworld_windows.executor": "Run",
+    "Lua Application.main_physics_blood.executor": "Run",
+    "Lua Application.main_rope.executor": "Run",
+    "Lua Application.main_rope_windows.executor": "Run",
+    "Lua Application.main_shader_include.executor": "Run",
+    "Lua Application.main_signal.executor": "Run",
+    "Lua Application.main_smoke.executor": "Run",
+    "Lua Application.main_sort.executor": "Run",
+    "Lua Application.main_swirl.executor": "Run",
+    "Lua Application.main_tesselation.executor": "Run",
+    "Lua Application.main_thread.executor": "Run",
+    "Lua Application.main_vertex_blood.lua.executor": "Run",
+    "Lua Application.main_vessels.executor": "Run",
+    "Lua Application.main_windows.executor": "Run",
+    "Lua Application.main_windows_battle.executor": "Run",
+    "Lua Application.main_windows_menu.executor": "Run",
+    "Lua Application.meta.lua.executor": "Run",
+    "Lua Application.overworld.executor": "Run",
+    "Lua Application.quicksave_indicator.lua.executor": "Run",
+    "Lua Application.rope.executor": "Run",
+    "Makefile Target.Makefile.executor": "Run",
+    "Native Application.love.executor": "Debug",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.RadMigrateCodeStyle": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "RunOnceActivity.readMode.enableVisualFormatting": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "cf.advertisement.text.has.clang-format": "true",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "deletionFromPopupRequiresConfirmation": "false",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/assets/fonts/NotoSansJP",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "project.propDebugger",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="ReadonlyStatusHandler">
     <option name="SHOW_DIALOG" value="false" />
   </component>
@@ -184,7 +171,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old_main" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_overworld">
+  <component name="RunManager" selected="Lua Application.main_noba">
     <configuration name="love-dbg" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="main.lua" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rat_game" TARGET_NAME="Unnamed" CONFIG_NAME="Unnamed" RUN_PATH="$PROJECT_DIR$/love/windows/love.exe">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -284,6 +271,17 @@
       <option name="showConsole" value="true" />
       <method v="2" />
     </configuration>
+    <configuration name="main_vessels" type="lua.app" factoryName="Lua Application">
+      <module name="rat_game" />
+      <option name="program" value="C:\Users\cleme\Workspace\rat_game\love\windows\love.exe" />
+      <option name="file" value="vessels_main.lua" />
+      <option name="workingDir" value="$PROJECT_DIR$" />
+      <option name="debuggerType" value="2" />
+      <option name="params" value="" />
+      <option name="charset" value="UTF-8" />
+      <option name="showConsole" value="true" />
+      <method v="2" />
+    </configuration>
     <configuration name="meta.lua" type="lua.app" factoryName="Lua Application" temporary="true">
       <option name="program" value="lua.exe" />
       <option name="file" value="$PROJECT_DIR$/common/meta.lua" />
@@ -335,6 +333,7 @@
       <item itemvalue="Emmy Debugger(NEW).remote_debugger" />
       <item itemvalue="Lua Application.main" />
       <item itemvalue="Lua Application.main_overworld" />
+      <item itemvalue="Lua Application.main_vessels" />
       <item itemvalue="Lua Application.main_noba" />
       <item itemvalue="Lua Application.main_blood" />
       <item itemvalue="Lua Application.main_rope" />
@@ -767,15 +766,8 @@
       <workItem from="1738708260629" duration="381000" />
       <workItem from="1738711851147" duration="6842000" />
       <workItem from="1738941751684" duration="2898000" />
-      <workItem from="1738948292556" duration="5142000" />
-    </task>
-    <task id="LOCAL-01431" summary="move disabled and turn resolve working">
-      <option name="closed" value="true" />
-      <created>1737401096060</created>
-      <option name="number" value="01431" />
-      <option name="presentableId" value="LOCAL-01431" />
-      <option name="project" value="LOCAL" />
-      <updated>1737401096060</updated>
+      <workItem from="1738948292556" duration="5635000" />
+      <workItem from="1739048790169" duration="11356000" />
     </task>
     <task id="LOCAL-01432" summary="stashing before removing intrinsic move disabling">
       <option name="closed" value="true" />
@@ -1161,7 +1153,15 @@
       <option name="project" value="LOCAL" />
       <updated>1738879608313</updated>
     </task>
-    <option name="localTasksCounter" value="1480" />
+    <task id="LOCAL-01480" summary="added stage decoder">
+      <option name="closed" value="true" />
+      <created>1738953653711</created>
+      <option name="number" value="01480" />
+      <option name="presentableId" value="LOCAL-01480" />
+      <option name="project" value="LOCAL" />
+      <updated>1738953653713</updated>
+    </task>
+    <option name="localTasksCounter" value="1481" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1215,7 +1215,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing befor label rework" />
     <MESSAGE value="label refactored" />
     <MESSAGE value="label done" />
     <MESSAGE value="refactored blood" />
@@ -1240,7 +1239,8 @@
     <MESSAGE value="added debug stage" />
     <MESSAGE value="added debug map" />
     <MESSAGE value="added edge interpolation" />
-    <option name="LAST_COMMIT_MESSAGE" value="added edge interpolation" />
+    <MESSAGE value="added stage decoder" />
+    <option name="LAST_COMMIT_MESSAGE" value="added stage decoder" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
