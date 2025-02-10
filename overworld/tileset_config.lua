@@ -1,5 +1,6 @@
 rt.settings.overworld.tileset_config = {
-    config_path = "assets/tilesets"
+    config_path = "assets/tilesets",
+    is_solid_property_name = "is_solid"
 }
 
 --[[
@@ -61,8 +62,8 @@ function ow.TilesetConfig:realize()
         return out
     end
 
-    local min_width, min_height = POSITIVE_INFINITY, POSITIVE_INFINITY
-    local max_width, max_height = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+    local widths = {}
+    local n_tiles = 0
     local total_area = 0
     local tiles_sorted = {}
     local _min, _max = math.min, math.max
@@ -74,6 +75,7 @@ function ow.TilesetConfig:realize()
     self._tiles = {}
     local tiles = _get(config, "tiles")
     for tile in values(tiles) do
+        -- init tile data
         local id = _get(tile, "id")
         local tile_path = config_path_prefix .. _get(tile, "image")
         local to_push = {
@@ -102,14 +104,20 @@ function ow.TilesetConfig:realize()
 
         self._tiles[id] = to_push
         table.insert(tiles_sorted, id)
-
-        min_width = _min(min_width, to_push.width)
-        max_width = _max(max_width, to_push.width)
-        min_height = _min(min_height, to_push.height)
-        max_height = _max(max_height, to_push.height)
+        table.insert(widths, to_push.width)
+        n_tiles = n_tiles + 1
         total_area = total_area + to_push.width * to_push.height
 
+        -- per-tile properties
+        if tile.properties ~= nil then
+            for key, value in pairs(_get(tile, "properties")) do
+                to_push.properties[key] = value
+            end
+        end
+
         -- parse physics shapes
+        local is_solid_name = rt.settings.overworld.tileset_config.is_solid_property_name
+
         if tile.objectGroup ~= nil then
             local objects = _get(_get(tile, "objectGroup"), "objects")
 
@@ -120,12 +128,21 @@ function ow.TilesetConfig:realize()
             for object in values(objects) do
                 local shape_type = _get(object, "shape")
                 if shape_type == "rectangle" then
+                    local x = _get(object, "x")
+                    local y = _get(object, "y")
+                    local width = _get(object, "width")
+                    local height = _get(object, "height")
+
+                    if width * height >= tile.width * tile.height then -- if hitbox is larger than tile, tile is wall
+                        to_push.properties[is_solid_name] = true
+                    end
+
                     table.insert(to_push.shapes, {
                         type = ow.TilesetObjectType.RECTANGLE,
-                        x = _get(object, "x"), -- top left
-                        y = _get(object, "y"),
-                        width = _get(object, "width"),
-                        height = _get(object, "height")
+                        x = x, -- top left
+                        y = y,
+                        width = width,
+                        height = height
                     })
                 elseif shape_type == "ellipse" then
                     local x = _get(object, "x")
@@ -169,16 +186,9 @@ function ow.TilesetConfig:realize()
                 end
             end
         end
-
-        -- per-tile properties
-        if tile.properties ~= nil then
-            for key, value in pairs(_get(tile, "properties")) do
-                to_push.properties[key] = value
-            end
-        end
     end
 
-    -- construct texture atlas
+    -- construct texture atlas positioning
     table.sort(tiles_sorted, function(a, b)
         return self._tiles[b].height < self._tiles[b].height
     end)
@@ -187,9 +197,22 @@ function ow.TilesetConfig:realize()
         return self._tiles[a].width < self._tiles[b].width
     end)
 
-    local atlas_width, atlas_height = math.max(max_width, math.ceil(math.sqrt(total_area))), 0
+    table.sort(widths, function(a, b)
+        return a > b
+    end)
+
+    -- heuristic to determine optimal atlas size
+    local atlas_width = widths[1]
+    if n_tiles > 1 then
+        atlas_width = atlas_width + widths[2]
+    end
+    atlas_width = math.max(atlas_width, math.ceil(math.sqrt(total_area)))
+
+    local atlas_height = 0
+    local max_row_width = NEGATIVE_INFINITY
     do
         local current_x, current_y = 0, 0
+        local row_width = 0
         local shelf_height = 0
 
         for id in values(tiles_sorted) do
@@ -199,6 +222,8 @@ function ow.TilesetConfig:realize()
                 current_x = 0
                 atlas_height = atlas_height + shelf_height
                 shelf_height = 0
+                max_row_width = math.max(max_row_width, row_width)
+                row_width = 0
             end
 
             tile.texture_x = current_x
@@ -207,24 +232,39 @@ function ow.TilesetConfig:realize()
             tile.texture_height = tile.height
 
             current_x = current_x + tile.width
+            row_width = row_width + tile.width
             shelf_height = math.max(shelf_height, tile.height)
         end
 
         atlas_height = atlas_height + shelf_height
     end
 
+    atlas_width = max_row_width -- trim if no row is full
+
+    -- paste to canvas
     self._texture_atlas = love.graphics.newCanvas(atlas_width, atlas_height, {
         msaa = 0
     })
-    dbg(self._id, total_area / (atlas_width * atlas_height))
+
+    local space_usage = total_area / (atlas_width * atlas_height)
+    if space_usage < 7 then
+        rt.warning("In ow.TilesetConfig.realize: texture atlas of tileset `" .. self._id .. "` only uses `" .. math.floor(space_usage * 1000) / 1000 * 100 .. "%` of allocated space")
+    end
 
     love.graphics.push()
     love.graphics.origin()
     love.graphics.setCanvas(self._texture_atlas)
     love.graphics.setColor(1, 1, 1, 1)
     for tile in values(self._tiles) do
-        love.graphics.rectangle("fill", tile.texture_x, tile.texture_y, tile.texture_width, tile.texture_height)
         love.graphics.draw(tile.texture, tile.texture_x, tile.texture_y)
+
+        -- float texture coordinates
+        tile.texture:release()
+        tile.texture = nil
+        tile.texture_x = tile.texture_x / atlas_width
+        tile.texture_y = tile.texture_y / atlas_height
+        tile.texture_width = tile.texture_width / atlas_width
+        tile.texture_height = tile.texture_height / atlas_height
     end
     love.graphics.setCanvas(nil)
 end
@@ -245,48 +285,56 @@ function ow.TilesetConfig:get_id()
 end
 
 --- @brief debug drawing
-function ow.TilesetConfig:_draw(tile_id, x, y)
-    local tile = self._tiles[tile_id]
-    if tile == nil then
-        rt.erorr("In ow.TilesetConfig._debug_draw: no tile with id `" .. tile_id .. "` in tileset `" .. self._id .. "`")
-    end
+function ow.TilesetConfig:_draw(x, y)
+    if x == nil then x = 0 end
+    if y == nil then y = 0 end
 
-    love.graphics.push()
-    love.graphics.translate(x, y)
+    love.graphics.setColor(1, 1, 1, 1)
+    love.graphics.draw(self._texture_atlas, x, y)
+    local atlas_w, atlas_h = self._texture_atlas:getDimensions()
 
-    love.graphics.draw(tile.texture)
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.rectangle("line", x, y, atlas_w, atlas_h)
+
     love.graphics.setPointSize(4)
     love.graphics.setLineWidth(1)
     love.graphics.setLineJoin("miter")
 
-    local hue, hue_step = 0, 1 / sizeof(tile.shapes)
-    for shape in values(tile.shapes) do
-        local r, g, b, _ = rt.color_unpack(rt.lcha_to_rgba(rt.LCHA(0.8, 1, hue, 1)))
-        hue = hue + hue_step
-        if shape.type == ow.TilesetObjectType.POINT then
-            love.graphics.setColor(r, g, b, 1)
-            love.graphics.points(shape.x, shape.y)
-        elseif shape.type == ow.TilesetObjectType.RECTANGLE then
-            love.graphics.setColor(r, g, b, 0.5)
-            love.graphics.rectangle("fill", shape.x, shape.y, shape.width, shape.height)
-            love.graphics.setColor(r, g, b, 1)
-            love.graphics.rectangle("line", shape.x, shape.y, shape.width, shape.height)
-        elseif shape.type == ow.TilesetObjectType.ELLIPSE then
-            love.graphics.setColor(r, g, b, 0.5)
-            love.graphics.circle("fill", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
-            love.graphics.setColor(r, g, b, 1)
-            love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
-        elseif shape.type == ow.TilesetObjectType.POLYGON then
-            love.graphics.setColor(r, g, b, 0.5)
-            love.graphics.polygon("fill", shape.vertices)
-            love.graphics.setColor(1, 1, 1, 1)
-            love.graphics.polygon("line", shape.vertices)
-        else
-            rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
-        end
-    end
+    local r, g, b = 0, 1, 1
+    local fill_a, line_a = 0.0, 0.8
 
-    love.graphics.pop()
+    for tile in values(self._tiles) do
+        local tx, ty, tw, th = tile.texture_x * atlas_w, tile.texture_y * atlas_h, tile.texture_width * atlas_w, tile.texture_height * atlas_h
+        love.graphics.setColor(1, 0, 1, 1)
+        love.graphics.rectangle("line", tx, ty, tw, th)
+
+        love.graphics.push()
+        love.graphics.translate(tx, ty)
+        for shape in values(tile.shapes) do
+            if shape.type == ow.TilesetObjectType.POINT then
+                love.graphics.setColor(r, g, b, line_a)
+                love.graphics.points(shape.x, shape.y)
+            elseif shape.type == ow.TilesetObjectType.RECTANGLE then
+                love.graphics.setColor(r, g, b, fill_a)
+                love.graphics.rectangle("fill", shape.x, shape.y, shape.width, shape.height)
+                love.graphics.setColor(r, g, b, line_a)
+                love.graphics.rectangle("line", shape.x, shape.y, shape.width, shape.height)
+            elseif shape.type == ow.TilesetObjectType.ELLIPSE then
+                love.graphics.setColor(r, g, b, fill_a)
+                love.graphics.circle("fill", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+                love.graphics.setColor(r, g, b, line_a)
+                love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+            elseif shape.type == ow.TilesetObjectType.POLYGON then
+                love.graphics.setColor(r, g, b, fill_a)
+                love.graphics.polygon("fill", shape.vertices)
+                love.graphics.setColor(1, 1, 1, line_a)
+                love.graphics.polygon("line", shape.vertices)
+            else
+                rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
+            end
+        end
+        love.graphics.pop()
+    end
 end
 
 -- ear clipping triangulation

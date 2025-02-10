@@ -97,12 +97,12 @@ function ow.StageConfig:realize()
 
         local layer_type = _get(layer, "type")
         if layer_type == "tilelayer" then
-            if config.chunks == nil then
-                rt.error("In ow.StageConfig.realize: unhandled layer type `" .. layer_type .. "` of stage at `" .. path .. "`")
+            if layer.chunks == nil then
+                rt.error("In ow.StageConfig.realize: layer `" .. layer_i .. "` does not have `chunks` field, is this an infinite map?")
             end
 
             -- construct gid matrix
-            local chunks = _get(config, "chunks")
+            local chunks = _get(layer, "chunks")
             for chunk in values(chunks) do
                 local x_offset = _get(chunk, "x")
                 local y_offset = _get(chunk, "y")
