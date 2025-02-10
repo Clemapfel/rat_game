@@ -179,7 +179,7 @@ vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 fragment_position
 
     vec2 position = uv;
     position -= vec2(0.5);
-    position = rotate(position, distance(uv, vec2(0.5)) * PI - 2 * elapsed);
+    //position = rotate(position, distance(uv, vec2(0.5)) * PI - 2 * elapsed);
     position += vec2(0.5);
 
     //float value = worley_noise(vec3(vec2(distance(uv, vec2(0.5))) * 2 * position.xy, elapsed / 10));

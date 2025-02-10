@@ -6,5 +6,6 @@ local tileset = ow.TilesetConfig("debug_tileset_objects")
 --config:realize()
 
 love.draw = function()
-    tileset:_draw(4, 50, 50)
+    love.graphics.draw(tileset._texture_atlas, 20, 20)
+    --tileset:_draw(4, 50, 50)
 end

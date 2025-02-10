@@ -63,7 +63,7 @@ function ow.TilesetConfig:realize()
 
     local min_width, min_height = POSITIVE_INFINITY, POSITIVE_INFINITY
     local max_width, max_height = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-    local total_width, total_height = 0, 0
+    local total_area = 0
     local tiles_sorted = {}
     local _min, _max = math.min, math.max
 
@@ -107,8 +107,7 @@ function ow.TilesetConfig:realize()
         max_width = _max(max_width, to_push.width)
         min_height = _min(min_height, to_push.height)
         max_height = _max(max_height, to_push.height)
-        total_width = total_width + to_push.width
-        total_height = total_height + to_push.height
+        total_area = total_area + to_push.width * to_push.height
 
         -- parse physics shapes
         if tile.objectGroup ~= nil then
@@ -148,11 +147,13 @@ function ow.TilesetConfig:realize()
                         table.insert(vertices, _get(vertex, "y") + offset_y)
                     end
 
-                    table.insert(to_push.shapes, {
-                        type = ow.TilesetObjectType.POLYGON,
-                        vertices = vertices,
-                        decomposition = ow.TilesetConfig._decompose_polygon(vertices)
-                    })
+                    -- decompose polygon into 8-gons
+                    for d in values(ow.TilesetConfig._decompose_polygon(vertices)) do
+                        table.insert(to_push.shapes, {
+                            type = ow.TilesetObjectType.POLYGON,
+                            vertices = d,
+                        })
+                    end
                 elseif shape_type == "point" then
                     table.insert(to_push.shapes, {
                         type = ow.TilesetObjectType.POINT,
@@ -179,37 +180,51 @@ function ow.TilesetConfig:realize()
 
     -- construct texture atlas
     table.sort(tiles_sorted, function(a, b)
-        return self._tiles[a].width < self._tiles[b].width
-    end)
-
-    table.sort(tiles_sorted, function(a, b)
         return self._tiles[b].height < self._tiles[b].height
     end)
 
-    self._texture = love.graphics.newCanvas(max_width, total_height, {
+    table.sort(tiles_sorted, function(a, b)
+        return self._tiles[a].width < self._tiles[b].width
+    end)
+
+    local atlas_width, atlas_height = math.max(max_width, math.ceil(math.sqrt(total_area))), 0
+    do
+        local current_x, current_y = 0, 0
+        local shelf_height = 0
+
+        for id in values(tiles_sorted) do
+            local tile = self._tiles[id]
+            if current_x + tile.width > atlas_width then
+                current_y = current_y + shelf_height
+                current_x = 0
+                atlas_height = atlas_height + shelf_height
+                shelf_height = 0
+            end
+
+            tile.texture_x = current_x
+            tile.texture_y = current_y
+            tile.texture_width = tile.width
+            tile.texture_height = tile.height
+
+            current_x = current_x + tile.width
+            shelf_height = math.max(shelf_height, tile.height)
+        end
+
+        atlas_height = atlas_height + shelf_height
+    end
+
+    self._texture_atlas = love.graphics.newCanvas(atlas_width, atlas_height, {
         msaa = 0
     })
+    dbg(self._id, total_area / (atlas_width * atlas_height))
 
-    -- TODO: use actual packing algorithm
     love.graphics.push()
     love.graphics.origin()
-    love.graphics.setCanvas(self._texture)
+    love.graphics.setCanvas(self._texture_atlas)
     love.graphics.setColor(1, 1, 1, 1)
-    local current_x, current_y = 0, 0
-    for id in values(tiles_sorted) do
-        local tile = self._tiles[id]
-        tile.texture_x = current_x
-        tile.texture_y = current_y
-        tile.texture_width = tile.width
-        tile.texture_height = tile.height
-        love.graphics.draw(tile.texture, current_x, current_y)
-
-        --[[
-        tile.texture:release()
-        tile.texture = nil
-        ]]--
-
-        current_y = current_y + tile.height
+    for tile in values(self._tiles) do
+        love.graphics.rectangle("fill", tile.texture_x, tile.texture_y, tile.texture_width, tile.texture_height)
+        love.graphics.draw(tile.texture, tile.texture_x, tile.texture_y)
     end
     love.graphics.setCanvas(nil)
 end
@@ -263,15 +278,9 @@ function ow.TilesetConfig:_draw(tile_id, x, y)
             love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
         elseif shape.type == ow.TilesetObjectType.POLYGON then
             love.graphics.setColor(r, g, b, 0.5)
-            --love.graphics.polygon("fill", shape.vertices)
+            love.graphics.polygon("fill", shape.vertices)
             love.graphics.setColor(1, 1, 1, 1)
-            --love.graphics.points(shape.vertices)
-
-            for d in values(shape.decomposition) do
-                love.graphics.setColor(r, g, b, 1)
-                --love.graphics.line(d[1], d[2], d[3], d[4], d[5], d[6], d[1], d[2])
-                love.graphics.polygon("line", d)
-            end
+            love.graphics.polygon("line", shape.vertices)
         else
             rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
         end
@@ -280,8 +289,8 @@ function ow.TilesetConfig:_draw(tile_id, x, y)
     love.graphics.pop()
 end
 
-function ow.TilesetConfig._decompose_polygon(vertices)
-    -- ear clipping triangulation
+-- ear clipping triangulation
+local function _triangulate(vertices)
     local triangles = {}
     local n = #vertices / 2
     local indices = {}
@@ -291,6 +300,10 @@ function ow.TilesetConfig._decompose_polygon(vertices)
 
     local function get_point(index)
         return vertices[2 * index - 1], vertices[2 * index]
+    end
+
+    local function sign(px1, py1, px2, py2, px3, py3)
+        return (px1 - px3) * (py2 - py3) - (px2 - px3) * (py1 - py3)
     end
 
     while #indices > 3 do
@@ -310,10 +323,6 @@ function ow.TilesetConfig._decompose_polygon(vertices)
                 for j = 1, #indices do
                     if j ~= i and j ~= (i % #indices) + 1 and j ~= (i + 1) % #indices + 1 then
                         local px, py = get_point(indices[j])
-
-                        local function sign(px1, py1, px2, py2, px3, py3)
-                            return (px1 - px3) * (py2 - py3) - (px2 - px3) * (py1 - py3)
-                        end
 
                         local d1 = sign(px, py, x1, y1, x2, y2)
                         local d2 = sign(px, py, x2, y2, x3, y3)
@@ -349,69 +358,66 @@ function ow.TilesetConfig._decompose_polygon(vertices)
     local x2, y2 = get_point(indices[2])
     local x3, y3 = get_point(indices[3])
     table.insert(triangles, {x1, y1, x2, y2, x3, y3})
+    return triangles
+end
 
-    -- Function to check if two triangles can be merged into a trapezoid
-    local function can_merge(triangle1, triangle2)
-        -- Check if they share a base (two vertices)
-        local shared_vertices = 0
-        for i = 1, 6, 2 do
-            for j = 1, 6, 2 do
-                if triangle1[i] == triangle2[j] and triangle1[i+1] == triangle2[j+1] then
-                    shared_vertices = shared_vertices + 1
-                end
-            end
-        end
-        return shared_vertices == 2
-    end
+-- merge triangles with shared base
+local function _merge_triangles_into_trapezoids(triangles)
+    local trapezoids = {}
+    local used = {}
 
-    -- Function to merge two triangles into a trapezoid
-    local function merge_triangles(triangle1, triangle2)
-        local trapezoid = {}
-        for i = 1, 6, 2 do
-            table.insert(trapezoid, triangle1[i])
-            table.insert(trapezoid, triangle1[i+1])
-        end
-        for i = 1, 6, 2 do
-            local is_shared = false
-            for j = 1, #trapezoid, 2 do
-                if triangle2[i] == trapezoid[j] and triangle2[i+1] == trapezoid[j+1] then
-                    is_shared = true
-                    break
-                end
-            end
-            if not is_shared then
-                table.insert(trapezoid, triangle2[i])
-                table.insert(trapezoid, triangle2[i+1])
-            end
-        end
-        return trapezoid
-    end
+    for i = 1, #triangles do
+        if not used[i] then
+            local merged = false
+            for j = i + 1, #triangles do
+                if not used[j] then
+                    local shared_vertices = 0
+                    for m = 1, 6, 2 do
+                        for n = 1, 6, 2 do
+                            if triangles[i][m] == triangles[j][n] and triangles[i][m + 1] == triangles[j][n + 1] then
+                                shared_vertices = shared_vertices + 1
+                            end
+                        end
+                    end
 
-    -- Function to merge a list of triangles into trapezoids
-    local function merge_triangles_into_trapezoids(triangles)
-        local trapezoids = {}
-        local used = {}
+                    if shared_vertices == 2 then
+                        local trapezoid = {}
+                        for m = 1, 6, 2 do
+                            table.insert(trapezoid, triangles[i][m])
+                            table.insert(trapezoid, triangles[i][m + 1])
+                        end
+                        for m = 1, 6, 2 do
+                            local is_shared = false
+                            for n = 1, #trapezoid, 2 do
+                                if triangles[j][m] == trapezoid[n] and triangles[j][m + 1] == trapezoid[n + 1] then
+                                    is_shared = true
+                                    break
+                                end
+                            end
+                            if not is_shared then
+                                table.insert(trapezoid, triangles[j][m])
+                                table.insert(trapezoid, triangles[j][m + 1])
+                            end
+                        end
 
-        for i = 1, #triangles do
-            if not used[i] then
-                local merged = false
-                for j = i + 1, #triangles do
-                    if not used[j] and can_merge(triangles[i], triangles[j]) then
-                        table.insert(trapezoids, merge_triangles(triangles[i], triangles[j]))
+                        assert(#trapezoid <= 8) -- box2d max vertex count
+                        table.insert(trapezoids, trapezoid)
                         used[i] = true
                         used[j] = true
                         merged = true
                         break
                     end
                 end
-                if not merged then
-                    table.insert(trapezoids, triangles[i])
-                end
+            end
+            if not merged then
+                table.insert(trapezoids, triangles[i])
             end
         end
-
-        return trapezoids
     end
 
-    return merge_triangles_into_trapezoids(triangles)
+    return trapezoids
+end
+
+function ow.TilesetConfig._decompose_polygon(vertices)
+    return _merge_triangles_into_trapezoids(_triangulate(vertices))
 end
