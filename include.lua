@@ -43,6 +43,7 @@ do
     cdef = love.filesystem.read("physics/enkits_cdef.h")
     ffi.cdef(cdef)
 
+    --[[
     -- load fftw3
     if jit.os == "Linux" then
         fftw3 = ffi.load("fftw3")
@@ -54,6 +55,7 @@ do
     rtmidi = ffi.load("rtmidi")
     cdef = love.filesystem.read("midi/rtmidi_cdef.h")
     ffi.cdef(cdef)
+    ]]--
 end
 
 -- debugger

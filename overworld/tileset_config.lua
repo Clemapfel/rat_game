@@ -24,7 +24,9 @@ ow.TilesetConfig._atlas = {}
 
 ow.TilesetObjectType = meta.new_enum("TilesetObjectType", {
     RECTANGLE = "rectangle",
-    ELLIPSE = "ellipse"
+    ELLIPSE = "ellipse",
+    POLYGON = "polygon",
+    POINT = "point"
 })
 
 --- @brief
@@ -140,16 +142,20 @@ function ow.TilesetConfig:realize()
                     })
                 elseif shape_type == "polygon" then
                     local vertices = {}
+                    local offset_x, offset_y = _get(object, "x"), _get(object, "y")
                     for vertex in values(_get(object, "polygon")) do
-                        table.insert(vertices, _get(vertex, "x"))
-                        table.insert(vertices, _get(vertex, "y"))
+                        table.insert(vertices, _get(vertex, "x") + offset_x)
+                        table.insert(vertices, _get(vertex, "y") + offset_y)
                     end
 
                     table.insert(to_push.shapes, {
-                        vertices = vertices
+                        type = ow.TilesetObjectType.POLYGON,
+                        vertices = vertices,
+                        decomposition = ow.TilesetConfig._decompose_polygon(vertices)
                     })
                 elseif shape_type == "point" then
                     table.insert(to_push.shapes, {
+                        type = ow.TilesetObjectType.POINT,
                         x = _get(object, "x"),
                         y = _get(object, "y")
                     })
@@ -197,6 +203,12 @@ function ow.TilesetConfig:realize()
         tile.texture_width = tile.width
         tile.texture_height = tile.height
         love.graphics.draw(tile.texture, current_x, current_y)
+
+        --[[
+        tile.texture:release()
+        tile.texture = nil
+        ]]--
+
         current_y = current_y + tile.height
     end
     love.graphics.setCanvas(nil)
@@ -215,4 +227,191 @@ end
 --- @brief
 function ow.TilesetConfig:get_id()
     return self._id
+end
+
+--- @brief debug drawing
+function ow.TilesetConfig:_draw(tile_id, x, y)
+    local tile = self._tiles[tile_id]
+    if tile == nil then
+        rt.erorr("In ow.TilesetConfig._debug_draw: no tile with id `" .. tile_id .. "` in tileset `" .. self._id .. "`")
+    end
+
+    love.graphics.push()
+    love.graphics.translate(x, y)
+
+    love.graphics.draw(tile.texture)
+    love.graphics.setPointSize(4)
+    love.graphics.setLineWidth(1)
+    love.graphics.setLineJoin("miter")
+
+    local hue, hue_step = 0, 1 / sizeof(tile.shapes)
+    for shape in values(tile.shapes) do
+        local r, g, b, _ = rt.color_unpack(rt.lcha_to_rgba(rt.LCHA(0.8, 1, hue, 1)))
+        hue = hue + hue_step
+        if shape.type == ow.TilesetObjectType.POINT then
+            love.graphics.setColor(r, g, b, 1)
+            love.graphics.points(shape.x, shape.y)
+        elseif shape.type == ow.TilesetObjectType.RECTANGLE then
+            love.graphics.setColor(r, g, b, 0.5)
+            love.graphics.rectangle("fill", shape.x, shape.y, shape.width, shape.height)
+            love.graphics.setColor(r, g, b, 1)
+            love.graphics.rectangle("line", shape.x, shape.y, shape.width, shape.height)
+        elseif shape.type == ow.TilesetObjectType.ELLIPSE then
+            love.graphics.setColor(r, g, b, 0.5)
+            love.graphics.circle("fill", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+            love.graphics.setColor(r, g, b, 1)
+            love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+        elseif shape.type == ow.TilesetObjectType.POLYGON then
+            love.graphics.setColor(r, g, b, 0.5)
+            --love.graphics.polygon("fill", shape.vertices)
+            love.graphics.setColor(1, 1, 1, 1)
+            --love.graphics.points(shape.vertices)
+
+            for d in values(shape.decomposition) do
+                love.graphics.setColor(r, g, b, 1)
+                --love.graphics.line(d[1], d[2], d[3], d[4], d[5], d[6], d[1], d[2])
+                love.graphics.polygon("line", d)
+            end
+        else
+            rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
+        end
+    end
+
+    love.graphics.pop()
+end
+
+function ow.TilesetConfig._decompose_polygon(vertices)
+    -- ear clipping triangulation
+    local triangles = {}
+    local n = #vertices / 2
+    local indices = {}
+    for i = 1, n do
+        indices[i] = i
+    end
+
+    local function get_point(index)
+        return vertices[2 * index - 1], vertices[2 * index]
+    end
+
+    while #indices > 3 do
+        local ear_found = false
+        for i = 1, #indices do
+            local i1 = indices[i]
+            local i2 = indices[(i % #indices) + 1]
+            local i3 = indices[(i + 1) % #indices + 1]
+
+            local x1, y1 = get_point(i1)
+            local x2, y2 = get_point(i2)
+            local x3, y3 = get_point(i3)
+
+            local cross_product = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
+            if cross_product < 0 then
+                local is_ear = true
+                for j = 1, #indices do
+                    if j ~= i and j ~= (i % #indices) + 1 and j ~= (i + 1) % #indices + 1 then
+                        local px, py = get_point(indices[j])
+
+                        local function sign(px1, py1, px2, py2, px3, py3)
+                            return (px1 - px3) * (py2 - py3) - (px2 - px3) * (py1 - py3)
+                        end
+
+                        local d1 = sign(px, py, x1, y1, x2, y2)
+                        local d2 = sign(px, py, x2, y2, x3, y3)
+                        local d3 = sign(px, py, x3, y3, x1, y1)
+
+                        local has_neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
+                        local has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
+
+                        local is_point_in_triangle = not (has_neg and has_pos)
+
+                        if is_point_in_triangle then
+                            is_ear = false
+                            break
+                        end
+                    end
+                end
+
+                if is_ear then
+                    table.insert(triangles, {x1, y1, x2, y2, x3, y3})
+                    table.remove(indices, (i % #indices) + 1)
+                    ear_found = true
+                    break
+                end
+            end
+        end
+
+        if not ear_found then
+            rt.error("In ow.TilesetConfig._decompose_polygon: unable to triangulate polygon")
+        end
+    end
+
+    local x1, y1 = get_point(indices[1])
+    local x2, y2 = get_point(indices[2])
+    local x3, y3 = get_point(indices[3])
+    table.insert(triangles, {x1, y1, x2, y2, x3, y3})
+
+    -- Function to check if two triangles can be merged into a trapezoid
+    local function can_merge(triangle1, triangle2)
+        -- Check if they share a base (two vertices)
+        local shared_vertices = 0
+        for i = 1, 6, 2 do
+            for j = 1, 6, 2 do
+                if triangle1[i] == triangle2[j] and triangle1[i+1] == triangle2[j+1] then
+                    shared_vertices = shared_vertices + 1
+                end
+            end
+        end
+        return shared_vertices == 2
+    end
+
+    -- Function to merge two triangles into a trapezoid
+    local function merge_triangles(triangle1, triangle2)
+        local trapezoid = {}
+        for i = 1, 6, 2 do
+            table.insert(trapezoid, triangle1[i])
+            table.insert(trapezoid, triangle1[i+1])
+        end
+        for i = 1, 6, 2 do
+            local is_shared = false
+            for j = 1, #trapezoid, 2 do
+                if triangle2[i] == trapezoid[j] and triangle2[i+1] == trapezoid[j+1] then
+                    is_shared = true
+                    break
+                end
+            end
+            if not is_shared then
+                table.insert(trapezoid, triangle2[i])
+                table.insert(trapezoid, triangle2[i+1])
+            end
+        end
+        return trapezoid
+    end
+
+    -- Function to merge a list of triangles into trapezoids
+    local function merge_triangles_into_trapezoids(triangles)
+        local trapezoids = {}
+        local used = {}
+
+        for i = 1, #triangles do
+            if not used[i] then
+                local merged = false
+                for j = i + 1, #triangles do
+                    if not used[j] and can_merge(triangles[i], triangles[j]) then
+                        table.insert(trapezoids, merge_triangles(triangles[i], triangles[j]))
+                        used[i] = true
+                        used[j] = true
+                        merged = true
+                        break
+                    end
+                end
+                if not merged then
+                    table.insert(trapezoids, triangles[i])
+                end
+            end
+        end
+
+        return trapezoids
+    end
+
+    return merge_triangles_into_trapezoids(triangles)
 end

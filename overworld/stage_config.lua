@@ -83,6 +83,7 @@ function ow.StageConfig:realize()
     end
 
     self._layer_i_to_gid_matrix = {}
+    self._layer_i_to_layer = {}
 
     local layer_i = 1
     for layer in values(_get(config, "layers")) do
@@ -94,7 +95,7 @@ function ow.StageConfig:realize()
         self._layer_i_to_layer[layer_i] = to_add
         layer_i = layer_i + 1
 
-        local layer_type = _get(layer, type)
+        local layer_type = _get(layer, "type")
         if layer_type == "tilelayer" then
             if config.chunks == nil then
                 rt.error("In ow.StageConfig.realize: unhandled layer type `" .. layer_type .. "` of stage at `" .. path .. "`")

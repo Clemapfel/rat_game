@@ -194,7 +194,7 @@ end
 
 --- @brief convert lcha to rgba
 function rt.lcha_to_rgba(lcha, c, h, alpha)
-    local L, C, H, alpha
+    local L, C, H
     if type(lcha) == "number" then
         L = lcha
         C = c

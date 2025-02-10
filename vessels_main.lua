@@ -82,6 +82,7 @@ self.realize = function(self)
                 current_n_branches = current_n_branches + 2
             end
         end
+        start_i = end_n
     end
 
     -- last pushed branches will keep -1, -1, but split depth signals to stop there

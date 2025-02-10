@@ -149,6 +149,10 @@ function rt.Texture:draw(x, y, r, g, b, a)
     love.graphics.draw(self._native, x, y)
 end
 
+function rt.Texture:release()
+    self._native:release()
+end
+
 if love.getVersion() >= 12 then
     --- @overload
     function rt.Texture:download()

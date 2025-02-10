@@ -1,6 +1,6 @@
 --- @class rt.Matrix
 rt.Matrix = meta.new_type("Matrix", function()
-    return meta.new({
+    return meta.new(rt.Matrix, {
         _data = {},
         _min_x = 0,
         _min_y = 0,
