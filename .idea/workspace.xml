@@ -22,11 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="trivial packing algorithm working">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/overworld/tiled_object.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/matrix.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/matrix.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld/stage_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld/tileset_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -767,15 +769,7 @@
       <workItem from="1738941751684" duration="2898000" />
       <workItem from="1738948292556" duration="5635000" />
       <workItem from="1739048790169" duration="14044000" />
-      <workItem from="1739121245177" duration="30611000" />
-    </task>
-    <task id="LOCAL-01438" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1737487522986</created>
-      <option name="number" value="01438" />
-      <option name="presentableId" value="LOCAL-01438" />
-      <option name="project" value="LOCAL" />
-      <updated>1737487522986</updated>
+      <workItem from="1739121245177" duration="34969000" />
     </task>
     <task id="LOCAL-01439" summary="stashing">
       <option name="closed" value="true" />
@@ -1161,7 +1155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739213063622</updated>
     </task>
-    <option name="localTasksCounter" value="1487" />
+    <task id="LOCAL-01487" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1739216506645</created>
+      <option name="number" value="01487" />
+      <option name="presentableId" value="LOCAL-01487" />
+      <option name="project" value="LOCAL" />
+      <updated>1739216506645</updated>
+    </task>
+    <option name="localTasksCounter" value="1488" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1229,7 +1231,6 @@
     <MESSAGE value="stashing, fix smooth motion for negative target values" />
     <MESSAGE value="dither working" />
     <MESSAGE value="dithering done" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="added debug stage" />
     <MESSAGE value="added debug map" />
     <MESSAGE value="added edge interpolation" />
@@ -1240,7 +1241,8 @@
     <MESSAGE value="stashing vessels" />
     <MESSAGE value="polygon decomposition working" />
     <MESSAGE value="trivial packing algorithm working" />
-    <option name="LAST_COMMIT_MESSAGE" value="trivial packing algorithm working" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
