@@ -267,6 +267,8 @@ require "battle.battle_scene"
 require "battle.simulation_handler"
 
 -- overworld
+require "overworld.sprite_batch"
+require "overworld.tiled_object"
 require "overworld.tileset_config"
 require "overworld.stage_config"
 require "overworld.overworld_scene"

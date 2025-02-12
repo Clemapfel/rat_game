@@ -28,12 +28,7 @@ ow.LayerType = meta.new_enum("LayerType", {
     OBJECTS = "objectlayer"
 })
 
-local function _decode_gid(gid)
-    local true_id = bit.band(gid, 0x0FFFFFFF)
-    local flip_x = 0 ~= bit.band(gid, 0x80000000)
-    local flip_y = 0 ~= bit.band(gid, 0x40000000)
-    return true_id, flip_x, flip_y
-end
+
 
 --- @brief
 function ow.StageConfig:realize()
@@ -155,15 +150,12 @@ function ow.StageConfig:realize()
             end
         elseif layer_type == "objectgroup" then
             to_add.type = ow.LayerType.OBJECTS
-            to_add.objects = {}
-
-            for object in values(_get(layer, "objects")) do
-
-            end
+            to_add.objects = ow.parse_tiled_object_group(layer)
         elseif layer_type == "imagelayer" then
             -- noop
+            rt.warning("In ow.StageConfig.realizue: layer type `imagelayer` of stage `" .. self._id .. "` is not supported")
         else
-            rt.error("In ow.StageConfig.realize: unhandled layer type `" .. layer_type .. "` of stage at `" .. path .. "`")
+            rt.error("In ow.StageConfig.realize: unhandled layer type `" .. layer_type .. "of stage `" .. self._id .. "` is not supported")
         end
     end
 end

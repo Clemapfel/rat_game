@@ -23,13 +23,7 @@ ow.TilesetConfig = meta.new_type("TilesetConfig", function(id)
 end)
 ow.TilesetConfig._atlas = {}
 
-ow.ObjectType = meta.new_enum("ObjectType", {
-    RECTANGLE = "rectangle",
-    ELLIPSE = "ellipse",
-    POLYGON = "polygon",
-    POINT = "point",
-    SPRITE = "sprite"
-})
+
 
 --- @brief
 function ow.TilesetConfig:realize()
@@ -117,15 +111,7 @@ function ow.TilesetConfig:realize()
         end
 
         if tile.objectGroup ~= nil then
-            local objects = _get(_get(tile, "objectGroup"), "objects")
-
-            if objects.properties ~= nil then
-                rt.error("In ow.TilesetConfig.realize: unhandled per-object group properties in object group of tile `" .. id .. "` of tiles set at `" .. path .. "`")
-            end
-
-            for object in values(objects) do
-                table.insert(to_push.objects, ow.parse_tile_object(object))
-            end
+            to_push.objects = ow.parse_tiled_object_group(_get(tile, "objectGroup"))
         end
     end
 
@@ -199,7 +185,7 @@ function ow.TilesetConfig:realize()
     for tile in values(self._tiles) do
         love.graphics.draw(tile.texture, tile.texture_x, tile.texture_y)
 
-        -- float texture coordinates
+        -- compute float texture coordinates
         tile.texture:release()
         tile.texture = nil
         tile.texture_x = tile.texture_x / atlas_width
@@ -252,7 +238,7 @@ function ow.TilesetConfig:_draw(x, y)
     love.graphics.setLineJoin("miter")
 
     local r, g, b = 0, 1, 1
-    local fill_a, line_a = 0.0, 0.8
+    local fill_a, line_a = 0.2, 0.8
 
     for tile in values(self._tiles) do
         local tx, ty, tw, th = tile.texture_x * atlas_w, tile.texture_y * atlas_h, tile.texture_width * atlas_w, tile.texture_height * atlas_h
@@ -261,7 +247,7 @@ function ow.TilesetConfig:_draw(x, y)
 
         love.graphics.push()
         love.graphics.translate(tx, ty)
-        for shape in values(tile.shapes) do
+        for shape in values(tile.objects) do
             if shape.type == ow.ObjectType.POINT then
                 love.graphics.setColor(r, g, b, line_a)
                 love.graphics.points(shape.x, shape.y)
@@ -276,147 +262,16 @@ function ow.TilesetConfig:_draw(x, y)
                 love.graphics.setColor(r, g, b, line_a)
                 love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
             elseif shape.type == ow.ObjectType.POLYGON then
-                love.graphics.setColor(r, g, b, fill_a)
-                love.graphics.polygon("fill", shape.vertices)
-                love.graphics.setColor(1, 1, 1, line_a)
-                love.graphics.polygon("line", shape.vertices)
+                for d in values(shape.shapes) do
+                    love.graphics.setColor(r, g, b, fill_a)
+                    love.graphics.polygon("fill", d)
+                    love.graphics.setColor(r, g, b, line_a)
+                    love.graphics.polygon("line", d)
+                end
             else
                 rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
             end
         end
         love.graphics.pop()
     end
-end
-
--- ear clipping triangulation
-local function _triangulate(vertices)
-    local triangles = {}
-    local n = #vertices / 2
-    local indices = {}
-    for i = 1, n do
-        indices[i] = i
-    end
-
-    local function get_point(index)
-        return vertices[2 * index - 1], vertices[2 * index]
-    end
-
-    local function sign(px1, py1, px2, py2, px3, py3)
-        return (px1 - px3) * (py2 - py3) - (px2 - px3) * (py1 - py3)
-    end
-
-    while #indices > 3 do
-        local ear_found = false
-        for i = 1, #indices do
-            local i1 = indices[i]
-            local i2 = indices[(i % #indices) + 1]
-            local i3 = indices[(i + 1) % #indices + 1]
-
-            local x1, y1 = get_point(i1)
-            local x2, y2 = get_point(i2)
-            local x3, y3 = get_point(i3)
-
-            local cross_product = (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
-            if cross_product < 0 then
-                local is_ear = true
-                for j = 1, #indices do
-                    if j ~= i and j ~= (i % #indices) + 1 and j ~= (i + 1) % #indices + 1 then
-                        local px, py = get_point(indices[j])
-
-                        local d1 = sign(px, py, x1, y1, x2, y2)
-                        local d2 = sign(px, py, x2, y2, x3, y3)
-                        local d3 = sign(px, py, x3, y3, x1, y1)
-
-                        local has_neg = (d1 < 0) or (d2 < 0) or (d3 < 0)
-                        local has_pos = (d1 > 0) or (d2 > 0) or (d3 > 0)
-
-                        local is_point_in_triangle = not (has_neg and has_pos)
-
-                        if is_point_in_triangle then
-                            is_ear = false
-                            break
-                        end
-                    end
-                end
-
-                if is_ear then
-                    table.insert(triangles, {x1, y1, x2, y2, x3, y3})
-                    table.remove(indices, (i % #indices) + 1)
-                    ear_found = true
-                    break
-                end
-            end
-        end
-
-        if not ear_found then
-            rt.error("In ow.TilesetConfig._decompose_polygon: unable to triangulate polygon")
-        end
-    end
-
-    local x1, y1 = get_point(indices[1])
-    local x2, y2 = get_point(indices[2])
-    local x3, y3 = get_point(indices[3])
-    table.insert(triangles, {x1, y1, x2, y2, x3, y3})
-    return triangles
-end
-
--- merge triangles with shared base
-local function _merge_triangles_into_trapezoids(triangles)
-    local trapezoids = {}
-    local used = {}
-
-    for i = 1, #triangles do
-        if not used[i] then
-            local merged = false
-            for j = i + 1, #triangles do
-                if not used[j] then
-                    local shared_vertices = 0
-                    for m = 1, 6, 2 do
-                        for n = 1, 6, 2 do
-                            if triangles[i][m] == triangles[j][n] and triangles[i][m + 1] == triangles[j][n + 1] then
-                                shared_vertices = shared_vertices + 1
-                            end
-                        end
-                    end
-
-                    if shared_vertices == 2 then
-                        local trapezoid = {}
-                        for m = 1, 6, 2 do
-                            table.insert(trapezoid, triangles[i][m])
-                            table.insert(trapezoid, triangles[i][m + 1])
-                        end
-                        for m = 1, 6, 2 do
-                            local is_shared = false
-                            for n = 1, #trapezoid, 2 do
-                                if triangles[j][m] == trapezoid[n] and triangles[j][m + 1] == trapezoid[n + 1] then
-                                    is_shared = true
-                                    break
-                                end
-                            end
-                            if not is_shared then
-                                table.insert(trapezoid, triangles[j][m])
-                                table.insert(trapezoid, triangles[j][m + 1])
-                            end
-                        end
-
-                        assert(#trapezoid <= 8) -- box2d max vertex count
-                        table.insert(trapezoids, trapezoid)
-                        used[i] = true
-                        used[j] = true
-                        merged = true
-                        break
-                    end
-                end
-            end
-            if not merged then
-                table.insert(trapezoids, triangles[i])
-            end
-        end
-    end
-
-    return trapezoids
-end
-
-function ow.TilesetConfig._decompose_polygon(vertices)
-    return _merge_triangles_into_trapezoids(_triangulate(vertices))
 end

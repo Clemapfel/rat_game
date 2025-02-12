@@ -307,7 +307,7 @@
   <object id="16" gid="1073741896" x="1656.63" y="558.675" width="100" height="109"/>
   <object id="17" gid="72" x="1655.44" y="425.024" width="100" height="109"/>
   <object id="21" gid="71" x="1247.01" y="357.291" width="72" height="70"/>
-  <object id="18" gid="2147483720" x="1509.86" y="426.217" width="100" height="109"/>
+  <object id="18" gid="2147483720" x="1509.86" y="426.217" width="100" height="109" rotation="10"/>
   <object id="19" gid="3221225544" x="1512.24" y="558.675" width="100" height="109"/>
   <object id="20" gid="70" x="1250.65" y="318.659" width="123" height="123"/>
   <object id="22" gid="71" x="1336.51" y="468.27" width="72" height="70"/>
@@ -319,6 +319,15 @@
   <object id="28" gid="69" x="1223.24" y="503.776" width="36" height="36"/>
   <object id="29" gid="69" x="1250.69" y="373.704" width="36" height="36"/>
   <object id="35" type="PlayerSpawn" x="127.486" y="443.651">
+   <properties>
+    <property name="bool_property" type="bool" value="false"/>
+    <property name="color_property" type="color" value=""/>
+    <property name="file_property" type="file" value="../../../../../../Program Files/Tiled/LICENSE.APACHE.txt"/>
+    <property name="float_property" type="float" value="1.23"/>
+    <property name="int_property" type="int" value="123"/>
+    <property name="object_property" type="object" value="14"/>
+    <property name="string_property" value="test"/>
+   </properties>
    <point/>
   </object>
   <object id="36" type="Path" x="973.993" y="448.751">
