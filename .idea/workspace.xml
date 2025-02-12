@@ -22,15 +22,11 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/overworld/sprite_batch.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="spritebatch working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/stage_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/tiled_object.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tiled_object.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/tileset_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/graphics_buffer.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -773,15 +769,7 @@
       <workItem from="1738948292556" duration="5635000" />
       <workItem from="1739048790169" duration="14044000" />
       <workItem from="1739121245177" duration="34969000" />
-      <workItem from="1739373520150" duration="7534000" />
-    </task>
-    <task id="LOCAL-01439" summary="stashing">
-      <option name="closed" value="true" />
-      <created>1737490694024</created>
-      <option name="number" value="01439" />
-      <option name="presentableId" value="LOCAL-01439" />
-      <option name="project" value="LOCAL" />
-      <updated>1737490694024</updated>
+      <workItem from="1739373520150" duration="11656000" />
     </task>
     <task id="LOCAL-01440" summary="stashing">
       <option name="closed" value="true" />
@@ -1167,7 +1155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739216506645</updated>
     </task>
-    <option name="localTasksCounter" value="1488" />
+    <task id="LOCAL-01488" summary="spritebatch working">
+      <option name="closed" value="true" />
+      <created>1739381313096</created>
+      <option name="number" value="01488" />
+      <option name="presentableId" value="LOCAL-01488" />
+      <option name="project" value="LOCAL" />
+      <updated>1739381313096</updated>
+    </task>
+    <option name="localTasksCounter" value="1489" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1221,7 +1217,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing random velocity" />
     <MESSAGE value="stashing fireworks" />
     <MESSAGE value="stashing before extracting fireworks" />
     <MESSAGE value="fireworks done" />
@@ -1246,7 +1241,8 @@
     <MESSAGE value="polygon decomposition working" />
     <MESSAGE value="trivial packing algorithm working" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="spritebatch working" />
+    <option name="LAST_COMMIT_MESSAGE" value="spritebatch working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

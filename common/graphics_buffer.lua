@@ -21,8 +21,8 @@ rt.GraphicsBuffer = meta.new_type("GraphicsBuffer", function(format, n_elements)
 end)
 
 --- @brief
-function rt.GraphicsBuffer:replace_data(data)
-    self._native:setArrayData(data)
+function rt.GraphicsBuffer:replace_data(data, data_index, buffer_index, n_elements)
+    self._native:setArrayData(data, data_index, buffer_index, n_elements)
 end
 
 --- @brief
