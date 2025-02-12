@@ -64,6 +64,8 @@ function ow.TilesetConfig:realize()
     local _min, _max = math.min, math.max
 
     self._n_tiles = _get(config, "tilecount")
+    self._tile_width = _get(config, "tilewidth")
+    self._tile_height = _get(config, "tileheight")
     self._first_tile_id = POSITIVE_INFINITY
     self._last_tile_id = NEGATIVE_INFINITY
     self._tile_ids = {}
@@ -169,9 +171,7 @@ function ow.TilesetConfig:realize()
     atlas_width = max_row_width -- trim if no row is full
 
     -- paste to canvas
-    self._texture_atlas = love.graphics.newCanvas(atlas_width, atlas_height, {
-        msaa = 0
-    })
+    self._texture_atlas = rt.RenderTexture(atlas_width, atlas_height, 0)
 
     local space_usage = total_area / (atlas_width * atlas_height)
     if space_usage < 0.7 then
@@ -180,7 +180,7 @@ function ow.TilesetConfig:realize()
 
     love.graphics.push()
     love.graphics.origin()
-    love.graphics.setCanvas(self._texture_atlas)
+    love.graphics.setCanvas(self._texture_atlas._native)
     love.graphics.setColor(1, 1, 1, 1)
     for tile in values(self._tiles) do
         love.graphics.draw(tile.texture, tile.texture_x, tile.texture_y)
@@ -221,14 +221,44 @@ function ow.TilesetConfig:get_id()
     return self._id
 end
 
+--- @brief
+function ow.TilesetConfig:get_texture()
+    return self._texture_atlas
+end
+
+--- @brief
+function ow.TilesetConfig:get_tile_size(id)
+    if id == nil then
+        return self._tile_width, self._tile_height
+    else
+        local tile = self._tiles[id]
+        if tile == nil then
+            rt.error("In ow.TilesetConfig.get_tile_size: no tile with id `" .. id .. "`")
+            return 0, 0
+        end
+        return tile.width, tile.height
+    end
+end
+
+--- @brief
+function ow.TilesetConfig:get_texture_bounds(id)
+    local tile = self._tiles[id]
+    if tile == nil then
+        rt.error("In ow.TilesetConfig.get_bounds: no tile with id `" .. id .. "`")
+        return 0, 0, 0, 0
+    end
+
+    return tile.texture_x, tile.texture_y, tile.texture_width, tile.texture_height
+end
+
 --- @brief debug drawing
 function ow.TilesetConfig:_draw(x, y)
     if x == nil then x = 0 end
     if y == nil then y = 0 end
 
     love.graphics.setColor(1, 1, 1, 1)
-    love.graphics.draw(self._texture_atlas, x, y)
-    local atlas_w, atlas_h = self._texture_atlas:getDimensions()
+    love.graphics.draw(self._texture_atlas._native, x, y)
+    local atlas_w, atlas_h = self._texture_atlas._native:getDimensions()
 
     love.graphics.setColor(1, 0, 1, 1)
     love.graphics.rectangle("line", x, y, atlas_w, atlas_h)

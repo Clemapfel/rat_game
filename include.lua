@@ -272,6 +272,7 @@ require "overworld.tiled_object"
 require "overworld.tileset_config"
 require "overworld.stage_config"
 require "overworld.overworld_scene"
+require "overworld.stage"
 
 -- state
 require "common.game_state"
