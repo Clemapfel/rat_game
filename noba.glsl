@@ -81,14 +81,17 @@ const uint MODE_TOON = 0u;
 const uint MODE_LINEAR = 1u; 
 const uint MODE_DITHER = 2u;
 const uint MODE_TOON_ANTI_ALIASED = 3u;
-uniform uint color_mode = MODE_TOON_ANTI_ALIASED; // interpolation mode, cf. `grayscale_to_color`
-uniform float color_mode_toon_aa_eps = 0.02;
+uniform uint color_mode = MODE_DITHER; // interpolation mode, cf. `grayscale_to_color`
+uniform float color_mode_toon_aa_eps = 0.1;
 
 uniform sampler2D palette_texture;   // palette texture
 uniform int palette_y_index;         // y index of which palette to use, 1-based
 
 uniform uint palette_offset = 6u;    // n pixels for background color palette to start
 uniform uint palette_n_colors = 5u;  // n steps in background palette
+
+uniform float time;
+float elapsed = time / 5;
 
 vec3 grayscale_to_color(float gray, vec2 fragment_position)
 {
@@ -102,13 +105,16 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
         uint mapped_left = uint(floor(gray * palette_n_colors)) + palette_offset;
         uint mapped_right = uint(floor(gray * palette_n_colors)) + palette_offset + 1u;
         mapped_right = clamp(mapped_right, palette_offset, palette_offset + palette_n_colors - 1u);
+
         vec4 left_color = texelFetch(palette_texture, ivec2(mapped_left, palette_y_index - 1), 0);
         vec4 right_color = texelFetch(palette_texture, ivec2(mapped_right, palette_y_index - 1), 0);
         float factor = 1 / float(palette_n_colors);
         float local_eps = mod(gray, factor) / factor;
 
-        if (distance(local_eps, 1) < color_mode_toon_aa_eps)
-            return mix(left_color, right_color, 1  + (local_eps - 1) / color_mode_toon_aa_eps).rgb;
+        if (distance(local_eps, 1) < color_mode_toon_aa_eps) {
+            float fraction = (local_eps - 1) / color_mode_toon_aa_eps;
+            return clamp(max(2 * distance(fraction, 0) + 0.2, 1) * mix(left_color, right_color, 1 + fraction).rgb, vec3(0), vec3(1));
+        }
         else
             return mix(left_color, right_color, 1 - step(local_eps, 1)).rgb;
     }
@@ -130,13 +136,20 @@ vec3 grayscale_to_color(float gray, vec2 fragment_position)
         vec4 left_color = texelFetch(palette_texture, ivec2(mapped_left, palette_y_index - 1), 0);
         vec4 right_color = texelFetch(palette_texture, ivec2(mapped_right, palette_y_index - 1), 0);
         float factor = 1 / float(palette_n_colors);
-        return dither_4x4(left_color.rgb, right_color.rgb, 0.5, vec2(fragment_position));
+
+        float local_eps = mod(gray, factor) / factor;
+        vec3 result = dither_4x4(left_color.rgb, right_color.rgb, 0.5, vec2(fragment_position));
+        if (distance(local_eps, 1) < color_mode_toon_aa_eps) {
+            //float fraction = (local_eps - 1) / color_mode_toon_aa_eps;
+            //result += distance(fraction, 0) * 0.6 ;
+        }
+
+        return result;
     }
     else
         discard; // invalid `color_mode`
 }
 
-uniform float time;
 uniform float time_since_last_pulse;
 uniform float pulse_max_dilation = 4; // maximum speedup after pulse
 uniform float pulse_duration = 1; // duration of speedup
@@ -171,20 +184,19 @@ float dilation_from_pulse_t(float t) {
 }
 
 vec4 effect(vec4 color, Image image, vec2 texture_coords, vec2 fragment_position) {
-    const float time_scale = 5;   // increase to slow down
-
-    float elapsed = time / time_scale;
-
     vec2 uv = fragment_position / love_ScreenSize.xy;
 
     vec2 position = uv;
     position -= vec2(0.5);
     //position = rotate(position, distance(uv, vec2(0.5)) * PI - 2 * elapsed);
     position += vec2(0.5);
+    position *= elapsed;
+
+    float worley = 2 * worley_noise(vec3(3 * position.xy, elapsed));
 
     //float value = worley_noise(vec3(vec2(distance(uv, vec2(0.5))) * 2 * position.xy, elapsed / 10));
     float value = (gradient_noise(vec3(10 * position.xy, elapsed)) + 1) / 2;
-    value /= 2 * worley_noise(vec3(3 * position.xy, elapsed));
+    value /= worley;
     value = clamp(value, 0, 1 - 0.0001);
     return vec4(grayscale_to_color(value, fragment_position), 1);
 }

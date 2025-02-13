@@ -8,8 +8,10 @@ mode_aa_eps = 0.01
 elapsed = 0
 time_since_last_pulse = 0
 
+local shader_path = "noba2.glsl"
+
 love.load = function()
-    shader = love.graphics.newShader("noba.glsl")
+    shader = love.graphics.newShader(shader_path)
     palette = love.graphics.newImage("noba_palette.png")
     palette:setFilter("linear")
 end
@@ -22,8 +24,8 @@ end
 love.draw = function()
     if shader ~= nil then
 
-        shader:send("palette_texture", palette)
-        shader:send("palette_y_index", palette_index)
+        --shader:send("palette_texture", palette)
+        --shader:send("palette_y_index", palette_index)
         --shader:send("color_mode_toon_aa_eps", mode_aa_eps)
         shader:send("time", elapsed)
         --shader:send("time_since_last_pulse", time_since_last_pulse)
@@ -37,7 +39,7 @@ end
 
 love.keypressed = function(which)
     if which == "x" then
-        shader = love.graphics.newShader("noba.glsl")
+        shader = love.graphics.newShader(shader_path)
         elapsed = 0
         time_since_last_pulse = POSITIVE_INFINITY
         dbg("recompile")

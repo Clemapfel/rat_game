@@ -22,13 +22,12 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="spritebatch done">
-      <change afterPath="$PROJECT_DIR$/overworld/stage.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/noba2.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/stage_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/tileset_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +141,7 @@
     &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/rat_game/assets/fonts/NotoSansJP&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/moth&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -172,7 +171,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old_main" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_overworld">
+  <component name="RunManager" selected="Lua Application.main_noba">
     <configuration name="love-dbg" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="main.lua" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rat_game" TARGET_NAME="Unnamed" CONFIG_NAME="Unnamed" RUN_PATH="$PROJECT_DIR$/love/windows/love.exe">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -770,15 +769,9 @@
       <workItem from="1738948292556" duration="5635000" />
       <workItem from="1739048790169" duration="14044000" />
       <workItem from="1739121245177" duration="34969000" />
-      <workItem from="1739373520150" duration="14280000" />
-    </task>
-    <task id="LOCAL-01441" summary="stashing milk">
-      <option name="closed" value="true" />
-      <created>1737577580438</created>
-      <option name="number" value="01441" />
-      <option name="presentableId" value="LOCAL-01441" />
-      <option name="project" value="LOCAL" />
-      <updated>1737577580438</updated>
+      <workItem from="1739373520150" duration="14949000" />
+      <workItem from="1739393889858" duration="413000" />
+      <workItem from="1739395342289" duration="7166000" />
     </task>
     <task id="LOCAL-01442" summary="stashing milk">
       <option name="closed" value="true" />
@@ -1164,7 +1157,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739385345954</updated>
     </task>
-    <option name="localTasksCounter" value="1490" />
+    <task id="LOCAL-01490" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1739388018636</created>
+      <option name="number" value="01490" />
+      <option name="presentableId" value="LOCAL-01490" />
+      <option name="project" value="LOCAL" />
+      <updated>1739388018636</updated>
+    </task>
+    <option name="localTasksCounter" value="1491" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1240,10 +1241,10 @@
     <MESSAGE value="stashing vessels" />
     <MESSAGE value="polygon decomposition working" />
     <MESSAGE value="trivial packing algorithm working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="spritebatch working" />
     <MESSAGE value="spritebatch done" />
-    <option name="LAST_COMMIT_MESSAGE" value="spritebatch done" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

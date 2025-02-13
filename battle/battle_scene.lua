@@ -2001,6 +2001,10 @@ end
 
 --- @brief
 function bt.BattleScene:_handle_button_pressed(which)
+
+    self:set_scene_state(bt.SceneState.SIMULATION)
+    self._text_box:append("So it would be regular text, <shake>shakey text</shake>, <wave>wavey text</wave>, and nice typewrite like this, along with dynamic wrapping.\n In addition, my engine can do <b>bold</b>, <i>italic</i>, <mono>monospace</mono>, <rainbow><b>RAINBOW</b></rainbow> and even <outline_color=WHITE><color=BLACK><b>outlined text</b></color></outline_color>, but this requires love12, my label class is also >2k lines long lol")
+
     local state = self._scene_state
     if state == bt.SceneState.INSPECT then
         if self._text_box_scroll_mode_active then
