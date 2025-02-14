@@ -1,10 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="8" nextobjectid="44">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="9" nextobjectid="44">
  <editorsettings>
   <export target="debug_stage.lua" format="lua"/>
  </editorsettings>
  <tileset firstgid="1" source="../tilesets/debug_tileset.tsx"/>
  <tileset firstgid="69" source="../tilesets/debug_tileset_objects.tsx"/>
+ <imagelayer id="8" name="Image Layer 1" offsetx="856.706" offsety="16.9981" parallaxx="2" repeatx="1" repeaty="1">
+  <image source="../sprites/why_scaled.png" width="480" height="480"/>
+ </imagelayer>
  <layer id="4" name="Ground" width="57" height="37">
   <data encoding="csv">
    <chunk x="0" y="0" width="16" height="16">
@@ -325,7 +328,7 @@
     <property name="file_property" type="file" value="../../../../../../Program Files/Tiled/LICENSE.APACHE.txt"/>
     <property name="float_property" type="float" value="1.23"/>
     <property name="int_property" type="int" value="123"/>
-    <property name="object_property" type="object" value="14"/>
+    <property name="object_property" type="object" value="31"/>
     <property name="string_property" value="test"/>
    </properties>
    <point/>

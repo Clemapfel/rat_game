@@ -24,6 +24,8 @@
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/noba2.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba2.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -770,6 +772,7 @@
       <workItem from="1739393889858" duration="413000" />
       <workItem from="1739395342289" duration="7373000" />
       <workItem from="1739490946465" duration="1905000" />
+      <workItem from="1739564696649" duration="6000000" />
     </task>
     <task id="LOCAL-01443" summary="stashing separate update">
       <option name="closed" value="true" />

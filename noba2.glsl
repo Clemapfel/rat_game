@@ -33,7 +33,6 @@ float gradient_noise(vec3 p) {
     dot( -1 + 2 * random_3d(i + vec3(1.0,1.0,1.0)), v - vec3(1.0,1.0,1.0)), u.x), u.y), u.z );
 }
 
-
 vec2 rotate(vec2 v, float angle) {
     float s = sin(angle);
     float c = cos(angle);
@@ -45,30 +44,51 @@ float project(float lower, float upper, float value)
     return value * abs(upper - lower) + min(lower, upper);
 }
 
-// Function to generate a periodic circular wave with every second period flipped
-float circular_wave(float x) {
-    return sin(acos(2 * x));
+float circle_wave(in vec2 position, in float theta_base, in float radius, float offset) {
+
+    // adapted from: https://www.shadertoy.com/view/stGyzt
+
+    theta_base = PI * max(theta_base, 0.0001);
+    vec2 circle_origin = radius * vec2(sin(theta_base), cos(theta_base));
+
+    position.x = abs(mod(position.x, circle_origin.x * 4.0) - circle_origin.x * 2.0);
+    vec2 position1 = position;
+    vec2 position2 = vec2(abs(position.x - 2.0 * circle_origin.x), -position.y + 2.0 * circle_origin.y);
+    float distance1 = ((circle_origin.y * position1.x > circle_origin.x * position1.y) ? length(position1 - circle_origin) : abs(length(position1) - radius));
+    float distance2 = ((circle_origin.y * position2.x > circle_origin.x * position2.y) ? length(position2 - circle_origin) : abs(length(position2) - radius));
+    return min(distance1, distance2);
 }
 
-vec4 effect(vec4 color, Image image, vec2 uv, vec2 screen_cords)
-{
-    float eps = 0.02;
-    float stretch = (1 + 2 * eps) * sin(time);
-    float line_width = 0.8;
+float sine_wave(float x, float frequency) {
+    return (sin(2.0 * PI * x * frequency - PI / 2.0) + 1.0) * 0.5;
+}
 
-    const float n_lines = 5;
-    uv *= n_lines * 2;
-    //uv += time / 1.5;
+vec4 effect(vec4 color, Image image, vec2 uv, vec2 screen_cords) {
 
-    //uv.x += time;
-    float line_x = uv.y;
-    float direction = (mod(floor(uv.x / 2), 2.0)) * 2.0 - 1.0;
-    line_x += (direction > 0 ? 1 : 0) * PI;
+    float eps = 0.002;
+    float line_width = 0.058;
+    int n_lines = 4;
+    float offset = sin(time / 3) * 0.1;
+    float amplitude = 0.3;
+    float frequency = 0.1;
 
-    float line_y = stretch * (circular_wave(line_x) / 2) + 1;
+    uv *= 1;
+    uv = rotate(uv, 0.1 * PI);
+    uv.x += time / 40.0;
 
-    float line = smoothstep(line_width - eps, line_width + eps, distance(fract(uv.x / 2) * 2, line_y));
+    float repeat_index = floor(uv.x * n_lines);
+    float y_offset = time / 30;
+    if (mod(repeat_index, 2.0) == 1.0) {
+        uv.x = 1 - uv.x;
+        //uv.x += y_offset;
+    }
+    else {
+        //uv.x += y_offset;
+    }
 
-    return vec4(smoothstep(-0.05, 0.05, distance(fract(uv.y), circular_wave(uv.x))));
-  //  return vec4(mix(color_dark, color_light, line), 1);
+    uv.x = fract(uv.x * n_lines) / n_lines;
+    uv.x -= line_width * 1.1;
+
+    float value = smoothstep(line_width - eps, line_width + eps, circle_wave(uv.yx, amplitude, frequency, sin(time)));
+    return vec4(mix(color_dark, color_light, value), 1);
 }

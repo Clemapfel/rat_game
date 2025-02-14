@@ -14,11 +14,22 @@ love.load = function()
     shader = love.graphics.newShader(shader_path)
     palette = love.graphics.newImage("noba_palette.png")
     palette:setFilter("linear")
+
+
+    label = rt.Label("<outline_color=BLACK><wave><rainbow><b>SHADERS</b></rainbow></wave></outline_color>", rt.settings.font.default_huge)
+    label:realize()
+    label:set_justify_mode(rt.JustifyMode.CENTER)
+    local label_w, label_h = label:measure()
+
+    local w, h =  love.graphics.getDimensions();
+    label:fit_into(0, 0.5 * h - 0.5 * label_h, w, h)
+
 end
 
 love.update = function(delta)
     elapsed = elapsed + delta
     time_since_last_pulse = time_since_last_pulse + delta
+    label:update(delta)
 end
 
 love.draw = function()
@@ -35,6 +46,8 @@ love.draw = function()
         love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
         love.graphics.setShader(nil)
     end
+
+    label:draw()
 end
 
 love.keypressed = function(which)
