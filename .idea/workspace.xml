@@ -23,11 +23,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
-      <change afterPath="$PROJECT_DIR$/noba2.glsl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/battle/battle_scene.lua" beforeDir="false" afterPath="$PROJECT_DIR$/battle/battle_scene.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba.glsl" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/noba_main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/noba2.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba2.glsl" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,7 +138,7 @@
     &quot;deletionFromPopupRequiresConfirmation&quot;: &quot;false&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/moth&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/cleme/Workspace/luasocket&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
@@ -771,15 +768,8 @@
       <workItem from="1739121245177" duration="34969000" />
       <workItem from="1739373520150" duration="14949000" />
       <workItem from="1739393889858" duration="413000" />
-      <workItem from="1739395342289" duration="7166000" />
-    </task>
-    <task id="LOCAL-01442" summary="stashing milk">
-      <option name="closed" value="true" />
-      <created>1737580771985</created>
-      <option name="number" value="01442" />
-      <option name="presentableId" value="LOCAL-01442" />
-      <option name="project" value="LOCAL" />
-      <updated>1737580771985</updated>
+      <workItem from="1739395342289" duration="7373000" />
+      <workItem from="1739490946465" duration="1905000" />
     </task>
     <task id="LOCAL-01443" summary="stashing separate update">
       <option name="closed" value="true" />
@@ -1165,7 +1155,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739388018636</updated>
     </task>
-    <option name="localTasksCounter" value="1491" />
+    <task id="LOCAL-01491" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1739470519445</created>
+      <option name="number" value="01491" />
+      <option name="presentableId" value="LOCAL-01491" />
+      <option name="project" value="LOCAL" />
+      <updated>1739470519445</updated>
+    </task>
+    <option name="localTasksCounter" value="1492" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
