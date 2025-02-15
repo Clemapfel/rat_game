@@ -26,11 +26,6 @@ local _get = function(t, name)
     return out
 end
 
--- tiled uses bottom right origin and degrees, convert to rads with top left origin
-local function _convert_angle(angle_dg)
-    return (2 * math.pi) - math.deg(angle_dg)
-end
-
 --- @brief parse tile object group, of tile or object layer
 function ow.parse_tiled_object_group(object_group)
     local is_solid_name = rt.settings.overworld.tiled.is_solid_property_name
@@ -43,7 +38,7 @@ function ow.parse_tiled_object_group(object_group)
         local to_push = {
             tiled_id = _get(object, "id"),
             name = _get(object, "name"),
-            class = _get(object, "type"),
+            class = _get(object, "type"), -- sic
             is_visible = _get(object, "visible") and group_visible,
             properties = {}
         }
@@ -57,7 +52,7 @@ function ow.parse_tiled_object_group(object_group)
             end
         end
 
-        to_push.rotation = _convert_angle(_get(object, "rotation"))
+        to_push.rotation = math.rad(_get(object, "rotation"))
 
         if object.gid ~= nil then -- sprite
             assert(object.shape == "rectangle", "In ow.parse_tiled_object: object has gid, but is not a rectangle")
@@ -68,18 +63,25 @@ function ow.parse_tiled_object_group(object_group)
 
             to_push.type = ow.ObjectType.SPRITE
             to_push.gid = true_gid
-            to_push.top_left_x = x - height + group_offset_x -- tiled uses bottom left
-            to_push.top_left_y = y + group_offset_y
+            to_push.top_left_x = x + group_offset_x
+            to_push.top_left_y = y - height + group_offset_y -- tiled uses bottom left
             to_push.width = width
             to_push.height = height
+            to_push.flip_vertically = false --flip_vertically
+            to_push.flip_horizontally = false --TODOflip_horizontally
+            to_push.origin_x = x
+            to_push.origin_y = y
         else
             local shape_type = _get(object, "shape")
             if shape_type == "rectangle" then
+                local x, y = _get(object, "x"), _get(object, "y")
                 to_push.type = ow.ObjectType.RECTANGLE
-                to_push.top_left_x = _get(object, "x") + group_offset_y -- top left
-                to_push.top_left_y = _get(object, "y") + group_offset_y
+                to_push.top_left_x = x + group_offset_y -- top left
+                to_push.top_left_y = y + group_offset_y
                 to_push.width = _get(object, "width")
                 to_push.height = _get(object, "height")
+                to_push.origin_x = x
+                to_push.origin_y = y
             elseif shape_type == "ellipse" then
                 local x = _get(object, "x") + group_offset_x
                 local y = _get(object, "y") + group_offset_y
@@ -91,21 +93,40 @@ function ow.parse_tiled_object_group(object_group)
                 to_push.center_y = y + 0.5 * height
                 to_push.x_radius = 0.5 * width
                 to_push.y_radius = 0.5 * height
+                to_push.origin_x = x
+                to_push.origin_y = y
             elseif shape_type == "polygon" then
                 local vertices = {}
                 local offset_x, offset_y = _get(object, "x"), _get(object, "y")
+
+                local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
+                local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
+
                 for vertex in values(_get(object, "polygon")) do
-                    table.insert(vertices, _get(vertex, "x") + offset_x + group_offset_x)
-                    table.insert(vertices, _get(vertex, "y") + offset_y + group_offset_y)
+                    local x, y = _get(vertex, "x"), _get(vertex, "y")
+                    table.insert(vertices, x + offset_x + group_offset_x)
+                    table.insert(vertices, y + offset_y + group_offset_y)
+
+                    min_x = math.min(min_x, x)
+                    max_x = math.max(max_x, x)
+                    min_y = math.min(min_y, y)
+                    max_y = math.max(max_y, y)
                 end
 
                 to_push.type = ow.ObjectType.POLYGON
                 to_push.vertices = vertices
                 to_push.shapes = ow.decompose_polygon(vertices)
+                to_push.origin_x = offset_x
+                to_push.origin_y = offset_y
+                to_push.flip_origin_x = min_x + 0.5 * (max_x - min_x)
+                to_push.flip_origin_y = min_y + 0.5 * (max_y - min_y)
             elseif shape_type == "point" then
+                local x, y = _get(object, "x"),  _get(object, "y")
                 to_push.type = ow.ObjectType.POINT
-                to_push.x = _get(object, "x") + group_offset_x
-                to_push.y = _get(object, "y") + group_offset_y
+                to_push.x = x + group_offset_x
+                to_push.y = y + group_offset_y
+                to_push.origin_x = x
+                to_push.origin_y = y
                 if object.rotation ~= nil then assert(object.rotation == 0) end
             end
         end

@@ -22,11 +22,20 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing circle wave">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/Frame010.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset/Frame010.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/noba2.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/noba2.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/stage_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/tiled_object.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tiled_object.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld/tileset_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/overworld_main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld_main.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -170,7 +179,7 @@
       <recent name="C:\Users\cleme\Workspace\rat_game\old_main" />
     </key>
   </component>
-  <component name="RunManager" selected="Lua Application.main_noba">
+  <component name="RunManager" selected="Lua Application.main_overworld">
     <configuration name="love-dbg" type="CLionExternalRunConfiguration" factoryName="Application" PROGRAM_PARAMS="main.lua" REDIRECT_INPUT="false" ELEVATE="false" USE_EXTERNAL_CONSOLE="false" EMULATE_TERMINAL="false" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="rat_game" TARGET_NAME="Unnamed" CONFIG_NAME="Unnamed" RUN_PATH="$PROJECT_DIR$/love/windows/love.exe">
       <method v="2">
         <option name="CLION.EXTERNAL.BUILD" enabled="true" />
@@ -772,15 +781,7 @@
       <workItem from="1739393889858" duration="413000" />
       <workItem from="1739395342289" duration="7373000" />
       <workItem from="1739490946465" duration="1905000" />
-      <workItem from="1739564696649" duration="6000000" />
-    </task>
-    <task id="LOCAL-01443" summary="stashing separate update">
-      <option name="closed" value="true" />
-      <created>1737655269295</created>
-      <option name="number" value="01443" />
-      <option name="presentableId" value="LOCAL-01443" />
-      <option name="project" value="LOCAL" />
-      <updated>1737655269296</updated>
+      <workItem from="1739564696649" duration="16861000" />
     </task>
     <task id="LOCAL-01444" summary="stashing, lighting done">
       <option name="closed" value="true" />
@@ -1166,7 +1167,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739470519445</updated>
     </task>
-    <option name="localTasksCounter" value="1492" />
+    <task id="LOCAL-01492" summary="stashing circle wave">
+      <option name="closed" value="true" />
+      <created>1739570939437</created>
+      <option name="number" value="01492" />
+      <option name="presentableId" value="LOCAL-01492" />
+      <option name="project" value="LOCAL" />
+      <updated>1739570939437</updated>
+    </task>
+    <option name="localTasksCounter" value="1493" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1220,7 +1229,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="stashing before extracting fireworks" />
     <MESSAGE value="fireworks done" />
     <MESSAGE value="moved init to compute shader" />
     <MESSAGE value="stashing sort by angle" />
@@ -1245,7 +1253,8 @@
     <MESSAGE value="spritebatch working" />
     <MESSAGE value="spritebatch done" />
     <MESSAGE value="stashing" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
+    <MESSAGE value="stashing circle wave" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing circle wave" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1285,6 +1294,11 @@
           <url>file://$PROJECT_DIR$/common/widget.lua</url>
           <line>87</line>
           <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="lua-line">
+          <url>file://$PROJECT_DIR$/common/serialize.lua</url>
+          <line>107</line>
+          <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="NONE" type="CMakeLineBreakpoint">
           <url>file://$PROJECT_DIR$/physics/box2d_extension/CMakeLists.txt</url>

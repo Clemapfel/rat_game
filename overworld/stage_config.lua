@@ -1,5 +1,6 @@
 rt.settings.overworld.stage_config = {
-    config_path = "assets/stages"
+    config_path = "assets/stages",
+    hitbox_class_name = "Hitbox"
 }
 
 --[[
@@ -68,7 +69,6 @@ function ow.StageConfig:realize()
     self._tile_height = _get(config, "tileheight")
     self._n_columns = _get(config, "width")
     self._n_rows = _get(config, "height")
-
 
     -- init tilesets
     self._tilesets = {}
@@ -188,7 +188,6 @@ end
 function ow.StageConfig:_construct_spritebatches()
     self._layer_i_to_tileset_to_spritebatch = {}
     for layer_i, layer in pairs(self._layer_i_to_layer) do
-
         local tileset_to_spritebatch = {}
         self._layer_i_to_tileset_to_spritebatch[layer_i] = tileset_to_spritebatch
 
@@ -219,7 +218,211 @@ function ow.StageConfig:_construct_spritebatches()
                     current_x = current_x + self._tile_width
                 end
                 current_y = current_y + self._tile_height
+                current_x = 0
             end
+        end
+    end
+end
+
+--- @brief
+function ow.StageConfig:_construct_object_sprites()
+    self._layer_i_to_object_spritebatches = {}
+    for layer_i, layer in pairs(self._layer_i_to_layer) do
+        if layer.type == ow.LayerType.OBJECTS then
+            local batches = {}
+            local bounds = {}
+            self._layer_i_to_object_spritebatches[layer_i] = {
+                batches = batches,
+                bounds = bounds
+            }
+
+            -- group subsequent sprites of same tileset to batches
+            -- but 1:1 tileset to batches is not possible, it would violate render order
+            local last_tileset = nil
+            local current_batch = nil
+            for object in values(layer.objects) do
+                if object.type == ow.ObjectType.SPRITE then
+                    local entry = self._gid_to_tileset_tile[object.gid]
+                    local tileset = entry.tileset
+
+                    if tileset ~= last_tileset then
+                        last_tileset = tileset
+                        current_batch = ow.SpriteBatch(tileset:get_texture())
+                        table.insert(batches, current_batch)
+                    end
+
+                    local local_id = entry.id
+                    local texture_x, texture_y, texture_w, texture_h = tileset:get_texture_bounds(local_id)
+                    current_batch:add(
+                        object.top_left_x, object.top_left_y, object.width, object.height,
+                        texture_x, texture_y, texture_w, texture_h,
+                        object.flip_horizontally, object.flip_vertically, object.rotation
+                    )
+
+                    table.insert(bounds, {
+                        object.top_left_x, object.top_left_y, object.width, object.height
+                    })
+                end
+            end
+        end
+    end
+end
+
+ow.PhysicsShapeType = meta.new_enum("PhysicsShapeType", {
+    CIRCLE = "circle",
+    POLYGON = "polygon"
+})
+
+--- @brief
+function ow.StageConfig:_construct_hitboxes()
+    local hitbox_class = rt.settings.overworld.stage_config.hitbox_class_name
+
+    local function _process_polygon(vertices, angle, origin_x, origin_y, offset_x, offset_y)
+        local cos_angle = math.cos(angle)
+        local sin_angle = math.sin(angle)
+
+        local out = {}
+        for i = 1, #vertices, 2 do
+            local x, y = vertices[i], vertices[i + 1]
+
+            x = x - origin_x
+            y = y - origin_y
+
+            local new_x = x * cos_angle - y * sin_angle
+            local new_y = x * sin_angle + y * cos_angle
+
+            new_x = new_x + origin_x
+            new_y = new_y + origin_y
+
+            table.insert(out, new_x + offset_x)
+            table.insert(out, new_y + offset_y)
+        end
+
+        return out
+    end
+    
+    self._layer_i_to_physics_shapes = {}
+    for layer_i, layer in pairs(self._layer_i_to_layer) do
+        local objects = {}
+
+        -- collect hitbox objects
+        if layer.type == ow.LayerType.TILES then
+            local current_x, current_y = 0, 0
+            for row_i = 1, self._n_rows do
+                for col_i = 1, self._n_columns do
+                    local gid = layer.gid_matrix:get(col_i, row_i)
+                    if gid ~= nil then
+                        local entry = self._gid_to_tileset_tile[gid]
+                        local tile_objects = entry.tileset:get_tile_objects(entry.id)
+                        for object in values(tile_objects) do
+                            if object.class == hitbox_class then
+                                table.insert(objects, {
+                                    object = object,
+                                    offset_x = current_x,
+                                    offset_y = current_y
+                                })
+                            end
+                        end
+                    end
+                    current_x = current_x + self._tile_width
+                end
+                current_y = current_y + self._tile_height
+                current_x = 0
+            end
+        elseif layer.type == ow.LayerType.OBJECTS then
+            for object in values(layer.objects) do
+                if object.class == hitbox_class then
+                    table.insert(objects, {
+                        object = object,
+                        offset_x = 0,
+                        offset_y = 0
+                    })
+                end
+
+                --[[
+                if object.type == ow.ObjectType.SPRITE then
+                    local gid = object.gid
+                    local entry = self._gid_to_tileset_tile[gid]
+                    local tile_objects = entry.tileset:get_tile_objects(entry.id)
+                    for tile_object in values(tile_objects) do
+                        if tile_object.class == hitbox_class then
+                            table.insert(objects, {
+                                object = tile_object,
+                                offset_x = object.top_left_x,
+                                offset_y = object.top_left_y,
+                                flip_horizontally = object.flip_horizontally,
+                                flip_vertically = object.flip_vertically
+                            })
+                        end
+                    end
+                end
+                ]]--
+            end
+        end
+
+        -- convert to physics shapes
+        local shapes = {}
+        for entry in values(objects) do
+            local object = entry.object
+            local offset_x, offset_y = entry.offset_x, entry.offset_y
+            if object.type == ow.ObjectType.RECTANGLE then
+                local x, y = object.top_left_x, object.top_left_y
+                local w, h = object.width, object.height
+
+                table.insert(shapes, {
+                    type = ow.PhysicsShapeType.POLYGON,
+                    vertices = _process_polygon({
+                            x, y,
+                            x + w, y,
+                            x + w, y + h,
+                            x, y + h
+                        },
+                        object.rotation, object.origin_x, object.origin_y,
+                        offset_x, offset_y
+                    );
+                })
+            elseif object.type == ow.ObjectType.ELLIPSE then
+                local xy = _process_polygon(
+                    {
+                        object.center_x,
+                        object.center_y
+                    },
+                    object.rotation, object.origin_x, object.origin_x,
+                    offset_x, offset_y
+                )
+                table.insert(shapes, {
+                    type = ow.PhysicsShapeType.CIRCLE,
+                    x = xy[1],
+                    y = xy[2],
+                    radius = math.max(object.x_radius, object.y_radius)
+                })
+
+                if object.x_radius ~= object.y_radius then
+                    rt.warning("In ow.StageConfig._construct_physics_shape: layer `" .. layer_i .. "` has object with elliptical shape, which is not support in box2d, use a circle instead")
+                end
+            elseif object.type == ow.ObjectType.POLYGON then
+                for vertices in values(object.shapes) do
+                    table.insert(shapes, {
+                        type = ow.PhysicsShapeType.POLYGON,
+                        vertices = _process_polygon(
+                            vertices,
+                            object.rotation,
+                            object.origin_x,
+                            object.origin_y,
+                            offset_x,
+                            offset_y
+                        )
+                    })
+                end
+            elseif object.type == ow.ObjectType.POINT then
+                rt.warning("In ow.StageConfig._construct_physics_shape: layer `" .. layer_i .. "` has point object with hitbox, it will be ignored")
+            end
+        end
+
+        if sizeof(shapes) > 0 then
+            self._layer_i_to_physics_shapes[layer_i] = {
+                shapes = shapes
+            }
         end
     end
 end
@@ -228,8 +431,38 @@ end
 function ow.StageConfig:draw()
     for i = 1, self._n_layers do
         local entry = self._layer_i_to_tileset_to_spritebatch[i]
-        for _, batch in pairs(entry) do
-            batch:draw()
+        if entry ~= nil then
+            for _, batch in pairs(entry) do
+                batch:draw()
+            end
+        end
+
+        entry = self._layer_i_to_object_spritebatches[i]
+        if entry ~= nil then
+            for batch in values(entry.batches) do
+                batch:draw()
+            end
+        end
+    end
+
+    -- debug draw:
+    for i = 1, self._n_layers do
+        local entry = self._layer_i_to_object_spritebatches[i]
+        if entry ~= nil then
+            for aabb in values(entry.bounds) do
+                love.graphics.rectangle("line", table.unpack(aabb))
+            end
+        end
+
+        entry = self._layer_i_to_physics_shapes[i]
+        if entry ~= nil then
+            for shape in values(entry.shapes) do
+                if shape.type == ow.PhysicsShapeType.CIRCLE then
+                    love.graphics.circle("line", shape.x, shape.y, shape.radius, shape.radius)
+                elseif shape.type == ow.PhysicsShapeType.POLYGON then
+                    love.graphics.polygon("line", shape.vertices)
+                end
+            end
         end
     end
 end

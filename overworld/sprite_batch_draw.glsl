@@ -44,10 +44,10 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     );
     vec2 offset = position_offsets[vertex_i];
 
-    vec2 center = sprite.top_left + (sprite.bottom_right - sprite.top_left) / 2;
-    offset -= center;
+    vec2 origin = sprite.bottom_left; // tiled uses bottom left origin for sprites
+    offset -= origin;
     offset = rotate(offset, sprite.angle);
-    offset += center;
+    offset += origin;
     vertex_position.xy += offset;
 
     vec2 texture_offsets[4] = vec2[4](
@@ -58,11 +58,13 @@ vec4 position(mat4 transform_projection, vec4 vertex_position)
     );
     texture_coords = texture_offsets[vertex_i];
 
-    if (sprite.flip_horizontally)
-        texture_coords.x = 1 - texture_coords.x;
+    if (sprite.flip_horizontally) {
+        texture_coords.x = sprite.texture_top_right.x - (texture_coords.x - sprite.texture_top_left.x);
+    }
 
-    if (sprite.flip_vertically)
-        texture_coords.y = 1 - texture_coords.y;
+    if (sprite.flip_vertically) {
+        texture_coords.y = sprite.texture_bottom_left.y - (texture_coords.y - sprite.texture_top_left.y);
+    }
 
     return transform_projection * vertex_position;
 }

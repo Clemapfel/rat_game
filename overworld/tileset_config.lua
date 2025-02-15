@@ -207,6 +207,16 @@ function ow.TilesetConfig:get_tile_property(id, property_name)
 end
 
 --- @brief
+function ow.TilesetConfig:get_tile_objects(id)
+    local tile = self._tiles[id]
+    if tile == nil then
+        rt.error("In ow.TilesetConfig.get_tile_property: no tile with id `" .. id .. "` in tileset `" .. self._id .. "`")
+        return nil
+    end
+    return tile.objects
+end
+
+--- @brief
 function ow.TilesetConfig:get_n_tiles()
     return self._n_tiles
 end

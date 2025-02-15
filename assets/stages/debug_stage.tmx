@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="9" nextobjectid="44">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="9" nextobjectid="50">
  <editorsettings>
   <export target="debug_stage.lua" format="lua"/>
  </editorsettings>
@@ -357,6 +357,13 @@
     <property name="next" type="object" value="37"/>
    </properties>
    <point/>
+  </object>
+  <object id="44" type="Hitbox" x="247.04" y="-160.519" width="147.996" height="97.9053" rotation="-5">
+   <ellipse/>
+  </object>
+  <object id="45" type="Hitbox" x="478.142" y="-211.749" width="224.271" height="108.151" rotation="7"/>
+  <object id="46" type="Hitbox" x="798.042" y="-72.8597" rotation="30">
+   <polygon points="0,0 265.255,-102.459 59.1985,-125.228 58.0601,-91.0747 -34.153,-95.6284"/>
   </object>
  </objectgroup>
  <objectgroup draworder="index" id="5" name="Object Layer 2">

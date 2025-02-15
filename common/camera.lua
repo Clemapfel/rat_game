@@ -12,11 +12,9 @@ rt.settings.camera = {
 }
 
 --- @class rt.Camera
-rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function(state)
-    meta.assert_isa(state, rt.GameState)
+rt.Camera = meta.new_type("Camera", rt.Drawable, rt.Updatable, function()
     local aabb = rt.AABB(0, 0, love.graphics.getWidth(), love.graphics.getHeight())
     local out = meta.new(rt.Camera, {
-        _state = state,
         _aabb = aabb,
 
         _current_x = aabb.x + 0.5 * aabb.width,

@@ -36,6 +36,7 @@ function ow.SpriteBatch._params_to_data(x, y, w, h, tx, ty, tw, th, flip_horizon
 end
 
 --- @brief
+--- @param rotation radians rotates bottom left corner
 --- @return
 function ow.SpriteBatch:add(x, y, w, h, tx, ty, tw, th, flip_horizontally, flip_vertically, angle)
     meta.assert_number(x, y, w, h, tx, ty, tw, th)
