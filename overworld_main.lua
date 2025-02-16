@@ -11,8 +11,18 @@ config:_construct_hitboxes()
 local offset_x, offset_y = 0, 0
 local scale = 1
 
+love.load = function()
+    love.window.updateMode(
+        1600 / 1.5,
+        800 / 1.5
+    )
+end
+
 love.draw = function()
     local w, h = love.graphics.getDimensions()
+    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.rectangle("fill", 0, 0, w, h)
+
     love.graphics.push()
     love.graphics.origin()
     love.graphics.translate(0.5 * w, 0.5 * h)
@@ -21,6 +31,8 @@ love.draw = function()
     love.graphics.translate(offset_x, offset_y)
     config:draw()
     love.graphics.pop()
+
+    --tileset:draw()
 end
 
 local scroll_margin_factor = 0.1
@@ -30,6 +42,15 @@ local mouse_active = false
 
 love.mousefocus = function(b)
     mouse_active = b
+end
+
+love.keypressed = function(which)
+    if which == "space" then
+        config:realize()
+        config:_construct_spritebatches()
+        config:_construct_object_sprites()
+        config:_construct_hitboxes()
+    end
 end
 
 love.update = function(delta)

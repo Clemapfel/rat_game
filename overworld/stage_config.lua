@@ -30,7 +30,8 @@ ow.StageConfig._atlas = {}
 
 ow.LayerType = meta.new_enum("LayerType", {
     TILES = "tilelayer",
-    OBJECTS = "objectlayer"
+    OBJECTS = "objectlayer",
+    IMAGE = "imagelayer"
 })
 
 --- @brief
@@ -159,8 +160,7 @@ function ow.StageConfig:realize()
             to_add.type = ow.LayerType.OBJECTS
             to_add.objects = ow.parse_tiled_object_group(layer)
         elseif layer_type == "imagelayer" then
-            -- noop
-            rt.warning("In ow.StageConfig.realizue: layer type `imagelayer` of stage `" .. self._id .. "` is not supported")
+            rt.warning("In ow.StageConfig.realize: layer type `imagelayer` is not supported")
         else
             rt.error("In ow.StageConfig.realize: unhandled layer type `" .. layer_type .. "of stage `" .. self._id .. "` is not supported")
         end
@@ -258,10 +258,6 @@ function ow.StageConfig:_construct_object_sprites()
                         texture_x, texture_y, texture_w, texture_h,
                         object.flip_horizontally, object.flip_vertically, object.rotation
                     )
-
-                    table.insert(bounds, {
-                        object.top_left_x, object.top_left_y, object.width, object.height
-                    })
                 end
             end
         end
@@ -277,13 +273,23 @@ ow.PhysicsShapeType = meta.new_enum("PhysicsShapeType", {
 function ow.StageConfig:_construct_hitboxes()
     local hitbox_class = rt.settings.overworld.stage_config.hitbox_class_name
 
-    local function _process_polygon(vertices, angle, origin_x, origin_y, offset_x, offset_y)
+    local function _process_polygon(vertices, angle, origin_x, origin_y, offset_x, offset_y, flip_horizontally, flip_vertically, flip_origin_x, flip_origin_y)
+        if flip_horizontally == nil then flip_horizontally = false end
+        if flip_vertically == nil then flip_vertically = false end
+
         local cos_angle = math.cos(angle)
         local sin_angle = math.sin(angle)
 
         local out = {}
         for i = 1, #vertices, 2 do
             local x, y = vertices[i], vertices[i + 1]
+
+            if flip_horizontally == true then
+                x = 2 * flip_origin_x - x
+            end
+            if flip_vertically == true then
+                y = 2 * flip_origin_y - y
+            end
 
             x = x - origin_x
             y = y - origin_y
@@ -339,7 +345,6 @@ function ow.StageConfig:_construct_hitboxes()
                     })
                 end
 
-                --[[
                 if object.type == ow.ObjectType.SPRITE then
                     local gid = object.gid
                     local entry = self._gid_to_tileset_tile[gid]
@@ -350,13 +355,20 @@ function ow.StageConfig:_construct_hitboxes()
                                 object = tile_object,
                                 offset_x = object.top_left_x,
                                 offset_y = object.top_left_y,
+
+                                -- additional sprite-only transforms
+                                is_sprite = true,
+                                rotation_origin_x = 0,
+                                rotation_origin_y = object.height,
                                 flip_horizontally = object.flip_horizontally,
-                                flip_vertically = object.flip_vertically
+                                flip_vertically = object.flip_vertically,
+                                flip_origin_x = object.flip_origin_x,
+                                flip_origin_y = object.flip_origin_y,
+                                rotation = object.rotation
                             })
                         end
                     end
                 end
-                ]]--
             end
         end
 
@@ -365,6 +377,11 @@ function ow.StageConfig:_construct_hitboxes()
         for entry in values(objects) do
             local object = entry.object
             local offset_x, offset_y = entry.offset_x, entry.offset_y
+            local rotation_offset = 0
+            local is_sprite = entry.is_sprite == true
+
+            if entry.rotation ~= nil then rotation_offset = entry.rotation end
+
             if object.type == ow.ObjectType.RECTANGLE then
                 local x, y = object.top_left_x, object.top_left_y
                 local w, h = object.width, object.height
@@ -377,41 +394,135 @@ function ow.StageConfig:_construct_hitboxes()
                             x + w, y + h,
                             x, y + h
                         },
-                        object.rotation, object.origin_x, object.origin_y,
-                        offset_x, offset_y
+                        object.rotation + rotation_offset,
+                        object.origin_x,
+                        object.origin_y,
+                        offset_x, offset_y,
+                        entry.flip_horizontally,
+                        entry.flip_vertically,
+                        entry.flip_origin_x,
+                        entry.flip_origin_y
                     );
                 })
             elseif object.type == ow.ObjectType.ELLIPSE then
-                local xy = _process_polygon(
-                    {
+                local is_circle = math.abs(object.x_radius - object.y_radius) < 1
+                if is_circle then
+                    local vertices = {
                         object.center_x,
                         object.center_y
-                    },
-                    object.rotation, object.origin_x, object.origin_x,
-                    offset_x, offset_y
-                )
-                table.insert(shapes, {
-                    type = ow.PhysicsShapeType.CIRCLE,
-                    x = xy[1],
-                    y = xy[2],
-                    radius = math.max(object.x_radius, object.y_radius)
-                })
+                    }
 
-                if object.x_radius ~= object.y_radius then
-                    rt.warning("In ow.StageConfig._construct_physics_shape: layer `" .. layer_i .. "` has object with elliptical shape, which is not support in box2d, use a circle instead")
-                end
-            elseif object.type == ow.ObjectType.POLYGON then
-                for vertices in values(object.shapes) do
+                    vertices = _process_polygon(
+                        vertices,
+                        object.rotation,
+                        object.origin_x,
+                        object.origin_y,
+                        ternary(is_sprite, 0, offset_x),
+                        ternary(is_sprite, 0, offset_y)
+                    )
+
+                    if is_sprite then
+                        vertices = _process_polygon(
+                            vertices,
+                            rotation_offset,
+                            entry.rotation_origin_x,
+                            entry.rotation_origin_y,
+                            offset_x, offset_y,
+                            entry.flip_horizontally,
+                            entry.flip_vertically,
+                            entry.flip_origin_x,
+                            entry.flip_origin_y
+                        )
+                    end
+
                     table.insert(shapes, {
-                        type = ow.PhysicsShapeType.POLYGON,
+                        type = ow.PhysicsShapeType.CIRCLE,
+                        x = vertices[1],
+                        y = vertices[2],
+                        radius = math.max(object.x_radius, object.y_radius)
+                    })
+                else
+                    -- box2d does not support ellipses, so construct one series of polygons
+                    local triangles = {}
+                    local center_x, center_y = object.center_x, object.center_y
+                    local x_radius, y_radius = object.x_radius, object.y_radius
+                    local n_outer_vertices = 16
+
+                    local angle_step = (2 * math.pi) / n_outer_vertices
+                    for i = 0, n_outer_vertices - 1 do
+                        local angle1 = i * angle_step
+                        local angle2 = (i + 1) * angle_step
+
+                        local x1 = center_x + x_radius * math.cos(angle1)
+                        local y1 = center_y + y_radius * math.sin(angle1)
+                        local x2 = center_x + x_radius * math.cos(angle2)
+                        local y2 = center_y + y_radius * math.sin(angle2)
+                       
+                        table.insert(triangles, {
+                            x1, y1,
+                            x2, y2,
+                            center_x, center_y
+                        })
+                    end
+
+                    for vertices in values(triangles) do
                         vertices = _process_polygon(
                             vertices,
                             object.rotation,
                             object.origin_x,
                             object.origin_y,
-                            offset_x,
-                            offset_y
+                            ternary(is_sprite, 0, offset_x),
+                            ternary(is_sprite, 0, offset_y)
                         )
+
+                        if is_sprite then
+                            vertices = _process_polygon(
+                                vertices,
+                                rotation_offset,
+                                entry.rotation_origin_x,
+                                entry.rotation_origin_y,
+                                offset_x, offset_y,
+                                entry.flip_horizontally,
+                                entry.flip_vertically,
+                                entry.flip_origin_x,
+                                entry.flip_origin_y
+                            )
+                        end
+
+                        table.insert(shapes, {
+                            type = ow.PhysicsShapeType.POLYGON,
+                            vertices = vertices
+                        })
+                    end
+                end
+            elseif object.type == ow.ObjectType.POLYGON then
+                for vertices in values(object.shapes) do
+                    vertices = _process_polygon(
+                        vertices,
+                        object.rotation,
+                        object.origin_x,
+                        object.origin_y,
+                        ternary(is_sprite, 0, offset_x),
+                        ternary(is_sprite, 0, offset_y)
+                    )
+
+                    if is_sprite then
+                        vertices = _process_polygon(
+                            vertices,
+                            rotation_offset,
+                            entry.rotation_origin_x,
+                            entry.rotation_origin_y,
+                            offset_x, offset_y,
+                            entry.flip_horizontally,
+                            entry.flip_vertically,
+                            entry.flip_origin_x,
+                            entry.flip_origin_y
+                        )
+                    end
+
+                    table.insert(shapes, {
+                        type = ow.PhysicsShapeType.POLYGON,
+                        vertices = vertices
                     })
                 end
             elseif object.type == ow.ObjectType.POINT then
@@ -420,6 +531,14 @@ function ow.StageConfig:_construct_hitboxes()
         end
 
         if sizeof(shapes) > 0 then
+            for shape in values(shapes) do
+                if shape.type == ow.PhysicsShapeType.POLYGON then
+                    shape.bounds = {table.unpack(shape.vertices)}
+                    table.insert(shape.bounds, shape.bounds[1])
+                    table.insert(shape.bounds, shape.bounds[2])
+                end
+            end
+
             self._layer_i_to_physics_shapes[layer_i] = {
                 shapes = shapes
             }
@@ -443,24 +562,31 @@ function ow.StageConfig:draw()
                 batch:draw()
             end
         end
+
+        local layer = self._layer_i_to_layer[i]
+        if layer.type == ow.LayerType.IMAGE then
+            love.graphics.push()
+            love.graphics.origin()
+            layer.shader:bind()
+            love.graphics.setColor(1, 1, 1, 1)
+            love.graphics.rectangle("fill", 0, 0, love.graphics.getDimensions())
+            layer.shader:unbind()
+            love.graphics.pop()
+        end
     end
 
     -- debug draw:
+    love.graphics.setLineJoin("miter")
+    love.graphics.setLineWidth(1)
+    love.graphics.setColor(1, 1, 1, 1)
     for i = 1, self._n_layers do
-        local entry = self._layer_i_to_object_spritebatches[i]
-        if entry ~= nil then
-            for aabb in values(entry.bounds) do
-                love.graphics.rectangle("line", table.unpack(aabb))
-            end
-        end
-
-        entry = self._layer_i_to_physics_shapes[i]
+        local entry = self._layer_i_to_physics_shapes[i]
         if entry ~= nil then
             for shape in values(entry.shapes) do
                 if shape.type == ow.PhysicsShapeType.CIRCLE then
                     love.graphics.circle("line", shape.x, shape.y, shape.radius, shape.radius)
                 elseif shape.type == ow.PhysicsShapeType.POLYGON then
-                    love.graphics.polygon("line", shape.vertices)
+                    love.graphics.line(shape.bounds)
                 end
             end
         end

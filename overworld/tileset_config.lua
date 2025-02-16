@@ -168,7 +168,7 @@ function ow.TilesetConfig:realize()
         atlas_height = atlas_height + shelf_height
     end
 
-    atlas_width = max_row_width -- trim if no row is full
+    --atlas_width = max_row_width -- trim if no row is full
 
     -- paste to canvas
     self._texture_atlas = rt.RenderTexture(atlas_width, atlas_height, 0)
@@ -262,7 +262,7 @@ function ow.TilesetConfig:get_texture_bounds(id)
 end
 
 --- @brief debug drawing
-function ow.TilesetConfig:_draw(x, y)
+function ow.TilesetConfig:draw(x, y)
     if x == nil then x = 0 end
     if y == nil then y = 0 end
 
@@ -288,6 +288,10 @@ function ow.TilesetConfig:_draw(x, y)
         love.graphics.push()
         love.graphics.translate(tx, ty)
         for shape in values(tile.objects) do
+            love.graphics.push()
+            love.graphics.translate(shape.origin_x, shape.origin_y)
+            love.graphics.rotate(shape.rotation)
+            love.graphics.translate(-shape.origin_x, -shape.origin_y)
             if shape.type == ow.ObjectType.POINT then
                 love.graphics.setColor(r, g, b, line_a)
                 love.graphics.points(shape.x, shape.y)
@@ -298,9 +302,9 @@ function ow.TilesetConfig:_draw(x, y)
                 love.graphics.rectangle("line", shape.x, shape.y, shape.width, shape.height)
             elseif shape.type == ow.ObjectType.ELLIPSE then
                 love.graphics.setColor(r, g, b, fill_a)
-                love.graphics.circle("fill", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+                love.graphics.ellipse("fill", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
                 love.graphics.setColor(r, g, b, line_a)
-                love.graphics.circle("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
+                love.graphics.ellipse("line", shape.center_x, shape.center_y, shape.x_radius, shape.y_radius)
             elseif shape.type == ow.ObjectType.POLYGON then
                 for d in values(shape.shapes) do
                     love.graphics.setColor(r, g, b, fill_a)
@@ -311,6 +315,7 @@ function ow.TilesetConfig:_draw(x, y)
             else
                 rt.error("In ow.TilesetConfig._debug_draw: unhandled shape type `" .. shape.type .. "` in tileset `" .. self._id .. "`")
             end
+            love.graphics.pop()
         end
         love.graphics.pop()
     end

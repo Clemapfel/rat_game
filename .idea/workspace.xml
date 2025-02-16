@@ -22,16 +22,13 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing circle wave">
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="everythign except sprite working">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/stages/debug_stage.tmx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/Frame010.png" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset/Frame010.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset/debug_tileset.hxl" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset/debug_tileset.hxl" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/assets/tilesets/debug_tileset_objects.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/camera.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/camera.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/render_texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/sprite_batch_draw.glsl" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/texture.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld/stage_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/stage_config.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld/tiled_object.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tiled_object.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/overworld/tileset_config.lua" beforeDir="false" afterPath="$PROJECT_DIR$/overworld/tileset_config.lua" afterDir="false" />
@@ -781,15 +778,7 @@
       <workItem from="1739393889858" duration="413000" />
       <workItem from="1739395342289" duration="7373000" />
       <workItem from="1739490946465" duration="1905000" />
-      <workItem from="1739564696649" duration="16861000" />
-    </task>
-    <task id="LOCAL-01444" summary="stashing, lighting done">
-      <option name="closed" value="true" />
-      <created>1737667699705</created>
-      <option name="number" value="01444" />
-      <option name="presentableId" value="LOCAL-01444" />
-      <option name="project" value="LOCAL" />
-      <updated>1737667699706</updated>
+      <workItem from="1739564696649" duration="28510000" />
     </task>
     <task id="LOCAL-01445" summary="blood stable, stashing before sdf collision">
       <option name="closed" value="true" />
@@ -1175,7 +1164,15 @@
       <option name="project" value="LOCAL" />
       <updated>1739570939437</updated>
     </task>
-    <option name="localTasksCounter" value="1493" />
+    <task id="LOCAL-01493" summary="everythign except sprite working">
+      <option name="closed" value="true" />
+      <created>1739646726060</created>
+      <option name="number" value="01493" />
+      <option name="presentableId" value="LOCAL-01493" />
+      <option name="project" value="LOCAL" />
+      <updated>1739646726060</updated>
+    </task>
+    <option name="localTasksCounter" value="1494" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1229,7 +1226,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="fireworks done" />
     <MESSAGE value="moved init to compute shader" />
     <MESSAGE value="stashing sort by angle" />
     <MESSAGE value="stashing contour sprite morph" />
@@ -1254,7 +1250,8 @@
     <MESSAGE value="spritebatch done" />
     <MESSAGE value="stashing" />
     <MESSAGE value="stashing circle wave" />
-    <option name="LAST_COMMIT_MESSAGE" value="stashing circle wave" />
+    <MESSAGE value="everythign except sprite working" />
+    <option name="LAST_COMMIT_MESSAGE" value="everythign except sprite working" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

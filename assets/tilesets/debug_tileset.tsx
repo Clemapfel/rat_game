@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset version="1.10" tiledversion="1.11.2" name="debug_tileset" tilewidth="32" tileheight="32" tilecount="35" columns="0">
+ <editorsettings>
+  <export target="debug_tileset.lua" format="lua"/>
+ </editorsettings>
  <grid orientation="orthogonal" width="1" height="1"/>
  <tile id="25">
   <image source="debug_tileset/Frame001.png" width="32" height="32"/>
@@ -10,7 +13,7 @@
  <tile id="27">
   <image source="debug_tileset/Frame003.png" width="32" height="32"/>
   <objectgroup draworder="index" id="2">
-   <object id="1" type="Hitbox" x="0" y="0" width="32" height="17"/>
+   <object id="1" type="Hitbox" x="0" y="0" width="32" height="18"/>
   </objectgroup>
  </tile>
  <tile id="28">

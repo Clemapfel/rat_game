@@ -67,10 +67,12 @@ function ow.parse_tiled_object_group(object_group)
             to_push.top_left_y = y - height + group_offset_y -- tiled uses bottom left
             to_push.width = width
             to_push.height = height
-            to_push.flip_vertically = false --flip_vertically
-            to_push.flip_horizontally = false --TODOflip_horizontally
-            to_push.origin_x = x
+            to_push.flip_vertically = flip_vertically
+            to_push.flip_horizontally = flip_horizontally
+            to_push.origin_x = x -- bottom left
             to_push.origin_y = y
+            to_push.flip_origin_x = 0.5 * width
+            to_push.flip_origin_y = 0.5 * height
         else
             local shape_type = _get(object, "shape")
             if shape_type == "rectangle" then
@@ -98,19 +100,10 @@ function ow.parse_tiled_object_group(object_group)
             elseif shape_type == "polygon" then
                 local vertices = {}
                 local offset_x, offset_y = _get(object, "x"), _get(object, "y")
-
-                local min_x, min_y = POSITIVE_INFINITY, POSITIVE_INFINITY
-                local max_x, max_y = NEGATIVE_INFINITY, NEGATIVE_INFINITY
-
                 for vertex in values(_get(object, "polygon")) do
                     local x, y = _get(vertex, "x"), _get(vertex, "y")
                     table.insert(vertices, x + offset_x + group_offset_x)
                     table.insert(vertices, y + offset_y + group_offset_y)
-
-                    min_x = math.min(min_x, x)
-                    max_x = math.max(max_x, x)
-                    min_y = math.min(min_y, y)
-                    max_y = math.max(max_y, y)
                 end
 
                 to_push.type = ow.ObjectType.POLYGON
@@ -118,8 +111,6 @@ function ow.parse_tiled_object_group(object_group)
                 to_push.shapes = ow.decompose_polygon(vertices)
                 to_push.origin_x = offset_x
                 to_push.origin_y = offset_y
-                to_push.flip_origin_x = min_x + 0.5 * (max_x - min_x)
-                to_push.flip_origin_y = min_y + 0.5 * (max_y - min_y)
             elseif shape_type == "point" then
                 local x, y = _get(object, "x"),  _get(object, "y")
                 to_push.type = ow.ObjectType.POINT

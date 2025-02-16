@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<tileset version="1.10" tiledversion="1.11.2" name="debug_tileset_objects" tilewidth="222" tileheight="167" tilecount="5" columns="0">
+<tileset version="1.10" tiledversion="1.11.2" name="debug_tileset_objects" tilewidth="222" tileheight="167" tilecount="6" columns="0">
  <editorsettings>
   <export target="debug_tileset_objects.lua" format="lua"/>
  </editorsettings>
@@ -32,7 +32,7 @@
   <image source="debug_tileset_objects/irregular_polygon.png" width="100" height="109"/>
   <objectgroup draworder="index" id="2">
    <object id="1" type="Hitbox" x="18.2936" y="98.8494">
-    <polygon points="0,0 54.7202,-33.0568 77.6674,9.30725 78.4698,-57.7691 -16.2075,-98.368"/>
+    <polygon points="-0.504503,1.26126 54.7202,-33.0568 77.9197,10.3163 78.7221,-58.0214 -16.2075,-98.368"/>
    </object>
   </objectgroup>
  </tile>
@@ -46,6 +46,14 @@
     <ellipse/>
    </object>
    <object id="3" type="Hitbox" x="198.822" y="144.904" width="19.7378" height="20.0587">
+    <ellipse/>
+   </object>
+  </objectgroup>
+ </tile>
+ <tile id="5">
+  <image source="debug_tileset_objects/ellipse.png" width="145" height="101"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="Hitbox" x="21.0102" y="-17.8858" width="148.684" height="82.9259" rotation="23">
     <ellipse/>
    </object>
   </objectgroup>

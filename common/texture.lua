@@ -106,8 +106,9 @@ end
 
 --- @brief set wrap mode
 --- @param mode rt.TextureWrapMode
-function rt.Texture:set_wrap_mode(mode)
-    self._native:setWrap(mode, mode)
+function rt.Texture:set_wrap_mode(mode_x, mode_y)
+    if mode_y == nil then mode_y = mode_x end
+    self._native:setWrap(mode_x, mode_y)
 end
 
 --- @brief get wrap mode
