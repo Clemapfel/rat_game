@@ -3,7 +3,7 @@ require "include"
 box2d = ffi.load("box2d")
 local cdef = love.filesystem.read("fast_physics/cdef.h")
 ffi.cdef(cdef)
-box2d.b2SetLengthUnitsPerMeter(20)
+    box2d.b2SetLengthUnitsPerMeter(20)
 
 require "fast_physics.capsule"
 require "fast_physics.circle"

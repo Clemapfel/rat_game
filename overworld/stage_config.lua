@@ -122,7 +122,7 @@ function ow.StageConfig:realize()
                 rt.error("In ow.StageConfig.realize: layer `" .. layer_i .. "` does not have `chunks` field, is this an infinite map?")
             end
 
-            local is_solid_matrix = rt.Matrix()
+            to_add.is_solid_matrix = rt.Matrix()
 
             -- construct gid matrix
             local chunks = _get(layer, "chunks")
@@ -143,7 +143,7 @@ function ow.StageConfig:realize()
                             local is_solid = tile.tileset:get_tile_property(tile.id, is_solid_name) == true
 
                             if is_solid then
-                                is_solid_matrix:set(x + x_offset, y + y_offset, true)
+                                to_add.is_solid_matrix:set(x + x_offset, y + y_offset, true)
                             end
                         end
                     end
@@ -372,8 +372,90 @@ function ow.StageConfig:_construct_hitboxes()
             end
         end
 
-        -- convert to physics shapes
         local shapes = {}
+
+        -- merge trivial hitboxes
+        if layer.type == ow.LayerType.TILES then
+            local min_x, min_y, max_x, max_y = layer.is_solid_matrix:get_index_range()
+
+            local visited = {}
+            local function is_visited(x, y)
+                return visited[y] and visited[y][x]
+            end
+
+            local function find_rectangle(x, y)
+                local width, height = 0, 1
+
+                -- expand right as much as possible
+                while layer.is_solid_matrix:get(x + width, y) do
+                    width = width + 1
+                end
+
+                -- if not possible, try downwards
+                if width == 1 then
+                    -- expand down as much as possible
+                    while layer.is_solid_matrix:get(x, y + height) do
+                        height = height + 1
+                    end
+
+                    while true do
+                        for col_offset = 0, height do
+                            local current_x, current_y = x + width, y + col_offset
+                            if layer.is_solid_matrix:get(current_x, current_y) ~= true then
+                                goto done
+                            end
+                        end
+                        width = width + 1
+                    end
+                    ::done::
+                else
+                    while true do
+                        for row_offset = 0, width do
+                            local current_x, current_y = x + row_offset, y + height
+                            if layer.is_solid_matrix:get(current_x, current_y) ~= true then
+                                goto done
+                            end
+                        end
+                        height = height + 1
+                    end
+                    ::done::
+                end
+
+                for i = 0, height - 1 do
+                    for j = 0, width - 1 do
+                        if not visited[y + i] then
+                            visited[y + i] = {}
+                        end
+                        visited[y + i][x + j] = true
+                    end
+                end
+
+                return x, y, width, height
+            end
+
+            for y = min_y, max_y do
+                for x = min_x, max_x do
+                    if layer.is_solid_matrix:get(x, y) and not is_visited(x, y) then
+                        local x, y, w, h = find_rectangle(x, y)
+                        x = (x - 1) * self._tile_width
+                        y = (y - 1) * self._tile_height
+                        w = w * self._tile_width
+                        h = h * self._tile_height
+                        table.insert(shapes, {
+                            type = ow.PhysicsShapeType.POLYGON,
+                            vertices = {
+                                x, y,
+                                x + w, y,
+                                x + w, y + h,
+                                x, y + h
+                            }
+                        })
+                    end
+                end
+            end
+        end
+
+        -- convert to physics shapes
         for entry in values(objects) do
             local object = entry.object
             local offset_x, offset_y = entry.offset_x, entry.offset_y
@@ -442,7 +524,7 @@ function ow.StageConfig:_construct_hitboxes()
                         radius = math.max(object.x_radius, object.y_radius)
                     })
                 else
-                    -- box2d does not support ellipses, so construct one series of polygons
+                    -- box2d does not support ellipses, so construct one as series of polygons
                     local triangles = {}
                     local center_x, center_y = object.center_x, object.center_y
                     local x_radius, y_radius = object.x_radius, object.y_radius
@@ -548,6 +630,7 @@ end
 
 --- @override
 function ow.StageConfig:draw()
+    --[[
     for i = 1, self._n_layers do
         local entry = self._layer_i_to_tileset_to_spritebatch[i]
         if entry ~= nil then
@@ -574,10 +657,11 @@ function ow.StageConfig:draw()
             love.graphics.pop()
         end
     end
+    ]]--
 
     -- debug draw:
-    love.graphics.setLineJoin("miter")
-    love.graphics.setLineWidth(1)
+    love.graphics.setLineJoin(rt.LineJoin.BEVEL)
+    love.graphics.setLineWidth(2)
     love.graphics.setColor(1, 1, 1, 1)
     for i = 1, self._n_layers do
         local entry = self._layer_i_to_physics_shapes[i]

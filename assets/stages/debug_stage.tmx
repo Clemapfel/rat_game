@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="9" nextobjectid="55">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="57" height="37" tilewidth="32" tileheight="32" infinite="1" nextlayerid="9" nextobjectid="58">
  <editorsettings>
   <export target="debug_stage.lua" format="lua"/>
  </editorsettings>
  <tileset firstgid="1" source="../tilesets/debug_tileset.tsx"/>
  <tileset firstgid="69" source="../tilesets/debug_tileset_objects.tsx"/>
- <imagelayer id="8" name="Image Layer 1" offsetx="802.379" offsety="9.23714" repeatx="1" repeaty="1">
+ <imagelayer id="8" name="Image Layer 1" offsetx="959.49" offsety="72.4053" repeatx="1" repeaty="1">
   <image source="../sprites/why_scaled.png" width="480" height="480"/>
  </imagelayer>
  <layer id="4" name="Ground" width="57" height="37">
@@ -32,7 +32,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 67,68,67,68,67,68,67,68,67,68,67,68,0,0,0,0,
 68,67,68,67,68,67,68,67,68,67,68,67,0,0,0,0,
-67,68,67,68,67,68,67,68,67,68,67,68,67,68,67,68,
+67,68,67,68,67,68,67,68,0,68,67,68,67,68,67,68,
 68,67,68,67,68,67,68,67,68,67,68,67,68,67,68,67,
 67,68,67,68,67,68,67,68,67,68,67,68,67,68,67,68,
 68,67,68,67,68,67,68,67,68,67,68,67,68,67,68,67,
@@ -318,56 +318,19 @@
   <object id="25" gid="69" x="1118.23" y="228.119" width="36" height="36"/>
   <object id="26" gid="69" x="1255.46" y="96.8544" width="36" height="36"/>
   <object id="29" gid="69" x="1250.69" y="373.704" width="36" height="36"/>
-  <object id="35" type="PlayerSpawn" x="127.486" y="443.651">
-   <properties>
-    <property name="bool_property" type="bool" value="false"/>
-    <property name="color_property" type="color" value=""/>
-    <property name="file_property" type="file" value="../../../../../../Program Files/Tiled/LICENSE.APACHE.txt"/>
-    <property name="float_property" type="float" value="1.23"/>
-    <property name="int_property" type="int" value="123"/>
-    <property name="object_property" type="object" value="31"/>
-    <property name="string_property" value="test"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="36" type="Path" x="973.993" y="448.751">
-   <properties>
-    <property name="next" type="object" value="39"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="37" type="Path" x="979.69" y="144.484">
-   <properties>
-    <property name="next" type="object" value="38"/>
-    <property name="previous" type="object" value="39"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="38" type="Path" x="447.051" y="125.786">
-   <properties>
-    <property name="previous" type="object" value="37"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="39" type="Path" x="1169.47" y="304.267">
-   <properties>
-    <property name="next" type="object" value="37"/>
-   </properties>
-   <point/>
-  </object>
-  <object id="45" type="Hitbox" x="478.142" y="-211.749" width="224.271" height="108.151" rotation="7"/>
+  <object id="45" type="Hitbox" x="492.719" y="-184.214" width="224.271" height="108.151" rotation="7"/>
   <object id="46" type="Hitbox" x="798.042" y="-72.8597" rotation="30">
    <polygon points="0,0 265.255,-102.459 59.1985,-125.228 58.0601,-91.0747 -34.153,-95.6284"/>
   </object>
   <object id="50" gid="74" x="1107.67" y="578.745" width="145" height="101"/>
   <object id="52" gid="1073741898" x="1179.46" y="576.805" width="145" height="101"/>
-  <object id="53" x="194.024" y="-162.98" width="207.606" height="108.653" rotation="-7">
+  <object id="53" type="Hitbox" x="194.024" y="-162.98" width="207.606" height="108.653" rotation="-7">
    <ellipse/>
   </object>
  </objectgroup>
  <objectgroup draworder="index" id="5" name="Object Layer 2">
   <object id="31" gid="70" x="606.863" y="195.096" width="123" height="123"/>
   <object id="33" gid="71" x="582" y="172.921" width="72" height="70"/>
-  <object id="32" name="circle_small" gid="69" x="563.187" y="155.556" width="36" height="36"/>
+  <object id="56" gid="69" x="562.863" y="154.119" width="36" height="36"/>
  </objectgroup>
 </map>

@@ -23,8 +23,6 @@ ow.TilesetConfig = meta.new_type("TilesetConfig", function(id)
 end)
 ow.TilesetConfig._atlas = {}
 
-
-
 --- @brief
 function ow.TilesetConfig:realize()
     local config_path_prefix = rt.settings.overworld.tileset_config.config_path .. "/"
@@ -112,8 +110,26 @@ function ow.TilesetConfig:realize()
             end
         end
 
+        local is_solid_property_name = rt.settings.overworld.tileset_config.is_solid_property_name
+
         if tile.objectGroup ~= nil then
             to_push.objects = ow.parse_tiled_object_group(_get(tile, "objectGroup"))
+
+            -- parse out trivial hitboxes, so they can be merged in stage config, keep other objects
+            local to_remove = {}
+            for object_i, object in ipairs(to_push.objects) do
+                if object.type == ow.ObjectType.RECTANGLE then
+                    if object.width * object.height >= self._tile_height * self._tile_height then
+                        to_push.properties[is_solid_property_name] = true
+                        table.insert(to_remove, object_i)
+                    end
+                end
+            end
+
+            table.sort(to_remove, function(a, b) return a > b end)
+            for i in values(to_remove) do
+                table.remove(to_push.objects, i)
+            end
         end
     end
 

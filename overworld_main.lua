@@ -13,14 +13,14 @@ local scale = 1
 
 love.load = function()
     love.window.updateMode(
-        1600 / 1.5,
-        800 / 1.5
+        1600,
+        800
     )
 end
 
 love.draw = function()
     local w, h = love.graphics.getDimensions()
-    love.graphics.setColor(1, 0, 1, 1)
+    love.graphics.setColor(0, 0, 0, 1)
     love.graphics.rectangle("fill", 0, 0, w, h)
 
     love.graphics.push()
