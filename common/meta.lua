@@ -464,6 +464,7 @@ function meta.install(instance, values)
     for key, value in pairs(values) do
         instance[key] = value
     end
+    return instance
 end
 
 --- @brief
@@ -535,16 +536,4 @@ function meta.make_immutable(t)
     return setmetatable({}, metatable), metatable
 end
 
-do
-    local SuperA = meta.class("SuperA")
-    meta.add_signals(SuperA, "a_signal")
-
-    local SuperB = meta.class("SuperB", SuperA)
-    meta.add_signals(SuperB, "b_signal")
-
-    local SuperC = meta.class("SuperC", SuperB)
-    meta.add_signals(SuperC, "c_signal")
-
-    local instance = SuperC()
-    dbg(instance:signal_list_signals())
-end
+return meta
