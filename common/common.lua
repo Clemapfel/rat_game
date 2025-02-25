@@ -9,71 +9,43 @@ assert(debug.setfenv ~= nil)
 require("table.new")
 assert(table.new ~= nil, "Unable to load table.new, is this LuaJIT?")
 
-_G._pairs = pairs
-_G._ipairs = ipairs
+ffi = require "ffi"
+utf8 = require "utf8"
+bit = require "bit"
 
+local _noop = function() return nil end
 
-do
-    local _noop = function() return nil end
+local _keys_iterator = function(t, k)
+    local next_key, _ = next(t, k)
+    return next_key
+end
 
-    --[[
-    function pairs(t)
-        if t == nil then return _noop end
-        return _G._pairs
-    end
+--- @brief iterate all keys of a table
+function keys(t)
+    if t == nil then return _noop end
+    return _keys_iterator, t
+end
 
-    function ipairs(t)
-        if t == nil then return _noop end
-        return _G._ipairs
-    end
-    ]]--
-
-    local _keys_iterator = function(t, k)
-        local next_key, _ = next(t, k)
-        return next_key
-    end
-
-    --- @brief iterate all keys of a table
-    function keys(t)
-        if t == nil then return _noop end
-        return _keys_iterator, t
-    end
-
-    --- @brief iterate all values of a table
-    function values(t)
-        if t == nil then return _noop end
-        local k, v
-        return function() -- impossible to do without closure
-            k, v = next(t, k)
-            return v
-        end
-    end
-
-    local function _range_iterator(state)
-        local next_i, out = next(state, state[1])
-        state[1] = next_i
-        return out, state
-    end
-
-    --- @brief iterate vararg
-    function range(...)
-        if select("#", ...) == 0 then return _noop end
-        return _range_iterator, {1, ...} -- start at 1, because because actual table is by one
+--- @brief iterate all values of a table
+function values(t)
+    if t == nil then return _noop end
+    local k, v
+    return function() -- impossible to do without closure
+        k, v = next(t, k)
+        return v
     end
 end
 
-function eachindex(t, size)
-    if size == nil then
-        local size = 0
-        for _ in pairs(t) do size = size + 1 end
-    end
+local function _range_iterator(state)
+    local next_i, out = next(state, state[1])
+    state[1] = next_i
+    return out, state
+end
 
-    return function(arr, i)
-        i = i + 1
-        if i <= size then
-            return i
-        end
-    end, t, 0
+--- @brief iterate vararg
+function range(...)
+    if select("#", ...) == 0 then return _noop end
+    return _range_iterator, {1, ...} -- start at 1, because because actual table is by one
 end
 
 --- @brief print, arguments are concatenated
@@ -109,20 +81,10 @@ function println(...)
     io.flush()
 end
 
---- @brief concatenate vararg into string
-function paste(...)
-    local values = {...}
-    local out = {}
-    for _, v in pairs(values) do
-        table.insert(out, tostring(v))
-    end
-    return table.concat(out)
-end
-
 --- @brief get number of elements in arbitrary object
 --- @param x any
 --- @return number
-function sizeof(x)
+function table.sizeof(x)
     if type(x) == "table" then
         local n = 0
         for _ in pairs(x) do
@@ -137,19 +99,17 @@ function sizeof(x)
         return 1
     end
 end
-table.sizeof = sizeof
 
 --- @brief is table empty
 --- @param x any
 --- @return boolean
-function is_empty(x)
+function table.is_empty(x)
     if type(x) ~= "table" then
         return true
     else
         return next(x) == nil
     end
 end
-table.is_empty = is_empty
 
 --- @brief clamp
 --- @param x number
@@ -210,48 +170,6 @@ function ternary(condition, if_true, if_false)
         error("In ternary: argument #1 does not evaluate to boolean")
     end
 end
-
---- @brief get first value, or `if_nil` if first value is nil
---- @param value any
---- @param if_nil any
-function which(value, if_nil)
-    if value == nil then return if_nil else return value end
-end
-
---- @brief invoke function with arguments
-function invoke(f, ...)
-    assert(type(f) == "function")
-    f(...)
-end
-
---- @brief expand table to tuple
-function splat(t)
-    if table.unpack == nil then
-        assert(unpack ~= nil)
-        return unpack(t)
-    else
-        return table.unpack(t)
-    end
-end
-
---- @brief wrap tuple in table
-function slurp(...)
-    return {...}
-end
-
-_G._select = _G.select
-
---- @brief positive infinity
-INFINITY = 1/0
-
---- @brief positive infinity
-POSITIVE_INFINITY = INFINITY
-
---- @brief negative infinity
-NEGATIVE_INFINITY = -1/0
-
---- @brief nan
-NAN = 0/0
 
 --- @brief round to nearest integer
 --- @param i number
@@ -320,44 +238,6 @@ function math.tanh(x)
     return x
 end
 
---- @brief get minimum and maximum of table
-function table.min_max(t)
-    local min, max = POSITIVE_INFINITY, NEGATIVE_INFINITY
-    for _, value in pairs(t) do
-        if value < min then min = value end
-        if value > max then max = value end
-    end
-    return min, max
-end
-
---- @brief
-function table.push(t, v)
-    table.insert(t, v)
-end
-
---- @brief get first element of table, in iteration order
---- @param t table
-function table.first(t)
-    for _, v in pairs(t) do return v end
-end
-
---- @brief get last element of table, in iteration order
---- @param t table
-function table.last(t)
-    local last = nil
-    for _, v in pairs(t) do
-        last = v
-    end
-    return last
-end
-
---- @brief
-function table.pop_front(t)
-    local front = t[1]
-    table.remove(t, 1)
-    return front
-end
-
 --- @brief create a table with n copies of object
 --- @param x any
 --- @param n Number
@@ -370,39 +250,6 @@ function table.rep(x, n)
     return out
 end
 
---- @brief
-function table.reverse(t)
-    local out = {}
-    local n = sizeof(table)
-    for k, v in ipairs(t) do
-        out[n + 1 - k] = v
-    end
-    return out
-end
-
---- @brief
-function table.seq(start, finish, step)
-    local out = {}
-    for x = start, finish, step do
-        table.insert(out, x)
-    end
-    return out
-end
-
---- @brief check if two tables have contents that compare equally
---- @param left table
---- @param right table
---- @return boolean
-function table.compare(left, right)
-    if #left ~= #right then return false end
-
-    for key, value in pairs(left) do
-        if right[key] ~= value then return false end
-    end
-
-    return true
-end
-
 --- @brief clear all values from table
 --- @param t Table
 --- @return nil
@@ -410,33 +257,6 @@ function table.clear(t)
     for key, _ in pairs(t) do
         t[key] = nil
     end
-end
-
---- @brief iterate integer range
---- @param range_start number
---- @param range_end number
---- @param increment number or nil
-function step_range(range_start, range_end, step)
-    if step == nil then step = 1 end
-
-    local start = range_start
-    if step == 0 then start = nil end -- causes _range_iterator to drop out before the first iteration
-
-    local state = {range_start, range_end, step, start}
-    return _step_range_iterator, state
-end
-
-_step_range_iterator = function(state)
-    local range_start, range_end, step, current = state[1], state[2], state[3], state[4]
-    if current == nil then return nil end
-
-    local next = current + step
-    if (step > 0 and next > range_end) or (step < 0 and next < range_end) then
-        next = nil
-    end
-
-    state[4] = next
-    return current, state
 end
 
 if utf8 == nil then utf8 = require "utf8" end
@@ -576,18 +396,6 @@ function string.replace(str, pattern, replacement)
     return string.gsub(str, pattern, replacement)
 end
 
---- @brief map string to 64-bit signed integer
---- @param str string
---- @return number
-function string.hash(str)
-    -- see: https://stackoverflow.com/a/7666577
-    local hash = 5381
-    for i = 1, #str do
-        hash = (bit.lshift(hash, 5) + hash) + string.byte(string.sub(str, i, i))
-    end
-    return hash
-end
-
 --- @brief get number of bits in string
 function string.len(str)
     return #str
@@ -596,12 +404,6 @@ end
 --- @brief
 function string.at(str, i)
     return string.sub(str, i, i)
-end
-
---- @brief
-function exit(status)
-    if status == nil then status = 0 end
-    love.event.push("quit", status)
 end
 
 --- @brief hash string
@@ -613,5 +415,127 @@ function string.sha256(string)
         hash = love.data.hash("sha256", string)
     end
     return hash
+end
+
+--- @brief
+function exit(status)
+    if status == nil then status = 0 end
+    love.event.push("quit", status)
+end
+
+local _serialize_get_indent = function(n_indent_tabs)
+    local tabspace = "    "
+    local buffer = {""}
+
+    for i = 1, n_indent_tabs do
+        table.insert(buffer, tabspace)
+    end
+
+    return table.concat(buffer)
+end
+
+local _serialize_insert = function(buffer, ...)
+    for i, value in pairs({...}) do
+        table.insert(buffer, value)
+    end
+end
+
+local function _serialize_inner(buffer, object, n_indent_tabs, seen, comment_out)
+    if type(object) == "number" then
+        _serialize_insert(buffer, object)
+    elseif type(object) == "string" then
+        _serialize_insert(buffer, "\"", object, "\"")
+    elseif type(object) == "boolean" then
+        if object == true then
+            _serialize_insert(buffer, "true")
+        else
+            _serialize_insert(buffer, "false")
+        end
+    elseif type(object) == "nil" then
+        _serialize_insert(buffer, "nil")
+    elseif type(object) == "table" then
+        local n_entries = sizeof(object)
+        if seen[object] then
+            _serialize_insert(buffer, " { ...")
+            return
+        end
+
+        if n_entries > 0 then
+            _serialize_insert(buffer, "{\n")
+            n_indent_tabs = n_indent_tabs + 1
+
+            local index = 0
+            for key, value in pairs(object) do
+                if comment_out and type(value) == "function" or type(value) == "userdata" then
+                    _serialize_insert(buffer, "--[[ ", key, " = ", tostring(value), ", ]]\n")
+                    index = index + 1
+                elseif comment_out and seen[object] then
+                    _serialize_insert(buffer, "--[[ ", key, " = ..., ]]\n")
+                    index = index + 1
+                else
+                    if type(key) == "string" then
+                        -- check if string is valid variable name, if no, escape
+                        local _, error_maybe = load(key .. " = 1")
+                        if error_maybe == nil then
+                            _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), tostring(key), " = ")
+                        else
+                            _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[\"", tostring(key), "\"]", " = ")
+                        end
+                    elseif type(key) == "number" then
+                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[", tostring(key), "] = ")
+                    else
+                        _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs), "[", serialize(key), "] = ")
+                    end
+
+                    _serialize_inner(buffer, value, n_indent_tabs, seen)
+
+                    index = index + 1
+                    if index < n_entries then
+                        _serialize_insert(buffer, ",\n")
+                    else
+                        _serialize_insert(buffer, "\n")
+                    end
+                end
+            end
+            _serialize_insert(buffer, _serialize_get_indent(n_indent_tabs-1), "}")
+        else
+            _serialize_insert(buffer, "{}")
+        end
+
+        seen[object] = true
+    else
+        -- function, userdata, when not commented out
+        _serialize_insert(buffer, "[", tostring(object), "]")
+    end
+end
+
+--- @brief convert arbitrary object to string
+--- @param object any
+--- @param comment_out_unserializable Boolean false by default
+--- @return string
+function serialize(object, comment_out_unserializable)
+    if comment_out_unserializable == nil then
+        comment_out_unserializable = false
+    end
+
+    if object == nil then
+        return nil
+    end
+
+    local buffer = {""}
+    local seen = {}
+    _serialize_inner(buffer, object, 0, seen, comment_out_unserializable)
+    return table.concat(buffer, "")
+end
+
+--- @brief
+function dbg(...)
+    for _, x in pairs({...}) do
+        io.write(serialize(x))
+        io.write(" ")
+    end
+
+    io.write("\n")
+    io.flush()
 end
 
