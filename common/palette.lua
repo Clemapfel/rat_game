@@ -87,3 +87,39 @@ do -- load from image
     rt.Palette.SPEED = rt.Palette.MINT_2
     rt.Palette.HP = rt.Palette.PURPLE_1
 end
+
+
+local image = love.image.newImageData("assets/palette_input.png")
+local n_cols, n_rows = image:getDimensions()
+
+-- get lightness values of gray
+local index_to_lightness = {}
+for col_i = 1, n_cols do
+    local gray = rt.RGBA(image:getPixel(col_i - 1,  1 - 0))
+    local as_lch = rt.rgba_to_lcha(gray)
+    index_to_lightness[col_i] = as_lch.l
+    dbg(col_i, as_lch.l)
+end
+
+for row_i = 2, n_rows do
+    local base, base_i
+    for col_i = 1, n_cols do
+        local pixel = rt.RGBA(image:getPixel(col_i - 1, row_i - 1))
+        if pixel.a > 0 then
+            base = rt.rgba_to_lcha(pixel)
+            base_i = col_i
+        end
+    end
+
+    if base ~= nil then
+        for col_i = 1, n_cols do
+            local lightness = index_to_lightness[col_i]
+            local lcha = rt.LCHA(lightness, base.c, base.h, 1)
+            local rgba = rt.lcha_to_rgba(lcha)
+            image:setPixel(col_i - 1, row_i - 1, rgba.r, rgba.g, rgba.b, 1)
+        end
+    end
+end
+
+love.filesystem.mountFullPath(love.filesystem.getSource() .. "/assets", "", "readwrite")
+assert(nil ~= image:encode("png", "palette_out.png", love.filesystem.getSource() .. "/assets"))

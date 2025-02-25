@@ -1,6 +1,7 @@
 require "include"
 
-profiler_active = false
+
+--[[
 
 STATE = rt.GameState()
 STATE:set_loading_screen(rt.LoadingScreen.DEFAULT)
@@ -48,3 +49,4 @@ end
 love.run = function()
     STATE:run()
 end
+]]--

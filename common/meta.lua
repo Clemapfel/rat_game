@@ -15,7 +15,7 @@ do
     local _type_super_hashes_index = "super_hashes"--_type_supers_index + 1
     local _type_signals_index = "signals"--_type_super_hashes_index + 1
     local _type_is_mutable_index = "is_mutable"--_type_signals_index + 1
-    local _type_constructor_index = "constructor"--_type_is_mutable_index + 1
+    local _type_constructor_index = "new"--_type_is_mutable_index + 1
 
     local _enum_value_set_index = "value_set"--_type_constructor_index + 1
 

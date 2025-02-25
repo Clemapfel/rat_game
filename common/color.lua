@@ -266,6 +266,55 @@ function rt.lcha_to_rgba(lcha, c, h, alpha)
     )
 end
 
+--- @brief convert rgba to lcha
+function rt.rgba_to_lcha(rgba, g, b, a)
+    local r
+    if type(rgba) ~= "number" then
+        r = rgba.r
+        g = rgba.g
+        b = rgba.b
+    end
+
+    a = rgba.a
+
+    -- Apply gamma correction
+    r = (r <= 0.04045) and (r / 12.92) or (((r + 0.055) / 1.055) ^ 2.4)
+    g = (g <= 0.04045) and (g / 12.92) or (((g + 0.055) / 1.055) ^ 2.4)
+    b = (b <= 0.04045) and (b / 12.92) or (((b + 0.055) / 1.055) ^ 2.4)
+
+    -- Convert to XYZ using the sRGB matrix
+    local x = r * 0.4124564 + g * 0.3575761 + b * 0.1804375
+    local y = r * 0.2126729 + g * 0.7151522 + b * 0.0721750
+    local z = r * 0.0193339 + g * 0.1191920 + b * 0.9503041
+
+    -- Reference white point
+    local x_ref, y_ref, z_ref = 0.95047, 1.00000, 1.08883
+
+    -- Normalize by reference white
+    x = x / x_ref
+    y = y / y_ref
+    z = z / z_ref
+
+    -- Apply the Lab transformation
+    x = (x > 0.008856) and (x ^ (1/3)) or ((7.787 * x) + (16 / 116))
+    y = (y > 0.008856) and (y ^ (1/3)) or ((7.787 * y) + (16 / 116))
+    z = (z > 0.008856) and (z ^ (1/3)) or ((7.787 * z) + (16 / 116))
+
+    local l = (116 * y) - 16
+    local a = 500 * (x - y)
+    local b = 200 * (y - z)
+
+    -- Convert Lab to LCH
+    local c = math.sqrt(a ^ 2 + b ^ 2)
+    local h = math.atan2(b, a)
+    h = math.deg(h)
+    if h < 0 then
+        h = h + 360
+    end
+
+    return rt.LCHA(l / 100, c / 100, h / 360, a)
+end
+
 
 --- @brief convert html hexadecimal to rgba
 --- @param code String "#RRGGBB(AA)"
