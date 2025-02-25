@@ -18,13 +18,12 @@ B2_PIXEL_TO_METER = 1 / B2_METER_TO_PIXEL
 b2 = {}
 
 require "physics.math"
-require "physics.world"
 require "physics.circle"
 require "physics.capsule"
-require "physics.segment"
 require "physics.polygon"
+require "physics.segment"
 require "physics.shape"
 require "physics.body"
-require "physics.joint"
+require "physics.world"
 
 return b2

@@ -22,12 +22,19 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="imported box2d">
-      <change afterPath="$PROJECT_DIR$/physics/box2d_cdef.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/enkits_cdef.h" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/physics/physics.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/old/physics/body.lua" beforeDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="stashing">
+      <change afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/collision_group.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/math.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/physics/physics.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/physics.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -827,15 +834,7 @@
       <workItem from="1740083932622" duration="735000" />
       <workItem from="1740330880234" duration="4406000" />
       <workItem from="1740481890506" duration="1938000" />
-      <workItem from="1740504897679" duration="12295000" />
-    </task>
-    <task id="LOCAL-01450" summary="label refactored">
-      <option name="closed" value="true" />
-      <created>1737923609080</created>
-      <option name="number" value="01450" />
-      <option name="presentableId" value="LOCAL-01450" />
-      <option name="project" value="LOCAL" />
-      <updated>1737923609080</updated>
+      <workItem from="1740504897679" duration="15532000" />
     </task>
     <task id="LOCAL-01451" summary="label done">
       <option name="closed" value="true" />
@@ -1221,7 +1220,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740515687024</updated>
     </task>
-    <option name="localTasksCounter" value="1499" />
+    <task id="LOCAL-01499" summary="stashing">
+      <option name="closed" value="true" />
+      <created>1740517288978</created>
+      <option name="number" value="01499" />
+      <option name="presentableId" value="LOCAL-01499" />
+      <option name="project" value="LOCAL" />
+      <updated>1740517288978</updated>
+    </task>
+    <option name="localTasksCounter" value="1500" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1296,11 +1303,11 @@
     <MESSAGE value="stashing circle wave" />
     <MESSAGE value="everythign except sprite working" />
     <MESSAGE value="polygon alignment working" />
-    <MESSAGE value="stashing" />
     <MESSAGE value="stashing before rewrite" />
     <MESSAGE value="moved to old" />
     <MESSAGE value="imported box2d" />
-    <option name="LAST_COMMIT_MESSAGE" value="imported box2d" />
+    <MESSAGE value="stashing" />
+    <option name="LAST_COMMIT_MESSAGE" value="stashing" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
