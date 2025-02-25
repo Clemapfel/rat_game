@@ -454,7 +454,7 @@ local function _serialize_inner(buffer, object, n_indent_tabs, seen, comment_out
     elseif type(object) == "nil" then
         _serialize_insert(buffer, "nil")
     elseif type(object) == "table" then
-        local n_entries = sizeof(object)
+        local n_entries = table.sizeof(object)
         if seen[object] then
             _serialize_insert(buffer, " { ...")
             return

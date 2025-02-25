@@ -1,19 +1,25 @@
 --- @class b2.BodyType
-b2.BodyType = {
+b2.BodyType = meta.enum("PhysicsBodyType", {
     STATIC = box2d.b2_staticBody,
     KINEMATIC = box2d.b2_kinematicBody,
     DYNAMIC = box2d.b2_dynamicBody
-}
+})
 
 --- @class b2.Body
 b2.Body = meta.class("PhysicsBody")
 
 --- @brief
 function b2.Body:instantiate(world, type, position_x, position_y, automatic_mass)
+    meta.assert_typeof(world, "PhysicsWorld", 1)
+    meta.assert_enum_value(type, b2.BodyType)
+    meta.assert_typeof(position_x, "Number", 3)
+    meta.assert_typeof(position_x, "Number", 4)
+
     local def = box2d.b2DefaultBodyDef()
     def.type = type
     def.position = b2.Vec2(position_x * B2_PIXEL_TO_METER, position_y * B2_PIXEL_TO_METER)
     if automatic_mass ~= nil then
+        meta.assert_typeof(automatic_mass, "Boolean", 5)
         def.automaticMass = automatic_mass
     end
 

@@ -8,6 +8,13 @@ function b2.Circle:instantiate(radius, x, y)
     local scale = B2_PIXEL_TO_METER
     if x == nil then x = 0 end
     if y == nil then y = 0 end
+
+    meta.assert(
+        radius, "Number",
+        x, "Number",
+        y, "Number"
+    )
+
     self._native = _create_native(
         b2.Vec2(x * scale, y * scale),
         radius * scale

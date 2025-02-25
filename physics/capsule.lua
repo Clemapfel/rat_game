@@ -5,6 +5,14 @@ b2.Capsule = meta.class("PhysicsCapsule")
 
 --- @brief
 function b2.Capsule:instantiate(a_x, a_y, b_x, b_y, radius)
+    meta.assert(
+        a_x, "Number",
+        a_y, "Number",
+        b_x, "Number",
+        b_y, "Number",
+        radius, "Number"
+    )
+
     local scale = B2_PIXEL_TO_METER
     self._native = _create_native(
         b2.Vec2(a_x * scale, a_y * scale),

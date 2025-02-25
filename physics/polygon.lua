@@ -17,7 +17,11 @@ b2.Polygon = meta.class("PhysicsPolygon")
 --- @brief
 function b2.Polygon:instantiate(...)
     local n_points = select("#", ...)
-    assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
+    assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16, "In b2.Polygon: number of points is not a multiple of 2, or exceeds 16")
+
+    for i = 1, n_points do
+        meta.assert_typeof(select(i, ...), "Number", i)
+    end
 
     self._native = _create_native({...})
 end

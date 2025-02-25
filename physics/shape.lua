@@ -32,6 +32,9 @@ end
 
 --- @brief
 function b2.CircleShape(body, circle, is_sensor)
+    if is_sensor == nil then is_sensor = false end
+    meta.assert(body, "PhysicsBody", circle, "Circle", is_sensor, "Boolean")
+
     local shape_def = b2.Shape._default_shape_def(is_sensor)
     return b2.Shape._create_from_native(
         box2d.b2CreateCircleShape(body._native, shape_def, circle._native)
@@ -40,6 +43,9 @@ end
 
 --- @brief
 function b2.CapsuleShape(body, capsule, is_sensor)
+    if is_sensor == nil then is_sensor = false end
+    meta.assert(body, "PhysicsBody", capsule, "PhysicsCapsule", is_sensor, "Boolean")
+
     local shape_def = b2.Shape._default_shape_def(is_sensor)
     return b2.Shape._create_from_native(
         box2d.b2CreateCapsuleShape(body._native, shape_def, capsule._native)
@@ -48,6 +54,9 @@ end
 
 --- @brief
 function b2.SegmentShape(body, segment, is_sensor)
+    if is_sensor == nil then is_sensor = false end
+    meta.assert(body, "PhysicsBody", segment, "PhysicsSegment", is_sensor, "Boolean")
+
     local shape_def = b2.Shape._default_shape_def(is_sensor)
     return b2.Shape._create_from_native(
         box2d.b2CreateSegmentShape(body._native, shape_def, segment._native)
@@ -56,6 +65,9 @@ end
 
 --- @brief
 function b2.PolygonShape(body, polygon, is_sensor)
+    if is_sensor == nil then is_sensor = false end
+    meta.assert(body, "PhysicsBody", polygon, "PhysicsPolygon", is_sensor, "Boolean")
+
     local shape_def = b2.Shape._default_shape_def(is_sensor)
     return b2.Shape._create_from_native(
         box2d.b2CreatePolygonShape(body._native, shape_def, polygon._native)

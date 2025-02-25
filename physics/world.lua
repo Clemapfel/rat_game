@@ -3,9 +3,19 @@ b2.World = meta.class("PhysicsWorld")
 
 --- @brief
 function b2.World:instantiate(gravity_x, gravity_y, n_threads)
+    if n_threads == nil or n_threads <= 1 then
+        n_threads = 0
+    end
+
+    meta.assert(
+        gravity_x, "Number",
+        gravity_y, "Number",
+        n_threads, "Number"
+    )
+
     local scale = B2_PIXEL_TO_METER --B2_PIXEL_TO_METER * B2_PIXEL_TO_METER
     local out
-    if n_threads == nil or n_threads <= 1 then
+    if n_threads == 0 then
         local def = box2d.b2DefaultWorldDef()
         def.gravity = b2.Vec2(gravity_x * scale, gravity_y * scale)
         def.restitutionThreshold = 0
@@ -41,7 +51,7 @@ function b2.World:instantiate(gravity_x, gravity_y, n_threads)
         })
     end
 
-    out._debug_draw = box2d.b2CreateDebugDraw(
+    self._debug_draw = box2d.b2CreateDebugDraw(
         b2.World._draw_polygon,
         b2.World._draw_solid_polygon,
         b2.World._draw_circle,
@@ -136,6 +146,8 @@ end
 
 --- @brief
 function b2.World:set_gravity(gravity_x, gravity_y)
+    meta.assert(gravity_x, "Number", gravity_y, "Number")
+
     local scale = B2_PIXEL_TO_METER * B2_PIXEL_TO_METER
     box2d.b2World_SetGravity(self._native, b2.Vec2(gravity_x * scale, gravity_y * scale))
 end
@@ -143,6 +155,7 @@ end
 --- @brief
 function b2.World:step(delta, n_iterations)
     if n_iterations == nil then n_iterations = 4 end
+    meta.assert(delta, "Number", n_iterations, "Number")
 
     local step = 1 / 60
     while delta > step do
@@ -158,11 +171,13 @@ end
 
 --- @brief
 function b2.World:set_sleeping_enabled(b)
+    meta.assert(b, "Boolean")
     box2d.b2World_EnableSleeping(self._native, b)
 end
 
 --- @brief
 function b2.World:set_continuous_enabled(b)
+    meta.assert(b, "Boolean")
     box2d.b2World_EnableContinuous(self._native, b)
 end
 
@@ -174,6 +189,14 @@ end
 --- @brief
 --- @param callback (b2.Shape, point_x, point_y, normal_x, normal_y, fraction) -> fraction
 function b2.World:raycast(start_x, start_y, end_x, end_y, callback)
+    meta.assert(
+        start_x, "Number",
+        start_y, "Number",
+        end_x, "Number",
+        end_y, "Number",
+        callback, "Function"
+    )
+
     local scale = B2_PIXEL_TO_METER
     start_x = start_x * scale
     start_y = start_y * scale
@@ -198,6 +221,13 @@ end
 --- @brief
 --- @return (b2.Shape, Number, Number, Number, Number, Number) shape, point_x, point_y, normal_x, normal_y, fraction
 function b2.World:raycast_closest(start_x, start_y, end_x, end_y)
+    meta.assert(
+        start_x, "Number",
+        start_y, "Number",
+        end_x, "Number",
+        end_y, "Number"
+    )
+
     local scale = B2_PIXEL_TO_METER
     start_x = start_x * scale
     start_y = start_y * scale
@@ -224,6 +254,13 @@ end
 
 --- @brief
 function b2.World:explode(position_x, position_y, radius, impulse)
+    meta.assert(
+        position_x, "Number",
+        position_y, "Number",
+        radius, "Number",
+        impulse, "Number"
+    )
+
     local scale = B2_PIXEL_TO_METER
     box2d.b2World_Explode(self._native, b2.Vec2(position_x * scale, position_y * scale), radius * scale, impulse * scale)
 end
@@ -237,6 +274,14 @@ do -- use upvalues to minimize luajit callback count
     --- @brief
     --- @param callback (b2.Shape) -> Boolean
     function b2.World:overlap_aabb(x, y, width, height, callback)
+        meta.assert(
+            x, "Number",
+            y, "Number",
+            width, "Number",
+            height, "Number",
+            callback, "Function"
+        )
+
         local scale = B2_PIXEL_TO_METER
         x = x * scale
         y = y * scale
@@ -251,6 +296,13 @@ do -- use upvalues to minimize luajit callback count
     --- @brief
     --- @param callback (b2.Shape) -> Boolean
     function b2.World:overlap_circle(x, y, radius, callback)
+        meta.assert(
+            x, "Number",
+            y, "Number",
+            radius, "Number",
+            callback, "Function"
+        )
+
         local scale = B2_PIXEL_TO_METER
         local circle = b2.Circle._create_native(b2.Vec2(x * scale, y * scale), radius * scale)
         _overlap_current_callback = callback
@@ -261,6 +313,15 @@ do -- use upvalues to minimize luajit callback count
     --- @brief
     --- @param callback (b2.Shape) -> Boolean
     function b2.World:overlap_capsule(a_x, a_y, b_x, b_y, radius, callback)
+        meta.assert(
+            a_x, "Number",
+            a_y, "Number",
+            b_x, "Number",
+            b_y, "Number",
+            radius, "Number",
+            callback, "Function"
+        )
+
         local scale = B2_PIXEL_TO_METER
         local capsule = b2.Capsule._create_native(
             b2.Vec2(a_x * scale, a_y * scale),
@@ -280,6 +341,11 @@ do -- use upvalues to minimize luajit callback count
         local n_points = #vertices
         assert(n_points >= 6 and n_points % 2 == 0 and n_points <= 16)
 
+        for i = 1, n_points do
+            meta.assert_typeof(vertices[i], "Number", 1)
+        end
+        meta.assert_typeof(callback, 2)
+
         local polygon = b2.Polygon._create_native(vertices) -- already scales
         _overlap_current_callback = callback
         box2d.b2World_OverlapPolygonWrapper(self._native, polygon, b2.IdentityTransform, box2d.b2DefaultQueryFilter(), _overlap_wrapper_callback)
@@ -292,6 +358,14 @@ do -- use upvalues to minimize luajit callback count
     --- @param shape b2.Shape
     --- @param callback (b2.Shape) -> Boolean
     function b2.World:overlap_shape(shape, x, y, angle, callback)
+        meta.assert(
+            shape, "Shape",
+            x, "Number",
+            y, "Number",
+            angle, "Number",
+            callback, "Function"
+        )
+
         local native = shape._native
         local transform = box2d.b2MakeTransform(x, y, angle)
         local type = box2d.b2Shape_GetType(native)
@@ -323,6 +397,18 @@ end
 --- @param end_callback Function (b2.Shape, b2.Shape) -> nil
 --- @param hit_callback Function (b2.Shape, b2.Shape, normal_x, normal_y, point_x, point_y) -> nil
 function b2.World:get_contact_events(begin_callback, end_callback, hit_callback)
+    if begin_callback ~= nil then
+        meta.assert_typeof(begin_callback, "Function", 1)
+    end
+
+    if end_callback ~= nil then
+        meta.assert_typeof(end_callback, "Function", 2)
+    end
+
+    if hit_callback ~= nil then
+        meta.assert_typeof(hit_callback, "Function", 3)
+    end
+
     local native = self._native
     local events = box2d.b2World_GetContactEvents(native)
 

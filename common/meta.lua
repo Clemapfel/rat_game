@@ -1,6 +1,6 @@
 require "common.common"
 local log = require "common.log"
-local meta = {}
+meta = {}
 
 --- @class meta.Type
 --- @class meta.Enum
@@ -77,6 +77,7 @@ end
 --- @brief
 function meta.assert(...)
     local n = select("#", ...)
+    assert(n % 2 == 0)
     for i = 1, n, 2 do
         local instance = select(i+0, ...)
         local typename = select(i+1, ...)
@@ -84,6 +85,24 @@ function meta.assert(...)
     end
 end
 
+--- @brief
+function meta.assert_typeof(x, type, argument_i)
+    local instance_type = meta.typeof(x)
+    local prefix = ""
+    if argument_i ~= nil then
+        prefix = "For argument #" .. argument_i .. ": "
+    end
+    assert(instance_type == type, prefix .. "expected `" .. type .. "`, got `" .. meta.typeof(x) .. "`")
+end
+
+--- @brief
+function meta.assert_enum_value(x, enum, argument_i)
+    local prefix = ""
+    if argument_i ~= nil then
+        prefix = "For argument #" .. argument_i .. ": "
+    end
+    assert(meta.is_enum_value(x, enum), prefix .. "expected value of enum `" .. _type_to_typename[enum] .. "`, got `" .. tostring(x) .. "`")
+end
 --- @brief
 function meta.is_nil(x)
     return x == nil
@@ -411,6 +430,7 @@ function meta.abstract_class(typename, super)
     type_metatable.__call = function()
         log.error("In " .. typename .. "(): trying to instantiated type, but it was declared abstract")
     end
+    return type
 end
 
 --- @brief
@@ -428,12 +448,13 @@ local _enum_to_instances = {}
 --- @return meta.Enum
 function meta.enum(typename, fields)
     local enum_metatable = {
-        __index = function(key)
+        __index = function(self, key)
             local result = fields[key]
             if result == nil then
                 log.error("In meta.enum: trying to access field `" .. key .. "` of enum `" .. typename .. "`, but enum has no such field")
                 return nil
             end
+            return result
         end,
 
         __newindex = function()
@@ -442,7 +463,6 @@ function meta.enum(typename, fields)
         end,
 
         __typename = "Enum",
-
         __value_to_is_present = {}
     }
 
@@ -456,6 +476,7 @@ function meta.enum(typename, fields)
     rawset(enum, _object_metatable_index, enum_metatable)
 
     _enum_to_instances[enum] = fields
+    _type_to_typename[enum] = typename
     return enum
 end
 
@@ -535,5 +556,3 @@ function meta.make_immutable(t)
 
     return setmetatable({}, metatable), metatable
 end
-
-return meta
