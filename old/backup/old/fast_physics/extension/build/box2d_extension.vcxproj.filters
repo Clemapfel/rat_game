@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\cleme\Workspace\rat_game\fast_physics\extension\box2d_extension.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\cleme\Workspace\rat_game\fast_physics\extension\box2d_extension.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\cleme\Workspace\rat_game\fast_physics\extension\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{79CBFE68-D766-3E65-932A-D4418464EEFD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{EC9CBEAB-DA36-3CED-A5C2-9BFDA5B4635C}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

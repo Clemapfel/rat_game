@@ -1,0 +1,10 @@
+^C:\USERS\CLEME\WORKSPACE\RAT_GAME\PHYSICS\BOX2D_EXTENSION\BUILD\CMAKEFILES\7191C669BCF232173C8A5A60146EE336\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cleme/Workspace/rat_game/physics/box2d_extension -BC:/Users/cleme/Workspace/rat_game/physics/box2d_extension/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/cleme/Workspace/rat_game/physics/box2d_extension/build/box2d_wrapper.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

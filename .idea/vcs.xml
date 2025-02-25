@@ -3,5 +3,10 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/old/backup/old/fast_physics/enkiTS" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/box2d" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/box2d/cmake-build-debug/_deps/enkits-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/box2d_extension/box2d/cmake-build-debug/_deps/glfw-src" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/physics/enkiTS" vcs="Git" />
   </component>
 </project>

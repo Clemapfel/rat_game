@@ -1,0 +1,3 @@
+C:/Users/cleme/Workspace/rat_game/physics/box2d_extension/cmake-build-debug/CMakeFiles/box2d.dir
+C:/Users/cleme/Workspace/rat_game/physics/box2d_extension/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/cleme/Workspace/rat_game/physics/box2d_extension/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,10 @@
+^C:\USERS\CLEME\WORKSPACE\RAT_GAME\FAST_PHYSICS\EXTENSION\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/cleme/Workspace/rat_game/fast_physics/extension -BC:/Users/cleme/Workspace/rat_game/fast_physics/extension/build --check-stamp-file C:/Users/cleme/Workspace/rat_game/fast_physics/extension/build/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

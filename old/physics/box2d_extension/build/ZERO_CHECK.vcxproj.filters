@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension\build\CMakeFiles\7191c669bcf232173c8a5a60146ee336\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{EA0B1C07-90B8-37C8-AFE2-7861F7BE6E83}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
