@@ -24,7 +24,7 @@ end
 
 require "common.common"
 meta = require "meta"
-log = require "log"
+log = require "common.log"
 
 rt.settings = {}
 meta.make_auto_extend(rt.settings, true)

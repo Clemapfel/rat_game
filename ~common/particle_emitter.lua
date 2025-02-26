@@ -11,8 +11,7 @@ rt.ParticleEmitter = meta.class("ParticleEmitter", rt.Widget)
 --- @brief
 function rt.ParticleEmitter:instantiate(particle)
     meta.assert(particle, "Test")
-
-    meta.install(sefl, rt.ParticleEmitter, {
+    meta.install(self, rt.ParticleEmitter, {
         _particle = particle,
         _native = love.graphics.newParticleSystem(particle._native),
         _bounds = rt.AABB(0, 0, 1, 1),

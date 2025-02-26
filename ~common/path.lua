@@ -3,7 +3,7 @@
 rt.Path = meta.class("Path")
 
 --- @brief
-function rt.Path(points, ...)
+function rt.Path:instantiate(points, ...)
     if meta.is_number(points) then
         points = {points, ...}
     end
