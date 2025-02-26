@@ -48,6 +48,21 @@ function range(...)
     return _range_iterator, {1, ...} -- start at 1, because because actual table is by one
 end
 
+
+--- @brief ternary
+--- @param condition boolean
+--- @param if_true any returned if condition == true
+--- @param if_false any return if condition == false
+function ternary(condition, if_true, if_false)
+    if condition == true then
+        return if_true
+    elseif condition == false then
+        return if_false
+    else
+        error("In ternary: argument #1 does not evaluate to boolean")
+    end
+end
+
 --- @brief print, arguments are concatenated
 --- @param vararg any
 --- @return nil
@@ -116,7 +131,7 @@ end
 --- @param lower_bound number
 --- @param upper_bound number
 --- @return number
-function clamp(x, lower_bound, upper_bound)
+function math.clamp(x, lower_bound, upper_bound)
     if type(lower_bound) == "nil" then lower_bound = NEGATIVE_INFINITY end
     if type(upper_bound) == "nil" then upper_bound = POSITIVE_INFINITY end
 
@@ -132,7 +147,7 @@ function clamp(x, lower_bound, upper_bound)
 end
 
 --- @brief
-function project(value, lower, upper)
+function math.project(value, lower, upper)
     return value * math.abs(upper - lower) + math.min(lower, upper);
 end
 
@@ -141,34 +156,20 @@ end
 --- @param upper number
 --- @param ratio number in [0, 1]
 --- @return number
-function mix(lower, upper, ratio)
+function math.mix(lower, upper, ratio)
     -- @see https://registry.khronos.org/OpenGL-Refpages/gl4/html/mix.xhtml
     return lower * (1 - ratio) + upper * ratio
 end
 
 --- @brief
-function smoothstep(lower, upper, ratio)
+function math.smoothstep(lower, upper, ratio)
     local t = clamp((ratio - lower) / (upper - lower), 0.0, 1.0);
     return t * t * (3.0 - 2.0 * t);
 end
 
 --- @brief
-function fract(x)
+function math.fract(x)
     return math.fmod(x, 1.0)
-end
-
---- @brief ternary
---- @param condition boolean
---- @param if_true any returned if condition == true
---- @param if_false any return if condition == false
-function ternary(condition, if_true, if_false)
-    if condition == true then
-        return if_true
-    elseif condition == false then
-        return if_false
-    else
-        error("In ternary: argument #1 does not evaluate to boolean")
-    end
 end
 
 --- @brief round to nearest integer

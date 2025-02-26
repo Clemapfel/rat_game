@@ -115,7 +115,6 @@ function rt.normalize(x, y)
     return x / magnitude, y / magnitude
 end
 
-
 function rt.intersection(l1p1x, l1p1y, l1p2x, l1p2y, l2p1x, l2p1y, l2p2x, l2p2y)
     local d = (l1p1x - l1p2x) * (l2p1y - l2p2y) - (l1p1y - l1p2y) * (l2p1x - l2p2x)
     local a = l1p1x * l1p2y - l1p1y * l1p2x

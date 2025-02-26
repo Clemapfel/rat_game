@@ -22,20 +22,70 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="refactored physics">
-      <change afterPath="$PROJECT_DIR$/common/log.lua" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/include.lua" afterDir="false" />
+    <list default="true" id="7fa9ba1b-2cff-4ecc-86fb-59ab2fa76ee1" name="Changes" comment="added type assertions">
+      <change afterPath="$PROJECT_DIR$/common/aabb.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/animation_queue.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/color.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/compute_shader.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/control_indicator.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/direction_indicator.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/drawable.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/font.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/frame.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/game_state.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/game_state_battle.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/game_state_inventory.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/graphics.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/graphics_buffer.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/input_button.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/input_controller.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/keybinding_indicator.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/keyboard.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/label.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/label.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/load_config.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/matrix.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/message_dialog.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/palette.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/particle_emitter.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/path.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/random.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/render_texture.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/scene.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/scrollbar.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/selection_graph.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/selection_state.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/shader.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/shape.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/shape_ellipse.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/shape_polygon.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/shape_rectangle.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/smoothed_motion_1d.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/smoothed_motion_2d.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/spacer.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sprite.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sprite_atlas.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sprite_batch.glsl" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/sprite_batch.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/text_box.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/texture.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/thread.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/timed_animation.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/translation.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/updatable.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/vertex_shape.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/common/widget.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/deadzone_visualization_widget.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/entity_info.lua" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/menu/inventory_scene.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/common.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/common.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/common/log.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/log.lua" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/common/meta.lua" beforeDir="false" afterPath="$PROJECT_DIR$/common/meta.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conf.lua" beforeDir="false" afterPath="$PROJECT_DIR$/conf.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/include.lua" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.lua" beforeDir="false" afterPath="$PROJECT_DIR$/main.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/body.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/body.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/capsule.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/capsule.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/circle.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/circle.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/polygon.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/polygon.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/segment.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/segment.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/shape.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/shape.lua" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/physics/world.lua" beforeDir="false" afterPath="$PROJECT_DIR$/physics/world.lua" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/old/common/geometry.lua" beforeDir="false" afterPath="$PROJECT_DIR$/old/common/geometry.lua" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -151,7 +201,7 @@
     "deletionFromPopupRequiresConfirmation": "false",
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
-    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/physics",
+    "last_opened_file_path": "C:/Users/cleme/Workspace/rat_game/menu",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -167,11 +217,11 @@
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\cleme\Workspace\rat_game\menu" />
+      <recent name="C:\Users\cleme\Workspace\rat_game\common" />
       <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
       <recent name="C:\Users\cleme\Workspace\rat_game\physics\box2d_extension" />
       <recent name="C:\Users\cleme\Workspace\rat_game\assets\fonts\NotoSansJP" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\assets" />
-      <recent name="C:\Users\cleme\Workspace\rat_game\love\windows" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\cleme\Workspace\rat_game\physics" />
@@ -835,15 +885,7 @@
       <workItem from="1740083932622" duration="735000" />
       <workItem from="1740330880234" duration="4406000" />
       <workItem from="1740481890506" duration="1938000" />
-      <workItem from="1740504897679" duration="17408000" />
-    </task>
-    <task id="LOCAL-01452" summary="refactored blood">
-      <option name="closed" value="true" />
-      <created>1738002783120</created>
-      <option name="number" value="01452" />
-      <option name="presentableId" value="LOCAL-01452" />
-      <option name="project" value="LOCAL" />
-      <updated>1738002783120</updated>
+      <workItem from="1740504897679" duration="23105000" />
     </task>
     <task id="LOCAL-01453" summary="rope working">
       <option name="closed" value="true" />
@@ -1229,7 +1271,15 @@
       <option name="project" value="LOCAL" />
       <updated>1740521695215</updated>
     </task>
-    <option name="localTasksCounter" value="1501" />
+    <task id="LOCAL-01501" summary="added type assertions">
+      <option name="closed" value="true" />
+      <created>1740523504590</created>
+      <option name="number" value="01501" />
+      <option name="presentableId" value="LOCAL-01501" />
+      <option name="project" value="LOCAL" />
+      <updated>1740523504590</updated>
+    </task>
+    <option name="localTasksCounter" value="1502" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -1283,7 +1333,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="sprite_morph working, added graphics buffer" />
     <MESSAGE value="stashing object get" />
     <MESSAGE value="stashing, fix smooth motion for negative target values" />
     <MESSAGE value="dither working" />
@@ -1308,7 +1357,8 @@
     <MESSAGE value="imported box2d" />
     <MESSAGE value="stashing" />
     <MESSAGE value="refactored physics" />
-    <option name="LAST_COMMIT_MESSAGE" value="refactored physics" />
+    <MESSAGE value="added type assertions" />
+    <option name="LAST_COMMIT_MESSAGE" value="added type assertions" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1343,11 +1393,6 @@
           <url>file://$PROJECT_DIR$/old/common/scrollbar.lua</url>
           <line>47</line>
           <option name="timeStamp" value="43" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="lua-line">
-          <url>file://$PROJECT_DIR$/old/common/widget.lua</url>
-          <line>87</line>
-          <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="lua-line">
           <url>file://$PROJECT_DIR$/old/common/color.lua</url>

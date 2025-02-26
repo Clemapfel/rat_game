@@ -1,6 +1,6 @@
 require "common.common"
 local log = require "common.log"
-meta = {}
+local meta = {}
 
 --- @class meta.Type
 --- @class meta.Enum
@@ -556,3 +556,5 @@ function meta.make_immutable(t)
 
     return setmetatable({}, metatable), metatable
 end
+
+return meta

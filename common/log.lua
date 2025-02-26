@@ -1,7 +1,7 @@
 require "common.common"
 
 --- @module log
-local log = {}
+log = {}
 
 --- @param message string
 --- @return boolean true if message should still be printed to console, false otherwise. If true, error will be propagated
@@ -179,5 +179,8 @@ function log.setMessageHook(hook)
     end
     log._message_hook = hook
 end
+
+rt.error = log.error
+rt.warning = log.warning
 
 return log
